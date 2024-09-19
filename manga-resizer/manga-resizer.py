@@ -14,8 +14,9 @@ def main():
 
 def process_images(root_dir):
   for root, _, files in os.walk(root_dir):
+    print(f'Processing "{root}"')
     for file in files:
-      if file.lower().endswith(('.jpg', '.jpeg', '.png')):
+      if is_image_file(file):
         image_path = os.path.join(root, file)
         resize_image(image_path)
 
@@ -31,7 +32,7 @@ def resize_image(image_path):
       # resize images larger than the target device
       new_height = DEVICE_HEIGHT
       new_width = int((new_height / height) * width)
-      img = img.resize((new_width, new_height), Image.ANTIALIAS)
+      img = img.resize((new_width, new_height), Image.LANCZOS)
       output_path = os.path.splitext(image_path)[0] + JPG_EXTENSION
       img.save(output_path, JPEG_FORMAT)
     else:
@@ -44,9 +45,12 @@ def resize_image(image_path):
   if not image_path.lower().endswith(JPG_EXTENSION):
     os.remove(image_path)
 
+def is_image_file(filename):
+  return filename.lower().endswith(('.jpg', '.jpeg', '.png'))
+
 if __name__ == "__main__":
-    try:
-        main()
-    except Exception as e:
-        print(f"An unexpected error occurred: {e}")
-    input("Press Enter to exit...")
+  try:
+    main()
+  except Exception as e:
+    print(f"An unexpected error occurred: {e}")
+  input("Press Enter to exit...")
