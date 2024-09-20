@@ -2,8 +2,9 @@ from PIL import Image
 import os
 
 DEVICE_HEIGHT = 1920
+JPEG_EXTENSION = '.jpg'
 JPEG_FORMAT = 'JPEG'
-JPG_EXTENSION = '.jpg'
+JPEG_QUALITY = 100
 
 def main():
   parent_folder = input("Enter the path to the parent folder containing the folders or images:\n")
@@ -33,16 +34,16 @@ def resize_image(image_path):
       new_height = DEVICE_HEIGHT
       new_width = int((new_height / height) * width)
       img = img.resize((new_width, new_height), Image.LANCZOS)
-      output_path = os.path.splitext(image_path)[0] + JPG_EXTENSION
-      img.save(output_path, JPEG_FORMAT)
+      output_path = os.path.splitext(image_path)[0] + JPEG_EXTENSION
+      img.save(output_path, JPEG_FORMAT, quality=JPEG_QUALITY)
     else:
       # convert images smaller than the target device if they are not JPG
-      if not image_path.lower().endswith(JPG_EXTENSION):
-        output_path = os.path.splitext(image_path)[0] + JPG_EXTENSION
-        img.save(output_path, JPEG_FORMAT)
+      if not image_path.lower().endswith(JPEG_EXTENSION):
+        output_path = os.path.splitext(image_path)[0] + JPEG_EXTENSION
+        img.save(output_path, JPEG_FORMAT, quality=JPEG_QUALITY)
 
   # delete original files if they are not JPG
-  if not image_path.lower().endswith(JPG_EXTENSION):
+  if not image_path.lower().endswith(JPEG_EXTENSION):
     os.remove(image_path)
 
 def is_image_file(filename):

@@ -3,9 +3,11 @@ import requests
 from PIL import Image
 from io import BytesIO
 
-cover_url = "https://steamcdn-a.akamaihd.net/steam/apps/{}/library_600x900.jpg"
-target_name = "folder.jpg"
-target_width = 256
+COVER_URL = "https://steamcdn-a.akamaihd.net/steam/apps/{}/library_600x900.jpg"
+JPEG_FORMAT = 'JPEG'
+JPEG_QUALITY = 100
+TARGET_NAME = "folder.jpg"
+TARGET_WIDTH = 256
 
 def main():
   parent_folder = input("Enter the path to the parent folder containing your Steam saves:\n")
@@ -20,25 +22,24 @@ def main():
   print("\nFinished generating cover images.")
 
 def process_folder(folder_path, folder_name):
-  cover_image_path = os.path.join(folder_path, target_name)
+  cover_path = os.path.join(folder_path, TARGET_NAME)
 
-  if os.path.exists(cover_image_path):
-    print(f"Skipping {folder_name} because it already contains a {target_name} file...")
+  if os.path.exists(cover_path):
+    print(f"Skipping {folder_name} because it already contains a {TARGET_NAME} file...")
     return
 
-  image_url = cover_url.format(folder_name)
+  image_url = COVER_URL.format(folder_name)
   response = requests.get(image_url)
 
   if response.status_code == 200:
     img = Image.open(BytesIO(response.content))
 
     aspect_ratio = img.height / img.width
-    new_height = int(target_width * aspect_ratio)
+    new_height = int(TARGET_WIDTH * aspect_ratio)
 
-    resized_img = img.resize((target_width, new_height))
-
-    resized_img.save(cover_image_path)
-    print(f"Generated cover image for game save {folder_name}.")
+    resized_img = img.resize((TARGET_WIDTH, new_height), Image.LANCZOS)
+    resized_img.save(cover_path, JPEG_FORMAT, quality=JPEG_QUALITY)
+    print(f"Generated cover image for game save {folder_name} with max quality.")
   else:
     print(f"Failed to download image for {folder_name} (status code {response.status_code}).")
 
