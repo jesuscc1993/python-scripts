@@ -15,11 +15,17 @@ def main():
     folder_path = os.path.join(parent_folder, folder_name)
 
     if os.path.isdir(folder_path):
-      download_and_resize_image(folder_name, folder_path)
+      process_folder(folder_path, folder_name)
 
   print("\nFinished generating cover images.")
 
-def download_and_resize_image(folder_name, folder_path):
+def process_folder(folder_path, folder_name):
+  cover_image_path = os.path.join(folder_path, target_name)
+
+  if os.path.exists(cover_image_path):
+    print(f"Skipping {folder_name} because it already contains a {target_name} file...")
+    return
+
   image_url = cover_url.format(folder_name)
   response = requests.get(image_url)
 
@@ -31,7 +37,6 @@ def download_and_resize_image(folder_name, folder_path):
 
     resized_img = img.resize((target_width, new_height))
 
-    cover_image_path = os.path.join(folder_path, target_name)
     resized_img.save(cover_image_path)
     print(f"Generated cover image for game save {folder_name}.")
   else:
