@@ -6,7 +6,7 @@ JPEG_FORMAT = 'JPEG'
 JPG_EXTENSION = '.jpg'
 
 def main():
-  parent_folder = input("Enter the path to the parent folder containing the folders or images: ")
+  parent_folder = input("Enter the path to the parent folder containing the folders or images:\n")
   if not os.path.isdir(parent_folder):
     print(f'The specified path "{parent_folder}" is not a directory.')
   else:
