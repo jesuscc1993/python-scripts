@@ -18,7 +18,7 @@ Windows only.
 
 (replace SCRIPT_NAME with your script of choice)
 
-### generate-music-icons
+### generate-icons-from-folder-images
 
 Will look for `folder.jpg` / `cover.jpg` / `AlbumArtSmall.jpg` files inside the folder.
 
