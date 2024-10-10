@@ -1,8 +1,9 @@
 import os
 from PIL import Image
 
-ICON_FILENAME = "icon.ico"
 DESKTOP_INI_FILENAME = "desktop.ini"
+ICON_FILENAME = "icon.ico"
+ICON_SIZE = 256
 
 def process_parent_folder(image_filenames):
     parent_folder = input("Enter the path to the parent folder containing the folders you want to generate icons for.\nLeave empty instead to provide and process a single folder instead.\nPARENT_FOLDER: ")
@@ -52,13 +53,13 @@ def png_to_ico(image_path, ico_path):
             os.unlink(ico_path)
 
         with Image.open(image_path) as img:
-            if img.width < 256:
-                img = img.resize((256, int(256 * img.height / img.width)), resample=Image.LANCZOS)
-            img.thumbnail((256, 256), Image.LANCZOS)
-            background = Image.new("RGBA", (256, 256), (0, 0, 0, 0))
-            offset = (int((256 - img.size[0]) / 2), int((256 - img.size[1]) / 2))
+            if img.width < ICON_SIZE:
+                img = img.resize((ICON_SIZE, int(ICON_SIZE * img.height / img.width)), resample=Image.LANCZOS)
+            img.thumbnail((ICON_SIZE, ICON_SIZE), Image.LANCZOS)
+            background = Image.new("RGBA", (ICON_SIZE, ICON_SIZE), (0, 0, 0, 0))
+            offset = (int((ICON_SIZE - img.size[0]) / 2), int((ICON_SIZE - img.size[1]) / 2))
             background.paste(img, offset)
-            background.save(ico_path, format='ICO', sizes=[(256, 256)])
+            background.save(ico_path, format='ICO', sizes=[(ICON_SIZE, ICON_SIZE)])
     except Exception as e:
         print(f"Error converting {image_path} to ICO: {e}")
 
