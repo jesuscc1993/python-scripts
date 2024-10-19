@@ -32,20 +32,20 @@ def process_parent_folder(image_filenames):
 
     print(f"\nFinished generating icons.")
 
-def process_folder(item_path, image_filenames):
+def process_folder(folder_path, image_filenames):
     image_path = None
     for image_filename in image_filenames:
-        potential_path = os.path.join(item_path, image_filename)
+        potential_path = os.path.join(folder_path, image_filename)
         if os.path.exists(potential_path):
             image_path = potential_path
             break
 
     if image_path:
-        ico_path = os.path.join(item_path, ICON_FILENAME)
+        ico_path = os.path.join(folder_path, ICON_FILENAME)
         png_to_ico(image_path, ico_path)
-        set_folder_icon(item_path)
+        set_folder_icon(folder_path)
     else:
-        print(f"No suitable image found in {item_path}")
+        print(f"No suitable image found in {folder_path}")
 
 def png_to_ico(image_path, ico_path):
     try:
