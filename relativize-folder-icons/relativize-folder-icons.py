@@ -12,7 +12,7 @@ def main():
 
 def process_subfolders(base_path, recursive, is_root = False):
   for root, dirs, files in os.walk(base_path):
-    if 'desktop.ini' in files:
+    if is_root and 'desktop.ini' in files:
       process_folder(root)
 
     if recursive or is_root:
