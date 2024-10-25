@@ -36,6 +36,9 @@ def process_folder(folder_path):
       icon_resource = config['.ShellClassInfo']['IconResource']
 
       if os.path.isabs(icon_resource) and folder_path in icon_resource:
+        if icon_resource.endswith(',0'):
+          icon_resource = icon_resource[:-2]
+
         relative_icon_path = os.path.relpath(icon_resource, folder_path)
         config['.ShellClassInfo']['IconResource'] = relative_icon_path
 
