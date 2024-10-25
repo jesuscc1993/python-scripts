@@ -7,16 +7,18 @@ def main():
   if not os.path.isdir(parent_folder):
     print(f'The specified path "{parent_folder}" is not a directory.')
   else:
-    process_subfolders(parent_folder)
+    recursive = input("Run recursively in subfolders? (y/n, default 'n'):\n").strip().lower() == 'y'
+    process_subfolders(parent_folder, recursive, is_root = True)
 
-def process_subfolders(base_path):
+def process_subfolders(base_path, recursive, is_root = False):
   for root, dirs, files in os.walk(base_path):
     if 'desktop.ini' in files:
       process_folder(root)
 
-    for dir in dirs:
-      subfolder_path = os.path.join(root, dir)
-      process_subfolders(subfolder_path)
+    if recursive or is_root:
+      for dir in dirs:
+        subfolder_path = os.path.join(root, dir)
+        process_subfolders(subfolder_path, recursive)
 
 def process_folder(folder_path):
   desktop_ini_path = os.path.join(folder_path, 'desktop.ini')
@@ -40,6 +42,8 @@ def process_folder(folder_path):
         with open(desktop_ini_path, 'w') as desktop_ini:
           config.write(desktop_ini)
         print(f"Updated IconResource in {desktop_ini_path} to relative path {relative_icon_path}")
+      else:
+        print(f"Skipping {folder_path}")
 
       ctypes.windll.kernel32.SetFileAttributesW(desktop_ini_path, 0x02 | 0x04)
   except PermissionError:
