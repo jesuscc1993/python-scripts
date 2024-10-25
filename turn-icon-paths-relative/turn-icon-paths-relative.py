@@ -1,5 +1,6 @@
-import os
 import configparser
+import ctypes
+import os
 
 def main():
   parent_folder = input("Enter the path to the parent folder containing the folders or images:\n")
@@ -26,11 +27,11 @@ def process_folder(folder_path):
   config.optionxform = str
 
   try:
+    ctypes.windll.kernel32.SetFileAttributesW(desktop_ini_path, 0x80)
     config.read(desktop_ini_path)
 
     if '.ShellClassInfo' in config and 'IconResource' in config['.ShellClassInfo']:
       icon_resource = config['.ShellClassInfo']['IconResource']
-      print(f'\nFound IconResource for {folder_path}')
 
       if os.path.isabs(icon_resource) and folder_path in icon_resource:
         relative_icon_path = os.path.relpath(icon_resource, folder_path)
@@ -39,8 +40,8 @@ def process_folder(folder_path):
         with open(desktop_ini_path, 'w') as desktop_ini:
           config.write(desktop_ini)
         print(f"Updated IconResource in {desktop_ini_path} to relative path {relative_icon_path}")
-      else:
-        print(f"{icon_resource} is not an absolute path relative to {folder_path}")
+
+      ctypes.windll.kernel32.SetFileAttributesW(desktop_ini_path, 0x02 | 0x04)
   except PermissionError:
     print(f"Permission denied for {desktop_ini_path}")
   except Exception as e:
