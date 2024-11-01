@@ -16,12 +16,12 @@ def main():
     new_file = os.path.join(parent_folder, new_file_name)
 
     os.rename(old_file, new_file)
-    print(f"Renamed '{file_name}' to '{new_file_name}'.")
-  print(f"\nFinished processing '{parent_folder}'.")
+    print(f'Renamed "{file_name}" to "{new_file_name}".')
+  print(f'\nFinished processing "{parent_folder}".')
 
 if __name__ == "__main__":
   try:
     main()
   except Exception as e:
-    print(f"An unexpected error occurred: {e}")
-  input("Press Enter to exit...")
+    print(f'An unexpected error occurred: {e}')
+  input('Press Enter to exit...')

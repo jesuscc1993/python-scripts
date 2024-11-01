@@ -29,7 +29,7 @@ def process_parent_folder(process_folder):
             item_path = os.path.join(root, dir_name)
             process_folder(item_path)
 
-    print(f"Finished generating icons.")
+    print(f'Finished generating icons.')
 
 def save_resized_image(img, folder_path):
     original_width, original_height = img.size
@@ -45,11 +45,11 @@ def save_resized_image(img, folder_path):
         img = img.resize((new_width, new_height), Image.LANCZOS)
 
     if img.mode == 'RGBA':
-        background = Image.new('RGB', img.size, TRANSPARENT_COLOR)
+        background = Image.new('RGBA', img.size, (255, 255, 255, 0))
         background.paste(img, (0, 0), img)
         img = background
 
     output_file_path = os.path.join(folder_path, FOLDER_IMAGE_FILENAME)
     img.save(output_file_path)
 
-    print(f"Saved {output_file_path}.\n")
+    print(f'Saved {output_file_path}.\n')
