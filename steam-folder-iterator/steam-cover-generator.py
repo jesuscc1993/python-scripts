@@ -3,14 +3,14 @@ import requests
 from PIL import Image
 from io import BytesIO
 
-COVER_URL = "https://steamcdn-a.akamaihd.net/steam/apps/{}/library_600x900.jpg"
+COVER_URL = 'https://steamcdn-a.akamaihd.net/steam/apps/{}/library_600x900.jpg'
 JPEG_FORMAT = 'JPEG'
 JPEG_QUALITY = 100
-TARGET_NAME = "folder.jpg"
+TARGET_NAME = 'folder.jpg'
 TARGET_WIDTH = 256
 
 def main():
-  parent_folder = input("Enter the path to the parent folder containing your Steam saves:\n")
+  parent_folder = input('Enter the path to the parent folder containing your Steam saves:\n')
   print('')
 
   for folder_name in os.listdir(parent_folder):
@@ -43,7 +43,7 @@ def process_folder(folder_path, folder_name):
   else:
     print(f'Failed to download image for {folder_name} (status code {response.status_code}).')
 
-if __name__ == "__main__":
+if __name__ == '__main__':
   try:
     main()
   except Exception as e:

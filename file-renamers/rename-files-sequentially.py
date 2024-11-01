@@ -1,7 +1,7 @@
 import os
 
 def main():
-  parent_folder = input("Enter the path to the folder containing your files:\n")
+  parent_folder = input('Enter the path to the folder containing your files:\n')
 
   files = [f for f in os.listdir(parent_folder) if os.path.isfile(os.path.join(parent_folder, f)) and not f.startswith('.')]
   files.sort()
@@ -11,7 +11,7 @@ def main():
 
   for index, file_name in enumerate(files, start=1):
     file_extension = os.path.splitext(file_name)[1]
-    new_file_name = f"{str(index).zfill(num_digits)}{file_extension}"
+    new_file_name = f'{str(index).zfill(num_digits)}{file_extension}'
     old_file = os.path.join(parent_folder, file_name)
     new_file = os.path.join(parent_folder, new_file_name)
 
@@ -19,7 +19,7 @@ def main():
     print(f'Renamed "{file_name}" to "{new_file_name}".')
   print(f'\nFinished processing "{parent_folder}".')
 
-if __name__ == "__main__":
+if __name__ == '__main__':
   try:
     main()
   except Exception as e:

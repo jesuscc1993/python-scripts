@@ -3,7 +3,7 @@ import ctypes
 import os
 
 def main():
-  parent_folder = input("Enter the path to the parent folder containing the folders or images:\n")
+  parent_folder = input('Enter the path to the parent folder containing the folders or images:\n')
   if not os.path.isdir(parent_folder):
     print(f'The specified path "{parent_folder}" is not a directory.')
   else:
@@ -54,9 +54,9 @@ def process_folder(folder_path):
   except Exception as e:
     print(f'An error occurred while processing {desktop_ini_path}: {e}')
 
-if __name__ == "__main__":
+if __name__ == '__main__':
   try:
     main()
   except Exception as e:
     print(f'An unexpected error occurred: {e}')
-  input("\nPress Enter to exit...")
+  input('\nPress Enter to exit...')

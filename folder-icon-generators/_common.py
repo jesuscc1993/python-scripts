@@ -1,15 +1,15 @@
 import os
 from PIL import Image
 
-DESKTOP_INI_FILENAME = "desktop.ini"
-ICON_FILENAME = "icon.ico"
+DESKTOP_INI_FILENAME = 'desktop.ini'
+ICON_FILENAME = 'icon.ico'
 ICON_SIZE = 256
 
 def process_parent_folder(image_filenames):
-  parent_folder = input("Enter the path to the parent folder containing the folders you want to generate icons for.\nLeave empty instead to provide and process a single folder instead.\nPARENT_FOLDER: ")
+  parent_folder = input('Enter the path to the parent folder containing the folders you want to generate icons for.\nLeave empty instead to provide and process a single folder instead.\nPARENT_FOLDER: ')
 
   if parent_folder == '':
-    target_folder = input("\nEnter the path to the specific folder you want to generate an icon for:\nFOLDER: ")
+    target_folder = input('\nEnter the path to the specific folder you want to generate an icon for:\nFOLDER: ')
 
     if not os.path.isdir(target_folder):
       print(f'The specified path "{target_folder}" is not a directory.')
@@ -45,7 +45,7 @@ def process_folder(folder_path, image_filenames):
     png_to_ico(image_path, ico_path)
     set_folder_icon(folder_path)
   else:
-    print(f'"No suitable image found in "{folder_path}"')
+    print(f'No suitable image found in "{folder_path}"')
 
 def png_to_ico(image_path, ico_path):
   try:
@@ -56,7 +56,7 @@ def png_to_ico(image_path, ico_path):
       if img.width < ICON_SIZE:
         img = img.resize((ICON_SIZE, int(ICON_SIZE * img.height / img.width)), resample=Image.LANCZOS)
       img.thumbnail((ICON_SIZE, ICON_SIZE), Image.LANCZOS)
-      background = Image.new("RGBA", (ICON_SIZE, ICON_SIZE), (0, 0, 0, 0))
+      background = Image.new('RGBA', (ICON_SIZE, ICON_SIZE), (0, 0, 0, 0))
       offset = (int((ICON_SIZE - img.size[0]) / 2), int((ICON_SIZE - img.size[1]) / 2))
       background.paste(img, offset)
       background.save(ico_path, format='ICO', sizes=[(ICON_SIZE, ICON_SIZE)])
@@ -71,7 +71,7 @@ def set_folder_icon(folder_path):
     if os.path.exists(desktop_ini_path):
       os.system(f'attrib -h -s "{desktop_ini_path}"')
 
-    with open(desktop_ini_path, "w") as desktop_ini:
+    with open(desktop_ini_path, 'w') as desktop_ini:
       desktop_ini.write('[.ShellClassInfo]\n')
       desktop_ini.write(f'IconResource={ICON_FILENAME},0\n')
 

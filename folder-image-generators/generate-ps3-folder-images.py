@@ -7,7 +7,7 @@ from io import BytesIO
 
 from _common import process_parent_folder, save_resized_image
 
-BASE_URL = "https://wiki.rpcs3.net"
+BASE_URL = 'https://wiki.rpcs3.net'
 SEARCH_URL = BASE_URL + "/index.php?search={game_id}"
 
 def main():
@@ -60,7 +60,7 @@ def download_game_cover(game_id, folder_path):
 
   return False
 
-if __name__ == "__main__":
+if __name__ == '__main__':
   try:
     main()
   except Exception as e:

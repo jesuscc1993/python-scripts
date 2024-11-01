@@ -7,7 +7,7 @@ from io import BytesIO
 
 from _common import process_parent_folder, save_resized_image
 
-SEARCH_URL = "https://cdromance.org/?s={game_id}"
+SEARCH_URL = 'https://cdromance.org/?s={game_id}'
 
 def main():
   process_parent_folder(process_folder)
@@ -59,7 +59,7 @@ def download_game_cover(game_id, folder_path):
 
   return False
 
-if __name__ == "__main__":
+if __name__ == '__main__':
   try:
     main()
   except Exception as e:

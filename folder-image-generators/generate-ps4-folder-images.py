@@ -7,7 +7,7 @@ from io import BytesIO
 
 from _common import process_parent_folder, save_resized_image
 
-TITLE_URL = "https://serialstation.com/titles/{game_id}"
+TITLE_URL = 'https://serialstation.com/titles/{game_id}'
 
 def main():
   process_parent_folder(process_folder)
@@ -39,7 +39,7 @@ def download_game_cover(game_id, folder_path):
   else:
     print(f'Failed to access {url}. Status code: {response.status_code}')
 
-if __name__ == "__main__":
+if __name__ == '__main__':
   try:
     main()
   except Exception as e:

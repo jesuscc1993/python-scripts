@@ -7,7 +7,7 @@ JPEG_FORMAT = 'JPEG'
 JPEG_QUALITY = 100
 
 def main():
-  parent_folder = input("Enter the path to the parent folder containing the folders or images:\n")
+  parent_folder = input('Enter the path to the parent folder containing the folders or images:\n')
   if not os.path.isdir(parent_folder):
     print(f'The specified path "{parent_folder}" is not a directory.')
   else:
@@ -49,7 +49,7 @@ def resize_image(image_path):
 def is_image_file(filename):
   return filename.lower().endswith(('.jpg', '.jpeg', '.png'))
 
-if __name__ == "__main__":
+if __name__ == '__main__':
   try:
     main()
   except Exception as e:

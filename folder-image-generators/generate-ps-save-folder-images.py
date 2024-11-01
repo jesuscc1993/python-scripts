@@ -3,7 +3,7 @@ from PIL import Image
 
 from _common import process_parent_folder, save_resized_image
 
-IMAGE_FILENAME = "ICON0.PNG"
+IMAGE_FILENAME = 'ICON0.PNG'
 
 def main():
   process_parent_folder(process_folder)
@@ -17,7 +17,7 @@ def process_folder(folder_path):
   else:
     print(f'No suitable image found in "{folder_path}"')
 
-if __name__ == "__main__":
+if __name__ == '__main__':
   try:
     main()
   except Exception as e:
