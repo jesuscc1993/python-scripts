@@ -2,7 +2,7 @@
 
 ## Description
 
-Python script that iterates existing Steam save folders and opens the store page for each on a new browser tab.
+Iterates existing Steam save folders and opens the store page for each on a new browser tab.
 
 ## Requirements
 

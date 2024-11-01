@@ -2,7 +2,7 @@
 
 ## Description
 
-Python script that generates folder icons for each folder.<br>
+Iterates folders and generates icons for each one.<br>
 Each different script will generate these icons from different sources.<br>
 Windows only.
 

@@ -2,7 +2,7 @@
 
 ## Description
 
-Python script that generates folder.jpg images for each folder.<br>
+Iterates folders and generates folder.jpg for each one.<br>
 Each different script will generate these images from different sources.<br>
 
 ## Requirements

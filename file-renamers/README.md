@@ -2,7 +2,7 @@
 
 ## Description
 
-Python script that iterates folder items and renames them sequentially.
+Iterates folder items and renames them sequentially.
 Useful to get consecutively named items when some are missing (e.g. 1,2,6 > 1,2,3).
 
 ## Running

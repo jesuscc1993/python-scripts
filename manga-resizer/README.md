@@ -2,7 +2,7 @@
 
 ## Description
 
-Python script that iterates manga folders and images to resize them if larger than a particular target device.<br>
+Iterates manga folders and images to resize them if larger than a particular target device.<br>
 Will also convert non-JPG files to JPG.
 
 ## Requirements
