@@ -3,6 +3,7 @@
 ## Description
 
 Recursively sets the view mode for folders on a given path.
+Doesn't seem to work.
 
 ## Running
 
