@@ -34,19 +34,18 @@ def process_folder(folder_path):
 
     if '.ShellClassInfo' in config and 'IconResource' in config['.ShellClassInfo']:
       icon_resource = config['.ShellClassInfo']['IconResource']
+      if icon_resource.endswith(',0'):
+        icon_resource = icon_resource[:-2]
 
       if os.path.isabs(icon_resource) and folder_path in icon_resource:
-        if icon_resource.endswith(',0'):
-          icon_resource = icon_resource[:-2]
-
         relative_icon_path = os.path.relpath(icon_resource, folder_path)
         config['.ShellClassInfo']['IconResource'] = relative_icon_path
 
         with open(desktop_ini_path, 'w') as desktop_ini:
           config.write(desktop_ini)
-        print(f'Updated IconResource in "{desktop_ini_path}" to relative path "{relative_icon_path}"')
+        print(f'Updated folder "{folder_path}" with IconResource "{relative_icon_path}"')
       else:
-        print(f'Skipping IconResource "{icon_resource}" in "{folder_path}"')
+        print(f'Skipping folder "{folder_path}" with IconResource "{icon_resource}"')
 
       ctypes.windll.kernel32.SetFileAttributesW(desktop_ini_path, 0x02 | 0x04)
   except PermissionError:
