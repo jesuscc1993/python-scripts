@@ -3,7 +3,8 @@ import requests
 from PIL import Image
 from io import BytesIO
 
-COVER_URL = 'https://steamcdn-a.akamaihd.net/steam/apps/{}/library_600x900.jpg'
+LIBRARY_URL = 'https://steamcdn-a.akamaihd.net/steam/apps/{}/library_600x900.jpg'
+HEADER_URL = 'https://steamcdn-a.akamaihd.net/steam/apps/{}/header.jpg'
 JPEG_FORMAT = 'JPEG'
 JPEG_QUALITY = 100
 TARGET_NAME = 'folder.jpg'
@@ -13,22 +14,29 @@ def main():
   parent_folder = input('Enter the path to the parent folder containing your Steam saves:\n')
   print('')
 
+  cover_type = input('Enter cover type (library or header). Default is header:\n').strip().lower()
+  cover_url = LIBRARY_URL if cover_type == 'library' else HEADER_URL
+  print('')
+
+  override_existing = input('Override existing images? (y|n). Default: n:\n').strip().lower() == 'y'
+  print('')
+
   for folder_name in os.listdir(parent_folder):
     folder_path = os.path.join(parent_folder, folder_name)
 
     if os.path.isdir(folder_path):
-      process_folder(folder_path, folder_name)
+      process_folder(folder_path, folder_name, cover_url, override_existing)
 
   print('\nFinished generating cover images.')
 
-def process_folder(folder_path, folder_name):
+def process_folder(folder_path, folder_name, cover_url, override_existing):
   cover_path = os.path.join(folder_path, TARGET_NAME)
 
-  if os.path.exists(cover_path):
+  if os.path.exists(cover_path) and not override_existing:
     print(f'Skipping {folder_name} because it already contains a {TARGET_NAME} file...')
     return
 
-  image_url = COVER_URL.format(folder_name)
+  image_url = cover_url.format(folder_name)
   response = requests.get(image_url)
 
   if response.status_code == 200:
@@ -39,9 +47,9 @@ def process_folder(folder_path, folder_name):
 
     resized_img = img.resize((TARGET_WIDTH, new_height), Image.LANCZOS)
     resized_img.save(cover_path, JPEG_FORMAT, quality=JPEG_QUALITY)
-    print(f'Generated cover image for game save {folder_name} with max quality.')
+    print(f'Generated cover image for game ID {folder_name}.')
   else:
-    print(f'Failed to download image for {folder_name} (status code {response.status_code}).')
+    print(f'Failed to download image for game ID {folder_name} (status code {response.status_code}).')
 
 if __name__ == '__main__':
   try:
