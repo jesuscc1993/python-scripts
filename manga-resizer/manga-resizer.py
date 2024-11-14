@@ -1,53 +1,72 @@
-from PIL import Image
 import os
+import time
+from PIL import Image
+from concurrent.futures import ThreadPoolExecutor
 
+# settings #
 DEVICE_HEIGHT = 1920
-JPEG_EXTENSION = '.jpg'
-JPEG_FORMAT = 'JPEG'
-JPEG_QUALITY = 100
+OUTPUT_EXTENSION = '.jpg'
+OUTPUT_FORMAT = 'JPEG'
+OUTPUT_QUALITY = 100
+
+JPG_EXTENSION = '.jpg'
+JPEG_EXTENSION = '.jpeg'
+PNG_EXTENSION = '.png'
 
 def main():
   parent_folder = input('Enter the path to the parent folder containing the folders or images:\n')
   if not os.path.isdir(parent_folder):
     print(f'The specified path "{parent_folder}" is not a directory.')
   else:
+    start_time = time.time()
     process_images(parent_folder)
+    elapsed_minutes = (time.time() - start_time) / 60
+    print(f'Finished processing "{parent_folder}" in {elapsed_minutes:.2f} minutes')
 
 def process_images(root_dir):
   for root, _, files in os.walk(root_dir):
     print(f'Processing "{root}"')
-    for file in files:
-      if is_image_file(file):
-        image_path = os.path.join(root, file)
-        resize_image(image_path)
+    with ThreadPoolExecutor(max_workers=os.cpu_count()) as executor:
+      _ = [
+        executor.submit(resize_image, os.path.join(root, file))
+        for file in files if is_image_file(file)
+      ]
 
 def resize_image(image_path):
-  with Image.open(image_path) as img:
-    width, height = img.size
+  try:
+    # print(f'Processing "{image_path}"')
+    with Image.open(image_path) as img:
+      width, height = img.size
+      needs_resizing = height > DEVICE_HEIGHT
+      needs_compression = not is_image_jpeg(image_path)
 
-    # discard alpha channel
-    if img.mode != 'RGB':
-      img = img.convert('RGB')
+      # discard alpha channel
+      if img.mode != 'RGB':
+        img = img.convert('RGB')
 
-    if height > DEVICE_HEIGHT:
       # resize images larger than the target device
-      new_height = DEVICE_HEIGHT
-      new_width = int((new_height / height) * width)
-      img = img.resize((new_width, new_height), Image.LANCZOS)
-      output_path = os.path.splitext(image_path)[0] + JPEG_EXTENSION
-      img.save(output_path, JPEG_FORMAT, quality=JPEG_QUALITY)
-    else:
-      # convert images smaller than the target device if they are not JPG
-      if not image_path.lower().endswith(JPEG_EXTENSION):
-        output_path = os.path.splitext(image_path)[0] + JPEG_EXTENSION
-        img.save(output_path, JPEG_FORMAT, quality=JPEG_QUALITY)
+      if needs_resizing:
+        new_height = DEVICE_HEIGHT
+        new_width = int((new_height / height) * width)
+        img = img.resize((new_width, new_height), Image.LANCZOS)
 
-  # delete original files if they are not JPG
-  if not image_path.lower().endswith(JPEG_EXTENSION):
-    os.remove(image_path)
+      # save when resized or uncompressed
+      if needs_resizing or needs_compression:
+        output_path = os.path.splitext(image_path)[0] + OUTPUT_EXTENSION
+        img.save(output_path, OUTPUT_FORMAT, quality=OUTPUT_QUALITY)
+
+        # delete the original file if they were replaced and save was successful
+        if needs_compression:
+          os.remove(image_path)
+
+  except Exception as e:
+    print(f'Error processing "{image_path}": {e}')
 
 def is_image_file(filename):
-  return filename.lower().endswith(('.jpg', '.jpeg', '.png'))
+  return filename.lower().endswith((JPG_EXTENSION, JPEG_EXTENSION, PNG_EXTENSION))
+
+def is_image_jpeg(filename):
+  return filename.lower().endswith((JPG_EXTENSION, JPEG_EXTENSION))
 
 if __name__ == '__main__':
   try:
