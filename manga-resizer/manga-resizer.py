@@ -4,7 +4,7 @@ from PIL import Image
 from concurrent.futures import ThreadPoolExecutor
 
 # settings #
-MAX_HEIGHT = 1080
+MAX_HEIGHT = 1200
 OUTPUT_EXTENSION = '.jpg'
 OUTPUT_FORMAT = 'JPEG'
 OUTPUT_QUALITY = 100
