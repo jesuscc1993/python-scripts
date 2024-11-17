@@ -1,4 +1,5 @@
 import os
+import winsound
 from PIL import Image
 
 DESKTOP_INI_FILENAME = 'desktop.ini'
@@ -30,6 +31,7 @@ def process_parent_folder(image_filenames):
       item_path = os.path.join(root, dir_name)
       process_folder(item_path, image_filenames)
 
+  winsound.MessageBeep(winsound.MB_ICONASTERISK)
   print(f'\nFinished generating icons.')
 
 def process_folder(folder_path, image_filenames):

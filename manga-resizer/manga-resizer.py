@@ -1,5 +1,6 @@
 import os
 import time
+import winsound
 from PIL import Image
 from concurrent.futures import ThreadPoolExecutor
 
@@ -21,6 +22,7 @@ def main():
     start_time = time.time()
     process_images(parent_folder)
     elapsed_minutes = (time.time() - start_time) / 60
+    winsound.MessageBeep(winsound.MB_ICONASTERISK)
     print(f'Finished processing "{parent_folder}" in {elapsed_minutes:.2f} minutes')
 
 def process_images(root_dir):
