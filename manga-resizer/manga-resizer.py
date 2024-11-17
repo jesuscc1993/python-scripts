@@ -4,7 +4,7 @@ from PIL import Image
 from concurrent.futures import ThreadPoolExecutor
 
 # settings #
-DEVICE_HEIGHT = 1920
+MAX_HEIGHT = 1080
 OUTPUT_EXTENSION = '.jpg'
 OUTPUT_FORMAT = 'JPEG'
 OUTPUT_QUALITY = 100
@@ -37,7 +37,7 @@ def resize_image(image_path):
     # print(f'Processing "{image_path}"')
     with Image.open(image_path) as img:
       width, height = img.size
-      needs_resizing = height > DEVICE_HEIGHT
+      needs_resizing = height > MAX_HEIGHT
       needs_compression = not is_image_jpeg(image_path)
 
       # discard alpha channel
@@ -46,7 +46,7 @@ def resize_image(image_path):
 
       # resize images larger than the target device
       if needs_resizing:
-        new_height = DEVICE_HEIGHT
+        new_height = MAX_HEIGHT
         new_width = int((new_height / height) * width)
         img = img.resize((new_width, new_height), Image.LANCZOS)
 
