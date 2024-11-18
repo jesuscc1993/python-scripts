@@ -5,10 +5,13 @@ from PIL import Image
 from concurrent.futures import ThreadPoolExecutor
 
 # settings #
-MAX_HEIGHT = 1200
+MAX_HEIGHT = 1920
+MAX_WIDTH = 1200
 OUTPUT_EXTENSION = '.jpg'
 OUTPUT_FORMAT = 'JPEG'
 OUTPUT_QUALITY = 100
+
+LONG_STRIP_ASPECT_RATIO = 10/16
 
 JPG_EXTENSION = '.jpg'
 JPEG_EXTENSION = '.jpeg'
@@ -39,7 +42,7 @@ def resize_image(image_path):
     # print(f'Processing "{image_path}"')
     with Image.open(image_path) as img:
       width, height = img.size
-      needs_resizing = height > MAX_HEIGHT
+      needs_resizing = height > MAX_HEIGHT or width > MAX_WIDTH
       needs_compression = not is_image_jpeg(image_path)
 
       # discard alpha channel
@@ -48,9 +51,19 @@ def resize_image(image_path):
 
       # resize images larger than the target device
       if needs_resizing:
-        new_height = MAX_HEIGHT
-        new_width = int((new_height / height) * width)
-        img = img.resize((new_width, new_height), Image.LANCZOS)
+        aspect_ratio = width / height
+
+        is_long_strip = aspect_ratio <= LONG_STRIP_ASPECT_RATIO
+        is_horizontal = aspect_ratio > 0
+
+        if not is_long_strip and height > MAX_HEIGHT:
+          height = MAX_HEIGHT
+          width = int(height * aspect_ratio)
+        elif not is_horizontal:
+          width = MAX_WIDTH
+          height = int(width / aspect_ratio)
+
+        img = img.resize((width, height), Image.LANCZOS)
 
       # save when resized or uncompressed
       if needs_resizing or needs_compression:
