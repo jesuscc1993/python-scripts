@@ -54,14 +54,13 @@ def resize_image(image_path):
         aspect_ratio = width / height
 
         is_long_strip = aspect_ratio <= LONG_STRIP_ASPECT_RATIO
-        is_horizontal = aspect_ratio > 0
 
-        if not is_long_strip and height > MAX_HEIGHT:
-          height = MAX_HEIGHT
-          width = int(height * aspect_ratio)
-        elif not is_horizontal:
+        if is_long_strip and width > MAX_WIDTH:
           width = MAX_WIDTH
           height = int(width / aspect_ratio)
+        elif not is_long_strip and height > MAX_HEIGHT:
+          height = MAX_HEIGHT
+          width = int(height * aspect_ratio)
 
         img = img.resize((width, height), Image.LANCZOS)
 
