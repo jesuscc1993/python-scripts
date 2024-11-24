@@ -12,7 +12,7 @@ def process_parent_folder(image_filenames):
     print(f'The specified path "{parent_folder}" is not a directory.')
     return
 
-  recursive = input('\nRun recursively in subfolders? (y|n). Default: n:\n').strip().lower() == 'y' != 'n'
+  recursive = input('\nRun recursively in subfolders? (y|n). Default: y:\n').strip().lower() != 'n'
   process_folder(parent_folder, image_filenames)
 
   if recursive:
