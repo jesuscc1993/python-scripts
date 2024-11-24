@@ -26,6 +26,8 @@ def process_parent_folder(image_filenames):
 
     print('')
 
+  process_folder(parent_folder, image_filenames)
+
   for root, dirs, _ in os.walk(parent_folder):
     for dir_name in dirs:
       item_path = os.path.join(root, dir_name)
