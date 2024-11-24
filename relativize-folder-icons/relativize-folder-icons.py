@@ -3,12 +3,13 @@ import ctypes
 import os
 
 def main():
-  parent_folder = input('Enter the path to the parent folder containing the folders or images:\n')
+  parent_folder = input('Enter the folder path to process:\n')
   if not os.path.isdir(parent_folder):
     print(f'The specified path "{parent_folder}" is not a directory.')
-  else:
-    recursive = input("Run recursively in subfolders? (y/n, default 'n'):\n").strip().lower() == 'y'
-    process_subfolders(parent_folder, recursive, is_root = True)
+    return
+
+  recursive = input('\nRun recursively in subfolders? (y|n). Default: n:\n').strip().lower() == 'y'
+  process_subfolders(parent_folder, recursive, is_root = True)
 
 def process_subfolders(base_path, recursive, is_root = False):
   for root, dirs, files in os.walk(base_path):

@@ -7,31 +7,19 @@ ICON_FILENAME = 'icon.ico'
 ICON_SIZE = 256
 
 def process_parent_folder(image_filenames):
-  parent_folder = input('Enter the path to the parent folder containing the folders you want to generate icons for.\nLeave empty instead to provide and process a single folder instead.\nPARENT_FOLDER: ')
+  parent_folder = input('Enter the folder path to process:\n')
+  if not os.path.isdir(parent_folder):
+    print(f'The specified path "{parent_folder}" is not a directory.')
+    return
 
-  if parent_folder == '':
-    target_folder = input('\nEnter the path to the specific folder you want to generate an icon for:\nFOLDER: ')
-
-    if not os.path.isdir(target_folder):
-      print(f'The specified path "{target_folder}" is not a directory.')
-      return
-
-    print('')
-    process_folder(target_folder, image_filenames)
-
-  else:
-    if not os.path.isdir(parent_folder):
-      print(f'The specified path "{parent_folder}" is not a directory.')
-      return
-
-    print('')
-
+  recursive = input('\nRun recursively in subfolders? (y|n). Default: n:\n').strip().lower() == 'y' != 'n'
   process_folder(parent_folder, image_filenames)
 
-  for root, dirs, _ in os.walk(parent_folder):
-    for dir_name in dirs:
-      item_path = os.path.join(root, dir_name)
-      process_folder(item_path, image_filenames)
+  if recursive:
+    for root, dirs, _ in os.walk(parent_folder):
+      for dir_name in dirs:
+        item_path = os.path.join(root, dir_name)
+        process_folder(item_path, image_filenames)
 
   winsound.MessageBeep(winsound.MB_ICONASTERISK)
   print(f'\nFinished generating icons.')
