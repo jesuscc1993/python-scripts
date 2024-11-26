@@ -7,8 +7,8 @@ from concurrent.futures import ThreadPoolExecutor
 # settings #
 MAX_HEIGHT = 1920
 MAX_WIDTH = 1200
-OUTPUT_EXTENSION = '.jpg'
-OUTPUT_FORMAT = 'JPEG'
+OUTPUT_EXTENSION = '.webp'
+OUTPUT_FORMAT = 'WEBP'
 OUTPUT_QUALITY = 100
 
 LONG_STRIP_ASPECT_RATIO = 10/16
@@ -16,6 +16,7 @@ LONG_STRIP_ASPECT_RATIO = 10/16
 JPG_EXTENSION = '.jpg'
 JPEG_EXTENSION = '.jpeg'
 PNG_EXTENSION = '.png'
+WEB_EXTENSION = '.webp'
 
 def main():
   parent_folder = input('Enter the path to the parent folder containing the folders or images:\n')
@@ -42,8 +43,14 @@ def resize_image(image_path):
     # print(f'Processing "{image_path}"')
     with Image.open(image_path) as img:
       width, height = img.size
-      needs_resizing = height > MAX_HEIGHT or width > MAX_WIDTH
-      needs_compression = not is_image_jpeg(image_path)
+
+      aspect_ratio = width / height
+      is_long_strip = aspect_ratio <= LONG_STRIP_ASPECT_RATIO
+      too_wide = is_long_strip and width > MAX_WIDTH
+      too_tall = not is_long_strip and height > MAX_HEIGHT
+      needs_resizing = too_wide or too_tall
+
+      needs_compression = is_image_uncompressed(image_path)
 
       # discard alpha channel
       if img.mode != 'RGB':
@@ -51,18 +58,16 @@ def resize_image(image_path):
 
       # resize images larger than the target device
       if needs_resizing:
-        aspect_ratio = width / height
-
-        is_long_strip = aspect_ratio <= LONG_STRIP_ASPECT_RATIO
-
-        if is_long_strip and width > MAX_WIDTH:
+        if too_wide:
           width = MAX_WIDTH
           height = int(width / aspect_ratio)
-        elif not is_long_strip and height > MAX_HEIGHT:
+        elif too_tall:
           height = MAX_HEIGHT
           width = int(height * aspect_ratio)
 
         img = img.resize((width, height), Image.LANCZOS)
+
+      # print(f'image_path: {image_path}, width: {width}, height: {height}, is_long_strip: {is_long_strip}, needs_resizing: {needs_resizing}, needs_compression: {needs_compression}')
 
       # save when resized or uncompressed
       if needs_resizing or needs_compression:
@@ -70,17 +75,17 @@ def resize_image(image_path):
         img.save(output_path, OUTPUT_FORMAT, quality=OUTPUT_QUALITY)
 
         # delete the original file if they were replaced and save was successful
-        if needs_compression:
+        if output_path != image_path:
           os.remove(image_path)
 
   except Exception as e:
     print(f'Error processing "{image_path}": {e}')
 
 def is_image_file(filename):
-  return filename.lower().endswith((JPG_EXTENSION, JPEG_EXTENSION, PNG_EXTENSION))
+  return filename.lower().endswith((JPG_EXTENSION, JPEG_EXTENSION, PNG_EXTENSION, WEB_EXTENSION))
 
-def is_image_jpeg(filename):
-  return filename.lower().endswith((JPG_EXTENSION, JPEG_EXTENSION))
+def is_image_uncompressed(filename):
+  return filename.lower().endswith((PNG_EXTENSION))
 
 if __name__ == '__main__':
   try:
