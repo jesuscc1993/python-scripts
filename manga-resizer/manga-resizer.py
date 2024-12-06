@@ -32,7 +32,7 @@ def main():
 def process_images(root_dir):
   for root, _, files in os.walk(root_dir):
     print(f'Processing "{root}"')
-    with ThreadPoolExecutor(max_workers=os.cpu_count()) as executor:
+    with ThreadPoolExecutor() as executor:
       _ = [
         executor.submit(resize_image, os.path.join(root, file))
         for file in files if is_image_file(file)

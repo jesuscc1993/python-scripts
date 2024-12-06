@@ -106,7 +106,7 @@ def process_folder(folder_name, container_folder):
 def main():
   container_folder = input('Enter the path to the folder containing your games:\n').strip() or os.getcwd()
 
-  with ThreadPoolExecutor(max_workers=os.cpu_count()) as executor:
+  with ThreadPoolExecutor() as executor:
     _ = [
       executor.submit(process_folder, folder_name, container_folder)
       for folder_name in os.listdir(container_folder) if os.path.isdir(os.path.join(container_folder, folder_name))
