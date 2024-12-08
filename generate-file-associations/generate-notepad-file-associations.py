@@ -24,7 +24,7 @@ def add_registry_entry(path, name, value):
 
 def main():
   for ext in EXTENSIONS:
-    icon_path = os.path.join(ICONS_PATH, f'{ext}.ico')
+    icon_path = f'"{os.path.join(ICONS_PATH, f"{ext.upper()}.ico")}"'
     file_type = f'{ext.lower()}file'
 
     delete_registry_entry(f'.{ext}\\OpenWithProgids')
