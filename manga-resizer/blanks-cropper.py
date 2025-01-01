@@ -51,8 +51,7 @@ def process_image(file_path):
 
 def is_blank_strip(image_strip):
   gray_strip = image_strip.convert('L')
-  extrema = gray_strip.getextrema()
-  min_pixel, max_pixel = extrema
+  min_pixel, max_pixel = gray_strip.getextrema()
   return min_pixel >= WHITE_THRESHOLD or max_pixel <= BLACK_THRESHOLD
 
 def process_strip(strip, height):
