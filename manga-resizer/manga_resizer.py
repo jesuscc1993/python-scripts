@@ -1,10 +1,11 @@
 import os
-import time
-import winsound
 
-from tqdm import tqdm
 from PIL import Image
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import ThreadPoolExecutor
+from tqdm import tqdm
+
+from _image_utils import is_image_file, is_image_uncompressed
+from _sound_utils import play_notification_sound
 
 # settings
 MAX_HEIGHT = 1920
@@ -15,21 +16,14 @@ OUTPUT_QUALITY = 100
 
 LONG_STRIP_ASPECT_RATIO = 10/16
 
-JPG_EXTENSION = '.jpg'
-JPEG_EXTENSION = '.jpeg'
-PNG_EXTENSION = '.png'
-WEB_EXTENSION = '.webp'
-
 def main():
   parent_folder = input('Enter the path to the parent folder containing the folders or images:\n')
   if not os.path.isdir(parent_folder):
     print(f'The specified path "{parent_folder}" is not a directory.')
   else:
-    start_time = time.time()
     process_images(parent_folder)
-    elapsed_minutes = (time.time() - start_time) / 60
-    winsound.MessageBeep(winsound.MB_ICONASTERISK)
-    print(f'Finished processing "{parent_folder}" in {elapsed_minutes:.2f} minutes')
+    play_notification_sound()
+    print(f'Finished processing "{parent_folder}".')
 
 def process_images(root_dir):
   files_to_process = []
@@ -85,12 +79,6 @@ def process_image(image_path):
 
   except Exception as e:
     print(f'Error processing "{image_path}": {e}')
-
-def is_image_file(filename):
-  return filename.lower().endswith((JPG_EXTENSION, JPEG_EXTENSION, PNG_EXTENSION, WEB_EXTENSION))
-
-def is_image_uncompressed(filename):
-  return filename.lower().endswith((PNG_EXTENSION))
 
 if __name__ == '__main__':
   try:
