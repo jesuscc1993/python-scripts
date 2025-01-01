@@ -7,9 +7,10 @@ from PIL import Image
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # settings
-HEIGHT_THRESHOLD = 48
-WHITE_THRESHOLD = 248
 BLACK_THRESHOLD = 8
+HEIGHT_THRESHOLD = 48
+OUTPUT_QUALITY = 100
+WHITE_THRESHOLD = 248
 
 JPG_EXTENSION = '.jpg'
 JPEG_EXTENSION = '.jpeg'
@@ -44,7 +45,7 @@ def process_image(file_path):
   try:
     with Image.open(file_path) as img:
       stitched_image = remove_and_stitch_blanks(img)
-      stitched_image.save(file_path)
+      stitched_image.save(file_path, quality = OUTPUT_QUALITY)
   except Exception as e:
     print(f'Failed to process {file_path}: {e}')
 
