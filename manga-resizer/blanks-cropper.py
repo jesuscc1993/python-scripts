@@ -84,7 +84,7 @@ def remove_and_stitch_blanks(image):
     result_parts.append(process_strip(blank_strip, height - blank_start))
 
   final_height = sum(part.height for part in result_parts)
-  stitched_image = Image.new("RGB", (width, final_height))
+  stitched_image = Image.new('RGB', (width, final_height))
   current_y = 0
   for part in result_parts:
     stitched_image.paste(part, (0, current_y))
