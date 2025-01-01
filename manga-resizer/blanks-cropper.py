@@ -2,8 +2,9 @@ import os
 import time
 import winsound
 
+from tqdm import tqdm
 from PIL import Image
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # settings
 HEIGHT_THRESHOLD = 48
@@ -26,21 +27,24 @@ def main():
     winsound.MessageBeep(winsound.MB_ICONASTERISK)
     print(f'Finished processing "{parent_folder}" in {elapsed_minutes:.2f} minutes')
 
-def process_images(parent_folder):
-  tasks = []
-  with ThreadPoolExecutor() as executor:
-    for root, _, files in os.walk(parent_folder):
-      for file in files:
-        if is_image_file(file):
-          file_path = os.path.join(root, file)
-          tasks.append(executor.submit(process_image, file_path))
+def process_images(root_dir):
+  files_to_process = []
+
+  for root, _, files in os.walk(root_dir):
+    for file in files:
+      if is_image_file(file):
+        file_path = os.path.join(root, file)
+        files_to_process.append(file_path)
+
+  with ThreadPoolExecutor() as executor, tqdm(total = len(files_to_process), desc = f'Processing "{root_dir}"') as progress:
+    for _ in executor.map(process_image, files_to_process):
+      progress.update(1)
 
 def process_image(file_path):
   try:
     with Image.open(file_path) as img:
       stitched_image = remove_and_stitch_blanks(img)
       stitched_image.save(file_path)
-      print(f'Processed {file_path}')
   except Exception as e:
     print(f'Failed to process {file_path}: {e}')
 

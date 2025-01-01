@@ -1,8 +1,10 @@
 import os
 import time
 import winsound
+
+from tqdm import tqdm
 from PIL import Image
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # settings
 MAX_HEIGHT = 1920
@@ -30,17 +32,20 @@ def main():
     print(f'Finished processing "{parent_folder}" in {elapsed_minutes:.2f} minutes')
 
 def process_images(root_dir):
-  for root, _, files in os.walk(root_dir):
-    print(f'Processing "{root}"')
-    with ThreadPoolExecutor() as executor:
-      _ = [
-        executor.submit(resize_image, os.path.join(root, file))
-        for file in files if is_image_file(file)
-      ]
+  files_to_process = []
 
-def resize_image(image_path):
+  for root, _, files in os.walk(root_dir):
+    for file in files:
+      if is_image_file(file):
+        file_path = os.path.join(root, file)
+        files_to_process.append(file_path)
+
+  with ThreadPoolExecutor() as executor, tqdm(total = len(files_to_process), desc = f'Processing "{root_dir}"') as progress:
+    for _ in executor.map(process_image, files_to_process):
+      progress.update(1)
+
+def process_image(image_path):
   try:
-    # print(f'Processing "{image_path}"')
     with Image.open(image_path) as img:
       width, height = img.size
 
@@ -72,7 +77,7 @@ def resize_image(image_path):
       # save when resized or uncompressed
       if needs_resizing or needs_compression:
         output_path = os.path.splitext(image_path)[0] + OUTPUT_EXTENSION
-        img.save(output_path, OUTPUT_FORMAT, quality=OUTPUT_QUALITY)
+        img.save(output_path, OUTPUT_FORMAT, quality = OUTPUT_QUALITY)
 
         # delete the original file if they were replaced and save was successful
         if output_path != image_path:
