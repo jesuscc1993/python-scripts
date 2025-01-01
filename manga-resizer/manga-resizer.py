@@ -4,7 +4,7 @@ import winsound
 from PIL import Image
 from concurrent.futures import ThreadPoolExecutor
 
-# settings #
+# settings
 MAX_HEIGHT = 1920
 MAX_WIDTH = 1200
 OUTPUT_EXTENSION = '.webp'
