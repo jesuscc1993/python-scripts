@@ -10,7 +10,7 @@ from _sound_utils import play_notification_sound
 # settings
 BLACK_THRESHOLD = 8
 HEIGHT_THRESHOLD = 48
-OUTPUT_QUALITY = 100
+OUTPUT_QUALITY = 80
 WHITE_THRESHOLD = 248
 
 def main():
