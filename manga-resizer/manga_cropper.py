@@ -11,6 +11,7 @@ from _sound_utils import play_notification_sound
 BLACK_THRESHOLD = 8
 HEIGHT_THRESHOLD = 48
 OUTPUT_QUALITY = 80
+PAGE_ASPECT_RATIO_THRESHOLD = 1/5
 WHITE_THRESHOLD = 248
 
 def main():
@@ -38,8 +39,8 @@ def process_images(root_dir):
 def process_image(file_path):
   try:
     with Image.open(file_path) as img:
-      stitched_image = remove_and_stitch_blanks(img)
-      stitched_image.save(file_path, quality = OUTPUT_QUALITY)
+      blank_free_image = crop_blanks(img)
+      save_image_splits(blank_free_image, file_path)
   except Exception as e:
     print(f'Failed to process {file_path}: {e}')
 
@@ -53,7 +54,7 @@ def process_strip(strip, height):
     return strip.resize((strip.width, HEIGHT_THRESHOLD))
   return strip
 
-def remove_and_stitch_blanks(image):
+def crop_blanks(image):
   width, height = image.size
   blank_start = None
   result_parts = []
@@ -85,6 +86,35 @@ def remove_and_stitch_blanks(image):
     current_y += part.height
 
   return stitched_image
+
+def save_image_splits(image, original_path):
+  width, height = image.size
+  aspect_ratio = width / height
+  if aspect_ratio < PAGE_ASPECT_RATIO_THRESHOLD:
+    split_height = int(width / PAGE_ASPECT_RATIO_THRESHOLD)
+    num_splits = (height + split_height - 1) // split_height
+    split_height = height // num_splits
+    base_name, ext = os.path.splitext(original_path)
+    saved_files = []
+    try:
+      for i in range(num_splits):
+        top = i * split_height
+        bottom = (i + 1) * split_height if i < num_splits - 1 else height
+        split_image = image.crop((0, top, width, bottom))
+        split_file_path = f"{base_name}.{i + 1}{ext}"
+        split_image.save(split_file_path, quality = OUTPUT_QUALITY)
+        saved_files.append(split_file_path)
+      os.remove(original_path)
+    except Exception as e:
+      print(f'Failed to save split images for {original_path}: {e}')
+      for file_path in saved_files:
+        if os.path.exists(file_path):
+          os.remove(file_path)
+  else:
+    try:
+      image.save(original_path, quality = OUTPUT_QUALITY)
+    except Exception as e:
+      print(f'Failed to save image {original_path}: {e}')
 
 if __name__ == '__main__':
   try:
