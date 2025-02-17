@@ -121,7 +121,10 @@ def save_image_splits(image, original_path):
           os.remove(file_path)
   else:
     try:
-      image.save(original_path, quality = OUTPUT_QUALITY)
+      output_path = os.path.splitext(original_path)[0] + OUTPUT_EXTENSION
+      image.save(output_path, OUTPUT_FORMAT, quality = OUTPUT_QUALITY)
+      if output_path != original_path:
+        os.remove(original_path)
     except Exception as e:
       print(f'Failed to save image {original_path}: {e}')
 
@@ -130,4 +133,4 @@ if __name__ == '__main__':
     main()
   except Exception as e:
     print(f'An unexpected error occurred: {e}')
-  input('Press Enter to exit...')
+    input('Press Enter to exit...')
