@@ -11,7 +11,8 @@ from _sound_utils import play_notification_sound
 BLACK_THRESHOLD = 8
 HEIGHT_THRESHOLD = 48
 OUTPUT_QUALITY = 80
-PAGE_ASPECT_RATIO_THRESHOLD = 1/5
+# MIN_PAGE_ASPECT_RATIO = 3/5
+MAX_PAGE_ASPECT_RATIO = 1/5
 WHITE_THRESHOLD = 248
 
 def main():
@@ -90,8 +91,8 @@ def crop_blanks(image):
 def save_image_splits(image, original_path):
   width, height = image.size
   aspect_ratio = width / height
-  if aspect_ratio < PAGE_ASPECT_RATIO_THRESHOLD:
-    split_height = int(width / PAGE_ASPECT_RATIO_THRESHOLD)
+  if aspect_ratio < MAX_PAGE_ASPECT_RATIO:
+    split_height = int(width / MAX_PAGE_ASPECT_RATIO)
     num_splits = (height + split_height - 1) // split_height
     split_height = height // num_splits
     base_name, ext = os.path.splitext(original_path)
