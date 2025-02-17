@@ -112,7 +112,7 @@ def save_image_splits(image, original_path):
         split_file_path = f"{base_name}.{i + 1}{ext}"
         output_path = os.path.splitext(split_file_path)[0] + OUTPUT_EXTENSION
         split_image.save(output_path, OUTPUT_FORMAT, quality = OUTPUT_QUALITY)
-        saved_files.append(split_file_path)
+        saved_files.append(output_path)
       os.remove(original_path)
     except Exception as e:
       print(f'Failed to save split images for {original_path}: {e}')
