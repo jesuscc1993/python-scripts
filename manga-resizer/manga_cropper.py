@@ -9,11 +9,15 @@ from _sound_utils import play_notification_sound
 
 # settings
 BLACK_THRESHOLD = 8
+WHITE_THRESHOLD = 248
 HEIGHT_THRESHOLD = 48
-OUTPUT_QUALITY = 80
+
 # MIN_PAGE_ASPECT_RATIO = 3/5
 MAX_PAGE_ASPECT_RATIO = 1/5
-WHITE_THRESHOLD = 248
+
+OUTPUT_EXTENSION = '.webp'
+OUTPUT_FORMAT = 'WEBP'
+OUTPUT_QUALITY = 80
 
 def main():
   parent_folder = input('Enter the path to the parent folder containing the folders or images:\n')
@@ -106,7 +110,8 @@ def save_image_splits(image, original_path):
         bottom = (i + 1) * split_height if i < num_splits - 1 else height
         split_image = image.crop((0, top, width, bottom))
         split_file_path = f"{base_name}.{i + 1}{ext}"
-        split_image.save(split_file_path, quality = OUTPUT_QUALITY)
+        output_path = os.path.splitext(split_file_path)[0] + OUTPUT_EXTENSION
+        split_image.save(output_path, OUTPUT_FORMAT, quality = OUTPUT_QUALITY)
         saved_files.append(split_file_path)
       os.remove(original_path)
     except Exception as e:

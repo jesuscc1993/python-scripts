@@ -10,11 +10,12 @@ from _sound_utils import play_notification_sound
 # settings
 MAX_HEIGHT = 1920
 MAX_WIDTH = 1200
+
+LONG_STRIP_ASPECT_RATIO = 5/8
+
 OUTPUT_EXTENSION = '.webp'
 OUTPUT_FORMAT = 'WEBP'
 OUTPUT_QUALITY = 80
-
-LONG_STRIP_ASPECT_RATIO = 10/16
 
 def main():
   parent_folder = input('Enter the path to the parent folder containing the folders or images:\n')
