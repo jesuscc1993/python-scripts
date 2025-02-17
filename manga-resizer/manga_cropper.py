@@ -17,12 +17,15 @@ WHITE_THRESHOLD = 248
 
 def main():
   parent_folder = input('Enter the path to the parent folder containing the folders or images:\n')
+  if not parent_folder:
+    return
   if not os.path.isdir(parent_folder):
     print(f'The specified path "{parent_folder}" is not a directory.')
   else:
     process_images(parent_folder)
     play_notification_sound()
-    print(f'Finished processing "{parent_folder}".')
+    print(f'Finished processing "{parent_folder}".\n')
+  main()
 
 def process_images(root_dir):
   files_to_process = []
