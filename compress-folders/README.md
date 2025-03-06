@@ -1,8 +1,8 @@
-# Manga Resizer
+# Folders Compressor
 
 ## Description
 
-Iterates folders and compresses them as CBR.
+Compresses each folder as a file for a single path.
 Not recursive.
 
 ## Requirements
