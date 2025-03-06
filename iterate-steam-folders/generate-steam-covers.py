@@ -1,15 +1,18 @@
 import os
 import requests
 import winsound
+
 from PIL import Image
 from io import BytesIO
 
-LIBRARY_URL = 'https://steamcdn-a.akamaihd.net/steam/apps/{}/library_600x900.jpg'
-HEADER_URL = 'https://steamcdn-a.akamaihd.net/steam/apps/{}/header.jpg'
+# settings
 JPEG_FORMAT = 'JPEG'
 JPEG_QUALITY = 100
 TARGET_NAME = 'folder.jpg'
 TARGET_WIDTH = 256
+
+LIBRARY_URL = 'https://steamcdn-a.akamaihd.net/steam/apps/{}/library_600x900.jpg'
+HEADER_URL = 'https://steamcdn-a.akamaihd.net/steam/apps/{}/header.jpg'
 
 def main():
   parent_folder = input('Enter the path to the parent folder containing your Steam saves:\n')

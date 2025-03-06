@@ -12,5 +12,5 @@ Then keeps the image that weights the least between the og and the new one.
 
 ## Running
 
-- Run `image_compressor.py`.
-- Run `python image_compressor.py` in the terminal.
+- Run `compress_images.py`.
+- Run `python compress_images.py` in the terminal.

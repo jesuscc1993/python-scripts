@@ -12,5 +12,5 @@ Will also convert non-JPG files to JPG.
 
 ## Running
 
-- Run `manga-resizer.py`.
-- Run `python manga-resizer.py` in the terminal.
+- Run `crop_manga.py` or `resize_manga.py`.
+- Run `python crop_manga.py` or `python resize_manga.py` in the terminal.
