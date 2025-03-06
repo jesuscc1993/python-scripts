@@ -12,5 +12,5 @@ Not recursive.
 
 ## Running
 
-- Run `folders_to_cbr.py`.
-- Run `python folders_to_cbr.py` in the terminal.
+- Run `compress_folders.py`.
+- Run `python compress_folders.py` in the terminal.
