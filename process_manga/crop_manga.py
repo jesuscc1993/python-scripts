@@ -15,8 +15,8 @@ HEIGHT_THRESHOLD = 48
 # MIN_PAGE_ASPECT_RATIO = 3/5
 MAX_PAGE_ASPECT_RATIO = 1/5
 
-OUTPUT_EXTENSION = '.webp'
 OUTPUT_FORMAT = 'WEBP'
+OUTPUT_EXTENSION = OUTPUT_FORMAT.lower()
 OUTPUT_QUALITY = 80
 
 def main():
@@ -110,7 +110,7 @@ def save_image_splits(image, original_path):
         bottom = (i + 1) * split_height if i < num_splits - 1 else height
         split_image = image.crop((0, top, width, bottom))
         split_file_path = f"{base_name}.{i + 1}{ext}"
-        output_path = os.path.splitext(split_file_path)[0] + OUTPUT_EXTENSION
+        output_path = f'{os.path.splitext(split_file_path)[0]}.{OUTPUT_EXTENSION}'
         split_image.save(output_path, OUTPUT_FORMAT, quality = OUTPUT_QUALITY)
         saved_files.append(output_path)
       os.remove(original_path)
@@ -121,7 +121,7 @@ def save_image_splits(image, original_path):
           os.remove(file_path)
   else:
     try:
-      output_path = os.path.splitext(original_path)[0] + OUTPUT_EXTENSION
+      output_path = f'{os.path.splitext(original_path)[0]}{OUTPUT_EXTENSION}'
       image.save(output_path, OUTPUT_FORMAT, quality = OUTPUT_QUALITY)
       if output_path != original_path:
         os.remove(original_path)

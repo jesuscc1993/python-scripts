@@ -4,8 +4,8 @@ from PIL import Image
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
-OUTPUT_EXTENSION = 'webp'
 OUTPUT_FORMAT = 'WEBP'
+OUTPUT_EXTENSION = OUTPUT_FORMAT.lower()
 OUTPUT_QUALITY = 100
 RESOLUTION_SCALE = 1.5
 

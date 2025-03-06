@@ -33,7 +33,7 @@ def download_game_cover(game_id, folder_path):
 
     game_link = soup.select_one('.mw-search-result-heading a')
     if game_link and 'href' in game_link.attrs:
-      game_page_url = BASE_URL + game_link['href']
+      game_page_url = f'{BASE_URL}{game_link["href"]}'
 
       game_response = requests.get(game_page_url)
       if game_response.status_code == 200:
@@ -41,7 +41,7 @@ def download_game_cover(game_id, folder_path):
 
         image_tag = game_soup.select_one('.citizen-body-container .image img')
         if image_tag and 'src' in image_tag.attrs:
-          image_url = BASE_URL + image_tag['src']
+          image_url = f'{BASE_URL}{image_tag["src"]}'
 
           image_response = requests.get(image_url)
           if image_response.status_code == 200:

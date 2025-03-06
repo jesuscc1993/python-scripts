@@ -7,7 +7,8 @@ from tqdm import tqdm
 from _sound_utils import play_notification_sound
 
 # settings
-OUTPUT_EXTENSION = 'ZIP'
+OUTPUT_FORMAT = 'ZIP'
+OUTPUT_EXTENSION = OUTPUT_FORMAT.lower()
 
 def main():
   parent_folder = input('Enter the path to the parent folder containing the folders you want to convert to CBR:\n')
@@ -29,7 +30,7 @@ def process_parent_folder(parent_folder):
 
 def process_folder(folder_path):
   folder_name = os.path.basename(folder_path)
-  compressed_file_path = f'{folder_path}.{OUTPUT_EXTENSION.lower()}'
+  compressed_file_path = f'{folder_path}.{OUTPUT_EXTENSION}'
 
   if os.path.exists(compressed_file_path):
     print(f'Skipping "{folder_name}". A compressed file with the same name already exists.')

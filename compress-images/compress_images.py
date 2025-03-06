@@ -8,8 +8,8 @@ from _image_utils import is_image_file
 from _sound_utils import play_notification_sound
 
 # settings
-OUTPUT_EXTENSION = '.webp'
 OUTPUT_FORMAT = 'WEBP'
+OUTPUT_EXTENSION = OUTPUT_FORMAT.lower()
 OUTPUT_QUALITY = 80
 
 def main():
@@ -41,7 +41,7 @@ def process_image(file_path):
   ext = os.path.splitext(file_path)[1].lower()
   name = os.path.splitext(file_path)[0]
   og_path = f'{name}.bak.{ext}'
-  output_path = f'{name}.webp'
+  output_path = f'{name}.{OUTPUT_EXTENSION}'
 
   os.rename(file_path, og_path)
 

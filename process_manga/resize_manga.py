@@ -13,8 +13,8 @@ MAX_WIDTH = 1200
 
 LONG_STRIP_ASPECT_RATIO = 5/8
 
-OUTPUT_EXTENSION = '.webp'
 OUTPUT_FORMAT = 'WEBP'
+OUTPUT_EXTENSION = OUTPUT_FORMAT.lower()
 OUTPUT_QUALITY = 80
 
 def main():
@@ -74,7 +74,7 @@ def process_image(image_path):
 
       # save when resized or uncompressed
       if needs_resizing or needs_compression:
-        output_path = os.path.splitext(image_path)[0] + OUTPUT_EXTENSION
+        output_path = f'{os.path.splitext(image_path)[0]}.{OUTPUT_EXTENSION}'
         img.save(output_path, OUTPUT_FORMAT, quality = OUTPUT_QUALITY)
 
         # delete the original file if they were replaced and save was successful

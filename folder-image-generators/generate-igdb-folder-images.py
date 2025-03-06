@@ -49,7 +49,7 @@ def get_cover_image(query):
 
     games = response.json()
     cover_url = games[0].get('cover', {}).get('url') if games else None
-    return 'https:' + cover_url.replace('t_thumb', 't_cover_big') if cover_url else None
+    return f'https:{cover_url.replace("t_thumb", "t_cover_big")}' if cover_url else None
 
   except Exception as e:
     print(f'Error fetching cover image: {e}')
