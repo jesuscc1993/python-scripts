@@ -10,7 +10,7 @@ OUTPUT_QUALITY = 100
 RESOLUTION_SCALE = 1.5
 
 def main():
-  parent_folder = input('Enter the path to the parent folder containing the PDF files:\n')
+  parent_folder = input('Enter the path to the parent folder containing the PDF files:\n').strip('" ')
   if not os.path.isdir(parent_folder):
     print(f'The specified path "{parent_folder}" is not a directory.')
   else:

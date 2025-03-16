@@ -11,7 +11,7 @@ OUTPUT_FORMAT = 'ZIP'
 OUTPUT_EXTENSION = OUTPUT_FORMAT.lower()
 
 def main():
-  parent_folder = input('Enter the path to the parent folder containing the folders you want to compress:\n')
+  parent_folder = input('Enter the path to the parent folder containing the folders you want to compress:\n').strip('" ')
   if not parent_folder:
     return
   if not os.path.isdir(parent_folder):

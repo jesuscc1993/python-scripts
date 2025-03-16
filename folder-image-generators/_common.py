@@ -6,7 +6,7 @@ FOLDER_IMAGE_FILENAME = 'folder.jpg'
 FOLDER_IMAGE_SIZE = 256
 
 def process_parent_folder(process_folder):
-  parent_folder = input('Enter the path to the parent folder containing the folders you want to generate icons for.\nLeave empty instead to provide and process a single folder instead.\nPARENT_FOLDER: ')
+  parent_folder = input('Enter the path to the parent folder containing the folders you want to generate icons for.\nLeave empty instead to provide and process a single folder instead.\nPARENT_FOLDER: ').strip('" ')
 
   if parent_folder == '':
     target_folder = input('\nEnter the path to the specific folder you want to generate an icon for:\nFOLDER: ')

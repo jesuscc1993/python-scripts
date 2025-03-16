@@ -3,7 +3,7 @@ import ctypes
 import os
 
 def main():
-  parent_folder = input('Enter the folder path to process:\n')
+  parent_folder = input('Enter the folder path to process:\n').strip('" ')
   if not os.path.isdir(parent_folder):
     print(f'The specified path "{parent_folder}" is not a directory.')
     return

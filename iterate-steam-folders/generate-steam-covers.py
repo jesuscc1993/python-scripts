@@ -15,7 +15,7 @@ LIBRARY_URL = 'https://steamcdn-a.akamaihd.net/steam/apps/{}/library_600x900.jpg
 HEADER_URL = 'https://steamcdn-a.akamaihd.net/steam/apps/{}/header.jpg'
 
 def main():
-  parent_folder = input('Enter the path to the parent folder containing your Steam saves:\n')
+  parent_folder = input('Enter the path to the parent folder containing your Steam saves:\n').strip('" ')
   print('')
 
   cover_type = input('Enter cover type (library or header). Default is header:\n').strip().lower()

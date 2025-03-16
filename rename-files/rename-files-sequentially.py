@@ -1,7 +1,7 @@
 import os
 
 def main():
-  parent_folder = input('Enter the path to the folder containing your files:\n')
+  parent_folder = input('Enter the path to the folder containing your files:\n').strip('" ')
 
   files = [f for f in os.listdir(parent_folder) if os.path.isfile(os.path.join(parent_folder, f)) and not f.startswith('.')]
   files.sort()

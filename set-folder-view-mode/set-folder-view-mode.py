@@ -2,7 +2,7 @@ import os
 import winreg as reg
 
 def main():
-  parent_folder = input('Enter the directory path where you want to update subfolders: ')
+  parent_folder = input('Enter the path you want to update the subfolders for: ').strip('" ')
   if not os.path.isdir(parent_folder):
     print(f'The specified path "{parent_folder}" is not a directory.')
     return
