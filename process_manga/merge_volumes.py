@@ -20,24 +20,23 @@ def main():
   main()
 
 def merge_folders(root_dir):
-  volume_map = {}
   files_to_process = []
 
   for folder in os.listdir(root_dir):
     folder_path = os.path.join(root_dir, folder)
     if os.path.isdir(folder_path):
       volume, chapter = get_volume_and_chapter(folder)
-      if volume and chapter:
-        target_folder = os.path.join(root_dir, f'Vol.{volume.zfill(2)}')
-        if volume not in volume_map:
-          if not os.path.exists(target_folder):
-            os.makedirs(target_folder)
-        else:
-          target_folder = volume_map[volume]
-        for item in os.listdir(folder_path):
-          src = os.path.join(folder_path, item)
-          if os.path.isfile(src):
-            files_to_process.append((src, target_folder, chapter))
+      if not volume or not chapter:
+        continue
+
+      target_folder = os.path.join(root_dir, f'Vol.{volume.zfill(2)}')
+      if not os.path.exists(target_folder):
+        os.makedirs(target_folder)
+
+      for item in os.listdir(folder_path):
+        src = os.path.join(folder_path, item)
+        if os.path.isfile(src):
+          files_to_process.append((src, target_folder, chapter))
 
   with ThreadPoolExecutor() as executor, tqdm(total=len(files_to_process), desc=f'Processing "{root_dir}"') as progress:
     for _ in executor.map(process_file, files_to_process):
