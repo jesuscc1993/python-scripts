@@ -39,7 +39,7 @@ def find_missing_chapters(directory):
     for ch in missing_chapters:
       print(f' {ch:03d}')
   else:
-    print('No missing chapters found.')
+    print(f'\nNo chapters found missing in "{directory}".')
 
 if __name__ == '__main__':
   try:
