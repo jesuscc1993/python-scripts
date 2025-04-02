@@ -20,14 +20,14 @@ def main():
   main()
 
 def find_missing_chapters(directory):
-  pattern = re.compile(r'(?:Vol(?:ume)?\.?\s*(\d+))?.*?(Ch(?:apter)?|Ep(?:isode)?)\.?\s*(\d+)', re.IGNORECASE)
+  pattern = re.compile(r'(?:Ch(?:apter)?|Ep(?:isode)?)\.?\s*(\d+)', re.IGNORECASE)
   chapters = set()
 
   for entry in os.scandir(directory):
     if entry.is_file() or entry.is_dir():
       match = pattern.search(entry.name)
       if match:
-        chapters.add(int(match.group(3)))
+        chapters.add(int(match.group(1)))
 
   if not chapters:
     print('No chapters found.')
