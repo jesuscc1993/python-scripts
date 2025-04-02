@@ -33,9 +33,7 @@ def find_missing_chapters(directory):
     print('No chapters found.')
     return
 
-  min_chapter, max_chapter = min(chapters), max(chapters)
-  missing_chapters = sorted(set(range(min_chapter, max_chapter + 1)) - chapters)
-
+  missing_chapters = sorted(set(range(1, max(chapters) + 1)) - chapters)
   if missing_chapters:
     print(f'Missing chapters: {missing_chapters}.')
   else:
