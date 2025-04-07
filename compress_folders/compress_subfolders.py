@@ -1,7 +1,5 @@
 import os
 
-from tqdm import tqdm
-
 from _sound_utils import play_notification_sound
 from _common import process_parent_folder
 
