@@ -4,10 +4,9 @@ from PIL import Image
 from concurrent.futures import ThreadPoolExecutor
 from tqdm import tqdm
 
-from _image_utils import is_image_file
+from _image_utils import is_image_file, save_image_to_path
 from _sound_utils import play_notification_sound
 from _settings import BLACK_THRESHOLD, WHITE_THRESHOLD, MAX_PAGE_ASPECT_RATIO
-from _common import save_image_to_path
 
 # settings
 HEIGHT_THRESHOLD = 48

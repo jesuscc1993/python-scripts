@@ -4,9 +4,9 @@ from PIL import Image
 from concurrent.futures import ThreadPoolExecutor
 from tqdm import tqdm
 
-from _image_utils import is_image_file, is_image_uncompressed
+from _image_utils import is_image_file, is_image_uncompressed, resize_image, save_image_to_path
 from _sound_utils import play_notification_sound
-from _settings import LONG_STRIP_ASPECT_RATIO, MAX_HEIGHT, MAX_WIDTH, OUTPUT_FORMAT, OUTPUT_EXTENSION, OUTPUT_QUALITY
+from _settings import LONG_STRIP_ASPECT_RATIO, MAX_HEIGHT, MAX_WIDTH
 
 def main():
   parent_folder = input('Enter the path to the parent folder containing the folders or images:\n').strip('" ')
@@ -43,32 +43,13 @@ def process_image(image_path):
       too_wide = is_long_strip and width > MAX_WIDTH
       too_tall = not is_long_strip and height > MAX_HEIGHT
       needs_resizing = too_wide or too_tall
-
       needs_compression = is_image_uncompressed(image_path)
 
-      # discard alpha channel
-      if img.mode != 'RGB':
-        img = img.convert('RGB')
-
-      # resize images larger than the target device
       if needs_resizing:
-        if too_wide:
-          width = MAX_WIDTH
-          height = int(width / aspect_ratio)
-        elif too_tall:
-          height = MAX_HEIGHT
-          width = int(height * aspect_ratio)
+        img = resize_image(img)
 
-        img = img.resize((width, height), Image.LANCZOS)
-
-      # print(f'image_path: {image_path}, width: {width}, height: {height}, is_long_strip: {is_long_strip}, needs_resizing: {needs_resizing}, needs_compression: {needs_compression}')
-
-      # save when resized or uncompressed
       if needs_resizing or needs_compression:
-        output_path = f'{os.path.splitext(image_path)[0]}.{OUTPUT_EXTENSION}'
-        img.save(output_path, OUTPUT_FORMAT, quality = OUTPUT_QUALITY)
-
-        # delete the original file if they were replaced and save was successful
+        output_path = save_image_to_path(img, image_path)
         if output_path != image_path:
           os.remove(image_path)
 

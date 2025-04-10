@@ -5,9 +5,8 @@ from PIL import Image
 from concurrent.futures import ThreadPoolExecutor
 from tqdm import tqdm
 
-from _common import save_image_to_path
-from _image_utils import is_image_file
-from _settings import WHITE_THRESHOLD, MAX_HEIGHT, MAX_WIDTH, MAX_WIDTH
+from _image_utils import is_image_file, resize_image, save_image_to_path
+from _settings import WHITE_THRESHOLD
 from _sound_utils import play_notification_sound
 
 def main():
@@ -60,26 +59,7 @@ def crop_blanks(img):
 
 def save_image(img, file_path):
   try:
-    width, height = img.size
-
-    height_ratio = height / MAX_HEIGHT
-    width_ratio = width / MAX_WIDTH
-    aspect_ratio = width / height
-    too_wide = width > MAX_WIDTH and width_ratio < height_ratio
-    too_tall = height > MAX_HEIGHT and height_ratio < width_ratio
-    needs_resizing = too_wide or too_tall
-
-    # resize images larger than the target device
-    if needs_resizing:
-      if too_wide:
-        width = MAX_WIDTH
-        height = int(width / aspect_ratio)
-      elif too_tall:
-        height = MAX_HEIGHT
-        width = int(height * aspect_ratio)
-
-      img = img.resize((width, height), Image.LANCZOS)
-
+    img = resize_image(img)
     output_path = save_image_to_path(img, file_path)
     if output_path and output_path != file_path:
       os.remove(file_path)
