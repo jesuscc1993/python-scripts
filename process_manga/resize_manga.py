@@ -40,8 +40,8 @@ def process_image(image_path):
 
       aspect_ratio = width / height
       is_long_strip = aspect_ratio <= LONG_STRIP_ASPECT_RATIO
-      too_wide = width > MAX_WIDTH and is_long_strip
-      too_tall = height > MAX_HEIGHT
+      too_wide = width > MAX_WIDTH
+      too_tall = height > MAX_HEIGHT and not is_long_strip
       needs_resizing = too_wide or too_tall
       needs_compression = is_image_uncompressed(image_path)
 
