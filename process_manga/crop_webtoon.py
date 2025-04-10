@@ -54,13 +54,13 @@ def process_strip(strip, height):
     return strip.resize((strip.width, HEIGHT_THRESHOLD))
   return strip
 
-def crop_blanks(image):
-  width, height = image.size
+def crop_blanks(img):
+  width, height = img.size
   blank_start = None
   result_parts = []
 
   for y in range(0, height, HEIGHT_THRESHOLD):
-    strip = image.crop((0, y, width, min(y + HEIGHT_THRESHOLD, height)))
+    strip = img.crop((0, y, width, min(y + HEIGHT_THRESHOLD, height)))
 
     if is_blank_strip(strip):
       if blank_start is None:
@@ -69,13 +69,13 @@ def crop_blanks(image):
       if blank_start is not None:
         blank_end = y
         blank_height = blank_end - blank_start
-        blank_strip = image.crop((0, blank_start, width, blank_end))
+        blank_strip = img.crop((0, blank_start, width, blank_end))
         result_parts.append(process_strip(blank_strip, blank_height))
         blank_start = None
       result_parts.append(strip)
 
   if blank_start is not None:
-    blank_strip = image.crop((0, blank_start, width, height))
+    blank_strip = img.crop((0, blank_start, width, height))
     result_parts.append(process_strip(blank_strip, height - blank_start))
 
   final_height = sum(part.height for part in result_parts)
