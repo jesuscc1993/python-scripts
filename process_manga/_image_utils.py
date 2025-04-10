@@ -51,7 +51,7 @@ def resize_image(img):
     return img.resize((width, height), Image.LANCZOS)
   return img
 
-def save_image_to_path(image, path):
+def save_image_to_path(img, path):
   output_path = f"{os.path.splitext(path)[0]}.{OUTPUT_EXTENSION}"
-  image.save(output_path, OUTPUT_FORMAT, quality = OUTPUT_QUALITY)
+  img.save(output_path, OUTPUT_FORMAT, quality = OUTPUT_QUALITY)
   return output_path

@@ -87,8 +87,8 @@ def crop_blanks(img):
 
   return stitched_image
 
-def save_image_splits(image, original_path):
-  width, height = image.size
+def save_image_splits(img, original_path):
+  width, height = img.size
   aspect_ratio = width / height
   if aspect_ratio < MAX_PAGE_ASPECT_RATIO:
     split_height = int(width / MAX_PAGE_ASPECT_RATIO)
@@ -100,7 +100,7 @@ def save_image_splits(image, original_path):
       for i in range(num_splits):
         top = i * split_height
         bottom = (i + 1) * split_height if i < num_splits - 1 else height
-        split_image = image.crop((0, top, width, bottom))
+        split_image = img.crop((0, top, width, bottom))
         split_file_path = f"{base_name}.{i + 1}{ext}"
         output_path = save_image_to_path(split_image, split_file_path)
         saved_files.append(output_path)
@@ -112,7 +112,7 @@ def save_image_splits(image, original_path):
           os.remove(file_path)
   else:
     try:
-      output_path = save_image_to_path(image, original_path)
+      output_path = save_image_to_path(img, original_path)
       if output_path != original_path:
         os.remove(original_path)
     except Exception as e:
