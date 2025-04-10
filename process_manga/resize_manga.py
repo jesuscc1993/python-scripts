@@ -6,16 +6,7 @@ from tqdm import tqdm
 
 from _image_utils import is_image_file, is_image_uncompressed
 from _sound_utils import play_notification_sound
-
-# settings
-MAX_HEIGHT = 1920
-MAX_WIDTH = 1200
-
-LONG_STRIP_ASPECT_RATIO = 5/8
-
-OUTPUT_FORMAT = 'WEBP'
-OUTPUT_EXTENSION = OUTPUT_FORMAT.lower()
-OUTPUT_QUALITY = 80
+from _settings import LONG_STRIP_ASPECT_RATIO, MAX_HEIGHT, MAX_WIDTH, OUTPUT_FORMAT, OUTPUT_EXTENSION, OUTPUT_QUALITY
 
 def main():
   parent_folder = input('Enter the path to the parent folder containing the folders or images:\n').strip('" ')

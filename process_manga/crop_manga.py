@@ -6,18 +6,10 @@ from tqdm import tqdm
 
 from _image_utils import is_image_file
 from _sound_utils import play_notification_sound
+from _settings import BLACK_THRESHOLD, WHITE_THRESHOLD, MAX_PAGE_ASPECT_RATIO, OUTPUT_FORMAT, OUTPUT_EXTENSION, OUTPUT_QUALITY
 
 # settings
-BLACK_THRESHOLD = 8
-WHITE_THRESHOLD = 248
 HEIGHT_THRESHOLD = 48
-
-# MIN_PAGE_ASPECT_RATIO = 3/5
-MAX_PAGE_ASPECT_RATIO = 1/5
-
-OUTPUT_FORMAT = 'WEBP'
-OUTPUT_EXTENSION = OUTPUT_FORMAT.lower()
-OUTPUT_QUALITY = 80
 
 def main():
   parent_folder = input('Enter the path to the parent folder containing the folders or images:\n').strip('" ')
@@ -121,7 +113,7 @@ def save_image_splits(image, original_path):
           os.remove(file_path)
   else:
     try:
-      output_path = f'{os.path.splitext(original_path)[0]}{OUTPUT_EXTENSION}'
+      output_path = f'{os.path.splitext(original_path)[0]}.{OUTPUT_EXTENSION}'
       image.save(output_path, OUTPUT_FORMAT, quality = OUTPUT_QUALITY)
       if output_path != original_path:
         os.remove(original_path)
