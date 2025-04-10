@@ -6,7 +6,8 @@ from tqdm import tqdm
 
 from _image_utils import is_image_file
 from _sound_utils import play_notification_sound
-from _settings import BLACK_THRESHOLD, WHITE_THRESHOLD, MAX_PAGE_ASPECT_RATIO, OUTPUT_FORMAT, OUTPUT_EXTENSION, OUTPUT_QUALITY
+from _settings import BLACK_THRESHOLD, WHITE_THRESHOLD, MAX_PAGE_ASPECT_RATIO
+from _common import save_image_to_path
 
 # settings
 HEIGHT_THRESHOLD = 48
@@ -102,8 +103,7 @@ def save_image_splits(image, original_path):
         bottom = (i + 1) * split_height if i < num_splits - 1 else height
         split_image = image.crop((0, top, width, bottom))
         split_file_path = f"{base_name}.{i + 1}{ext}"
-        output_path = f'{os.path.splitext(split_file_path)[0]}.{OUTPUT_EXTENSION}'
-        split_image.save(output_path, OUTPUT_FORMAT, quality = OUTPUT_QUALITY)
+        output_path = save_image_to_path(split_image, split_file_path)
         saved_files.append(output_path)
       os.remove(original_path)
     except Exception as e:
@@ -113,8 +113,7 @@ def save_image_splits(image, original_path):
           os.remove(file_path)
   else:
     try:
-      output_path = f'{os.path.splitext(original_path)[0]}.{OUTPUT_EXTENSION}'
-      image.save(output_path, OUTPUT_FORMAT, quality = OUTPUT_QUALITY)
+      output_path = save_image_to_path(image, original_path)
       if output_path != original_path:
         os.remove(original_path)
     except Exception as e:

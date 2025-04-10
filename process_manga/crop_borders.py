@@ -5,9 +5,10 @@ from PIL import Image
 from concurrent.futures import ThreadPoolExecutor
 from tqdm import tqdm
 
+from _common import save_image_to_path
 from _image_utils import is_image_file
+from _settings import WHITE_THRESHOLD, MAX_HEIGHT, MAX_WIDTH, MAX_WIDTH
 from _sound_utils import play_notification_sound
-from _settings import WHITE_THRESHOLD, OUTPUT_FORMAT, OUTPUT_EXTENSION, OUTPUT_QUALITY, MAX_HEIGHT, MAX_WIDTH, MAX_WIDTH
 
 def main():
   parent_folder = input('Enter the path to the parent folder containing the folders or images:\n').strip('" ')
@@ -79,11 +80,8 @@ def save_image(img, file_path):
 
       img = img.resize((width, height), Image.LANCZOS)
 
-    output_path = f'{os.path.splitext(file_path)[0]}.{OUTPUT_EXTENSION}'
-    img.save(output_path, OUTPUT_FORMAT, quality = OUTPUT_QUALITY)
-
-    # delete the original file if they were replaced and save was successful
-    if output_path != file_path:
+    output_path = save_image_to_path(img, file_path)
+    if output_path and output_path != file_path:
       os.remove(file_path)
 
   except Exception as e:
