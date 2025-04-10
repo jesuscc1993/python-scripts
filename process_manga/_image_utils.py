@@ -18,6 +18,17 @@ def is_image_file(filename):
 def is_image_uncompressed(filename):
   return filename.lower().endswith((PNG_EXTENSION))
 
+def image_needs_resizing(img):
+  width, height = img.size
+
+  aspect_ratio = width / height
+  is_long_strip = aspect_ratio <= LONG_STRIP_ASPECT_RATIO
+  too_wide = width > MAX_WIDTH
+  too_tall = height > MAX_HEIGHT and not is_long_strip
+  needs_resizing = too_wide or too_tall
+
+  return needs_resizing
+
 def resize_image(img):
   width, height = img.size
 

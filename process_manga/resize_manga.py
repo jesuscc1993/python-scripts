@@ -4,9 +4,8 @@ from PIL import Image
 from concurrent.futures import ThreadPoolExecutor
 from tqdm import tqdm
 
-from _image_utils import is_image_file, is_image_uncompressed, resize_image, save_image_to_path
+from _image_utils import image_needs_resizing, is_image_file, is_image_uncompressed, resize_image, save_image_to_path
 from _sound_utils import play_notification_sound
-from _settings import LONG_STRIP_ASPECT_RATIO, MAX_HEIGHT, MAX_WIDTH
 
 def main():
   parent_folder = input('Enter the path to the parent folder containing the folders or images:\n').strip('" ')
@@ -36,13 +35,7 @@ def process_images(root_dir):
 def process_image(image_path):
   try:
     with Image.open(image_path) as img:
-      width, height = img.size
-
-      aspect_ratio = width / height
-      is_long_strip = aspect_ratio <= LONG_STRIP_ASPECT_RATIO
-      too_wide = width > MAX_WIDTH
-      too_tall = height > MAX_HEIGHT and not is_long_strip
-      needs_resizing = too_wide or too_tall
+      needs_resizing = image_needs_resizing(img)
       needs_compression = is_image_uncompressed(image_path)
 
       if needs_resizing:
