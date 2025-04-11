@@ -12,15 +12,18 @@ TARGET_NAME = 'folder.jpg'
 TARGET_HEIGHT = 168
 TARGET_WIDTH = 256
 
-LIBRARY_URL = 'https://steamcdn-a.akamaihd.net/steam/apps/{}/library_600x900.jpg'
-HEADER_URL = 'https://steamcdn-a.akamaihd.net/steam/apps/{}/header.jpg'
+COVER_URL_MAP = {
+  'capsule': 'https://cdn.cloudflare.steamstatic.com/steam/apps/{}/capsule_616x353.jpg',
+  'header': 'https://steamcdn-a.akamaihd.net/steam/apps/{}/header.jpg',
+  'library': 'https://steamcdn-a.akamaihd.net/steam/apps/{}/library_600x900.jpg'
+}
 
 def main():
   parent_folder = input('Enter the path to the parent folder containing your Steam saves:\n').strip('" ')
   print('')
 
-  cover_type = input('Enter cover type (library or header). Default is header:\n').strip().lower()
-  cover_url = LIBRARY_URL if cover_type == 'library' else HEADER_URL
+  cover_type = input('Enter cover type (capsule, header, or library). Default is capsule:\n').strip().lower() or 'capsule'
+  cover_url = COVER_URL_MAP.get(cover_type)
   print('')
 
   override_existing = input('Override existing images? (y|n). Default: n:\n').strip().lower() == 'y'
