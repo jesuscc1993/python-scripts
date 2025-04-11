@@ -1,4 +1,4 @@
-# Manga Resizer
+# Process Manga
 
 ## Description
 
@@ -9,8 +9,12 @@ Will also convert non-JPG files to JPG.
 
 - Having python installed.
 - Running `pip install -r requirements.txt` to install the required dependencies.
+- (For `upscale_manga.py`)
+  - Download your waifu2x client of choice to /waifu2x
+  - Rename the exe to `waifu2x.exe`
+  - Rename the model name in `upscale_manga.py` to match the one bundled with your exe
 
 ## Running
 
-- Run `crop_manga.py` or `resize_manga.py`.
-- Run `python crop_manga.py` or `python resize_manga.py` in the terminal.
+- Run the script from the explorer
+- Run the script with `python FILENAME` in the terminal
