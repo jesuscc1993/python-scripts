@@ -18,18 +18,7 @@ def is_image_file(filename):
 def is_image_uncompressed(filename):
   return filename.lower().endswith((PNG_EXTENSION))
 
-def image_needs_resizing(img):
-  width, height = img.size
-
-  aspect_ratio = width / height
-  is_long_strip = aspect_ratio <= LONG_STRIP_ASPECT_RATIO
-  too_wide = width > MAX_WIDTH
-  too_tall = height > MAX_HEIGHT and not is_long_strip
-  needs_resizing = too_wide or too_tall
-
-  return needs_resizing
-
-def resize_image(img):
+def get_max_dimensions(img):
   width, height = img.size
 
   aspect_ratio = width / height
@@ -38,17 +27,26 @@ def resize_image(img):
   is_long_strip = aspect_ratio <= LONG_STRIP_ASPECT_RATIO
   too_wide = width > MAX_WIDTH and width_ratio < height_ratio
   too_tall = height > MAX_HEIGHT and height_ratio < width_ratio and not is_long_strip
-  needs_resizing = too_wide or too_tall
 
-  if needs_resizing:
-    if too_wide:
-      width = MAX_WIDTH
-      height = int(width / aspect_ratio)
-    elif too_tall:
-      height = MAX_HEIGHT
-      width = int(height * aspect_ratio)
+  if too_wide:
+    width = MAX_WIDTH
+    height = int(width / aspect_ratio)
+  elif too_tall:
+    height = MAX_HEIGHT
+    width = int(height * aspect_ratio)
+  else:
+    return None
 
-    return img.resize((width, height), Image.LANCZOS)
+  return (width, height)
+
+
+def image_needs_resizing(img):
+  return get_max_dimensions(img) is not None
+
+def resize_image(img):
+  new_dimensions = get_max_dimensions(img)
+  if new_dimensions:
+    return img.resize(new_dimensions, Image.LANCZOS)
   return img
 
 def save_image_to_path(img, path):
