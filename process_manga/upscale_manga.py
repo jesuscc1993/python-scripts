@@ -5,24 +5,12 @@ from concurrent.futures import ThreadPoolExecutor
 from tqdm import tqdm
 
 from _image_utils import is_image_file
-from _sound_utils import play_notification_sound
 from _settings import OUTPUT_EXTENSION
+from _common import select_parent_folder
 
 waifu2x_path = os.path.join(os.path.dirname(__file__), 'waifu2x/waifu2x.exe')
 
-def main():
-  parent_folder = input('Enter the path to the parent folder containing the folders or images:\n').strip('" ')
-  if not parent_folder:
-    return
-  if not os.path.isdir(parent_folder):
-    print(f'The specified path "{parent_folder}" is not a directory.')
-  else:
-    process_images(parent_folder)
-    play_notification_sound()
-    print(f'Finished processing "{parent_folder}".\n')
-  main()
-
-def process_images(root_dir):
+def process_parent_folder(root_dir):
   files_to_process = []
 
   for root, _, files in os.walk(root_dir):
@@ -53,7 +41,7 @@ def process_image(original_path):
 
 if __name__ == '__main__':
   try:
-    main()
+    select_parent_folder('Enter the path to the parent folder containing the folders or images:\n', process_parent_folder)
   except Exception as e:
     print(f'An unexpected error occurred: {e}')
     input('Press Enter to exit...')

@@ -5,23 +5,11 @@ from PIL import Image
 from concurrent.futures import ThreadPoolExecutor
 from tqdm import tqdm
 
+from _common import select_parent_folder
 from _image_utils import is_image_file, resize_image, save_image_to_path
 from _settings import WHITE_THRESHOLD
-from _sound_utils import play_notification_sound
 
-def main():
-  parent_folder = input('Enter the path to the parent folder containing the folders or images:\n').strip('" ')
-  if not parent_folder:
-    return
-  if not os.path.isdir(parent_folder):
-    print(f'The specified path "{parent_folder}" is not a directory.')
-  else:
-    process_images(parent_folder)
-    play_notification_sound()
-    print(f'Finished processing "{parent_folder}".\n')
-  main()
-
-def process_images(root_dir):
+def process_parent_folder(root_dir):
   files_to_process = []
 
   for root, _, files in os.walk(root_dir):
@@ -60,7 +48,7 @@ def crop_blanks(img):
 
 if __name__ == '__main__':
   try:
-    main()
+    select_parent_folder('Enter the path to the parent folder containing the folders or images:\n', process_parent_folder)
   except Exception as e:
     print(f'An unexpected error occurred: {e}')
     input('Press Enter to exit...')

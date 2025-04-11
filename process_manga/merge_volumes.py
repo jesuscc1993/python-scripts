@@ -5,21 +5,9 @@ import re
 from concurrent.futures import ThreadPoolExecutor
 from tqdm import tqdm
 
-from _sound_utils import play_notification_sound
+from _common import select_parent_folder
 
-def main():
-  parent_folder = input('Enter the path to the parent folder containing the chapter folders:\n').strip('" ')
-  if not parent_folder:
-    return
-  if not os.path.isdir(parent_folder):
-    print(f'The specified path "{parent_folder}" is not a directory.')
-  else:
-    merge_folders(parent_folder)
-    play_notification_sound()
-    print(f'Finished processing "{parent_folder}".\n')
-  main()
-
-def merge_folders(root_dir):
+def process_parent_folder(root_dir):
   files_to_process = []
 
   for folder in os.listdir(root_dir):
@@ -71,7 +59,7 @@ def delete_empty_folders(parent_folder):
 
 if __name__ == '__main__':
   try:
-    main()
+    select_parent_folder('Enter the path to the parent folder containing the chapter folders:\n', process_parent_folder)
   except Exception as e:
     print(f'An unexpected error occurred: {e}')
     input('Press Enter to exit...')
