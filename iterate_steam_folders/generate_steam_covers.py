@@ -9,6 +9,7 @@ from io import BytesIO
 JPEG_FORMAT = 'JPEG'
 JPEG_QUALITY = 100
 TARGET_NAME = 'folder.jpg'
+TARGET_HEIGHT = 168
 TARGET_WIDTH = 256
 
 LIBRARY_URL = 'https://steamcdn-a.akamaihd.net/steam/apps/{}/library_600x900.jpg'
@@ -28,7 +29,7 @@ def main():
   for folder_name in os.listdir(parent_folder):
     folder_path = os.path.join(parent_folder, folder_name)
 
-    if os.path.isdir(folder_path):
+    if folder_name.isdigit() and os.path.isdir(folder_path):
       process_folder(folder_path, folder_name, cover_url, override_existing)
 
   winsound.MessageBeep(winsound.MB_ICONASTERISK)
@@ -47,11 +48,12 @@ def process_folder(folder_path, folder_name, cover_url, override_existing):
   if response.status_code == 200:
     img = Image.open(BytesIO(response.content))
 
-    aspect_ratio = img.height / img.width
-    new_height = int(TARGET_WIDTH * aspect_ratio)
+    new_scale = max(TARGET_WIDTH / img.width, TARGET_HEIGHT / img.height)
+    new_width = int(img.width * new_scale)
+    new_height = int(img.height * new_scale)
 
-    resized_img = img.resize((TARGET_WIDTH, new_height), Image.LANCZOS)
-    resized_img.save(cover_path, JPEG_FORMAT, quality=JPEG_QUALITY)
+    resized_img = img.resize((new_width, new_height), Image.LANCZOS)
+    resized_img.save(cover_path, JPEG_FORMAT, quality = JPEG_QUALITY)
     print(f'Generated cover image for game ID {folder_name}.')
   else:
     print(f'Failed to download image for game ID {folder_name} (status code {response.status_code}).')
