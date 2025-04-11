@@ -95,26 +95,23 @@ def save_image_splits(img, original_path):
     num_splits = (height + split_height - 1) // split_height
     split_height = height // num_splits
     base_name, ext = os.path.splitext(original_path)
-    saved_files = []
     try:
       for i in range(num_splits):
         top = i * split_height
         bottom = (i + 1) * split_height if i < num_splits - 1 else height
         split_image = img.crop((0, top, width, bottom))
         split_file_path = f"{base_name}.{i + 1}{ext}"
-        output_path = save_image_to_path(split_image, split_file_path)
-        saved_files.append(output_path)
+        save_image_to_path(split_image, split_file_path, True)
       os.remove(original_path)
     except Exception as e:
       print(f'Failed to save split images for {original_path}: {e}')
-      for file_path in saved_files:
-        if os.path.exists(file_path):
-          os.remove(file_path)
+      for i in range(num_splits):
+        split_file_path = f"{base_name}.{i + 1}{ext}"
+        if os.path.exists(split_file_path):
+          os.remove(split_file_path)
   else:
     try:
-      output_path = save_image_to_path(img, original_path)
-      if output_path != original_path:
-        os.remove(original_path)
+      save_image_to_path(img, original_path)
     except Exception as e:
       print(f'Failed to save image {original_path}: {e}')
 

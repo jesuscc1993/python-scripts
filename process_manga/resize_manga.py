@@ -32,22 +32,20 @@ def process_images(root_dir):
     for _ in executor.map(process_image, files_to_process):
       progress.update(1)
 
-def process_image(image_path):
+def process_image(original_path):
   try:
-    with Image.open(image_path) as img:
+    with Image.open(original_path) as img:
       needs_resizing = image_needs_resizing(img)
-      needs_compression = is_image_uncompressed(image_path)
+      needs_compression = is_image_uncompressed(original_path)
 
       if needs_resizing:
         img = resize_image(img)
 
       if needs_resizing or needs_compression:
-        output_path = save_image_to_path(img, image_path)
-        if output_path != image_path:
-          os.remove(image_path)
+        save_image_to_path(img, original_path)
 
   except Exception as e:
-    print(f'Error processing "{image_path}": {e}')
+    print(f'Error processing "{original_path}": {e}')
 
 if __name__ == '__main__':
   try:

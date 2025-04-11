@@ -25,8 +25,8 @@ def get_max_dimensions(img):
   height_ratio = height / MAX_HEIGHT
   width_ratio = width / MAX_WIDTH
   is_long_strip = aspect_ratio <= LONG_STRIP_ASPECT_RATIO
-  too_wide = width > MAX_WIDTH and width_ratio < height_ratio
-  too_tall = height > MAX_HEIGHT and height_ratio < width_ratio and not is_long_strip
+  too_wide = width > MAX_WIDTH and width_ratio > height_ratio
+  too_tall = height > MAX_HEIGHT and height_ratio > width_ratio and not is_long_strip
 
   if too_wide:
     width = MAX_WIDTH
@@ -49,7 +49,12 @@ def resize_image(img):
     return img.resize(new_dimensions, Image.LANCZOS)
   return img
 
-def save_image_to_path(img, path):
-  output_path = f"{os.path.splitext(path)[0]}.{OUTPUT_EXTENSION}"
-  img.save(output_path, OUTPUT_FORMAT, quality = OUTPUT_QUALITY)
-  return output_path
+def save_image_to_path(img, original_path, keep = False):
+  try:
+    output_path = f"{os.path.splitext(original_path)[0]}.{OUTPUT_EXTENSION}"
+    img.save(output_path, OUTPUT_FORMAT, quality = OUTPUT_QUALITY)
+    if not keep and output_path != original_path:
+      os.remove(original_path)
+
+  except Exception as e:
+    print(f'Error processing "{original_path}": {e}')

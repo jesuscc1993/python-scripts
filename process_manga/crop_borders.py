@@ -37,8 +37,9 @@ def process_images(root_dir):
 def process_image(file_path):
   try:
     with Image.open(file_path) as img:
-      blank_free_image = crop_blanks(img)
-      save_image(blank_free_image, file_path)
+      img = crop_blanks(img)
+      img = resize_image(img)
+      save_image_to_path(img, file_path)
   except Exception as e:
     print(f'Failed to process {file_path}: {e}')
 
@@ -56,16 +57,6 @@ def crop_blanks(img):
   cropped_array = np_img[y0:y1, x0:x1]
   cropped_img = Image.fromarray(cropped_array)
   return cropped_img
-
-def save_image(img, file_path):
-  try:
-    img = resize_image(img)
-    output_path = save_image_to_path(img, file_path)
-    if output_path and output_path != file_path:
-      os.remove(file_path)
-
-  except Exception as e:
-    print(f'Error processing "{img}": {e}')
 
 if __name__ == '__main__':
   try:
