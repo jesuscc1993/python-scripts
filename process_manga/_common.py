@@ -1,5 +1,9 @@
 import os
 
+from concurrent.futures import ThreadPoolExecutor
+from tqdm import tqdm
+
+from _image_utils import is_image_file
 from _sound_utils import play_notification_sound
 
 def select_parent_folder(prompt, callback):
@@ -13,3 +17,16 @@ def select_parent_folder(prompt, callback):
     play_notification_sound()
     print(f'Finished processing "{parent_folder}".\n')
   select_parent_folder(prompt, callback)
+
+def process_folder_images(folder_path, callback):
+  files_to_process = []
+
+  for root, _, files in os.walk(folder_path):
+    for file in files:
+      if is_image_file(file):
+        file_path = os.path.join(root, file)
+        files_to_process.append(file_path)
+
+  with ThreadPoolExecutor() as executor, tqdm(total = len(files_to_process), desc = f'Processing "{folder_path}"') as progress:
+    for _ in executor.map(callback, files_to_process):
+      progress.update(1)
