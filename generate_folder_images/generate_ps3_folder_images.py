@@ -28,37 +28,36 @@ def download_game_cover(game_id, folder_path):
   search_url = SEARCH_URL.format(game_id=game_id)
   response = requests.get(search_url)
 
-  if response.status_code == 200:
-    soup = BeautifulSoup(response.text, 'html.parser')
-
-    game_link = soup.select_one('.mw-search-result-heading a')
-    if game_link and 'href' in game_link.attrs:
-      game_page_url = f'{BASE_URL}{game_link["href"]}'
-
-      game_response = requests.get(game_page_url)
-      if game_response.status_code == 200:
-        game_soup = BeautifulSoup(game_response.text, 'html.parser')
-
-        image_tag = game_soup.select_one('.citizen-body-container .image img')
-        if image_tag and 'src' in image_tag.attrs:
-          image_url = f'{BASE_URL}{image_tag["src"]}'
-
-          image_response = requests.get(image_url)
-          if image_response.status_code == 200:
-            img = Image.open(BytesIO(image_response.content))
-            save_resized_image(img, folder_path)
-          else:
-            print(f'Failed to download image from {image_url}.')
-        else:
-          print(f'Cover image not found for game ID {game_id}.')
-      else:
-        print(f'Failed to access the game page. Status code: {game_response.status_code}')
-    else:
-      print(f'No game found for ID {game_id}.')
-  else:
+  if response.status_code != 200:
     print(f'Failed to access the search results for {game_id}. Status code: {response.status_code}')
+    return
 
-  return False
+  soup = BeautifulSoup(response.text, 'html.parser')
+  game_link = soup.select_one('.mw-search-result-heading a')
+  if not (game_link and 'href' in game_link.attrs):
+    print(f'No game found for ID {game_id}.')
+    return
+
+  game_page_url = f'{BASE_URL}{game_link["href"]}'
+  game_response = requests.get(game_page_url)
+  if game_response.status_code != 200:
+    print(f'Failed to access the game page. Status code: {game_response.status_code}')
+    return
+
+  game_soup = BeautifulSoup(game_response.text, 'html.parser')
+  image_tag = game_soup.select_one('.citizen-body-container .image img')
+  if not (image_tag and 'src' in image_tag.attrs):
+    print(f'Cover image not found for game ID {game_id}.')
+    return
+
+  image_url = f'{BASE_URL}{image_tag["src"]}'
+  image_response = requests.get(image_url)
+  if image_response.status_code != 200:
+    print(f'Failed to download image from {image_url}.')
+    return
+
+  img = Image.open(BytesIO(image_response.content))
+  save_resized_image(img, folder_path)
 
 if __name__ == '__main__':
   try:

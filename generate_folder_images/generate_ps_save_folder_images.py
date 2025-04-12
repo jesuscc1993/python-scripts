@@ -11,11 +11,12 @@ def main():
 def process_folder(folder_path):
   image_path = os.path.join(folder_path, IMAGE_FILENAME)
 
-  if image_path:
-    with Image.open(image_path) as img:
-      save_resized_image(img, folder_path)
-  else:
+  if not image_path:
     print(f'No suitable image found in "{folder_path}"')
+    return
+
+  with Image.open(image_path) as img:
+    save_resized_image(img, folder_path)
 
 if __name__ == '__main__':
   try:
