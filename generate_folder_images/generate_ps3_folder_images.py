@@ -25,7 +25,7 @@ def process_folder(folder_path):
   download_game_cover(game_id, folder_path)
 
 def download_game_cover(game_id, folder_path):
-  search_url = SEARCH_URL.format(game_id=game_id)
+  search_url = SEARCH_URL.format(game_id = game_id)
   response = requests.get(search_url)
 
   if response.status_code != 200:
