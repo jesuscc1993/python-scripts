@@ -28,6 +28,9 @@ def process_parent_folder(process_folder):
   for root, dirs, _ in os.walk(parent_folder):
     for dir_name in dirs:
       item_path = os.path.join(root, dir_name)
+      if os.path.exists(os.path.join(item_path, FOLDER_IMAGE_FILENAME)):
+        print(f'Skipping "{item_path}" as it already contains "{FOLDER_IMAGE_FILENAME}".')
+        continue
       process_folder(item_path)
 
   winsound.MessageBeep(winsound.MB_ICONASTERISK)
