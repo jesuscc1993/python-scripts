@@ -20,7 +20,7 @@ def process_image(file_path):
 
 def crop_blanks(img):
   np_img = numpy.array(img)
-  mask = numpy.any(np_img < WHITE_THRESHOLD, axis=2)
+  mask = numpy.any(np_img < WHITE_THRESHOLD, axis = 2)
 
   coords = numpy.argwhere(mask)
   if coords.size == 0:
