@@ -1,4 +1,4 @@
-# PDF to image
+# PDF to Image
 
 ## Description
 

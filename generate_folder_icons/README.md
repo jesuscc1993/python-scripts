@@ -1,4 +1,4 @@
-# Folder Icon Generator
+# Generate Folder Icons
 
 ## Description
 

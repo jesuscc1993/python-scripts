@@ -1,4 +1,4 @@
-# Folders Compressor
+# Compress Folders
 
 ## Description
 

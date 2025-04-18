@@ -1,4 +1,4 @@
-# Rename Files Sequentially
+# Rename Files
 
 ## Description
 

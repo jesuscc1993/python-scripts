@@ -1,4 +1,4 @@
-# Rename Files Sequentially
+# Delete Empty Folders
 
 ## Description
 

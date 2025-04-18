@@ -1,4 +1,4 @@
-# Image Compressor
+# Compress Images
 
 ## Description
 

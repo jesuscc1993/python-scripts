@@ -1,4 +1,4 @@
-# Steam Folder Iterator
+# Iterate Steam Folders
 
 ## Description
 
