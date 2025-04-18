@@ -26,8 +26,8 @@ def crop_blanks(img):
   if coords.size == 0:
     return img
 
-  y0, x0 = coords.min(axis=0)
-  y1, x1 = coords.max(axis=0) + 1
+  y0, x0 = coords.min(axis = 0)
+  y1, x1 = coords.max(axis = 0) + 1
 
   cropped_array = np_img[y0:y1, x0:x1]
   cropped_img = Image.fromarray(cropped_array)
