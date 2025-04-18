@@ -1,7 +1,7 @@
 import os
 import re
 import requests
-import webbrowser
+# import webbrowser
 
 from PIL import Image
 from io import BytesIO
@@ -14,13 +14,12 @@ def main():
   process_parent_folder(process_folder)
 
 def process_folder(folder_path):
-  folder_name = os.path.basename(os.path.normpath(folder_path))
-  match = re.match(r'(^[0-9A-F]+$)', folder_name.upper())
+  match = re.match(r'(^[0-9A-F]+$)', os.path.basename(os.path.normpath(folder_path)).upper())
 
   if match:
     game_id = match.group(1)
   else:
-    print(f'Could not extract a valid game ID from "{folder_name}"')
+    print(f'Could not extract a valid game ID from "{folder_path}"')
     return
 
   download_game_cover(game_id, folder_path)
