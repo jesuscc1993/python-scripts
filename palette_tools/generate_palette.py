@@ -1,11 +1,12 @@
 import colorsys
+import math
 import os
 
 from PIL import Image, ImageDraw
 from collections import Counter
 
 SQUARE_SIZE = 40
-COLUMNS = 8
+MIN_COLS = 4
 
 def main():
   src_path = input('Enter the path to the image you want to generate the palette for:\n').strip('" ')
@@ -31,22 +32,27 @@ def extract_colors(image_path):
   return [c[0] for c in sorted_colors]
 
 def create_palette_image(colors, output_path):
-  rows = (len(colors) + COLUMNS - 1) // COLUMNS
-  width = COLUMNS * SQUARE_SIZE
-  height = rows * SQUARE_SIZE
-  palette_img = Image.new('P', (width, height))
-  palette = []
+  if len(colors) > 255:
+    return print('ERROR: Palette supports a maximum of 256 colors (transparency included)')
 
+  columns = MIN_COLS * math.ceil(math.sqrt(len(colors)) / MIN_COLS)
+  rows = (len(colors) + columns - 1) // columns
+  width = columns * SQUARE_SIZE
+  height = rows * SQUARE_SIZE
+  palette_img = Image.new('P', (width, height), color = 0)
+
+  palette = [0, 0, 0]
   for color in colors:
     palette.extend(color[:3])
   palette += [0] * (768 - len(palette))
   palette_img.putpalette(palette)
-  draw = ImageDraw.Draw(palette_img)
+  palette_img.info['transparency'] = 0
 
+  draw = ImageDraw.Draw(palette_img)
   for i, color in enumerate(colors):
-    x = (i % COLUMNS) * SQUARE_SIZE
-    y = (i // COLUMNS) * SQUARE_SIZE
-    draw.rectangle([x, y, x + SQUARE_SIZE, y + SQUARE_SIZE], fill = colors.index(color))
+    x = (i % columns) * SQUARE_SIZE
+    y = (i // columns) * SQUARE_SIZE
+    draw.rectangle([x, y, x + SQUARE_SIZE, y + SQUARE_SIZE], fill=i + 1)
 
   palette_img.save(output_path, format = 'PNG', save_all = False)
   print(f'Saved "{output_path}".')
