@@ -46,9 +46,9 @@ def create_palette_image(colors, output_path):
   for i, color in enumerate(colors):
     x = (i % COLUMNS) * SQUARE_SIZE
     y = (i // COLUMNS) * SQUARE_SIZE
-    draw.rectangle([x, y, x + SQUARE_SIZE, y + SQUARE_SIZE], fill=colors.index(color))
+    draw.rectangle([x, y, x + SQUARE_SIZE, y + SQUARE_SIZE], fill = colors.index(color))
 
-  palette_img.save(output_path, format = 'PNG', save_all=False)
+  palette_img.save(output_path, format = 'PNG', save_all = False)
   print(f'Saved "{output_path}".')
 
 if __name__ == '__main__':
