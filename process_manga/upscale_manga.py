@@ -1,29 +1,29 @@
 import os
 import subprocess
 
-from _common import process_folder_images, select_parent_folder
-from _settings import OUTPUT_EXTENSION
+from _common import select_parent_folder, process_folder_images
 
-waifu2x_path = os.path.join(os.path.dirname(__file__), 'waifu2x/waifu2x.exe')
+binary_path = os.path.join(os.path.dirname(__file__), 'binaries/realesrgan/realesrgan-ncnn-vulkan.exe')
 
 def process_parent_folder(folder_path):
   process_folder_images(folder_path, process_image)
 
-def process_image(original_path):
+def process_image(file_path):
   try:
-    output_path = f'{original_path.rsplit(".", 1)[0]}@2x.{OUTPUT_EXTENSION}'
-
-    subprocess.run([
-      waifu2x_path,
-      '-i', original_path,
-      '-o', output_path,
-      '-m', 'models-upconv_7_anime_style_art_rgb',
-      '-n', '2',
-      '-s', '2'
-    ])
+    subprocess.run(
+      [
+        binary_path,
+        '-i', file_path,
+        '-o', file_path,
+        '-s', '2',
+        '-n', 'realesr-animevideov3-x2'
+      ],
+      stdout=subprocess.DEVNULL,
+      stderr=subprocess.DEVNULL
+    )
 
   except Exception as e:
-    print(f'Error processing "{original_path}": {e}')
+    print(f'Error processing "{file_path}": {e}')
 
 if __name__ == '__main__':
   try:
