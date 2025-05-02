@@ -2,7 +2,7 @@ import os
 import shutil
 
 def main():
-  src_path = prompt_path('Enter the path containing the replacement files:\n')
+  src_path = prompt_path('Enter the path containing the files to copy:\n')
   if src_path is None: return
   print('')
 
