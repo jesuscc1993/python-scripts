@@ -39,7 +39,10 @@ def copy_folder_assets(src_path, dest_path):
 
       for file in os.listdir(item_path):
         if file in FILES_TO_COPY:
-          shutil.copy2(os.path.join(item_path, file), os.path.join(dest_folder, file))
+          src_file = os.path.join(item_path, file)
+          dest_file = os.path.join(dest_folder, file)
+          shutil.copy2(src_file, dest_file)
+          print(f'Copied "{src_file}" to "{dest_file}".')
 
 if __name__ == '__main__':
   try:
