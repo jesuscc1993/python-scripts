@@ -12,11 +12,20 @@ def process_parent_folder(image_filenames):
     print(f'The specified path "{parent_folder}" is not a directory.')
     return
 
-  recursive = input('\nRun recursively in subfolders? (y|n). Default: y:\n').strip().lower() != 'n'
+  try:
+    depth = int(input('\nEnter the depth for processing subfolders (default: 1):\n').strip() or 1)
+    if depth < 0:
+      raise ValueError()
+  except ValueError:
+    print('\nERROR: Depth must be a positive integer.')
+    return
+
   process_folder(parent_folder, image_filenames)
 
-  if recursive:
-    for root, dirs, _ in os.walk(parent_folder):
+  if depth > 0:
+    for current_depth, (root, dirs, _) in enumerate(os.walk(parent_folder)):
+      if current_depth >= depth:
+        break
       for dir_name in dirs:
         item_path = os.path.join(root, dir_name)
         process_folder(item_path, image_filenames)
