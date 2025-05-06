@@ -42,11 +42,11 @@ def download_all_chapters(base_url, chapter_count):
 
 def download_images_from_chapter(base_url, chapter_number):
   chapter_url = base_url % chapter_number
-  folder = f'downloads/Ch.{str(chapter_number).zfill(3)}'
+  folder = f'downloads/Ch.{pad_string(chapter_number)}'
   os.makedirs(folder, exist_ok=True)
 
   try:
-    response = requests.get(chapter_url, timeout=10)
+    response = requests.get(chapter_url, timeout = 10)
     soup = BeautifulSoup(response.text, 'html.parser')
     images = soup.find_all('img')
 
@@ -54,13 +54,16 @@ def download_images_from_chapter(base_url, chapter_number):
       src = img.get('src')
       if src:
         img_url = urllib.parse.urljoin(chapter_url, src)
-        img_data = requests.get(img_url, timeout=10).content
+        img_data = requests.get(img_url, timeout = 10).content
         img_ext = os.path.splitext(urllib.parse.urlparse(img_url).path)[1]
-        img_name = os.path.join(folder, f'{str(i+1).zfill(2)}{img_ext}')
+        img_name = os.path.join(folder, f'{pad_string(i + 1)}{img_ext}')
         with open(img_name, 'wb') as f:
           f.write(img_data)
   except Exception as e:
     print(f'Failed to download chapter {chapter_number}: {e}')
+
+def pad_string(string, width = 3):
+  return str(string).zfill(width)
 
 if __name__ == '__main__':
   try:
