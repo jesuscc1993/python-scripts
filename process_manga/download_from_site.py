@@ -1,0 +1,70 @@
+import os
+import requests
+import urllib
+
+from bs4 import BeautifulSoup
+from concurrent.futures import ThreadPoolExecutor
+from tqdm import tqdm
+
+from _sound_utils import play_notification_sound
+
+def main():
+  base_url = input('Enter the url to download from (replace chapter with a %s placeholder):\n').strip('" ')
+  if not base_url:
+    print(f'The url must be defined.')
+    return
+
+  try:
+    chapter_count = int(input('\nEnter the chapter count:\n').strip())
+    if chapter_count < 0:
+      raise ValueError()
+  except ValueError:
+    print('\nERROR: Chapter count must be a positive integer.')
+    return
+  print('')
+
+  download_all_chapters(base_url, chapter_count)
+  print('')
+
+  play_notification_sound()
+  print(f'Finished downloading from "{base_url}".\n')
+  main()
+
+def download_all_chapters(base_url, chapter_count):
+  files_to_process = range(1, chapter_count + 1)
+
+  with ThreadPoolExecutor() as executor, tqdm(total=len(files_to_process), desc='Downloading Chapters') as progress:
+    futures = [executor.submit(download_images_from_chapter, base_url, num) for num in files_to_process]
+
+    for future in futures:
+      future.result()
+      progress.update(1)
+
+def download_images_from_chapter(base_url, chapter_number):
+  chapter_url = base_url % chapter_number
+  folder = f'downloads/Ch.{str(chapter_number).zfill(3)}'
+  os.makedirs(folder, exist_ok=True)
+
+  try:
+    response = requests.get(chapter_url, timeout=10)
+    soup = BeautifulSoup(response.text, 'html.parser')
+    images = soup.find_all('img')
+
+    for i, img in enumerate(images):
+      src = img.get('src')
+      if src:
+        img_url = urllib.parse.urljoin(chapter_url, src)
+        img_data = requests.get(img_url, timeout=10).content
+        img_ext = os.path.splitext(urllib.parse.urlparse(img_url).path)[1]
+        img_name = os.path.join(folder, f'{str(i+1).zfill(2)}{img_ext}')
+        with open(img_name, 'wb') as f:
+          f.write(img_data)
+  except Exception as e:
+    print(f'Failed to download chapter {chapter_number}: {e}')
+
+if __name__ == '__main__':
+  try:
+    main()
+  except Exception as e:
+    print(f'An unexpected error occurred: {e}')
+    input('Press Enter to exit...')

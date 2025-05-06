@@ -1,12 +1,12 @@
 import os
+import sys
 
 from concurrent.futures import ThreadPoolExecutor
-from tqdm import tqdm
 
 META_FILES = ['.noxml', '.nomedia']
 
-def main():
-  parent_folder = input('Enter the path to the image you want to generate the palette for:\n')
+def prompt_parent_folder(default_folder=None):
+  parent_folder = default_folder or input('Enter the path to the image you want to generate the palette for:\n')
   if not parent_folder:
     return
   if not os.path.isdir(parent_folder):
@@ -41,7 +41,8 @@ def process_folder(folder_path):
 
 if __name__ == '__main__':
   try:
-    main()
+    parent_folder = sys.argv[1] if len(sys.argv) > 1 else None
+    prompt_parent_folder(parent_folder)
   except Exception as e:
     print(f'An unexpected error occurred: {e}')
   input('Press Enter to exit...')
