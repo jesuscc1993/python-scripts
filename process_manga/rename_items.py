@@ -5,7 +5,7 @@ import sys
 from concurrent.futures import ThreadPoolExecutor
 from tqdm import tqdm
 
-META_FILES = ['.noxml', '.nomedia']
+from _sound_utils import play_notification_sound
 
 def prompt_parent_folder(default_folder = None):
   parent_folder = default_folder or input('Enter the path to the image you want to generate the palette for:\n')
@@ -15,6 +15,7 @@ def prompt_parent_folder(default_folder = None):
     print(f'The specified path "{parent_folder}" is not a directory.')
   else:
     process_parent_folder(parent_folder)
+    play_notification_sound()
 
 def process_parent_folder(parent_folder):
   for root, dirs, files in os.walk(parent_folder, topdown = False):

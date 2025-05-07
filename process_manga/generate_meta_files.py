@@ -3,6 +3,8 @@ import sys
 
 from concurrent.futures import ThreadPoolExecutor
 
+from _sound_utils import play_notification_sound
+
 META_FILES = ['.noxml', '.nomedia']
 
 def prompt_parent_folder(default_folder = None):
@@ -13,6 +15,7 @@ def prompt_parent_folder(default_folder = None):
     print(f'The specified path "{parent_folder}" is not a directory.')
   else:
     process_parent_folder(parent_folder)
+    play_notification_sound()
 
 def process_parent_folder(parent_folder):
   folders_to_process = []
