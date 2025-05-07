@@ -5,7 +5,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 META_FILES = ['.noxml', '.nomedia']
 
-def prompt_parent_folder(default_folder=None):
+def prompt_parent_folder(default_folder = None):
   parent_folder = default_folder or input('Enter the path to the image you want to generate the palette for:\n')
   if not parent_folder:
     return
