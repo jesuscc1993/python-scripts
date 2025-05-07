@@ -26,8 +26,9 @@ def process_parent_folder(parent_folder):
     for dir_name in dirs:
       folders.append(os.path.join(root, dir_name))
 
-  with ThreadPoolExecutor() as executor:
-    list(tqdm(executor.map(process_folder, folders), total=len(folders), desc=f'Processing "{parent_folder}"'))
+  if len(folders) > 0:
+    with ThreadPoolExecutor() as executor:
+      list(tqdm(executor.map(process_folder, folders), total=len(folders), desc=f'Processing "{parent_folder}"'))
 
 def process_folder(folder_path):
   folder_name = os.path.basename(folder_path)
@@ -38,13 +39,17 @@ def process_folder(folder_path):
     return
 
   try:
-    with zipfile.ZipFile(compressed_file_path, 'w', zipfile.ZIP_DEFLATED) as compressed_file:
-      for root, _, files in os.walk(folder_path):
-        for file in files:
-          file_path = os.path.join(root, file)
+    files = []
+    for root, _, filenames in os.walk(folder_path):
+      for file in filenames:
+        files.append(os.path.join(root, file))
+
+    if len(files) > 0:
+      with zipfile.ZipFile(compressed_file_path, 'w', zipfile.ZIP_DEFLATED) as compressed_file:
+        for file_path in files:
           compressed_file.write(file_path, os.path.relpath(file_path, folder_path))
 
-    shutil.rmtree(folder_path)
+      shutil.rmtree(folder_path)
 
   except Exception as e:
     print(f'An error occurred while processing "{folder_name}": {e}')
