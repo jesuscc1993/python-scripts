@@ -1,11 +1,6 @@
 import os
-import shutil
 import re
 
-from concurrent.futures import ThreadPoolExecutor
-from tqdm import tqdm
-
-from _sound_utils import play_notification_sound
 from _common import select_parent_folder
 
 def process_parent_folder(directory):
