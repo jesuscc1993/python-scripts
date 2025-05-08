@@ -7,13 +7,13 @@ from tqdm import tqdm
 from _sound_utils import play_notification_sound
 
 def main():
-  parent_folder = input('Enter the path to the parent folder containing the files:\n').strip('" ')
+  parent_folder = input('Enter the path to the parent folder containing the files:\n').strip(' "\'')
   if not parent_folder:
     return
   if not os.path.isdir(parent_folder):
     print(f'The specified path "{parent_folder}" is not a directory.')
   else:
-    pattern = re.compile(input('Enter the pattern files need to match (regex):\n').strip('" '))
+    pattern = re.compile(input('Enter the pattern files need to match (regex):\n').strip(' "\''))
     process_files(parent_folder, pattern)
     play_notification_sound()
     print(f'Finished processing "{parent_folder}".\n')

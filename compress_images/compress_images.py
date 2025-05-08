@@ -13,7 +13,7 @@ OUTPUT_EXTENSION = OUTPUT_FORMAT.lower()
 OUTPUT_QUALITY = 80
 
 def main():
-  parent_folder = input('Enter the path to the parent folder containing the folders or images:\n').strip('" ')
+  parent_folder = input('Enter the path to the parent folder containing the folders or images:\n').strip(' "\'')
   if not parent_folder:
     return
   if not os.path.isdir(parent_folder):

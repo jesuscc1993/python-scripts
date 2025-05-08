@@ -9,7 +9,7 @@ from tqdm import tqdm
 from _sound_utils import play_notification_sound
 
 def main():
-  base_url = input('Enter the url to download from (replace chapter with a %s placeholder):\n').strip('" ')
+  base_url = input('Enter the url to download from (replace chapter with a %s placeholder):\n').strip(' "\'')
   if not base_url:
     print(f'The url must be defined.')
     return

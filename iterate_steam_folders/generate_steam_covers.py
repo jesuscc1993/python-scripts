@@ -19,7 +19,7 @@ COVER_URL_MAP = {
 }
 
 def main():
-  parent_folder = input('Enter the path to the parent folder containing your Steam saves:\n').strip('" ')
+  parent_folder = input('Enter the path to the parent folder containing your Steam saves:\n').strip(' "\'')
   print('')
 
   cover_type = input('Enter cover type (capsule, header, or library). Default is capsule:\n').strip().lower() or 'capsule'

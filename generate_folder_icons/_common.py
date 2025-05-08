@@ -7,7 +7,7 @@ ICON_FILENAME = 'icon.ico'
 ICON_SIZE = 256
 
 def process_parent_folder(image_filenames):
-  parent_folder = input('Enter the folder path to process:\n').strip('" ')
+  parent_folder = input('Enter the folder path to process:\n').strip(' "\'')
   if not os.path.isdir(parent_folder):
     print(f'The specified path "{parent_folder}" is not a directory.')
     return

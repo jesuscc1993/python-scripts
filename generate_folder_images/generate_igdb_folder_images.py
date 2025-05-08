@@ -104,7 +104,7 @@ def process_folder(folder_name, container_folder):
       print(f'Error processing folder "{folder_name}": {e}')
 
 def main():
-  container_folder = input('Enter the path to the folder containing your games:\n').strip('" ') or os.getcwd()
+  container_folder = input('Enter the path to the folder containing your games:\n').strip(' "\'') or os.getcwd()
 
   with ThreadPoolExecutor() as executor:
     _ = [

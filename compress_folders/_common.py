@@ -9,7 +9,7 @@ from _settings import OUTPUT_EXTENSION
 from _sound_utils import play_notification_sound
 
 def select_parent_folder(prompt, callback):
-  parent_folder = input(prompt).strip('" ')
+  parent_folder = input(prompt).strip(' "\'')
   if not parent_folder:
     return
   if not os.path.isdir(parent_folder):
