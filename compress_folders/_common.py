@@ -26,15 +26,25 @@ def process_parent_folder(parent_folder):
     for dir_name in dirs:
       folders.append(os.path.join(root, dir_name))
 
+  tmp_dir = os.path.join(parent_folder, '.tmp')
+  shutil.rmtree(tmp_dir, ignore_errors = True)
+  os.makedirs(tmp_dir)
+
   if len(folders) > 0:
     with ThreadPoolExecutor() as executor:
-      list(tqdm(executor.map(process_folder, folders), total=len(folders), desc=f'Processing "{parent_folder}"'))
+      list(tqdm(executor.map(process_folder, folders), total = len(folders), desc = f'Processing "{parent_folder}"'))
+
+    shutil.rmtree(tmp_dir, ignore_errors = True)
 
 def process_folder(folder_path):
   folder_name = os.path.basename(folder_path)
-  compressed_file_path = f'{folder_path}.{OUTPUT_EXTENSION}'
+  tmp_dir = os.path.join(os.path.dirname(folder_path), '.tmp')
 
-  if os.path.exists(compressed_file_path):
+  zip_filename = f'{folder_name}.{OUTPUT_EXTENSION}'
+  tmp_zip_path = os.path.join(tmp_dir, zip_filename)
+  final_zip_path = os.path.join(os.path.dirname(folder_path), zip_filename)
+
+  if os.path.exists(final_zip_path):
     print(f'Skipping "{folder_name}". A compressed file with the same name already exists.')
     return
 
@@ -45,10 +55,11 @@ def process_folder(folder_path):
         files.append(os.path.join(root, file))
 
     if len(files) > 0:
-      with zipfile.ZipFile(compressed_file_path, 'w', zipfile.ZIP_DEFLATED) as compressed_file:
+      with zipfile.ZipFile(tmp_zip_path, 'w', zipfile.ZIP_DEFLATED) as compressed_file:
         for file_path in files:
           compressed_file.write(file_path, os.path.relpath(file_path, folder_path))
 
+      shutil.move(tmp_zip_path, final_zip_path)
       shutil.rmtree(folder_path)
 
   except Exception as e:
