@@ -24,11 +24,12 @@ def get_max_dimensions(img):
   aspect_ratio = width / height
   height_ratio = height / MAX_HEIGHT
   width_ratio = width / MAX_WIDTH
+  is_portrait = height > width
   is_long_strip = aspect_ratio <= LONG_STRIP_ASPECT_RATIO
-  too_wide = width > MAX_WIDTH and width_ratio > height_ratio
-  too_tall = height > MAX_HEIGHT and height_ratio > width_ratio and not is_long_strip
+  too_wide = width > MAX_WIDTH and is_portrait
+  too_tall = height > MAX_HEIGHT and not is_long_strip
 
-  if too_wide:
+  if too_wide and width_ratio > height_ratio:
     width = MAX_WIDTH
     height = int(width / aspect_ratio)
   elif too_tall:
