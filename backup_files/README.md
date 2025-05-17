@@ -3,7 +3,7 @@
 ## Description
 
 Recursively copies updated files from one path to another.<br>
-Will only copy updated files.
+If a file already exists in the destination, it will only be backed up if it was updated.
 
 ## Running
 
