@@ -1,6 +1,8 @@
 import os
 import shutil
 
+from _common import prompt_path
+
 def main():
   src_path = prompt_path('Enter the path containing the files to copy:\n')
   if src_path is None: return
@@ -15,13 +17,6 @@ def main():
 
   print(f'Finished copying "{src_path}" to "{dest_path}".\n')
   main()
-
-def prompt_path(prompt_message):
-  path = input(prompt_message).strip(' "\'')
-  if not path or not os.path.isdir(path):
-    print(f'The specified path "{path}" is not a directory.')
-    return None
-  return path
 
 def rename_and_copy_files(src_path, dest_path):
   for filename in os.listdir(src_path):

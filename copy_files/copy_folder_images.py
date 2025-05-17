@@ -1,6 +1,8 @@
 import os
 import shutil
 
+from _common import prompt_path
+
 FILES_TO_COPY = {
   'cover.jpg',
   'desktop.ini',
@@ -22,13 +24,6 @@ def main():
 
   print(f'Finished copying "{src_path}" to "{dest_path}".\n')
   main()
-
-def prompt_path(prompt_message):
-  path = input(prompt_message).strip(' "\'')
-  if not path or not os.path.isdir(path):
-    print(f'The specified path "{path}" is not a directory.')
-    return None
-  return path
 
 def copy_folder_assets(src_path, dest_path):
   for item in os.listdir(src_path):
