@@ -5,7 +5,7 @@ import zipfile
 from concurrent.futures import ThreadPoolExecutor
 from tqdm import tqdm
 
-from _settings import OUTPUT_EXTENSION
+from _settings import FOLDER_OUTPUT_EXTENSION
 from _sound_utils import play_notification_sound
 
 def select_parent_folder(prompt, callback):
@@ -26,11 +26,11 @@ def process_parent_folder(parent_folder):
     for dir_name in dirs:
       folders.append(os.path.join(root, dir_name))
 
-  tmp_dir = os.path.join(parent_folder, '.tmp')
-  shutil.rmtree(tmp_dir, ignore_errors = True)
-  os.makedirs(tmp_dir)
-
   if len(folders) > 0:
+    tmp_dir = os.path.join(parent_folder, '.tmp')
+    shutil.rmtree(tmp_dir, ignore_errors = True)
+    os.makedirs(tmp_dir)
+
     with ThreadPoolExecutor() as executor:
       list(tqdm(executor.map(process_folder, folders), total = len(folders), desc = f'Processing "{parent_folder}"'))
 
@@ -40,7 +40,7 @@ def process_folder(folder_path):
   folder_name = os.path.basename(folder_path)
   tmp_dir = os.path.join(os.path.dirname(folder_path), '.tmp')
 
-  zip_filename = f'{folder_name}.{OUTPUT_EXTENSION}'
+  zip_filename = f'{folder_name}.{FOLDER_OUTPUT_EXTENSION}'
   tmp_zip_path = os.path.join(tmp_dir, zip_filename)
   final_zip_path = os.path.join(os.path.dirname(folder_path), zip_filename)
 

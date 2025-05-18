@@ -1,5 +1,3 @@
-import os
-
 from _common import process_parent_folder, select_parent_folder
 
 if __name__ == '__main__':

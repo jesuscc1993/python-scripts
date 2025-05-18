@@ -5,12 +5,8 @@ from concurrent.futures import ThreadPoolExecutor
 from tqdm import tqdm
 
 from _image_utils import is_image_file
+from _settings import IMAGE_OUTPUT_FORMAT, IMAGE_OUTPUT_EXTENSION, IMAGE_OUTPUT_QUALITY
 from _sound_utils import play_notification_sound
-
-# settings
-OUTPUT_FORMAT = 'WEBP'
-OUTPUT_EXTENSION = OUTPUT_FORMAT.lower()
-OUTPUT_QUALITY = 80
 
 def main():
   parent_folder = input('Enter the path to the parent folder containing the folders or images:\n').strip(' "\'')
@@ -41,12 +37,12 @@ def process_image(file_path):
   ext = os.path.splitext(file_path)[1].lower()
   name = os.path.splitext(file_path)[0]
   og_path = f'{name}.bak.{ext}'
-  output_path = f'{name}.{OUTPUT_EXTENSION}'
+  output_path = f'{name}.{IMAGE_OUTPUT_EXTENSION}'
 
   os.rename(file_path, og_path)
 
   with Image.open(og_path) as img:
-    img.save(output_path, OUTPUT_FORMAT, quality = OUTPUT_QUALITY)
+    img.save(output_path, IMAGE_OUTPUT_FORMAT, quality = IMAGE_OUTPUT_QUALITY)
 
   if os.path.getsize(output_path) < os.path.getsize(og_path):
     os.remove(og_path)
