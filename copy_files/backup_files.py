@@ -1,6 +1,23 @@
-import argparse
 import os
 import shutil
+import sys
+
+from _common import prompt_path
+
+def main():
+  if len(sys.argv) > 2:
+    src_path = sys.argv[1]
+    dest_path = sys.argv[2]
+  else:
+    src_path = prompt_path('Enter the path containing the files to copy:\n')
+    if src_path is None: return
+    print('')
+
+    dest_path = prompt_path('Enter the path the files will be copied to:\n')
+    if dest_path is None: return
+    print('')
+
+  copy_updated_files(src_path, dest_path)
 
 def copy_updated_files(src, dest):
   for src_dir, _, files in os.walk(src):
@@ -15,13 +32,6 @@ def copy_updated_files(src, dest):
       if not os.path.exists(dest_file) or os.path.getmtime(src_file) > os.path.getmtime(dest_file):
         shutil.copy2(src_file, dest_file)
         print(f'Backed up "{src_file}" to "{dest_file}".')
-
-def main():
-  parser = argparse.ArgumentParser(description='Recursively copy updated files from src to dest.')
-  parser.add_argument('src', type=str, help='Source directory')
-  parser.add_argument('dest', type=str, help='Destination directory')
-  args = parser.parse_args()
-  copy_updated_files(args.src, args.dest)
 
 if __name__ == '__main__':
   try:

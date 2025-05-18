@@ -7,12 +7,23 @@ from _sound_utils import play_notification_sound
 
 META_FILES = ['.noxml', '.nomedia']
 
+def main():
+  if len(sys.argv) > 1:
+    parent_folder = sys.argv[1]
+  else:
+    parent_folder = prompt_parent_folder()
+
+  if not parent_folder: return
+  process_parent_folder(parent_folder)
+  play_notification_sound()
+
 def prompt_parent_folder():
   parent_folder = input('Enter the path to the image you want to generate the palette for:\n')
   if os.path.isdir(parent_folder):
     return parent_folder
   else:
-    print(f'The specified path "{parent_folder}" is not a directory.')
+    if parent_folder:
+      print(f'The specified path "{parent_folder}" is not a directory.')
     return
 
 def process_parent_folder(parent_folder):
@@ -42,14 +53,7 @@ def process_folder(folder_path):
 
 if __name__ == '__main__':
   try:
-    if len(sys.argv) > 1:
-      parent_folder = sys.argv[1]
-    else:
-      parent_folder = prompt_parent_folder()
-
-    if parent_folder:
-      process_parent_folder(parent_folder)
-      play_notification_sound()
+    main()
   except Exception as e:
     print(f'An unexpected error occurred: {e}')
   input('Press Enter to exit...')
