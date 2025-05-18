@@ -42,7 +42,11 @@ def process_folder(folder_path):
 
 if __name__ == '__main__':
   try:
-    parent_folder = sys.argv[1] if len(sys.argv) > 1 else prompt_parent_folder()
+    if len(sys.argv) > 1:
+      parent_folder = sys.argv[1]
+    else:
+      parent_folder = prompt_parent_folder()
+
     if parent_folder:
       process_parent_folder(parent_folder)
       play_notification_sound()
