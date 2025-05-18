@@ -36,8 +36,8 @@ def get_volume_and_chapter(folder_name):
   match = re.search(r'(Vol(?:ume)?)\.?\s*(\d+).*?(Ch(?:apter)?|Ep(?:isode)?)\.?\s*(\d+)', folder_name, re.IGNORECASE)
   return (match.group(2), match.group(4)) if match else (None, None)
 
-def process_file(args):
-  src, target_folder, chapter = args
+def process_file(params):
+  src, target_folder, chapter = params
   base, ext = os.path.splitext(os.path.basename(src))
   new_name = f'ch{chapter}_p{base}{ext}'
   dest = os.path.join(target_folder, new_name)
