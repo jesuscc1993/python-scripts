@@ -45,7 +45,7 @@ def process_folder(folder_path):
   final_zip_path = os.path.join(os.path.dirname(folder_path), zip_filename)
 
   if os.path.exists(final_zip_path):
-    print(f'Skipping "{folder_name}". A compressed file with the same name already exists.')
+    print(f'Skipping "{folder_path}". A compressed file with the same name already exists.')
     return
 
   try:
