@@ -18,7 +18,7 @@ def main():
   play_notification_sound()
 
 def prompt_parent_folder():
-  parent_folder = input('Enter the path to the image you want to generate the palette for:\n')
+  parent_folder = input('Enter the path to the image you want to generate the metadata files for:\n')
   if os.path.isdir(parent_folder):
     return parent_folder
   else:
