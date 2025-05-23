@@ -8,15 +8,21 @@ def main():
     delete_empty_folders(parent_folder)
 
 def delete_empty_folders(parent_folder):
+  none_deleted = True
+
   for root, dirs, _ in os.walk(parent_folder, topdown=False):
     for dir_name in dirs:
       dir_path = os.path.join(root, dir_name)
       if is_folder_recursively_empty(dir_path):
         try:
           os.rmdir(dir_path)
+          none_deleted = False
           print(f'Deleted empty folder: "{dir_path}"')
         except OSError:
           pass
+
+  if none_deleted:
+    print('No empty folders were found.')
 
 def is_folder_recursively_empty(dir_path):
   if os.listdir(dir_path):
