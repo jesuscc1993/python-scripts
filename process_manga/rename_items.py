@@ -33,8 +33,8 @@ def process_item(root, item_name):
 
 def get_processed_name(name):
   new_name = re.sub(r'\s+', ' ', name)
-  new_name = re.sub(r'\bchapter\b\s*', 'Ch.', new_name, flags = re.IGNORECASE)
-  new_name = re.sub(r'\bvolume\b\s*', 'Vol.', new_name, flags = re.IGNORECASE)
+  new_name = re.sub(r'\b(chapter|ch)\b\s*', 'Ch.', new_name, flags = re.IGNORECASE)
+  new_name = re.sub(r'\b(volume|vol)\b\s*', 'Vol.', new_name, flags = re.IGNORECASE)
   return new_name
 
 if __name__ == '__main__':
