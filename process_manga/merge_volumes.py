@@ -17,14 +17,14 @@ def process_parent_folder(root_dir):
       if not volume or not chapter:
         continue
 
-      target_folder = os.path.join(root_dir, f'Vol.{volume.zfill(2)}')
-      if not os.path.exists(target_folder):
-        os.makedirs(target_folder)
+      output_path = os.path.join(root_dir, f'Vol.{volume.zfill(2)}')
+      if not os.path.exists(output_path):
+        os.makedirs(output_path)
 
       for item in os.listdir(folder_path):
         src = os.path.join(folder_path, item)
         if os.path.isfile(src):
-          files_to_process.append((src, target_folder, chapter))
+          files_to_process.append((src, output_path, chapter))
 
   with ThreadPoolExecutor() as executor, tqdm(total=len(files_to_process), desc=f'Processing "{root_dir}"') as progress:
     for _ in executor.map(process_file, files_to_process):

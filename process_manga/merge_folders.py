@@ -8,9 +8,9 @@ from tqdm import tqdm
 from _common import delete_empty_folders, select_parent_folder
 
 def process_parent_folder(root_dir):
-  output_dir = os.path.join(root_dir, 'output')
-  if not os.path.exists(output_dir):
-    os.makedirs(output_dir)
+  output_path = os.path.join(root_dir, 'output')
+  if not os.path.exists(output_path):
+    os.makedirs(output_path)
 
   files_to_process = []
 
@@ -24,7 +24,7 @@ def process_parent_folder(root_dir):
       for item in os.listdir(folder_path):
         src = os.path.join(folder_path, item)
         if os.path.isfile(src):
-          files_to_process.append((src, output_dir, chapter))
+          files_to_process.append((src, output_path, chapter))
 
   with ThreadPoolExecutor() as executor, tqdm(total=len(files_to_process), desc=f'Processing "{root_dir}"') as progress:
     for _ in executor.map(process_file, files_to_process):
