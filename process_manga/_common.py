@@ -30,3 +30,12 @@ def process_folder_images(folder_path, callback):
   with ThreadPoolExecutor() as executor, tqdm(total = len(files_to_process), desc = f'Processing "{folder_path}"') as progress:
     for _ in executor.map(callback, files_to_process):
       progress.update(1)
+
+def delete_empty_folders(folder_path):
+  for root, dirs, _ in os.walk(folder_path, topdown = False):
+    for dir_name in dirs:
+      dir_path = os.path.join(root, dir_name)
+      try:
+        os.rmdir(dir_path)
+      except OSError:
+        pass

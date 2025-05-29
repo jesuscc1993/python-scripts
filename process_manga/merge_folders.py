@@ -8,23 +8,23 @@ from tqdm import tqdm
 from _common import delete_empty_folders, select_parent_folder
 
 def process_parent_folder(root_dir):
+  output_dir = os.path.join(root_dir, 'output')
+  if not os.path.exists(output_dir):
+    os.makedirs(output_dir)
+
   files_to_process = []
 
   for folder in os.listdir(root_dir):
     folder_path = os.path.join(root_dir, folder)
-    if os.path.isdir(folder_path):
-      volume, chapter = get_volume_and_chapter(folder)
-      if not volume or not chapter:
+    if os.path.isdir(folder_path) and folder != 'output':
+      chapter = get_chapter(folder)
+      if not chapter:
         continue
-
-      target_folder = os.path.join(root_dir, f'Vol.{volume.zfill(2)}')
-      if not os.path.exists(target_folder):
-        os.makedirs(target_folder)
 
       for item in os.listdir(folder_path):
         src = os.path.join(folder_path, item)
         if os.path.isfile(src):
-          files_to_process.append((src, target_folder, chapter))
+          files_to_process.append((src, output_dir, chapter))
 
   with ThreadPoolExecutor() as executor, tqdm(total=len(files_to_process), desc=f'Processing "{root_dir}"') as progress:
     for _ in executor.map(process_file, files_to_process):
@@ -32,9 +32,9 @@ def process_parent_folder(root_dir):
 
   delete_empty_folders(root_dir)
 
-def get_volume_and_chapter(folder_name):
-  match = re.search(r'(Vol(?:ume)?)\.?\s*(\d+).*?(Ch(?:apter)?|Ep(?:isode)?)\.?\s*(\d+)', folder_name, re.IGNORECASE)
-  return (match.group(2), match.group(4)) if match else (None, None)
+def get_chapter(folder_name):
+  match = re.search(r'(Ch(?:apter)?|Ep(?:isode)?)\.?\s*(\d+)', folder_name, re.IGNORECASE)
+  return match.group(2) if match else None
 
 def process_file(params):
   src, target_folder, chapter = params
