@@ -26,14 +26,14 @@ def process_parent_folder(root_dir):
         if os.path.isfile(src):
           files_to_process.append((src, output_path, chapter))
 
-  with ThreadPoolExecutor() as executor, tqdm(total=len(files_to_process), desc=f'Processing "{root_dir}"') as progress:
+  with ThreadPoolExecutor() as executor, tqdm(total = len(files_to_process), desc = f'Processing "{root_dir}"') as progress:
     for _ in executor.map(process_file, files_to_process):
       progress.update(1)
 
   delete_empty_folders(root_dir)
 
 def get_chapter(folder_name):
-  match = re.search(r'(Ch(?:apter)?|Ep(?:isode)?)\.?\s*(\d+)', folder_name, re.IGNORECASE)
+  match = re.search(r'(Ch(?:apter)?|Ep(?:isode)?)\.?\s*(\d+(?:\.\d+)?)', folder_name, re.IGNORECASE)
   return match.group(2) if match else None
 
 def process_file(params):
