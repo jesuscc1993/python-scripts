@@ -12,17 +12,20 @@ def main():
   if dest_path is None: return
   print('')
 
-  rename_and_copy_files(src_path, dest_path)
+  matches_only = input('Matches only? (y/n): ').strip().lower() == 'n'
+  print('')
+
+  rename_and_copy_files(src_path, dest_path, matches_only)
   print('')
 
   print(f'Finished copying "{src_path}" to "{dest_path}".\n')
   main()
 
-def rename_and_copy_files(src_path, dest_path):
+def rename_and_copy_files(src_path, dest_path, matches_only):
   for filename in os.listdir(src_path):
     src_file = os.path.join(src_path, filename)
-    if os.path.isfile(src_file):
-      dest_file = os.path.join(dest_path, filename)
+    dest_file = os.path.join(dest_path, filename)
+    if os.path.isfile(src_file) and (os.path.exists(dest_file) or not matches_only):
       backup_file(dest_file)
       shutil.copy(src_file, dest_file)
 
