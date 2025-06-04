@@ -1,6 +1,11 @@
 import os
 import requests
 
+OUTPUT_FOLDER = os.path.join('output', 'assets')
+
+SEARCH_URL = 'https://store.steampowered.com/api/storesearch/'
+SEARCH_PARAMS = {'term': '', 'l': 'english', 'cc': 'US'}
+
 COVER_URL_MAP = {
   'header': {
     'src': 'https://steamcdn-a.akamaihd.net/steam/apps/{}/header.jpg',
@@ -11,8 +16,6 @@ COVER_URL_MAP = {
     'dest': '{}p.jpg'
   }
 }
-
-OUTPUT_FOLDER = os.path.join('output', 'assets')
 
 session = requests.Session()
 headers = {'User-Agent': 'Mozilla/5.0'}
@@ -47,11 +50,11 @@ def main():
     print('')
 
 def searchGame(name):
-  response = session.get(
-    'https://store.steampowered.com/api/storesearch/',
-    params={'term': name, 'l': 'english', 'cc': 'US'},
-    headers=headers
-  )
+  params = SEARCH_PARAMS.copy()
+  params['term'] = name
+
+  response = session.get(SEARCH_URL, params = params, headers = headers)
+
   if not response.ok:
     return []
 
