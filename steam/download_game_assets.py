@@ -31,18 +31,23 @@ def main():
       print('No results found.')
       continue
 
-    print('\nSelect a result (default = 1):')
-    for i, item in enumerate(items, 1):
-      print(f"{i}. {item.get('name')} ({item.get('id')})")
 
-    try:
-      choice = int(input('').strip() or '1')
-      if not (1 <= choice <= len(items)):
-        print('Invalid selection.')
+    if len(items) == 1:
+      choice = 1
+      print(f'\n1. {items[0].get("name")} ({items[0].get("id")})')
+    else:
+      print('\nSelect a result (default = 1):')
+      for i, item in enumerate(items, 1):
+        print(f"{i}. {item.get('name')} ({item.get('id')})")
+
+      try:
+        choice = int(input('').strip() or '1')
+        if not (1 <= choice <= len(items)):
+          print('Invalid selection.')
+          continue
+      except ValueError:
+        print('Invalid input.')
         continue
-    except ValueError:
-      print('Invalid input.')
-      continue
 
     print('')
     selected = items[choice - 1]
