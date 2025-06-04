@@ -59,12 +59,7 @@ def searchGame(name):
   params['term'] = name
 
   response = session.get(SEARCH_URL, params = params, headers = headers)
-
-  if not response.ok:
-    return []
-
-  data = response.json()
-  return data.get('items', [])
+  return response.json().get('items', []) if response.ok else []
 
 def downloadGameAssets(appid):
   output_dir = os.path.join(os.getcwd(), OUTPUT_FOLDER)
