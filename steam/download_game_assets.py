@@ -1,10 +1,13 @@
 import os
 import requests
 
+# settings
+TERMS_BLACKLIST = ['soundtrack', 'artbook']
 OUTPUT_FOLDER = os.path.join('output', 'assets')
 
 SEARCH_URL = 'https://store.steampowered.com/api/storesearch/'
 SEARCH_PARAMS = {'term': '', 'l': 'english', 'cc': 'US'}
+RESPONSE_NAME = 'name'
 
 COVER_URL_MAP = {
   'header': {
@@ -31,14 +34,18 @@ def main():
       print('No results found.')
       continue
 
+    items = [
+      item for item in items
+      if all(word not in item.get(RESPONSE_NAME, '').lower() for word in TERMS_BLACKLIST)
+    ]
 
     if len(items) == 1:
       choice = 1
-      print(f'\n1. {items[0].get("name")} ({items[0].get("id")})')
+      print(f'\n1. {items[0].get(RESPONSE_NAME)} ({items[0].get("id")})')
     else:
       print('\nSelect a result (default = 1):')
       for i, item in enumerate(items, 1):
-        print(f"{i}. {item.get('name')} ({item.get('id')})")
+        print(f"{i}. {item.get(RESPONSE_NAME)} ({item.get('id')})")
 
       try:
         choice = int(input('').strip() or '1')
