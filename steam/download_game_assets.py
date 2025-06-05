@@ -1,6 +1,9 @@
 import os
 import requests
 
+from PIL import Image
+from io import BytesIO
+
 # settings
 TERMS_BLACKLIST = ['soundtrack', 'artbook']
 OUTPUT_FOLDER = os.path.join('output', 'assets')
@@ -11,12 +14,14 @@ RESPONSE_NAME = 'name'
 
 COVER_URL_MAP = {
   'header': {
-    'src': 'https://steamcdn-a.akamaihd.net/steam/apps/{}/header.jpg',
-    'dest': '{}.jpg'
+    'url': 'https://steamcdn-a.akamaihd.net/steam/apps/{}/header.jpg',
+    'dest': '{}.jpg',
+    'size': [220, 103] # remove to keep original size
   },
   'library': {
-    'src': 'https://steamcdn-a.akamaihd.net/steam/apps/{}/library_600x900.jpg',
-    'dest': '{}p.jpg'
+    'url': 'https://steamcdn-a.akamaihd.net/steam/apps/{}/library_600x900.jpg',
+    'dest': '{}p.jpg',
+    'size': [160, 240] # remove to keep original size
   }
 }
 
@@ -26,10 +31,9 @@ headers = {'User-Agent': 'Mozilla/5.0'}
 def main():
   while True:
     name = input('Enter the name of the game: ').strip()
-    if not name:
-      break
+    if not name: break
 
-    items = searchGame(name)
+    items = search_game(name)
     if not items:
       print('No results found.')
       continue
@@ -58,31 +62,39 @@ def main():
 
     print('')
     selected = items[choice - 1]
-    downloadGameAssets(selected.get('id'))
+    download_game_assets(selected.get('id'))
     print('')
 
-def searchGame(name):
+def search_game(name):
   params = SEARCH_PARAMS.copy()
   params['term'] = name
 
   response = session.get(SEARCH_URL, params = params, headers = headers)
   return response.json().get('items', []) if response.ok else []
 
-def downloadGameAssets(appid):
+def download_game_assets(appid):
   output_dir = os.path.join(os.getcwd(), OUTPUT_FOLDER)
   os.makedirs(output_dir, exist_ok = True)
 
   for key, data in COVER_URL_MAP.items():
-    url = data['src'].format(appid)
+    url = data['url'].format(appid)
     filename = data['dest'].format(appid)
+    size = data.get('size')
     filepath = os.path.join(output_dir, filename)
 
     response = session.get(url, headers = headers)
     if response.ok:
-      with open(filepath, 'wb') as f:
-        f.write(response.content)
-      print(f'Downloaded: {filepath}')
+      save_asset(response.content, filepath, size)
     else:
       print(f'Failed to download {key} image.')
+
+def save_asset(content, filepath, size = None):
+  try:
+    img = Image.open(BytesIO(content))
+    if size: img = img.resize(size, Image.LANCZOS)
+    img.save(filepath)
+    print(f'Saved: {filepath}')
+  except Exception:
+    print(f'Failed to save asset at {filepath}')
 
 main()
