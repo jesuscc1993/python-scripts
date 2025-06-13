@@ -1,5 +1,6 @@
 import os
 import requests
+import sys
 import winsound
 
 from PIL import Image
@@ -19,20 +20,36 @@ COVER_URL_MAP = {
 }
 
 def main():
+  if len(sys.argv) > 1:
+    cover_type = 'capsule'
+    override_existing = False
+
+    parent_folder = sys.argv[1]
+    if len(sys.argv) > 2: cover_type = sys.argv[2]
+    if len(sys.argv) > 3: override_existing = sys.argv[3].lower() == 'y'
+  else:
+    parent_folder, cover_type, override_existing = prompt_params()
+
+  generate_covers(parent_folder, cover_type, override_existing)
+
+def prompt_params():
   parent_folder = input('Enter the path to the parent folder containing your Steam saves:\n').strip(' "\'')
   print('')
 
   cover_type = input('Enter cover type (capsule, header, or library). Default is capsule:\n').strip().lower() or 'capsule'
-  cover_url = COVER_URL_MAP.get(cover_type)
   print('')
 
   override_existing = input('Override existing images? (y|n). Default: n:\n').strip().lower() == 'y'
   print('')
 
+  return parent_folder, cover_type, override_existing
+
+def generate_covers(parent_folder, cover_type, override_existing):
   for folder_name in os.listdir(parent_folder):
     folder_path = os.path.join(parent_folder, folder_name)
 
     if folder_name.isdigit() and os.path.isdir(folder_path):
+      cover_url = COVER_URL_MAP.get(cover_type)
       process_folder(folder_path, folder_name, cover_url, override_existing)
 
   winsound.MessageBeep(winsound.MB_ICONASTERISK)
