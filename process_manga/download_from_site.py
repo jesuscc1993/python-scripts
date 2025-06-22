@@ -51,7 +51,7 @@ def download_images_from_chapter(base_url, css_selector, chapter_number):
     soup = BeautifulSoup(response.text, 'html.parser')
     images = []
     for container in soup.select(css_selector):
-      images.extend(container.find_all('img', recursive = False))
+      images.extend(container.find_all('img', recursive = True))
 
     if images:
       os.makedirs(folder, exist_ok = True)
