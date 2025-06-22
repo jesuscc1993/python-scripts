@@ -14,6 +14,8 @@ def main():
     print(f'The url must be defined.')
     return
 
+  css_selector = input('Enter the CSS selector for the image container(s):\n').strip() or 'body'
+
   try:
     chapter_count = int(input('\nEnter the chapter count:\n').strip())
     if chapter_count < 0:
@@ -23,32 +25,37 @@ def main():
     return
   print('')
 
-  download_all_chapters(base_url, chapter_count)
+  download_all_chapters(base_url, css_selector, chapter_count)
   print('')
 
   play_notification_sound()
   print(f'Finished downloading from "{base_url}".\n')
   main()
 
-def download_all_chapters(base_url, chapter_count):
+def download_all_chapters(base_url, css_selector, chapter_count):
   files_to_process = range(1, chapter_count + 1)
 
-  with ThreadPoolExecutor() as executor, tqdm(total=len(files_to_process), desc='Downloading Chapters') as progress:
-    futures = [executor.submit(download_images_from_chapter, base_url, num) for num in files_to_process]
+  with ThreadPoolExecutor() as executor, tqdm(total = len(files_to_process), desc='Downloading Chapters') as progress:
+    futures = [executor.submit(download_images_from_chapter, base_url, css_selector, num) for num in files_to_process]
 
     for future in futures:
       future.result()
       progress.update(1)
 
-def download_images_from_chapter(base_url, chapter_number):
-  chapter_url = base_url % chapter_number
+def download_images_from_chapter(base_url, css_selector, chapter_number):
+  chapter_url = base_url % tuple([chapter_number] * base_url.count('%s'))
   folder = f'downloads/Ch.{pad_string(chapter_number)}'
-  os.makedirs(folder, exist_ok=True)
 
   try:
+    print(chapter_url)
     response = requests.get(chapter_url, timeout = 10)
     soup = BeautifulSoup(response.text, 'html.parser')
-    images = soup.find_all('img')
+    images = []
+    for container in soup.select(css_selector):
+      images.extend(container.find_all('img', recursive = False))
+
+    if images:
+      os.makedirs(folder, exist_ok = True)
 
     for i, img in enumerate(images):
       src = img.get('src')
