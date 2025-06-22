@@ -14,7 +14,7 @@ def main():
     print(f'The url must be defined.')
     return
 
-  css_selector = input('Enter the CSS selector for the image container(s):\n').strip() or 'body'
+  css_selector = input('\nEnter the CSS selector for the image container(s):\n').strip() or 'body'
 
   try:
     chapter_count = int(input('\nEnter the chapter count:\n').strip())
@@ -47,7 +47,6 @@ def download_images_from_chapter(base_url, css_selector, chapter_number):
   folder = f'downloads/Ch.{pad_string(chapter_number)}'
 
   try:
-    print(chapter_url)
     response = requests.get(chapter_url, timeout = 10)
     soup = BeautifulSoup(response.text, 'html.parser')
     images = []
