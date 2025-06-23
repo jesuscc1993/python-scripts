@@ -17,7 +17,7 @@ def main():
   css_selector = input('\nEnter the CSS selector for the image container(s):\n').strip() or 'body'
 
   try:
-    chapter_count = int(input('\nEnter the chapter count:\n').strip())
+    chapter_count = int(input('\nEnter the chapter count:\n').strip() or '1')
     if chapter_count < 0:
       raise ValueError()
   except ValueError:
