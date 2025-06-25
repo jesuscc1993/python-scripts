@@ -25,7 +25,7 @@ def prompt_parent_folder():
     return None
 
 def prompt_chapter_ranges():
-  ranges_input = input('Enter the last chapter for each volume, separated by commas (e.g. 10,20):\n')
+  ranges_input = input('Enter the last chapter for each volume, separated by commas (e.g. 12,24,36):\n')
   try:
     chapter_bounds = sorted([float(x.strip()) for x in ranges_input.split(',')])
   except Exception as e:
@@ -53,8 +53,6 @@ def process_parent_folder(parent_folder, chapter_ranges):
       ch_num = float(chapter)
     except ValueError:
       continue
-
-    print(ch_num)
 
     for vol_index, (start, end) in enumerate(chapter_ranges, 1):
       if start <= ch_num <= end:
