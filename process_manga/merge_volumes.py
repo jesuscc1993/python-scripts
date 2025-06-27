@@ -24,7 +24,7 @@ def process_parent_folder(root_dir):
       for item in os.listdir(folder_path):
         src = os.path.join(folder_path, item)
         if os.path.isfile(src):
-          files_to_process.append((src, output_path, chapter))
+          files_to_process.append((src, output_path, get_sanitized_chapter(chapter)))
 
   with ThreadPoolExecutor() as executor, tqdm(total = len(files_to_process), desc = f'Processing "{root_dir}"') as progress:
     for _ in executor.map(process_file, files_to_process):
@@ -35,6 +35,12 @@ def process_parent_folder(root_dir):
 def get_volume_and_chapter(folder_name):
   match = re.search(r'(Vol(?:ume)?)\.?\s*(\d+(?:\.\d+)?).*?(Ch(?:apter)?|Ep(?:isode)?)\.?\s*(\d+(?:\.\d+)?)', folder_name, re.IGNORECASE)
   return (match.group(2), match.group(4)) if match else (None, None)
+
+def get_sanitized_chapter(chapter):
+  parts = chapter.split('.')
+  name = f'{int(parts[0]):03d}'
+  if len(parts) > 1: name += chr(ord('a') + int(parts[1]) - 1)
+  return name
 
 def process_file(params):
   src, target_folder, chapter = params
