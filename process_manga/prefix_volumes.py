@@ -16,7 +16,7 @@ def main():
     main()
 
 def prompt_parent_folder():
-  parent_folder = input('Enter the path to the parent folder containing the chapter folders:\n')
+  parent_folder = input('Enter the path to the parent folder containing the chapter folders you want to prefix:\n')
   if os.path.isdir(parent_folder):
     return parent_folder
   else:
@@ -26,6 +26,8 @@ def prompt_parent_folder():
 
 def prompt_chapter_ranges():
   ranges_input = input('Enter the last chapter for each volume, separated by commas (e.g. 12,24,36):\n')
+  if not ranges_input:
+    return [(0, float('inf'))]
   try:
     chapter_bounds = sorted([float(x.strip()) for x in ranges_input.split(',')])
   except Exception as e:
