@@ -1,3 +1,5 @@
+import sys
+
 from PIL import Image
 
 from _common import process_folder_images, select_parent_folder
@@ -23,7 +25,10 @@ def process_image(original_path):
 
 if __name__ == '__main__':
   try:
-    select_parent_folder('Enter the path to the parent folder containing the folders or images:\n', process_parent_folder)
+    if len(sys.argv) > 1:
+      process_parent_folder(sys.argv[1])
+    else:
+      select_parent_folder('Enter the path to the parent folder containing the folders or images:\n', process_parent_folder)
   except Exception as e:
     print(f'An unexpected error occurred: {e}')
     input('Press Enter to exit...')
