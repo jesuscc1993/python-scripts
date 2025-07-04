@@ -3,7 +3,7 @@ import sys
 
 from PIL import Image
 
-from _common import process_folder_images, select_parent_folder
+from _common import exit_with_prompt, print_error, process_folder_images, select_parent_folder
 from _image_utils import save_image_to_path
 from _settings import BLACK_THRESHOLD, WHITE_THRESHOLD, MAX_PAGE_ASPECT_RATIO
 
@@ -24,8 +24,8 @@ def process_image(file_path):
     with Image.open(file_path) as img:
       blank_free_image = crop_blanks(img)
       save_image_splits(blank_free_image, file_path)
-  except Exception as e:
-    print(f'Failed to process {file_path}: {e}')
+  except Exception as ex:
+    print(f'Failed to process {file_path}: {ex}')
 
 def is_blank_strip(image_strip):
   gray_strip = image_strip.convert('L')
@@ -86,8 +86,8 @@ def save_image_splits(img, original_path):
         split_file_path = f"{base_name}.{i + 1}{ext}"
         save_image_to_path(split_image, split_file_path, True)
       os.remove(original_path)
-    except Exception as e:
-      print(f'Failed to save split images for {original_path}: {e}')
+    except Exception as ex:
+      print(f'Failed to save split images for {original_path}: {ex}')
       for i in range(num_splits):
         split_file_path = f"{base_name}.{i + 1}{ext}"
         if os.path.exists(split_file_path):
@@ -95,12 +95,12 @@ def save_image_splits(img, original_path):
   else:
     try:
       save_image_to_path(img, original_path)
-    except Exception as e:
-      print(f'Failed to save image {original_path}: {e}')
+    except Exception as ex:
+      print(f'Failed to save image {original_path}: {ex}')
 
 if __name__ == '__main__':
   try:
     main()
-  except Exception as e:
-    print(f'An unexpected error occurred: {e}')
-    input('Press Enter to exit...')
+  except Exception as ex:
+    print_error(ex)
+    exit_with_prompt()

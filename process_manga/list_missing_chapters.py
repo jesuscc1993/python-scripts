@@ -2,7 +2,7 @@ import os
 import re
 import sys
 
-from _common import select_parent_folder
+from _common import exit_with_prompt, print_error, select_parent_folder
 
 def main():
   if len(sys.argv) > 1:
@@ -35,6 +35,6 @@ def process_parent_folder(directory):
 if __name__ == '__main__':
   try:
     main()
-  except Exception as e:
-    print(f'An unexpected error occurred: {e}')
-    input('Press Enter to exit...')
+  except Exception as ex:
+    print_error(ex)
+    exit_with_prompt()

@@ -51,12 +51,12 @@ def process_folder(folder_path):
       ctypes.windll.kernel32.SetFileAttributesW(desktop_ini_path, 0x02 | 0x04)
   except PermissionError:
     print(f'Permission denied for "{desktop_ini_path}"')
-  except Exception as e:
-    print(f'An error occurred while processing {desktop_ini_path}: {e}')
+  except Exception as ex:
+    print(f'An error occurred while processing {desktop_ini_path}: {ex}')
 
 if __name__ == '__main__':
   try:
     main()
-  except Exception as e:
-    print(f'An unexpected error occurred: {e}')
+  except Exception as ex:
+    print(f'An unexpected error occurred: {ex}')
   input('\nPress Enter to exit...')

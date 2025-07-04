@@ -61,8 +61,8 @@ def png_to_ico(image_path, ico_path):
       offset = (int((ICON_SIZE - img.size[0]) / 2), int((ICON_SIZE - img.size[1]) / 2))
       background.paste(img, offset)
       background.save(ico_path, format='ICO', sizes=[(ICON_SIZE, ICON_SIZE)])
-  except Exception as e:
-    print(f'Error converting "{image_path}" to ICO: {e}')
+  except Exception as ex:
+    print(f'Error converting "{image_path}" to ICO: {ex}')
 
 def set_folder_icon(folder_path):
   try:
@@ -83,5 +83,5 @@ def set_folder_icon(folder_path):
     print(f'Saved "{icon_path}" and "{desktop_ini_path}".')
   except PermissionError:
     print(f'Permission denied: "{desktop_ini_path}". You may need to run the script as an administrator.')
-  except Exception as e:
-    print(f'Error setting folder icon to "{folder_path}": {e}')
+  except Exception as ex:
+    print(f'Error setting folder icon to "{folder_path}": {ex}')

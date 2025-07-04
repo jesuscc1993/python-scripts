@@ -18,6 +18,6 @@ def process_root_folder(parent_folder):
 if __name__ == '__main__':
   try:
     main()
-  except Exception as e:
-    print(f'An unexpected error occurred: {e}')
+  except Exception as ex:
+    print(f'An unexpected error occurred: {ex}')
     input('Press Enter to exit...')

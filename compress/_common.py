@@ -62,5 +62,5 @@ def process_folder(folder_path):
       shutil.move(tmp_zip_path, final_zip_path)
       shutil.rmtree(folder_path)
 
-  except Exception as e:
-    print(f'An error occurred while processing "{folder_name}": {e}')
+  except Exception as ex:
+    print(f'An error occurred while processing "{folder_name}": {ex}')

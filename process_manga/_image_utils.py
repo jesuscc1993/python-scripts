@@ -57,5 +57,5 @@ def save_image_to_path(img, original_path, keep = False):
     if not keep and output_path != original_path:
       os.remove(original_path)
 
-  except Exception as e:
-    print(f'Error processing "{original_path}": {e}')
+  except Exception as ex:
+    print(f'Error processing "{original_path}": {ex}')

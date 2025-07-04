@@ -51,8 +51,8 @@ def get_cover_image(query):
     cover_url = games[0].get('cover', {}).get('url') if games else None
     return f'https:{cover_url.replace("t_thumb", "t_cover_big")}' if cover_url else None
 
-  except Exception as e:
-    print(f'Error fetching cover image: {e}')
+  except Exception as ex:
+    print(f'Error fetching cover image: {ex}')
   return None
 
 def download_image(image_url):
@@ -60,8 +60,8 @@ def download_image(image_url):
     response = requests.get(image_url)
     response.raise_for_status()
     return Image.open(BytesIO(response.content))
-  except Exception as e:
-    print(f'Error downloading image: {e}')
+  except Exception as ex:
+    print(f'Error downloading image: {ex}')
     return None
 
 # def resize_image(img):
@@ -79,8 +79,8 @@ def save_image(img, save_path):
       img = img.convert('RGB')
     img.save(save_path, format='JPEG')
     print(f'Saved: "{save_path}"')
-  except Exception as e:
-    print(f'Error saving "{img}": {e}')
+  except Exception as ex:
+    print(f'Error saving "{img}": {ex}')
 
 def process_folder(folder_name, container_folder):
   folder_path = os.path.join(container_folder, folder_name)
@@ -100,8 +100,8 @@ def process_folder(folder_name, container_folder):
         # img = resize_image(img)
         save_path = os.path.join(folder_path, FOLDER_IMAGE_NAME)
         save_image(img, save_path)
-    except Exception as e:
-      print(f'Error processing folder "{folder_name}": {e}')
+    except Exception as ex:
+      print(f'Error processing folder "{folder_name}": {ex}')
 
 def main():
   container_folder = input('Enter the path to the folder containing your games:\n').strip(' "\'') or os.getcwd()
@@ -115,6 +115,6 @@ def main():
 if __name__ == '__main__':
   try:
     main()
-  except Exception as e:
-    print(f'An unexpected error occurred: {e}')
+  except Exception as ex:
+    print(f'An unexpected error occurred: {ex}')
   input('\nPress Enter to exit...')

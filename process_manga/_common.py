@@ -39,3 +39,9 @@ def delete_empty_folders(folder_path):
         os.rmdir(dir_path)
       except OSError:
         pass
+
+def print_error(error):
+  print(f'An unexpected error occurred: {error}')
+
+def exit_with_prompt():
+  input('Press Enter to exit...')

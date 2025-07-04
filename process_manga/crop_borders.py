@@ -3,7 +3,7 @@ import sys
 
 from PIL import Image
 
-from _common import process_folder_images, select_parent_folder
+from _common import exit_with_prompt, print_error, process_folder_images, select_parent_folder
 from _image_utils import resize_image, save_image_to_path
 from _settings import WHITE_THRESHOLD
 
@@ -22,8 +22,8 @@ def process_image(file_path):
       img = crop_blanks(img)
       img = resize_image(img)
       save_image_to_path(img, file_path)
-  except Exception as e:
-    print(f'Failed to process {file_path}: {e}')
+  except Exception as ex:
+    print(f'Failed to process {file_path}: {ex}')
 
 def crop_blanks(img):
   np_img = numpy.array(img)
@@ -43,6 +43,6 @@ def crop_blanks(img):
 if __name__ == '__main__':
   try:
     main()
-  except Exception as e:
-    print(f'An unexpected error occurred: {e}')
-    input('Press Enter to exit...')
+  except Exception as ex:
+    print_error(ex)
+    exit_with_prompt()

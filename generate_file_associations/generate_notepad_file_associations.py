@@ -12,15 +12,15 @@ def delete_registry_entry(path):
     reg.DeleteKey(reg.HKEY_CLASSES_ROOT, path)
   except FileNotFoundError:
     pass
-  except Exception as e:
-    print(f'Error deleting registry entry for {path}: {e}')
+  except Exception as ex:
+    print(f'Error deleting registry entry for {path}: {ex}')
 
 def add_registry_entry(path, name, value):
   try:
     with reg.CreateKey(reg.HKEY_CLASSES_ROOT, path) as key:
       reg.SetValueEx(key, name, 0, reg.REG_SZ, value)
-  except Exception as e:
-    print(f'Error adding registry entry for {path}: {e}')
+  except Exception as ex:
+    print(f'Error adding registry entry for {path}: {ex}')
 
 def main():
   for ext in EXTENSIONS:
@@ -38,6 +38,6 @@ def main():
 if __name__ == '__main__':
   try:
     main()
-  except Exception as e:
-    print(f'An unexpected error occurred: {e}')
+  except Exception as ex:
+    print(f'An unexpected error occurred: {ex}')
   input('\nPress Enter to exit...')

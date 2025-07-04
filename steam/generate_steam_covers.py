@@ -81,6 +81,6 @@ def process_folder(folder_path, folder_name, cover_url, override_existing):
 if __name__ == '__main__':
   try:
     main()
-  except Exception as e:
-    print(f'An unexpected error occurred: {e}')
+  except Exception as ex:
+    print(f'An unexpected error occurred: {ex}')
   input('Press Enter to exit...')

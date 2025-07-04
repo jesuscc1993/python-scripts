@@ -2,7 +2,7 @@ import os
 import subprocess
 import sys
 
-from _common import select_parent_folder, process_folder_images
+from _common import exit_with_prompt, print_error, process_folder_images, select_parent_folder
 
 binary_path = os.path.join(os.path.dirname(__file__), 'binaries/realesrgan/realesrgan-ncnn-vulkan.exe')
 
@@ -29,12 +29,12 @@ def process_image(file_path):
       stderr=subprocess.DEVNULL
     )
 
-  except Exception as e:
-    print(f'Error processing "{file_path}": {e}')
+  except Exception as ex:
+    print(f'Error processing "{file_path}": {ex}')
 
 if __name__ == '__main__':
   try:
     main()
-  except Exception as e:
-    print(f'An unexpected error occurred: {e}')
-    input('Press Enter to exit...')
+  except Exception as ex:
+    print_error(ex)
+    exit_with_prompt()

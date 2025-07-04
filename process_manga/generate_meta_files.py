@@ -3,28 +3,27 @@ import sys
 
 from concurrent.futures import ThreadPoolExecutor
 
+from _common import exit_with_prompt, print_error
 from _sound_utils import play_notification_sound
 
 META_FILES = ['.noxml', '.nomedia']
 
 def main():
   if len(sys.argv) > 1:
-    parent_folder = sys.argv[1]
+    process_parent_folder(sys.argv[1])
   else:
-    parent_folder = prompt_parent_folder()
-
-  if not parent_folder: return
-  process_parent_folder(parent_folder)
-  play_notification_sound()
+    prompt_parent_folder()
 
 def prompt_parent_folder():
   parent_folder = input('Enter the path to the image you want to generate the metadata files for:\n')
-  if os.path.isdir(parent_folder):
-    return parent_folder
-  else:
-    if parent_folder:
-      print(f'The specified path "{parent_folder}" is not a directory.')
+  if not parent_folder:
     return
+  if not os.path.isdir(parent_folder):
+    print(f'The specified path "{parent_folder}" is not a directory.')
+  else:
+    process_parent_folder(parent_folder)
+    play_notification_sound()
+    exit_with_prompt()
 
 def process_parent_folder(parent_folder):
   folders_to_process = [parent_folder]
@@ -48,12 +47,12 @@ def process_folder(folder_path):
         os.system(f'attrib +h "{file_path}"')
         print(f'Successfully created hidden file "{file_path}".')
 
-    except Exception as e:
-      print(f'ERROR: Failed to create "{filename}": {e}')
+    except Exception as ex:
+      print(f'ERROR: Failed to create "{filename}": {ex}')
 
 if __name__ == '__main__':
   try:
     main()
-  except Exception as e:
-    print(f'An unexpected error occurred: {e}')
-  input('Press Enter to exit...')
+  except Exception as ex:
+    print_error(ex)
+    exit_with_prompt()

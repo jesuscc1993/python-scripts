@@ -6,6 +6,7 @@ from bs4 import BeautifulSoup
 from concurrent.futures import ThreadPoolExecutor
 from tqdm import tqdm
 
+from _common import exit_with_prompt, print_error
 from _sound_utils import play_notification_sound
 
 def main():
@@ -65,8 +66,8 @@ def download_images_from_chapter(base_url, css_selector, chapter_number):
         img_name = os.path.join(folder, f'{pad_string(i + 1)}{img_ext}')
         with open(img_name, 'wb') as f:
           f.write(img_data)
-  except Exception as e:
-    print(f'Failed to download chapter {chapter_number}: {e}')
+  except Exception as ex:
+    print(f'Failed to download chapter {chapter_number}: {ex}')
 
 def pad_string(string, width = 3):
   return str(string).zfill(width)
@@ -74,6 +75,6 @@ def pad_string(string, width = 3):
 if __name__ == '__main__':
   try:
     main()
-  except Exception as e:
-    print(f'An unexpected error occurred: {e}')
-    input('Press Enter to exit...')
+  except Exception as ex:
+    print_error(ex)
+    exit_with_prompt()

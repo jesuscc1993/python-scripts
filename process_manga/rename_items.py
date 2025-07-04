@@ -5,6 +5,7 @@ import sys
 from concurrent.futures import ThreadPoolExecutor
 from tqdm import tqdm
 
+from _common import exit_with_prompt, print_error
 from _sound_utils import play_notification_sound
 
 def main():
@@ -14,7 +15,7 @@ def main():
     prompt_parent_folder()
 
 def prompt_parent_folder():
-  parent_folder = input('Enter the path to the image you want to generate the palette for:\n')
+  parent_folder = input('Enter the path to the image you want to rename:\n')
   if not parent_folder:
     return
   if not os.path.isdir(parent_folder):
@@ -22,6 +23,7 @@ def prompt_parent_folder():
   else:
     process_parent_folder(parent_folder)
     play_notification_sound()
+    exit_with_prompt()
 
 def process_parent_folder(parent_folder):
   for root, dirs, files in os.walk(parent_folder, topdown = False):
@@ -46,6 +48,6 @@ def get_processed_name(name):
 if __name__ == '__main__':
   try:
     main()
-  except Exception as e:
-    print(f'An unexpected error occurred: {e}')
-  input('Press Enter to exit...')
+  except Exception as ex:
+    print_error(ex)
+    exit_with_prompt()

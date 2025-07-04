@@ -3,6 +3,7 @@ import re
 
 from tqdm import tqdm
 
+from _common import exit_with_prompt, print_error
 from _sound_utils import play_notification_sound
 
 def main():
@@ -30,8 +31,8 @@ def prompt_chapter_ranges():
     return [(0, float('inf'))]
   try:
     chapter_bounds = sorted([float(x.strip()) for x in ranges_input.split(',')])
-  except Exception as e:
-    print(f'Invalid input: {e}')
+  except Exception as ex:
+    print(f'Invalid input: {ex}')
     return None
   if len(chapter_bounds) < 1:
     print('At least one boundary is required')
@@ -76,6 +77,6 @@ def get_chapter(folder_name):
 if __name__ == '__main__':
   try:
     main()
-  except Exception as e:
-    print(f'An unexpected error occurred: {e}')
-    input('Press Enter to exit...')
+  except Exception as ex:
+    print_error(ex)
+    exit_with_prompt()
