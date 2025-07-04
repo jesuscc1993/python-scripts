@@ -1,23 +1,16 @@
-import importlib.util
 import os
-import sys
+import subprocess
 
 from _common import exit_with_prompt, print_error, select_parent_folder
 
-SCRIPT_NAMES = ['merge_volumes', 'rename_items', 'crop_borders']
+SCRIPT_NAMES = ['merge_volumes', 'rename_items', 'crop_borders', '../compress/compress_folders']
 
 def process_parent_folder(parent_folder):
-
   for script in SCRIPT_NAMES:
     abs_path = os.path.abspath(os.path.join(os.path.dirname(__file__), script + '.py'))
-    sys.argv = [abs_path, parent_folder]
-
-    spec = importlib.util.spec_from_file_location(script, abs_path)
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
 
     print(f'\nRunning {script}:')
-    module.main()
+    subprocess.run(['python', abs_path, parent_folder])
 
 if __name__ == '__main__':
   try:
