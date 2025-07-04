@@ -7,8 +7,14 @@ from tqdm import tqdm
 
 from _sound_utils import play_notification_sound
 
-def prompt_parent_folder(default_folder = None):
-  parent_folder = default_folder or input('Enter the path to the image you want to generate the palette for:\n')
+def main():
+  if len(sys.argv) > 1:
+    process_parent_folder(sys.argv[1])
+  else:
+    prompt_parent_folder()
+
+def prompt_parent_folder():
+  parent_folder = input('Enter the path to the image you want to generate the palette for:\n')
   if not parent_folder:
     return
   if not os.path.isdir(parent_folder):
@@ -33,14 +39,13 @@ def process_item(root, item_name):
 
 def get_processed_name(name):
   new_name = re.sub(r'\s+', ' ', name)
-  new_name = re.sub(r'\b(chapter|ch)\b\s*', 'Ch.', new_name, flags = re.IGNORECASE)
-  new_name = re.sub(r'\b(volume|vol)\b\s*', 'Vol.', new_name, flags = re.IGNORECASE)
+  new_name = re.sub(r'\b(chapter|ch)\b\.*\s*', 'Ch.', new_name, flags = re.IGNORECASE)
+  new_name = re.sub(r'\b(volume|vol)\b\.*\s*', 'Vol.', new_name, flags = re.IGNORECASE)
   return new_name
 
 if __name__ == '__main__':
   try:
-    parent_folder = sys.argv[1] if len(sys.argv) > 1 else None
-    prompt_parent_folder(parent_folder)
+    main()
   except Exception as e:
     print(f'An unexpected error occurred: {e}')
   input('Press Enter to exit...')

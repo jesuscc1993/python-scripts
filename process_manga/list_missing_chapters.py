@@ -4,6 +4,12 @@ import sys
 
 from _common import select_parent_folder
 
+def main():
+  if len(sys.argv) > 1:
+    process_parent_folder(sys.argv[1])
+  else:
+    select_parent_folder('Enter the path to the parent folder containing the chapter folders:\n', process_parent_folder)
+
 def process_parent_folder(directory):
   pattern = re.compile(r'(?:Ch(?:apter)?|Ep(?:isode)?)\.?\s*(\d+)', re.IGNORECASE)
   chapters = set()
@@ -28,10 +34,7 @@ def process_parent_folder(directory):
 
 if __name__ == '__main__':
   try:
-    if len(sys.argv) > 1:
-      process_parent_folder(sys.argv[1])
-    else:
-      select_parent_folder('Enter the path to the parent folder containing the chapter folders:\n', process_parent_folder)
+    main()
   except Exception as e:
     print(f'An unexpected error occurred: {e}')
     input('Press Enter to exit...')

@@ -8,6 +8,12 @@ from tqdm import tqdm
 
 from _common import delete_empty_folders, select_parent_folder
 
+def main():
+  if len(sys.argv) > 1:
+    process_parent_folder(sys.argv[1])
+  else:
+    select_parent_folder('Enter the path to the parent folder containing the chapter folders you want to merge:\n', process_parent_folder)
+
 def process_parent_folder(root_dir):
   output_path = os.path.join(root_dir, 'output')
   if not os.path.exists(output_path):
@@ -57,10 +63,7 @@ def process_file(params):
 
 if __name__ == '__main__':
   try:
-    if len(sys.argv) > 1:
-      process_parent_folder(sys.argv[1])
-    else:
-      select_parent_folder('Enter the path to the parent folder containing the chapter folders you want to merge:\n', process_parent_folder)
+    main()
   except Exception as e:
     print(f'An unexpected error occurred: {e}')
     input('Press Enter to exit...')

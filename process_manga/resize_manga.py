@@ -5,6 +5,12 @@ from PIL import Image
 from _common import process_folder_images, select_parent_folder
 from _image_utils import image_needs_resizing, is_image_uncompressed, resize_image, save_image_to_path
 
+def main():
+  if len(sys.argv) > 1:
+    process_parent_folder(sys.argv[1])
+  else:
+    select_parent_folder('Enter the path to the parent folder containing the folders or images you want to resize:\n', process_parent_folder)
+
 def process_parent_folder(folder_path):
   process_folder_images(folder_path, process_image)
 
@@ -25,10 +31,7 @@ def process_image(original_path):
 
 if __name__ == '__main__':
   try:
-    if len(sys.argv) > 1:
-      process_parent_folder(sys.argv[1])
-    else:
-      select_parent_folder('Enter the path to the parent folder containing the folders or images you want to resize:\n', process_parent_folder)
+    main()
   except Exception as e:
     print(f'An unexpected error occurred: {e}')
     input('Press Enter to exit...')

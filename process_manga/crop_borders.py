@@ -7,6 +7,12 @@ from _common import process_folder_images, select_parent_folder
 from _image_utils import resize_image, save_image_to_path
 from _settings import WHITE_THRESHOLD
 
+def main():
+  if len(sys.argv) > 1:
+    process_parent_folder(sys.argv[1])
+  else:
+    select_parent_folder('Enter the path to the parent folder containing the folders or images you want to crop the borders of:\n', process_parent_folder)
+
 def process_parent_folder(folder_path):
   process_folder_images(folder_path, process_image)
 
@@ -36,10 +42,7 @@ def crop_blanks(img):
 
 if __name__ == '__main__':
   try:
-    if len(sys.argv) > 1:
-      process_parent_folder(sys.argv[1])
-    else:
-      select_parent_folder('Enter the path to the parent folder containing the folders or images you want to crop the borders of:\n', process_parent_folder)
+    main()
   except Exception as e:
     print(f'An unexpected error occurred: {e}')
     input('Press Enter to exit...')
