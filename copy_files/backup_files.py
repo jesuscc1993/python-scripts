@@ -10,12 +10,7 @@ def main():
     dest_path = sys.argv[2]
   else:
     src_path = prompt_path('Enter the path containing the files to copy:\n')
-    if src_path is None: return
-    print('')
-
     dest_path = prompt_path('Enter the path the files will be copied to:\n')
-    if dest_path is None: return
-    print('')
 
   copy_updated_files(src_path, dest_path)
 

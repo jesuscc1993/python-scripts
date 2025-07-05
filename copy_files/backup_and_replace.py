@@ -5,18 +5,10 @@ from _common import prompt_path
 
 def main():
   src_path = prompt_path('Enter the path containing the files to copy:\n')
-  if src_path is None: return
-  print('')
-
   dest_path = prompt_path('Enter the path the files will be copied to:\n')
-  if dest_path is None: return
-  print('')
-
   matches_only = input('Matches only? (y/n): ').strip().lower() == 'n'
-  print('')
 
   rename_and_copy_files(src_path, dest_path, matches_only)
-  print('')
 
   print(f'Finished copying "{src_path}" to "{dest_path}".\n')
   main()

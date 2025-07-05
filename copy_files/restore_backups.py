@@ -4,13 +4,9 @@ from _common import prompt_path
 
 def main():
   dir_path = prompt_path('Enter the directory containing .bak files to restore:\n')
-  if dir_path is None: return
-  print('')
 
   restore_bak_files(dir_path)
-  print('')
-
-  print(f'Finished restoring .bak files in "{dir_path}".\n')
+  print(f'\nFinished restoring .bak files in "{dir_path}".\n')
   main()
 
 def restore_bak_files(dir_path):

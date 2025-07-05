@@ -12,17 +12,10 @@ FILES_TO_COPY = {
 
 def main():
   src_path = prompt_path('Enter the path containing the files to copy:\n')
-  if src_path is None: return
-  print('')
-
   dest_path = prompt_path('Enter the path the files will be copied to:\n')
-  if dest_path is None: return
-  print('')
 
   copy_folder_assets(src_path, dest_path)
-  print('')
-
-  print(f'Finished copying "{src_path}" to "{dest_path}".\n')
+  print(f'\nFinished copying "{src_path}" to "{dest_path}".\n')
   main()
 
 def copy_folder_assets(src_path, dest_path):
