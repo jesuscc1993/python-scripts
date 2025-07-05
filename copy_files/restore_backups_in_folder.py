@@ -1,13 +1,17 @@
 import os
 import shutil
+import sys
 
 from _common import prompt_path
 
 def main():
-  dir_path = prompt_path('Enter the directory containing .bak files to restore:\n')
+  if len(sys.argv) > 1:
+    src_path = sys.argv[1]
+  else:
+    src_path = prompt_path('Enter the directory containing .bak files to restore:\n')
 
-  restore_backups(dir_path)
-  print(f'\nFinished restoring .bak files in "{dir_path}".\n')
+  restore_backups(src_path)
+  print(f'\nFinished restoring .bak files in "{src_path}".\n')
   main()
 
 def restore_backups(dir_path):

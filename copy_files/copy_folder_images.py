@@ -1,5 +1,6 @@
 import os
 import shutil
+import sys
 
 from _common import prompt_path
 
@@ -11,8 +12,12 @@ FILES_TO_COPY = {
 }
 
 def main():
-  src_path = prompt_path('Enter the path containing the files to copy:\n')
-  dest_path = prompt_path('Enter the path the files will be copied to:\n')
+  if len(sys.argv) > 2:
+    src_path = sys.argv[1]
+    dest_path = sys.argv[2]
+  else:
+    src_path = prompt_path('Enter the path containing the files to copy:\n')
+    dest_path = prompt_path('Enter the path the files will be copied to:\n')
 
   copy_folder_assets(src_path, dest_path)
   print(f'\nFinished copying "{src_path}" to "{dest_path}".\n')
