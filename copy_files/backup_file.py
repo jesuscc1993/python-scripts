@@ -2,7 +2,7 @@ import os
 import shutil
 import sys
 
-from _common import prompt_file, rename_with_timestamp, BACKUP_EXT, BACKUP_PATH, TIMESTAMP_FORMAT
+from _common import prompt_file, rename_with_timestamp, BACKUP_EXT, BACKUP_PATH
 
 def main():
   if len(sys.argv) > 1:
