@@ -1,17 +1,25 @@
 import os
 import shutil
 import sys
+import time
 
-from _common import prompt_file, rename_with_timestamp, BACKUP_EXT, BACKUP_PATH
+from _common import prompt_file, rename_with_timestamp, BACKUP_EXT, BACKUP_PATH, WATCH_INTERVAL
 
 def main():
   if len(sys.argv) > 1:
     og_file_path = sys.argv[1]
+    watch = sys.argv[2] == 'watch' if len(sys.argv) > 2 else False
   else:
     og_file_path = prompt_file('Enter the path to the file to backup:\n')
 
-  backup_file(og_file_path)
-  print()
+  if watch:
+    while True:
+      backup_file(og_file_path)
+      print(f'Sleeping for {WATCH_INTERVAL} seconds...')
+      time.sleep(WATCH_INTERVAL)
+  else:
+    backup_file(og_file_path)
+    print()
 
 def backup_file(og_file_path):
   og_dir_path = os.path.dirname(og_file_path)

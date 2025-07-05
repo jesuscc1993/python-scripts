@@ -7,6 +7,7 @@ from datetime import datetime
 BACKUP_EXT = '.bak'
 BACKUP_PATH = 'backups'
 TIMESTAMP_FORMAT = '%Y-%m-%d_%H-%M-%S'
+WATCH_INTERVAL = 60
 
 def prompt_path(prompt_message, optional = False):
   path = input(prompt_message).strip(' "\'')
