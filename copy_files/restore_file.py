@@ -26,11 +26,11 @@ def restore_file(bak_file_path):
     print(f'File {bak_file_name} does not exist')
     return
 
-  if os.path.exists(og_file_path) and os.path.getmtime(bak_file_path) == os.path.getmtime(og_file_path):
-    print(f'Both {bak_file_name} and {og_file_name} have the same timestamp. Skipping...')
-    return
-
   if os.path.exists(og_file_path):
+    if os.path.getmtime(bak_file_path) == os.path.getmtime(og_file_path):
+      print(f'Both {bak_file_name} and {og_file_name} have the same timestamp. Skipping...')
+      return
+
     rename_with_timestamp(bak_dir_path, og_file_path)
 
   if os.path.exists(bak_file_path):

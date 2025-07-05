@@ -27,16 +27,16 @@ def backup_file(og_file_path):
     print(f'File {og_file_name} does not exist')
     return
 
-  if os.path.exists(bak_file_path) and os.path.getmtime(og_file_path) == os.path.getmtime(bak_file_path):
-    print(f'Both {og_file_name} and {bak_file_name} have the same timestamp. Skipping...')
-    return
-
   if os.path.exists(bak_file_path):
+    if os.path.getmtime(og_file_path) == os.path.getmtime(bak_file_path):
+      print(f'Both {og_file_name} and {bak_file_name} have the same timestamp. Skipping...')
+      return
+
     rename_with_timestamp(bak_dir_path, bak_file_path)
 
   if os.path.exists(og_file_path):
     shutil.copy2(og_file_path, bak_file_path)
-    print(f'Backup up {og_file_name} as {bak_file_name}')
+    print(f'Backed up {og_file_name} as {bak_file_name}')
 
 if __name__ == '__main__':
   try:
