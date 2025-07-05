@@ -33,9 +33,8 @@ def restore_file(bak_file_path):
 
     rename_with_timestamp(bak_dir_path, og_file_path)
 
-  if os.path.exists(bak_file_path):
-    shutil.copy2(bak_file_path, og_file_path)
-    print(f'Restored {bak_file_name} as {og_file_name}')
+  shutil.copy2(bak_file_path, og_file_path)
+  print(f'Restored {bak_file_name} as {og_file_name}')
 
 if __name__ == '__main__':
   try:

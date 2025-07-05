@@ -34,9 +34,8 @@ def backup_file(og_file_path):
 
     rename_with_timestamp(bak_dir_path, bak_file_path)
 
-  if os.path.exists(og_file_path):
-    shutil.copy2(og_file_path, bak_file_path)
-    print(f'Backed up {og_file_name} as {bak_file_name}')
+  shutil.copy2(og_file_path, bak_file_path)
+  print(f'Backed up {og_file_name} as {bak_file_name}')
 
 if __name__ == '__main__':
   try:
