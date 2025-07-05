@@ -23,6 +23,14 @@ def backup_file(og_file_path):
   bak_file_path = os.path.join(bak_dir_path, bak_file_name)
   os.makedirs(bak_dir_path, exist_ok = True)
 
+  if not os.path.exists(og_file_path):
+    print(f'File {og_file_name} does not exist')
+    return
+
+  if os.path.exists(bak_file_path) and os.path.getmtime(og_file_path) == os.path.getmtime(bak_file_path):
+    print(f'Both {og_file_name} and {bak_file_name} have the same timestamp. Skipping...')
+    return
+
   if os.path.exists(bak_file_path):
     rename_with_timestamp(bak_dir_path, bak_file_path)
 
@@ -35,4 +43,4 @@ if __name__ == '__main__':
     main()
   except Exception as ex:
     print(f'An unexpected error occurred: {ex}')
-    input('Press Enter to exit...')
+  input('Press Enter to exit...')

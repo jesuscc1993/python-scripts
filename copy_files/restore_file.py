@@ -22,6 +22,14 @@ def restore_file(bak_file_path):
   og_file_name = f'{bak_file_stem.replace(BACKUP_EXT, '')}{src_file_ext}'
   og_file_path = os.path.join(og_dir_path, og_file_name)
 
+  if not os.path.exists(bak_file_path):
+    print(f'File {bak_file_name} does not exist')
+    return
+
+  if os.path.exists(og_file_path) and os.path.getmtime(bak_file_path) == os.path.getmtime(og_file_path):
+    print(f'Both {bak_file_name} and {og_file_name} have the same timestamp. Skipping...')
+    return
+
   if os.path.exists(og_file_path):
     rename_with_timestamp(bak_dir_path, og_file_path)
 
@@ -34,4 +42,4 @@ if __name__ == '__main__':
     main()
   except Exception as ex:
     print(f'An unexpected error occurred: {ex}')
-    input('Press Enter to exit...')
+  input('Press Enter to exit...')
