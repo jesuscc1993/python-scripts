@@ -5,8 +5,8 @@ import sys
 from _common import prompt_file, rename_with_timestamp, BACKUP_EXT, BACKUP_PATH, TIMESTAMP_FORMAT
 
 def main():
-  if len(sys.argv) > 2:
-    bak_file_path = sys.argv[2]
+  if len(sys.argv) > 1:
+    bak_file_path = sys.argv[1]
   else:
     bak_file_path = prompt_file('Enter the path to the file to restore:\n')
 
