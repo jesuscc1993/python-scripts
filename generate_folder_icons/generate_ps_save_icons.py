@@ -1,9 +1,18 @@
-from _common import process_parent_folder
+import sys
+
+from _common import process_parent_folder, prompt_depth, prompt_path
 
 IMAGE_FILENAMES = ['ICON0.PNG']
 
 def main():
-  process_parent_folder(IMAGE_FILENAMES)
+  if len(sys.argv) > 1:
+    parent_path = sys.argv[1]
+    depth = sys.argv[1] if len(sys.argv) > 2 else 1
+  else:
+    parent_path = prompt_path('Enter the folder path to process:\n')
+    depth = prompt_depth()
+
+  process_parent_folder(parent_path, depth, IMAGE_FILENAMES)
 
 if __name__ == '__main__':
   try:

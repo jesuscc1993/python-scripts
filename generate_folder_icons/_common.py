@@ -1,25 +1,33 @@
 import os
+import sys
 import winsound
+
 from PIL import Image
 
 DESKTOP_INI_FILENAME = 'desktop.ini'
 ICON_FILENAME = 'icon.ico'
 ICON_SIZE = 256
 
-def process_parent_folder(image_filenames):
-  parent_folder = input('Enter the folder path to process:\n').strip(' "\'')
-  if not os.path.isdir(parent_folder):
-    print(f'The specified path "{parent_folder}" is not a directory.')
-    return
+def prompt_path(prompt_message, optional = False):
+  path = input(prompt_message).strip(' "\'')
+  if not path or not os.path.isdir(path):
+    print(f'The specified path "{path}" is not a directory.')
+    if not optional: sys.exit(1)
+    return None
+  print('')
+  return path
 
+def prompt_depth():
   try:
-    depth = int(input('\nEnter the depth for processing subfolders (default: 1):\n').strip() or 1)
+    depth = int(input('Enter the depth for processing subfolders (default: 1):\n').strip() or 1)
     if depth < 0:
       raise ValueError()
+    return depth
   except ValueError:
     print('\nERROR: Depth must be a positive integer.')
     return
 
+def process_parent_folder(parent_folder, depth, image_filenames):
   process_folder(parent_folder, image_filenames)
 
   if depth > 0:
