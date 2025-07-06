@@ -50,4 +50,4 @@ if __name__ == '__main__':
     main()
   except Exception as ex:
     print(f'An unexpected error occurred: {ex}')
-  input('Press Enter to exit...')
+    input('Press Enter to exit...')
