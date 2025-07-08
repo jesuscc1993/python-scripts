@@ -4,6 +4,7 @@ import sys
 
 SUBTITLES_PATH = 'subtitles'
 VIDEO_EXTS = ['.mp4', '.mkv']
+SUBTITLE_EXT = '.srt'
 
 def main():
   if len(sys.argv) > 1:
@@ -14,26 +15,27 @@ def main():
   process_directory(dir_path)
 
 def process_directory(dir_path):
-  os.makedirs(os.path.join(dir_path, SUBTITLES_PATH), exist_ok = True)
+  output_path = os.path.join(dir_path, SUBTITLES_PATH)
+  os.makedirs(output_path, exist_ok = True)
 
-  for filename in os.listdir(dir_path):
-    name, ext = os.path.splitext(filename)
+  for file_name in os.listdir(dir_path):
+    name, ext = os.path.splitext(file_name)
     if ext.lower() in VIDEO_EXTS:
-      input_path = os.path.join(dir_path, filename)
-      output_path = os.path.join(dir_path, SUBTITLES_PATH, name + '.srt')
+      src_file_path = os.path.join(dir_path, file_name)
+      dest_file_path = os.path.join(output_path, name + SUBTITLE_EXT)
       cmd = [
         'ffmpeg',
-        '-i', input_path,
+        '-i', src_file_path,
         '-map', '0:s:0',
-        output_path
+        dest_file_path
       ]
       subprocess.run(cmd, stdout = subprocess.DEVNULL, stderr = subprocess.DEVNULL)
 
-      if os.path.exists(output_path) and os.path.getsize(output_path) == 0:
-        os.remove(output_path)
-        print(f'No subtitles found for "{filename}". Removed empty subtitle file.')
+      if os.path.exists(dest_file_path) and os.path.getsize(dest_file_path) == 0:
+        os.remove(dest_file_path)
+        print(f'No subtitles found for "{file_name}". Removed empty subtitle file.')
       else:
-        print(f'Extracted subtitles for "{filename}".')
+        print(f'Extracted subtitles for "{file_name}".')
 
 def prompt_path(prompt_message, optional = False):
   path = input(prompt_message).strip(' "\'')
