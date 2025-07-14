@@ -1,11 +1,35 @@
 import os
 import winreg as reg
 
-EXE_PATH = r'Y:\Software\Development\Notepad++\notepad++.exe'
-ICONS_PATH = r'Y:\Images\Icons\Packs\File Types\ICO'
+EXE_PATH = r'Z:\Software\Development\Notepad++\notepad++.exe'
+ICONS_PATH = r'Z:\Images\Icons\Packs\File Types\ICO'
 REG_ROOT = r'SOFTWARE\Classes'
 FILE_EXTS = r'HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts'
-EXTENSIONS = ['cfg', 'css', 'csv', 'gitignore', 'ini', 'js', 'json', 'less', 'lua', 'md', 'scss', 'srt', 'ts', 'txt', 'xml']
+EXTENSIONS = [
+  'cfg',
+  'conf',
+  'css',
+  'csv',
+  'git',
+  'gitignore',
+  'inf',
+  'ini',
+  'js',
+  'json',
+  'less',
+  'log',
+  'lua',
+  'md',
+  'nfo',
+  'sass',
+  'scss',
+  'srt',
+  'ts',
+  'txt',
+  'xml',
+  'yaml',
+  'yml'
+]
 
 def delete_registry_entry(path):
   try:

@@ -1,0 +1,49 @@
+[
+  {
+    "extensions": [
+      "cfg",
+      "conf",
+      "css",
+      "csv",
+      "git",
+      "gitignore",
+      "inf",
+      "ini",
+      "js",
+      "json",
+      "less",
+      "log",
+      "lua",
+      "md",
+      "nfo",
+      "sass",
+      "scss",
+      "srt",
+      "ts",
+      "txt",
+      "xml",
+      "yaml",
+      "yml"
+    ],
+    "icon": "Z:/Images/Icons/Packs/File Types/ICO/_plain_text.ico",
+    "name": "Text File",
+    "ctx": [
+      {
+        "name": "Open",
+        "default": true,
+        "action": "Z:/Software/Development/Notepad++/notepad++.exe %s"
+      }
+    ]
+  },
+  {
+    "extensions": ["ahk", "bat", "html", "ps1", "py", "rb", "sh"],
+    "icon": "Z:/Images/Icons/Packs/File Types/ICO/_plain_text.ico",
+    "name": "Text File",
+    "ctx": [
+      {
+        "name": "Edit",
+        "action": "Z:/Software/Development/Notepad++/notepad++.exe %s"
+      }
+    ]
+  }
+]
