@@ -33,6 +33,15 @@ MAPPINGS = [
   },
   {
     'exts': [
+      'bat',
+      'html',
+      'ps1',
+      'sh',
+    ],
+    'name': 'Text File'
+  },
+  {
+    'exts': [
       'aac',
       'flac',
       'mp3',
@@ -62,23 +71,39 @@ def add_registry_entry(path, name, value):
   except Exception as ex:
     print(f'Error adding registry entry for {path}: {ex}')
 
+def get_registry_value(path, name):
+  try:
+    with reg.OpenKey(reg.HKEY_CLASSES_ROOT, path) as key:
+      value, _ = reg.QueryValueEx(key, name)
+      return value
+  except Exception as ex:
+    print(f'Error reading registry entry for {path}: {ex}')
+    return None
+
 def main():
   for mapping in MAPPINGS:
-    exe_path = mapping['exe']
-    type_name = mapping['name']
+    exe_path = mapping.get('exe')
+    type_name = mapping.get('name')
 
     for ext in mapping['exts']:
-      icon_path = f'"{os.path.join(ICONS_PATH, f"{ext.upper()}.ico")}"'
-      file_type = f'{ext.lower()}file'
+      icon_path = os.path.join(ICONS_PATH, f'{ext.upper()}.ico')
+      file_type = get_registry_value(f'.{ext}', '') or f'{ext.lower()}file'
 
       delete_registry_entry(f'{FILE_EXTS}\\.{ext}\\UserChoice')
-      add_registry_entry(f'.{ext}\\OpenWithProgids', '', file_type)
       add_registry_entry(f'.{ext}', '', file_type)
-      add_registry_entry(f'{file_type}', 'FriendlyTypeName', type_name)
-      add_registry_entry(f'{file_type}\\shell\\open\\command', '', f'"{exe_path}" "%1"')
-      add_registry_entry(f'{file_type}\\DefaultIcon', '', icon_path)
 
-  print('Registry entries created successfully!')
+      if type_name:
+        add_registry_entry(f'{file_type}', 'FriendlyTypeName', type_name)
+
+      if os.path.exists(icon_path):
+        add_registry_entry(f'{file_type}\\DefaultIcon', '', f'"{icon_path}"')
+
+      if exe_path:
+        add_registry_entry(f'{file_type}\\shell\\open\\command', '', f'"{exe_path}" "%1"')
+
+      print(f'Saved registry key: HKEY_CLASSES_ROOT\\{file_type}')
+
+  print('Registry entries saved successfully.')
 
 if __name__ == '__main__':
   try:
