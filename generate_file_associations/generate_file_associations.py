@@ -6,13 +6,14 @@ FILE_EXTS = 'HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Ex
 
 def main():
   associations = get_associations()
+  icons_path = associations.get('icons_path')
 
   for mapping in associations.get('mappings'):
     exe_path = mapping.get('exe_path')
     type_name = mapping.get('type_name')
 
     for ext in mapping.get('extensions'):
-      icon_path = os.path.join(associations.get('icons_path'), f'{ext.upper()}.ico')
+      icon_path = os.path.join(icons_path, f'{ext.upper()}.ico')
       file_type = get_registry_value(f'.{ext}', '') or f'{ext.lower()}file'
 
       delete_registry_entry(f'{FILE_EXTS}\\.{ext}\\UserChoice')
