@@ -2,6 +2,7 @@ import json
 import os
 import winreg
 
+ASSOCIATIONS_JSON = './associations.json'
 FILE_EXTS = 'HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts'
 
 def main():
@@ -33,7 +34,7 @@ def main():
   print('Registry entries saved successfully.')
 
 def get_associations():
-  with open('./associations.json', 'r') as associations:
+  with open(ASSOCIATIONS_JSON, 'r') as associations:
     return json.load(associations)
 
 def get_registry_value(path, name):
