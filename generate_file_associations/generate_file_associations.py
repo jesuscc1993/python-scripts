@@ -2,7 +2,6 @@ import json
 import os
 import winreg
 
-ICONS_PATH = r'Z:\Images\Icons\Packs\File Types\ICO'
 FILE_EXTS = 'HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts'
 
 def delete_registry_entry(path):
