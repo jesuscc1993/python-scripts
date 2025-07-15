@@ -3,7 +3,7 @@
   "mappings": [
     {
       "exe_path": "Z:\\Software\\Development\\Notepad++\\notepad++.exe",
-      "exts": [
+      "extensions": [
         "cfg",
         "conf",
         "css",
@@ -31,12 +31,12 @@
       "type_name": "Text File"
     },
     {
-      "exts": ["ahk", "bat", "html", "ps1", "py", "rb", "sh"],
+      "extensions": ["ahk", "bat", "html", "ps1", "py", "rb", "sh"],
       "type_name": "Text File"
     },
     {
       "exe_path": "Z:\\Software\\Heavy\\Multimedia\\AIMP\\AIMP.exe",
-      "exts": ["aac", "flac", "mp3", "ogg", "wav"],
+      "extensions": ["aac", "flac", "mp3", "ogg", "wav"],
       "type_name": "Audio File"
     }
   ]

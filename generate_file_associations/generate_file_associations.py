@@ -11,7 +11,7 @@ def main():
     exe_path = mapping.get('exe_path')
     type_name = mapping.get('type_name')
 
-    for ext in mapping['exts']:
+    for ext in mapping.get('extensions'):
       icon_path = os.path.join(associations.get('icons_path'), f'{ext.upper()}.ico')
       file_type = get_registry_value(f'.{ext}', '') or f'{ext.lower()}file'
 
