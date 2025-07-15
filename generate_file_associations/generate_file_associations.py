@@ -4,34 +4,6 @@ import winreg
 
 FILE_EXTS = 'HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts'
 
-def delete_registry_entry(path):
-  try:
-    winreg.DeleteKey(winreg.HKEY_CLASSES_ROOT, path)
-  except FileNotFoundError:
-    pass
-  except Exception as ex:
-    print(f'Error deleting registry entry for {path}: {ex}')
-
-def add_registry_entry(path, name, value):
-  try:
-    with winreg.CreateKey(winreg.HKEY_CLASSES_ROOT, path) as key:
-      winreg.SetValueEx(key, name, 0, winreg.REG_SZ, value)
-  except Exception as ex:
-    print(f'Error adding registry entry for {path}: {ex}')
-
-def get_registry_value(path, name):
-  try:
-    with winreg.OpenKey(winreg.HKEY_CLASSES_ROOT, path) as key:
-      value, _ = winreg.QueryValueEx(key, name)
-      return value
-  except Exception as ex:
-    print(f'Error reading registry entry for {path}: {ex}')
-    return None
-
-def get_associations():
-  with open('./associations.json', 'r') as associations:
-    return json.load(associations)
-
 def main():
   associations = get_associations()
 
@@ -58,6 +30,34 @@ def main():
       print(f'Saved registry key: HKEY_CLASSES_ROOT\\{file_type}')
 
   print('Registry entries saved successfully.')
+
+def get_associations():
+  with open('./associations.json', 'r') as associations:
+    return json.load(associations)
+
+def get_registry_value(path, name):
+  try:
+    with winreg.OpenKey(winreg.HKEY_CLASSES_ROOT, path) as key:
+      value, _ = winreg.QueryValueEx(key, name)
+      return value
+  except Exception as ex:
+    print(f'Error reading registry entry for {path}: {ex}')
+    return None
+
+def delete_registry_entry(path):
+  try:
+    winreg.DeleteKey(winreg.HKEY_CLASSES_ROOT, path)
+  except FileNotFoundError:
+    pass
+  except Exception as ex:
+    print(f'Error deleting registry entry for {path}: {ex}')
+
+def add_registry_entry(path, name, value):
+  try:
+    with winreg.CreateKey(winreg.HKEY_CLASSES_ROOT, path) as key:
+      winreg.SetValueEx(key, name, 0, winreg.REG_SZ, value)
+  except Exception as ex:
+    print(f'Error adding registry entry for {path}: {ex}')
 
 if __name__ == '__main__':
   try:
