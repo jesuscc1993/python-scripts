@@ -28,7 +28,8 @@ MAPPINGS = [
       'yaml',
       'yml'
     ],
-    'exe': r'Z:\Software\Development\Notepad++\notepad++.exe'
+    'exe': r'Z:\Software\Development\Notepad++\notepad++.exe',
+    'name': 'Text File'
   },
   {
     'exts': [
@@ -38,7 +39,8 @@ MAPPINGS = [
       'ogg',
       'wav'
     ],
-    'exe': r'Z:\Software\Heavy\Multimedia\AIMP\AIMP.exe'
+    'exe': r'Z:\Software\Heavy\Multimedia\AIMP\AIMP.exe',
+    'name': 'Audio File'
   }
 ]
 
@@ -63,6 +65,8 @@ def add_registry_entry(path, name, value):
 def main():
   for mapping in MAPPINGS:
     exe_path = mapping['exe']
+    type_name = mapping['name']
+
     for ext in mapping['exts']:
       icon_path = f'"{os.path.join(ICONS_PATH, f"{ext.upper()}.ico")}"'
       file_type = f'{ext.lower()}file'
@@ -70,6 +74,7 @@ def main():
       delete_registry_entry(f'{FILE_EXTS}\\.{ext}\\UserChoice')
       add_registry_entry(f'.{ext}\\OpenWithProgids', '', file_type)
       add_registry_entry(f'.{ext}', '', file_type)
+      add_registry_entry(f'{file_type}', 'FriendlyTypeName', type_name)
       add_registry_entry(f'{file_type}\\shell\\open\\command', '', f'"{exe_path}" "%1"')
       add_registry_entry(f'{file_type}\\DefaultIcon', '', icon_path)
 
