@@ -1,3 +1,4 @@
+import ctypes
 import json
 import os
 import winreg
@@ -6,6 +7,10 @@ ASSOCIATIONS_JSON = './associations.json'
 FILE_EXTS = 'HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts'
 
 def main():
+  if ctypes.windll.shell32.IsUserAnAdmin() == 0:
+    print('Admin privileges required. Please run as administrator.')
+    return
+
   associations = get_associations()
   icons_path = associations.get('icons_path')
 
