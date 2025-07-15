@@ -1,64 +1,13 @@
+import json
 import os
-import winreg as reg
-
-MAPPINGS = [
-  {
-    'exts': [
-      'cfg',
-      'conf',
-      'css',
-      'csv',
-      'git',
-      'gitignore',
-      'inf',
-      'ini',
-      'js',
-      'json',
-      'less',
-      'log',
-      'lua',
-      'md',
-      'nfo',
-      'sass',
-      'scss',
-      'srt',
-      'ts',
-      'txt',
-      'xml',
-      'yaml',
-      'yml'
-    ],
-    'exe': r'Z:\Software\Development\Notepad++\notepad++.exe',
-    'name': 'Text File'
-  },
-  {
-    'exts': [
-      'bat',
-      'html',
-      'ps1',
-      'sh',
-    ],
-    'name': 'Text File'
-  },
-  {
-    'exts': [
-      'aac',
-      'flac',
-      'mp3',
-      'ogg',
-      'wav'
-    ],
-    'exe': r'Z:\Software\Heavy\Multimedia\AIMP\AIMP.exe',
-    'name': 'Audio File'
-  }
-]
+import winreg
 
 ICONS_PATH = r'Z:\Images\Icons\Packs\File Types\ICO'
-FILE_EXTS = r'HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts'
+FILE_EXTS = 'HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts'
 
 def delete_registry_entry(path):
   try:
-    reg.DeleteKey(reg.HKEY_CLASSES_ROOT, path)
+    winreg.DeleteKey(winreg.HKEY_CLASSES_ROOT, path)
   except FileNotFoundError:
     pass
   except Exception as ex:
@@ -66,27 +15,33 @@ def delete_registry_entry(path):
 
 def add_registry_entry(path, name, value):
   try:
-    with reg.CreateKey(reg.HKEY_CLASSES_ROOT, path) as key:
-      reg.SetValueEx(key, name, 0, reg.REG_SZ, value)
+    with winreg.CreateKey(winreg.HKEY_CLASSES_ROOT, path) as key:
+      winreg.SetValueEx(key, name, 0, winreg.REG_SZ, value)
   except Exception as ex:
     print(f'Error adding registry entry for {path}: {ex}')
 
 def get_registry_value(path, name):
   try:
-    with reg.OpenKey(reg.HKEY_CLASSES_ROOT, path) as key:
-      value, _ = reg.QueryValueEx(key, name)
+    with winreg.OpenKey(winreg.HKEY_CLASSES_ROOT, path) as key:
+      value, _ = winreg.QueryValueEx(key, name)
       return value
   except Exception as ex:
     print(f'Error reading registry entry for {path}: {ex}')
     return None
 
+def get_associations():
+  with open('./associations.json', 'r') as associations:
+    return json.load(associations)
+
 def main():
-  for mapping in MAPPINGS:
-    exe_path = mapping.get('exe')
-    type_name = mapping.get('name')
+  associations = get_associations()
+
+  for mapping in associations.get('mappings'):
+    exe_path = mapping.get('exe_path')
+    type_name = mapping.get('type_name')
 
     for ext in mapping['exts']:
-      icon_path = os.path.join(ICONS_PATH, f'{ext.upper()}.ico')
+      icon_path = os.path.join(associations.get('icons_path'), f'{ext.upper()}.ico')
       file_type = get_registry_value(f'.{ext}', '') or f'{ext.lower()}file'
 
       delete_registry_entry(f'{FILE_EXTS}\\.{ext}\\UserChoice')

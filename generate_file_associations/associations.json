@@ -1,0 +1,43 @@
+{
+  "icons_path": "Z:\\Images\\Icons\\Packs\\File Types\\ICO",
+  "mappings": [
+    {
+      "exe_path": "Z:\\Software\\Development\\Notepad++\\notepad++.exe",
+      "exts": [
+        "cfg",
+        "conf",
+        "css",
+        "csv",
+        "git",
+        "gitignore",
+        "inf",
+        "ini",
+        "js",
+        "json",
+        "less",
+        "log",
+        "lua",
+        "md",
+        "nfo",
+        "sass",
+        "scss",
+        "srt",
+        "ts",
+        "txt",
+        "xml",
+        "yaml",
+        "yml"
+      ],
+      "type_name": "Text File"
+    },
+    {
+      "exts": ["ahk", "bat", "html", "ps1", "py", "rb", "sh"],
+      "type_name": "Text File"
+    },
+    {
+      "exe_path": "Z:\\Software\\Heavy\\Multimedia\\AIMP\\AIMP.exe",
+      "exts": ["aac", "flac", "mp3", "ogg", "wav"],
+      "type_name": "Audio File"
+    }
+  ]
+}
