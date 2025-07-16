@@ -46,6 +46,8 @@ def get_registry_value(path, name):
   try:
     with winreg.OpenKey(winreg.HKEY_CLASSES_ROOT, path) as key:
       return winreg.QueryValueEx(key, name)[0]
+  except FileNotFoundError:
+    return None
   except Exception as ex:
     print(f'Error reading registry entry for {path}: {ex}')
     return None
