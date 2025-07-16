@@ -17,9 +17,11 @@ def main():
   for mapping in associations.get('mappings'):
     exe_path = mapping.get('exe_path')
     type_name = mapping.get('type_name')
+    fallback_icon = mapping.get('fallback_icon')
 
     for ext in mapping.get('extensions'):
-      icon_path = os.path.join(icons_path, f'{ext.upper()}.ico')
+      ext_icon_path = get_icon_path(icons_path, ext.upper())
+      fallback_icon_path = get_icon_path(icons_path, fallback_icon)
       file_type = get_registry_value(f'.{ext}', '') or f'{ext.lower()}file'
 
       delete_registry_entry(f'{FILE_EXTS}\\.{ext}\\UserChoice')
@@ -28,13 +30,14 @@ def main():
       if type_name:
         add_registry_entry(f'{file_type}', 'FriendlyTypeName', type_name)
 
-      if os.path.exists(icon_path):
-        add_registry_entry(f'{file_type}\\DefaultIcon', '', f'"{icon_path}"')
+      type_icon = ext_icon_path or fallback_icon_path
+      if type_icon and os.path.exists(type_icon):
+        add_registry_entry(f'{file_type}\\DefaultIcon', '', f'"{type_icon}"')
 
       if exe_path:
         add_registry_entry(f'{file_type}\\shell\\open\\command', '', f'"{exe_path}" "%1"')
 
-      print(f'Saved registry key: HKEY_CLASSES_ROOT\\{file_type}')
+      print(f'Saved registry key "HKEY_CLASSES_ROOT\\{file_type}" for extension "HKEY_CLASSES_ROOT\\.{ext}".')
 
   print('Registry entries saved successfully.')
 
@@ -66,6 +69,10 @@ def add_registry_entry(path, name, value):
       winreg.SetValueEx(key, name, 0, winreg.REG_SZ, value)
   except Exception as ex:
     print(f'Error adding registry entry for {path}: {ex}')
+
+def get_icon_path(icons_path, name):
+  path = os.path.join(icons_path, f'{name}.ico')
+  return path if os.path.exists(path) else None
 
 if __name__ == '__main__':
   try:

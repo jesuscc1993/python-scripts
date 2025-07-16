@@ -29,11 +29,13 @@
         "yaml",
         "yml"
       ],
-      "type_name": "Text File"
+      "type_name": "Text File",
+      "fallback_icon": "_plain_text"
     },
     {
       "extensions": ["ahk", "bat", "html", "ps1", "py", "rb", "sh"],
-      "type_name": "Text File"
+      "type_name": "Text File",
+      "fallback_icon": "_plain_text"
     },
     {
       "exe_path": "Z:\\Software\\Heavy\\Multimedia\\AIMP\\AIMP.exe",
