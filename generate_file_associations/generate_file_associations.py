@@ -12,12 +12,13 @@ def main():
     return
 
   associations = get_associations()
-  icons_path = associations.get('icons_path')
+  root_icons_path = associations.get('icons_path')
 
   for mapping in associations.get('mappings'):
     exe_path = mapping.get('exe_path')
     type_name = mapping.get('type_name')
     fallback_icon = mapping.get('fallback_icon')
+    icons_path = mapping.get('icons_path') or root_icons_path
 
     for ext in mapping.get('extensions'):
       ext_icon_path = get_icon_path(icons_path, ext.upper())

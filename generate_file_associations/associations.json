@@ -17,6 +17,7 @@
         "js",
         "json",
         "jsx",
+        "keys",
         "less",
         "log",
         "lua",
@@ -46,6 +47,22 @@
       "exe_path": "Z:\\Software\\Heavy\\Multimedia\\AIMP\\AIMP.exe",
       "extensions": ["aac", "flac", "mp3", "ogg", "wav"],
       "type_name": "Audio File"
+    },
+    {
+      "icons_path": "Z:\\Images\\Icons\\Packs\\ROM Types",
+      "extensions": [
+        "3ds",
+        "gba",
+        "n64",
+        "nca",
+        "nds",
+        "nsp",
+        "sfc",
+        "smc",
+        "wbfs",
+        "xci"
+      ],
+      "type_name": "ROM File"
     }
   ]
 }
