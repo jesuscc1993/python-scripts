@@ -69,13 +69,21 @@
     {
       "types": ["ahk", "bat", "html", "ps1", "py", "rb", "sh"],
       "fallback_icon": "_plain_text",
+      "shell": [
+        {
+          "command": "\"Z:\\Software\\Development\\Notepad++\\notepad++.exe\" \"%1\"",
+          "icon": "\"Z:\\Software\\Development\\Notepad++\\notepad++.exe\"",
+          "key": "edit",
+          "label": "Edit in Notepad++"
+        }
+      ],
       "type_name": "Text File"
     },
     {
       "types": ["aac", "flac", "mp3", "ogg", "wav"],
       "shell": [
         {
-          "command": "\"Z:\\Software\\Heavy\\Multimedia\\AIMP\\AIMP.exe\" \"%1\"",
+          "command": "\"Z:\\Software\\Development\\Notepad++\\notepad++.exe\" \"%1\"",
           "key": "open"
         }
       ],

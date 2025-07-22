@@ -44,7 +44,19 @@ def main():
 
       if shell:
         for item in shell:
-          add_registry_entry(f'{file_type}\\shell\\{item["key"]}\\command', '', item['command'])
+          command = item.get('command')
+          icon = item.get('icon')
+          key = item.get('ext')
+          label = item.get('label')
+
+          add_registry_entry(f'{file_type}\\shell\\{key}', '', label or '')
+
+          if icon:
+            add_registry_entry(f'{file_type}\\shell\\{key}', 'Icon', icon)
+          else:
+            delete_registry_entry(f'{file_type}\\shell\\{key}', 'Icon')
+
+          add_registry_entry(f'{file_type}\\shell\\{key}\\command', '', command)
 
       print(f'Saved registry key "HKEY_CLASSES_ROOT\\{file_type}" for extension "HKEY_CLASSES_ROOT\\.{ext}".')
 
@@ -64,9 +76,13 @@ def get_registry_value(path, name):
     print(f'Error reading registry entry for {path}: {ex}')
     return None
 
-def delete_registry_entry(path):
+def delete_registry_entry(path, name = None):
   try:
-    winreg.DeleteKey(winreg.HKEY_CLASSES_ROOT, path)
+    if name is None:
+      winreg.DeleteKey(winreg.HKEY_CLASSES_ROOT, path)
+    else:
+      with winreg.OpenKey(winreg.HKEY_CLASSES_ROOT, path, 0, winreg.KEY_SET_VALUE) as key:
+        winreg.DeleteValue(key, name)
   except FileNotFoundError:
     pass
   except Exception as ex:
