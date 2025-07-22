@@ -69,12 +69,6 @@
     {
       "types": ["ahk", "bat", "html", "ps1", "py", "rb", "sh"],
       "fallback_icon": "_plain_text",
-      "shell": [
-        {
-          "command": "\"Z:\\Software\\Development\\Notepad++\\notepad++.exe\" \"%1\"",
-          "key": "edit"
-        }
-      ],
       "type_name": "Text File"
     },
     {
