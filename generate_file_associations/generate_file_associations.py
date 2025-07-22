@@ -15,13 +15,20 @@ def main():
   root_icons_path = associations.get('icons_path')
 
   for mapping in associations.get('mappings'):
-    exe_path = mapping.get('exe_path')
+    shell = mapping.get('shell')
     type_name = mapping.get('type_name')
     fallback_icon = mapping.get('fallback_icon')
     icons_path = mapping.get('icons_path') or root_icons_path
 
-    for ext in mapping.get('extensions'):
-      ext_icon_path = get_icon_path(icons_path, ext.upper())
+    for type in mapping.get('types'):
+      if isinstance(type, str):
+        ext = type
+        ext_icon = type
+      else:
+        ext = type.get('ext')
+        ext_icon = type.get('parent')
+
+      ext_icon_path = get_icon_path(icons_path, ext_icon.upper())
       fallback_icon_path = get_icon_path(icons_path, fallback_icon)
       file_type = get_registry_value(f'.{ext}', '') or f'{ext.lower()}file'
 
@@ -35,8 +42,9 @@ def main():
       if type_icon and os.path.exists(type_icon):
         add_registry_entry(f'{file_type}\\DefaultIcon', '', f'"{type_icon}"')
 
-      if exe_path:
-        add_registry_entry(f'{file_type}\\shell\\open\\command', '', f'"{exe_path}" "%1"')
+      if shell:
+        for item in shell:
+          add_registry_entry(f'{file_type}\\shell\\{item["key"]}\\command', '', item['command'])
 
       print(f'Saved registry key "HKEY_CLASSES_ROOT\\{file_type}" for extension "HKEY_CLASSES_ROOT\\.{ext}".')
 

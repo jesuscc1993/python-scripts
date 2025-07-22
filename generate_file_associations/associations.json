@@ -2,22 +2,17 @@
   "icons_path": "Z:\\Images\\Icons\\Packs\\File Types\\ICO",
   "mappings": [
     {
-      "exe_path": "Z:\\Software\\Development\\Notepad++\\notepad++.exe",
-      "extensions": [
+      "types": [
         "cfg",
         "conf",
         "css",
         "csv",
         "git",
-        "gitconfig",
-        "gitignore",
         "inc",
         "inf",
         "ini",
         "js",
         "json",
-        "jsonc",
-        "jsx",
         "keys",
         "less",
         "log",
@@ -25,33 +20,75 @@
         "md",
         "nfo",
         "sass",
-        "scss",
         "settings",
         "srt",
         "ts",
-        "tsx",
         "txt",
         "vdf",
         "xml",
         "yaml",
-        "yml"
+        "yml",
+        {
+          "ext": "gitconfig",
+          "parent": "json"
+        },
+        {
+          "ext": "gitignore",
+          "parent": "json"
+        },
+        {
+          "ext": "jsonc",
+          "parent": "json"
+        },
+        {
+          "ext": "map",
+          "parent": "json"
+        },
+        {
+          "ext": "jsx",
+          "parent": "js"
+        },
+        {
+          "ext": "scss",
+          "parent": "sass"
+        },
+        {
+          "ext": "tsx",
+          "parent": "ts"
+        }
       ],
-      "type_name": "Text File",
-      "fallback_icon": "_plain_text"
+      "fallback_icon": "_plain_text",
+      "shell": [
+        {
+          "command": "\"Z:\\Software\\Development\\Notepad++\\notepad++.exe\" \"%1\"",
+          "key": "open"
+        }
+      ],
+      "type_name": "Text File"
     },
     {
-      "extensions": ["ahk", "bat", "html", "ps1", "py", "rb", "sh"],
-      "type_name": "Text File",
-      "fallback_icon": "_plain_text"
+      "types": ["ahk", "bat", "html", "ps1", "py", "rb", "sh"],
+      "fallback_icon": "_plain_text",
+      "shell": [
+        {
+          "command": "\"Z:\\Software\\Development\\Notepad++\\notepad++.exe\" \"%1\"",
+          "key": "edit"
+        }
+      ],
+      "type_name": "Text File"
     },
     {
-      "exe_path": "Z:\\Software\\Heavy\\Multimedia\\AIMP\\AIMP.exe",
-      "extensions": ["aac", "flac", "mp3", "ogg", "wav"],
+      "types": ["aac", "flac", "mp3", "ogg", "wav"],
+      "shell": [
+        {
+          "command": "\"Z:\\Software\\Heavy\\Multimedia\\AIMP\\AIMP.exe\" \"%1\"",
+          "key": "open"
+        }
+      ],
       "type_name": "Audio File"
     },
     {
-      "icons_path": "Z:\\Images\\Icons\\Packs\\ROM Types",
-      "extensions": [
+      "types": [
         "3ds",
         "gba",
         "n64",
@@ -61,8 +98,12 @@
         "sfc",
         "smc",
         "wbfs",
-        "xci"
+        {
+          "ext": "xci",
+          "parent": "nsp"
+        }
       ],
+      "icons_path": "Z:\\Images\\Icons\\Packs\\ROM Types",
       "type_name": "ROM File"
     }
   ]
