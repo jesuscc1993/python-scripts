@@ -2,6 +2,14 @@
   "icons_path": "Z:\\Images\\Icons\\Packs\\File Types\\ICO",
   "mappings": [
     {
+      "fallback_icon": "_plain_text",
+      "shell": [
+        {
+          "command": "\"Z:\\Software\\Development\\Notepad++\\notepad++.exe\" \"%1\"",
+          "key": "open"
+        }
+      ],
+      "type_name": "Text File",
       "types": [
         "cfg",
         "conf",
@@ -56,18 +64,9 @@
           "ext": "tsx",
           "parent": "ts"
         }
-      ],
-      "fallback_icon": "_plain_text",
-      "shell": [
-        {
-          "command": "\"Z:\\Software\\Development\\Notepad++\\notepad++.exe\" \"%1\"",
-          "key": "open"
-        }
-      ],
-      "type_name": "Text File"
+      ]
     },
     {
-      "types": ["ahk", "bat", "html", "ps1", "py", "rb", "reg", "sh"],
       "fallback_icon": "_plain_text",
       "shell": [
         {
@@ -77,19 +76,22 @@
           "label": "Edit in Notepad++"
         }
       ],
-      "type_name": "Text File"
+      "type_name": "Text File",
+      "types": ["ahk", "bat", "html", "ps1", "py", "rb", "reg", "sh"]
     },
     {
-      "types": ["aac", "flac", "mp3", "ogg", "wav"],
       "shell": [
         {
           "command": "\"Z:\\Software\\Development\\Notepad++\\notepad++.exe\" \"%1\"",
           "key": "open"
         }
       ],
-      "type_name": "Audio File"
+      "type_name": "Audio File",
+      "types": ["aac", "flac", "mp3", "ogg", "wav"]
     },
     {
+      "icons_path": "Z:\\Images\\Icons\\Packs\\ROM Types",
+      "type_name": "ROM File",
       "types": [
         "3ds",
         "gba",
@@ -104,9 +106,7 @@
           "ext": "xci",
           "parent": "nsp"
         }
-      ],
-      "icons_path": "Z:\\Images\\Icons\\Packs\\ROM Types",
-      "type_name": "ROM File"
+      ]
     }
   ]
 }
