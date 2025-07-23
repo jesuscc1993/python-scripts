@@ -67,7 +67,7 @@
       "type_name": "Text File"
     },
     {
-      "types": ["ahk", "bat", "html", "ps1", "py", "rb", "sh"],
+      "types": ["ahk", "bat", "html", "ps1", "py", "rb", "reg", "sh"],
       "fallback_icon": "_plain_text",
       "shell": [
         {
