@@ -8,7 +8,7 @@ FILE_EXTS = 'HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Ex
 
 def main():
   if ctypes.windll.shell32.IsUserAnAdmin() == 0:
-    print('Admin privileges required. Please run as administrator.')
+    print('[ERROR] Admin privileges required. Please run as administrator.')
     return
 
   associations = get_associations()
@@ -58,9 +58,9 @@ def main():
 
           add_registry_entry(f'{file_type}\\shell\\{key}\\command', '', command)
 
-      print(f'Saved registry key "HKEY_CLASSES_ROOT\\{file_type}" for extension "HKEY_CLASSES_ROOT\\.{ext}".')
+      print(f'[LOG] Saved registry key "HKEY_CLASSES_ROOT\\{file_type}" for extension "HKEY_CLASSES_ROOT\\.{ext}".\n')
 
-  print('Registry entries saved successfully.')
+  print('[LOG] Registry entries saved successfully.')
 
 def get_associations():
   with open(ASSOCIATIONS_JSON, 'r') as associations:
@@ -73,27 +73,32 @@ def get_registry_value(path, name):
   except FileNotFoundError:
     return None
   except Exception as ex:
-    print(f'Error reading registry entry for {path}: {ex}')
+    print(f'[ERROR] Could not get value for registry entry "{path}": {ex}')
     return None
 
 def delete_registry_entry(path, name = None):
   try:
-    if name is None:
+    if not name:
       winreg.DeleteKey(winreg.HKEY_CLASSES_ROOT, path)
+      print(f'Deleted key: "HKEY_CLASSES_ROOT\\{path}"')
     else:
       with winreg.OpenKey(winreg.HKEY_CLASSES_ROOT, path, 0, winreg.KEY_SET_VALUE) as key:
         winreg.DeleteValue(key, name)
-  except FileNotFoundError:
+        print(f'Deleted value: "HKEY_CLASSES_ROOT\\{path}\\{name}"')
+  except FileNotFoundError as ex:
+    full_path = f'HKEY_CLASSES_ROOT\\{path}\\{name}' if name else f'HKEY_CLASSES_ROOT\\{path}'
+    print(f'[WARN] Could not find registry entry {full_path}')
     pass
   except Exception as ex:
-    print(f'Error deleting registry entry for {path}: {ex}')
+    print(f'[ERROR] Could not delete registry entry "{path}": {ex}')
 
 def add_registry_entry(path, name, value):
   try:
     with winreg.CreateKey(winreg.HKEY_CLASSES_ROOT, path) as key:
       winreg.SetValueEx(key, name, 0, winreg.REG_SZ, value)
+      print(f'[INFO] Set registry entry "HKEY_CLASSES_ROOT\\{path}\\{name}" with value "{value}"')
   except Exception as ex:
-    print(f'Error adding registry entry for {path}: {ex}')
+    print(f'[ERROR] Could not add registry entry for "{path}": {ex}')
 
 def get_icon_path(icons_path, name):
   path = os.path.join(icons_path, f'{name}.ico')
