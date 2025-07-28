@@ -56,14 +56,16 @@ def main():
           key = item.get('key')
           label = item.get('label')
 
-          add_registry_entry(winreg.HKEY_CLASSES_ROOT, f'{file_type}\\shell\\{key}', '', label or '')
+          shell_key = f'{file_type}\\shell\\{key}'
+
+          add_registry_entry(winreg.HKEY_CLASSES_ROOT, shell_key, '', label or '')
 
           if icon:
-            add_registry_entry(winreg.HKEY_CLASSES_ROOT, f'{file_type}\\shell\\{key}', 'Icon', icon)
+            add_registry_entry(winreg.HKEY_CLASSES_ROOT, shell_key, 'Icon', icon)
           else:
-            delete_registry_entry(winreg.HKEY_CLASSES_ROOT, f'{file_type}\\shell\\{key}', 'Icon')
+            delete_registry_entry(winreg.HKEY_CLASSES_ROOT, shell_key, 'Icon')
 
-          add_registry_entry(winreg.HKEY_CLASSES_ROOT, f'{file_type}\\shell\\{key}\\command', '', command)
+          add_registry_entry(winreg.HKEY_CLASSES_ROOT, f'{shell_key}\\command', '', command)
 
       print(f'[LOG] Saved registry key "HKEY_CLASSES_ROOT\\{file_type}" for extension "HKEY_CLASSES_ROOT\\.{ext}".\n')
 
