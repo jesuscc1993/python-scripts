@@ -43,7 +43,7 @@ def main():
       add_registry_entry(winreg.HKEY_CLASSES_ROOT, f'.{ext}', '', file_type)
 
       if type_name:
-        add_registry_entry(winreg.HKEY_CLASSES_ROOT, f'{file_type}', 'FriendlyTypeName', type_name)
+        add_registry_entry(winreg.HKEY_CLASSES_ROOT, file_type, 'FriendlyTypeName', type_name)
 
       type_icon = ext_icon_path or fallback_icon_path
       if type_icon and os.path.exists(type_icon):
