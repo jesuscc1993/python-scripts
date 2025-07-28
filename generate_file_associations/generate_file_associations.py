@@ -46,7 +46,7 @@ def main():
         for item in shell:
           command = item.get('command')
           icon = item.get('icon')
-          key = item.get('ext')
+          key = item.get('key')
           label = item.get('label')
 
           add_registry_entry(f'{file_type}\\shell\\{key}', '', label or '')
