@@ -1,5 +1,6 @@
 import os
 import re
+import sys
 
 from tqdm import tqdm
 
@@ -7,17 +8,21 @@ from _common import exit_with_prompt, print_error
 from _sound_utils import play_notification_sound
 
 def main():
-  folder = prompt_parent_folder()
-  if folder:
-    print('')
+  if len(sys.argv) > 1:
+    folder = sys.argv[1]
+  else:
+    folder = prompt_parent_folder()
+
+  if len(sys.argv) > 2:
+    ranges = sys.argv[2]
+  else:
     ranges = prompt_chapter_ranges()
-  if ranges:
-    print('')
-    process_parent_folder(folder, ranges)
-    main()
+
+  process_parent_folder(folder, ranges)
 
 def prompt_parent_folder():
   parent_folder = input('Enter the path to the parent folder containing the chapter folders you want to prefix:\n')
+  print('')
   if os.path.isdir(parent_folder):
     return parent_folder
   else:
@@ -27,6 +32,7 @@ def prompt_parent_folder():
 
 def prompt_chapter_ranges():
   ranges_input = input('Enter the last chapter for each volume, separated by commas (e.g. 12,24,36):\n')
+  print('')
   if not ranges_input:
     return [(0, float('inf'))]
   try:
