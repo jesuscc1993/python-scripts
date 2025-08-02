@@ -3,7 +3,7 @@ import subprocess
 
 from _common import exit_with_prompt, print_error, select_parent_folder
 
-SCRIPT_NAMES = ['prefix_volumes', 'merge_volumes']
+SCRIPT_NAMES = ['prefix_volumes', 'merge_volumes', '../compress/compress_folders']
 
 def process_parent_folder(parent_folder):
   for script in SCRIPT_NAMES:
