@@ -9,13 +9,13 @@ def main():
   total_items = len(items)
   num_digits = len(str(total_items))
 
-  for index, name in enumerate(items, start = 1):
+  for index, old_name in enumerate(items, start = 1):
     new_name = f'{str(index).zfill(num_digits)}'
-    old_path = os.path.join(parent_dir, name)
+    old_path = os.path.join(parent_dir, old_name)
     new_path = os.path.join(parent_dir, new_name)
 
     os.rename(old_path, new_path)
-    print(f'Renamed "{name}" to "{new_name}".')
+    print(f'Renamed "{old_name}" to "{new_name}".')
   print(f'\nFinished processing "{parent_dir}".')
 
 if __name__ == '__main__':
