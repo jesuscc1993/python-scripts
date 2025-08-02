@@ -14,5 +14,5 @@ Collection of my own python scripts.
 - [iterate_steam_folders](iterate_steam_folders)
 - [process_manga](process_manga)
 - [relativize_folder_icons](relativize_folder_icons)
-- [rename_files](rename_files)
+- [rename](rename)
 <!-- - []() -->
