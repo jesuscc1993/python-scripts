@@ -5,7 +5,7 @@ from PIL import Image
 
 from _common import exit_with_prompt, print_error, process_folder_images, select_parent_folder
 from _image_utils import resize_image, save_image_to_path
-from _settings import WHITE_THRESHOLD
+from _settings import MAX_HEIGHT, MAX_WIDTH, WHITE_THRESHOLD
 
 def main():
   if len(sys.argv) > 1:
@@ -19,9 +19,11 @@ def process_parent_folder(folder_path):
 def process_image(file_path):
   try:
     with Image.open(file_path) as img:
-      img = crop_blanks(img)
-      img = resize_image(img)
-      save_image_to_path(img, file_path)
+      width, height = img.size
+      if width > MAX_WIDTH or height > MAX_HEIGHT:
+        img = crop_blanks(img)
+        img = resize_image(img)
+        save_image_to_path(img, file_path)
   except Exception as ex:
     print(f'Failed to process {file_path}: {ex}')
 
