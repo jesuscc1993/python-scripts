@@ -45,11 +45,12 @@ def prompt_params():
   return parent_folder, cover_type, override_existing
 
 def generate_covers(parent_folder, cover_type, override_existing):
+  cover_url = COVER_URL_MAP.get(cover_type)
+
   for folder_name in os.listdir(parent_folder):
     folder_path = os.path.join(parent_folder, folder_name)
 
-    if folder_name.isdigit() and os.path.isdir(folder_path):
-      cover_url = COVER_URL_MAP.get(cover_type)
+    if os.path.isdir(folder_path) and folder_name.isdigit():
       process_folder(folder_path, folder_name, cover_url, override_existing)
 
   winsound.MessageBeep(winsound.MB_ICONASTERISK)
