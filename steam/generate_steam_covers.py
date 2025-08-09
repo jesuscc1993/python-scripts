@@ -53,7 +53,7 @@ def generate_covers(parent_folder, cover_type, override_existing):
     if os.path.isdir(folder_path) and folder_name.isdigit():
       process_folder(folder_path, folder_name, cover_url, override_existing)
 
-  winsound.MessageBeep(winsound.MB_ICONASTERISK)
+  play_notification_sound()
   print('\nFinished generating cover images.')
 
 def process_folder(folder_path, folder_name, cover_url, override_existing):
@@ -78,6 +78,9 @@ def process_folder(folder_path, folder_name, cover_url, override_existing):
     print(f'Generated cover image for game ID {folder_name}.')
   else:
     print(f'Failed to download image for game ID {folder_name} (status code {response.status_code}).')
+
+def play_notification_sound():
+  winsound.MessageBeep(winsound.MB_ICONASTERISK)
 
 if __name__ == '__main__':
   try:
