@@ -54,7 +54,8 @@ def save_icon_to_ini(dir_path, exe_path):
     print(f'[DEBUG] Icon already set for "{dir_path}". Skipping...')
     return
 
-  config[SHELL_SECTION][ICON_KEY] = f'{exe_path},0'
+  relative_exe_path = os.path.relpath(exe_path, dir_path)
+  config[SHELL_SECTION][ICON_KEY] = f'{relative_exe_path},0'
 
   with open(ini_path, 'w', encoding = ENCODING) as ini:
     config.write(ini)
