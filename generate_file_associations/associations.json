@@ -11,6 +11,7 @@
       ],
       "type_name": "Text File",
       "types": [
+        "bms",
         "cfg",
         "conf",
         "css",
