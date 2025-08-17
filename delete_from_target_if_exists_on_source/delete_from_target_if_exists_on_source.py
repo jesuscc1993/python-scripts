@@ -10,6 +10,7 @@ def main():
     dest_path = prompt_path('Enter the target path (files will be deleted here):\n')
 
   compare_paths_and_delete_files(src_path, dest_path)
+  delete_empty_folders(dest_path)
 
 def compare_paths_and_delete_files(src_path, dest_path):
   for root, _, files in os.walk(src_path):
@@ -18,7 +19,15 @@ def compare_paths_and_delete_files(src_path, dest_path):
       path_b = path_a.replace(src_path, dest_path, 1)
       if os.path.exists(path_b):
         os.remove(path_b)
-  print(f'Finished deleting from "{dest_path}" the files that already existed in "{src_path}".')
+  print(f'Finished deleting from "{dest_path}" the files that already existed in "{src_path}".\n')
+
+def delete_empty_folders(parent_folder):
+  for root, dirs, _ in os.walk(parent_folder, topdown = False):
+    for dir_name in dirs:
+      try:
+        os.rmdir(os.path.join(root, dir_name))
+      except OSError:
+        pass
 
 def prompt_path(prompt_message, optional = False):
   path = input(prompt_message).strip(' "\'')
