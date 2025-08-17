@@ -69,6 +69,18 @@
       ]
     },
     {
+      "shell": [
+        {
+          "command": "\"Z:\\Software\\Compression\\WinRAR\\WinRAR.exe\" \"%1\"",
+          "icon": "\"Z:\\Software\\Compression\\WinRAR\\WinRAR.exe\"",
+          "key": "open_in_winrar",
+          "label": "Open in WinRAR"
+        }
+      ],
+      "type_name": "Archive File",
+      "types": ["apk", "iso", "jar"]
+    },
+    {
       "fallback_icon": "_plain_text",
       "shell": [
         {
