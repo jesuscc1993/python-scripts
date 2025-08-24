@@ -1,8 +1,9 @@
 import os
 import sys
-import winsound
 
 from PIL import Image
+
+from _sound_utils import play_notification_sound
 
 DESKTOP_INI_FILENAME = 'desktop.ini'
 ICON_FILENAME = 'icon.ico'
@@ -11,7 +12,7 @@ ICON_SIZE = 256
 def prompt_path(prompt_message, optional = False):
   path = input(prompt_message).strip(' "\'')
   if not path or not os.path.isdir(path):
-    print(f'The specified path "{path}" is not a directory.')
+    print(f'[WARN] The specified path "{path}" is not a directory.')
     if not optional: sys.exit(1)
     return None
   print('')
@@ -24,7 +25,7 @@ def prompt_depth():
       raise ValueError()
     return depth
   except ValueError:
-    print('\nERROR: Depth must be a positive integer.')
+    print('\n[ERROR] Depth must be a positive integer.')
     return
 
 def process_parent_folder(parent_folder, depth, image_filenames):
@@ -38,8 +39,8 @@ def process_parent_folder(parent_folder, depth, image_filenames):
         item_path = os.path.join(root, dir_name)
         process_folder(item_path, image_filenames)
 
-  winsound.MessageBeep(winsound.MB_ICONASTERISK)
-  print(f'\nFinished generating icons.')
+  play_notification_sound()
+  print(f'\n[LOG] Finished setting icons for "{parent_folder}".')
 
 def process_folder(folder_path, image_filenames):
   image_path = None
@@ -54,7 +55,7 @@ def process_folder(folder_path, image_filenames):
     png_to_ico(image_path, ico_path)
     set_folder_icon(folder_path)
   else:
-    print(f'No suitable image found in "{folder_path}"')
+    print(f'[DEBUG] No suitable image found in "{folder_path}"')
 
 def png_to_ico(image_path, ico_path):
   try:
@@ -70,7 +71,7 @@ def png_to_ico(image_path, ico_path):
       background.paste(img, offset)
       background.save(ico_path, format='ICO', sizes=[(ICON_SIZE, ICON_SIZE)])
   except Exception as ex:
-    print(f'Error converting "{image_path}" to ICO: {ex}')
+    print(f'[ERROR] Error converting "{image_path}" to ICO: {ex}')
 
 def set_folder_icon(folder_path):
   try:
@@ -88,8 +89,8 @@ def set_folder_icon(folder_path):
     os.system(f'attrib +h "{icon_path}"')
     os.system(f'attrib +s "{folder_path}"')
 
-    print(f'Saved "{icon_path}" and "{desktop_ini_path}".')
+    print(f'[LOG] Saved "{icon_path}" and "{desktop_ini_path}".')
   except PermissionError:
-    print(f'Permission denied: "{desktop_ini_path}". You may need to run the script as an administrator.')
+    print(f'[WARN] Permission denied: "{desktop_ini_path}". You may need to run the script as an administrator.')
   except Exception as ex:
-    print(f'Error setting folder icon to "{folder_path}": {ex}')
+    print(f'[ERROR] Error setting folder icon to "{folder_path}": {ex}')

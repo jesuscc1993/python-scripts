@@ -3,6 +3,7 @@ import os
 import sys
 
 from _common import prompt_path
+from _sound_utils import play_notification_sound
 
 ENCODING = 'utf-8'
 ICON_KEY = 'IconResource'
@@ -30,6 +31,9 @@ def main():
     except Exception as e:
       print(f'[ERROR] Could not process "{child_path}": {e}')
       continue
+
+  play_notification_sound()
+  print(f'[LOG] Finished setting icons for "{parent_path}".')
 
 def find_exe(folder):
   for dirpath, _, filenames in os.walk(folder):
@@ -59,7 +63,7 @@ def save_icon_to_ini(dir_path, exe_path):
 
   with open(ini_path, 'w', encoding = ENCODING) as ini:
     config.write(ini)
-    print(f'[DEBUG] Saved icon for {dir_path}.')
+    print(f'[DEBUG] Set icon for {dir_path}.')
 
   os.system(f'attrib +h "{ini_path}"')
   os.system(f'attrib +s +r "{dir_path}"')
