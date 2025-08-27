@@ -34,16 +34,15 @@ def process_parent_folder(parent_folder, depth, image_filenames):
   parent_folder = os.path.abspath(parent_folder)
   parent_depth = parent_folder.rstrip(os.sep).count(os.sep)
 
-  if depth > 0:
-    for root, dirs, _ in os.walk(parent_folder):
-      current_depth = root.rstrip(os.sep).count(os.sep) - parent_depth
-      if current_depth >= depth:
-        dirs.clear()
-        continue
+  for root, dirs, _ in os.walk(parent_folder):
+    current_depth = root.rstrip(os.sep).count(os.sep) - parent_depth
+    if current_depth >= depth:
+      dirs.clear()
+      continue
 
-      for dir_name in dirs:
-        item_path = os.path.join(root, dir_name)
-        process_folder(item_path, image_filenames)
+    for dir_name in dirs:
+      item_path = os.path.join(root, dir_name)
+      process_folder(item_path, image_filenames)
 
   play_notification_sound()
   print(f'\n[LOG] Finished setting icons for "{parent_folder}".')
