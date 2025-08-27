@@ -22,7 +22,7 @@ def main():
     if chapter_count < 0:
       raise ValueError()
   except ValueError:
-    print('\nERROR: Chapter count must be a positive integer.')
+    print('\n[ERROR] Chapter count must be a positive integer.')
     return
   print('')
 
@@ -30,7 +30,7 @@ def main():
   print('')
 
   play_notification_sound()
-  print(f'Finished downloading from "{base_url}".\n')
+  print(f'[LOG] Finished downloading from "{base_url}".\n')
   main()
 
 def download_all_chapters(base_url, css_selector, chapter_count):
@@ -56,6 +56,8 @@ def download_images_from_chapter(base_url, css_selector, chapter_number):
 
     if images:
       os.makedirs(folder, exist_ok = True)
+    else:
+      print(f'[WARN] Found no images for selector {css_selector} on URL "{chapter_url}".')
 
     for i, img in enumerate(images):
       src = img.get('src')
@@ -67,7 +69,7 @@ def download_images_from_chapter(base_url, css_selector, chapter_number):
         with open(img_name, 'wb') as f:
           f.write(img_data)
   except Exception as ex:
-    print(f'Failed to download chapter {chapter_number}: {ex}')
+    print(f'[ERROR] Failed to download chapter {chapter_number}: {ex}')
 
 def pad_string(string, width = 3):
   return str(string).zfill(width)
