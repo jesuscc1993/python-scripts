@@ -2,7 +2,7 @@ import configparser
 import os
 import sys
 
-from _common import prompt_path
+from _common import prompt_depth, prompt_path
 from _sound_utils import play_notification_sound
 
 ENCODING = 'utf-8'
@@ -13,24 +13,35 @@ SHELL_SECTION = '.ShellClassInfo'
 def main():
   if len(sys.argv) > 1:
     parent_path = sys.argv[1]
+    depth = int(sys.argv[2]) if len(sys.argv) > 2 else 1
   else:
     parent_path = prompt_path('Enter the folder path to process:\n')
+    depth = prompt_depth()
 
-  for child_dir in os.listdir(parent_path):
-    try:
-      child_path = os.path.join(parent_path, child_dir)
-      if not os.path.isdir(child_path):
-        continue
+  parent_path = os.path.abspath(parent_path)
+  parent_depth = parent_path.rstrip(os.sep).count(os.sep)
 
-      exe_path = find_exe(child_path)
-      if not exe_path:
-        continue
-
-      save_icon_to_ini(child_path, exe_path)
-
-    except Exception as e:
-      print(f'[ERROR] Could not process "{child_path}": {e}')
+  for root, dirs, _ in os.walk(parent_path):
+    current_depth = root.rstrip(os.sep).count(os.sep) - parent_depth
+    if current_depth >= depth:
+      dirs.clear()
       continue
+
+    for dir_name in dirs:
+      try:
+        child_path = os.path.join(root, dir_name)
+        if not os.path.isdir(child_path):
+          continue
+
+        exe_path = find_exe(child_path)
+        if not exe_path:
+          continue
+
+        save_icon_to_ini(child_path, exe_path)
+
+      except Exception as e:
+        print(f'[ERROR] Could not process "{child_path}": {e}')
+        continue
 
   play_notification_sound()
   print(f'[LOG] Finished setting icons for "{parent_path}".')

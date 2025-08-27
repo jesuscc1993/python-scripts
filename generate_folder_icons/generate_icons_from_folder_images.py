@@ -7,7 +7,7 @@ IMAGE_FILENAMES = ['folder.jpg', 'cover.jpg', 'AlbumArtSmall.jpg']
 def main():
   if len(sys.argv) > 1:
     parent_path = sys.argv[1]
-    depth = sys.argv[1] if len(sys.argv) > 2 else 1
+    depth = int(sys.argv[2]) if len(sys.argv) > 2 else 1
   else:
     parent_path = prompt_path('Enter the folder path to process:\n')
     depth = prompt_depth()

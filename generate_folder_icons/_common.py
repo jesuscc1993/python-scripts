@@ -31,10 +31,16 @@ def prompt_depth():
 def process_parent_folder(parent_folder, depth, image_filenames):
   process_folder(parent_folder, image_filenames)
 
+  parent_folder = os.path.abspath(parent_folder)
+  parent_depth = parent_folder.rstrip(os.sep).count(os.sep)
+
   if depth > 0:
-    for current_depth, (root, dirs, _) in enumerate(os.walk(parent_folder)):
+    for root, dirs, _ in os.walk(parent_folder):
+      current_depth = root.rstrip(os.sep).count(os.sep) - parent_depth
       if current_depth >= depth:
-        break
+        dirs.clear()
+        continue
+
       for dir_name in dirs:
         item_path = os.path.join(root, dir_name)
         process_folder(item_path, image_filenames)
