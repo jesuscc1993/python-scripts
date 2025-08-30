@@ -25,11 +25,14 @@ def process_image(file_path):
         img = resize_image(img)
         save_image_to_path(img, file_path)
   except Exception as ex:
-    print(f'Failed to process {file_path}: {ex}')
+    print(f'[ERROR] Failed to process {file_path}: {ex}')
 
 def crop_blanks(img):
   np_img = numpy.array(img)
-  mask = numpy.any(np_img < WHITE_THRESHOLD, axis = 2)
+  if np_img.ndim == 2:
+    mask = np_img < WHITE_THRESHOLD
+  else:
+    mask = numpy.any(np_img < WHITE_THRESHOLD, axis = 2)
 
   coords = numpy.argwhere(mask)
   if coords.size == 0:
