@@ -53,12 +53,12 @@ def main():
     sanitized = sanitize_name(game)
     app_id = owned_games.get(sanitized)
     if not app_id:
-      print(f'Skipping "{game}": no matching Steam appid found.')
+      print(f'[WARN] Skipping "{game}": no matching Steam appid found.')
       continue
 
     filepath = os.path.join(steam_apps_path, f'appmanifest_{app_id}.acf')
     if os.path.exists(filepath):
-      print(f'Skipping "{game}": Manifest already exists ({filepath}).')
+      print(f'[WARN] Skipping "{game}": Manifest already exists ({filepath}).')
       continue
 
     name = game

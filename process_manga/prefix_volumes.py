@@ -59,7 +59,8 @@ def process_parent_folder(parent_folder, chapter_ranges):
   for folder in tqdm(folders, desc=f'Processing "{parent_folder}"'):
     chapter = get_chapter(folder)
     if not chapter:
-      continue
+        tqdm.write(f'[WARN] Skipping "{folder}" because chapter number could not be inferred.')
+        continue
     try:
       ch_num = float(chapter)
     except ValueError:

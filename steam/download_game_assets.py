@@ -35,7 +35,7 @@ def main():
 
     items = search_game(name)
     if not items:
-      print('No results found.')
+      print('[WARN] No results found.')
       continue
 
     items = [
@@ -54,10 +54,10 @@ def main():
       try:
         choice = int(input('').strip() or '1')
         if not (1 <= choice <= len(items)):
-          print('Invalid selection.')
+          print('[ERROR] Invalid selection.')
           continue
       except ValueError:
-        print('Invalid input.')
+        print('[ERROR] Invalid input.')
         continue
 
     print('')
