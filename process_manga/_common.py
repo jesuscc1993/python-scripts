@@ -11,11 +11,11 @@ def select_parent_folder(prompt, callback):
   if not parent_folder:
     return
   if not os.path.isdir(parent_folder):
-    print(f'The specified path "{parent_folder}" is not a directory.')
+    print(f'[ERROR] The specified path "{parent_folder}" is not a directory.')
   else:
     callback(parent_folder)
     play_notification_sound()
-    print(f'Finished processing "{parent_folder}".\n')
+    print(f'[LOG] Finished processing "{parent_folder}".\n')
   select_parent_folder(prompt, callback)
 
 def process_folder_images(folder_path, callback):
@@ -41,7 +41,7 @@ def delete_empty_folders(folder_path):
         pass
 
 def print_error(error):
-  print(f'An unexpected error occurred: {error}')
+  print(f'[ERROR] An unexpected error occurred: {error}')
 
 def exit_with_prompt():
   input('Press Enter to exit...')

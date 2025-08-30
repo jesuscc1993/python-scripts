@@ -19,7 +19,7 @@ def prompt_parent_folder():
   if not parent_folder:
     return
   if not os.path.isdir(parent_folder):
-    print(f'The specified path "{parent_folder}" is not a directory.')
+    print(f'[ERROR] The specified path "{parent_folder}" is not a directory.')
   else:
     process_parent_folder(parent_folder)
     play_notification_sound()

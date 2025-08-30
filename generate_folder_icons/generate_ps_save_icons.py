@@ -18,5 +18,5 @@ if __name__ == '__main__':
   try:
     main()
   except Exception as ex:
-    print(f'An unexpected error occurred: {ex}')
+    print(f'[ERROR] An unexpected error occurred: {ex}')
   input('Press Enter to exit...')

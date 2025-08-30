@@ -58,7 +58,7 @@ def main():
 
     filepath = os.path.join(steam_apps_path, f'appmanifest_{app_id}.acf')
     if os.path.exists(filepath):
-      print(f'[WARN] Skipping "{game}": Manifest already exists ({filepath}).')
+      print(f'[DEBUG] Skipping "{game}": Manifest already exists ({filepath}).')
       continue
 
     name = game
@@ -85,5 +85,5 @@ if __name__ == '__main__':
   try:
     main()
   except Exception as ex:
-    print(f'An unexpected error occurred: {ex}')
+    print(f'[ERROR] An unexpected error occurred: {ex}')
   input('Press Enter to exit...')

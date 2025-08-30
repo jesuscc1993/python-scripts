@@ -19,7 +19,7 @@ def process_folder(folder_path):
   if match:
     game_id = match.group(1)
   else:
-    print(f'Could not extract a valid game ID from "{folder_path}"')
+    print(f'[ERROR] Could not extract a valid game ID from "{folder_path}"')
     return
 
   download_game_cover(game_id, folder_path)
@@ -30,7 +30,7 @@ def download_game_cover(game_id, folder_path):
   response = requests.get(image_url)
 
   if response.status_code != 200:
-    print(f'Failed to access the search results for {game_id}. Status code: {response.status_code}')
+    print(f'[ERROR] Could not access the search results for {game_id}. Status code: {response.status_code}')
     return
 
   img = Image.open(BytesIO(response.content))
@@ -40,5 +40,5 @@ if __name__ == '__main__':
   try:
     main()
   except Exception as ex:
-    print(f'An unexpected error occurred: {ex}')
+    print(f'[ERROR] An unexpected error occurred: {ex}')
   input('Press Enter to exit...')

@@ -69,7 +69,7 @@ def download_images_from_chapter(base_url, css_selector, chapter_number):
         with open(img_name, 'wb') as f:
           f.write(img_data)
   except Exception as ex:
-    print(f'[ERROR] Failed to download chapter {chapter_number}: {ex}')
+    print(f'[ERROR] Could not download chapter {chapter_number}: {ex}')
 
 def pad_string(string, width = 3):
   return str(string).zfill(width)

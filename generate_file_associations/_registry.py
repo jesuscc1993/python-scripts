@@ -20,11 +20,11 @@ def delete_registry_entry(root, path, name = None):
   try:
     if not name:
       winreg.DeleteKey(root, path)
-      print(f'Deleted key: "{get_registry_key(root, path)}"')
+      print(f'[LOG] Deleted key: "{get_registry_key(root, path)}"')
     else:
       with winreg.OpenKey(root, path, 0, winreg.KEY_SET_VALUE) as key:
         winreg.DeleteValue(key, name)
-        print(f'Deleted value: "{get_registry_key(root, path, name)}"')
+        print(f'[LOG] Deleted value: "{get_registry_key(root, path, name)}"')
   except FileNotFoundError:
     print(f'[WARN] Could not find registry entry "{get_registry_key(root, path, name)}"')
   except Exception as ex:

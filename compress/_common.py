@@ -13,11 +13,11 @@ def select_parent_folder(prompt, callback):
   if not parent_folder:
     return
   if not os.path.isdir(parent_folder):
-    print(f'The specified path "{parent_folder}" is not a directory.')
+    print(f'[ERROR] The specified path "{parent_folder}" is not a directory.')
   else:
     callback(parent_folder)
     play_notification_sound()
-    print(f'Finished processing "{parent_folder}".\n')
+    print(f'[LOG] Finished processing "{parent_folder}".\n')
   select_parent_folder(prompt, callback)
 
 def process_parent_folder(parent_folder):
@@ -45,7 +45,7 @@ def process_folder(folder_path):
   final_zip_path = os.path.join(os.path.dirname(folder_path), zip_filename)
 
   if os.path.exists(final_zip_path):
-    print(f'Skipping "{folder_path}". A compressed file with the same name already exists.')
+    print(f'[DEBUG] Skipping "{folder_path}". A compressed file with the same name already exists.')
     return
 
   try:
@@ -63,4 +63,4 @@ def process_folder(folder_path):
       shutil.rmtree(folder_path)
 
   except Exception as ex:
-    print(f'An error occurred while processing "{folder_name}": {ex}')
+    print(f'[ERROR] An error occurred while processing "{folder_name}": {ex}')

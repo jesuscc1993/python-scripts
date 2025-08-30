@@ -23,22 +23,22 @@ def restore_file(bak_file_path):
   og_file_path = os.path.join(og_dir_path, og_file_name)
 
   if not os.path.exists(bak_file_path):
-    print(f'File {bak_file_name} does not exist')
+    print(f'[ERROR] File "{bak_file_name}" does not exist')
     return
 
   if os.path.exists(og_file_path):
     if os.path.getmtime(bak_file_path) == os.path.getmtime(og_file_path):
-      print(f'Both {bak_file_name} and {og_file_name} have the same timestamp. Skipping...')
+      print(f'[DEBUG] Skipping "{bak_file_name}". Both "{bak_file_name}" and "{og_file_name}" have the same timestamp.')
       return
 
     rename_with_timestamp(bak_dir_path, og_file_path)
 
   shutil.copy2(bak_file_path, og_file_path)
-  print(f'Restored {bak_file_name} as {og_file_name}')
+  print(f'[LOG] Restored "{bak_file_name}" as "{og_file_name}"')
 
 if __name__ == '__main__':
   try:
     main()
   except Exception as ex:
-    print(f'An unexpected error occurred: {ex}')
+    print(f'[ERROR] An unexpected error occurred: {ex}')
     input('Press Enter to exit...')

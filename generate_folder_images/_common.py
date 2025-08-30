@@ -12,7 +12,7 @@ def process_parent_folder(process_folder):
     target_folder = input('\nEnter the path to the specific folder you want to generate an icon for:\nFOLDER: ')
 
     if not os.path.isdir(target_folder):
-      print(f'[WARN] The specified path "{target_folder}" is not a directory.')
+      print(f'[ERROR] The specified path "{target_folder}" is not a directory.')
       return
 
     print('')
@@ -20,7 +20,7 @@ def process_parent_folder(process_folder):
 
   else:
     if not os.path.isdir(parent_folder):
-      print(f'[WARN] The specified path "{parent_folder}" is not a directory.')
+      print(f'[ERROR] The specified path "{parent_folder}" is not a directory.')
       return
 
     print('')
@@ -29,7 +29,7 @@ def process_parent_folder(process_folder):
     for dir_name in dirs:
       item_path = os.path.join(root, dir_name)
       if os.path.exists(os.path.join(item_path, FOLDER_IMAGE_FILENAME)):
-        print(f'[WARN] Skipping "{item_path}" as it already contains "{FOLDER_IMAGE_FILENAME}".')
+        print(f'[DEBUG] Skipping "{item_path}". "{FOLDER_IMAGE_FILENAME}" is already contained within.')
         continue
       process_folder(item_path)
 

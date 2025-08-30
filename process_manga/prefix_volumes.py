@@ -28,7 +28,7 @@ def prompt_parent_folder():
     return parent_folder
   else:
     if parent_folder:
-      print(f'The specified path "{parent_folder}" is not a directory.')
+      print(f'[ERROR] The specified path "{parent_folder}" is not a directory.')
     return None
 
 def prompt_chapter_ranges():
@@ -59,7 +59,7 @@ def process_parent_folder(parent_folder, chapter_ranges):
   for folder in tqdm(folders, desc=f'Processing "{parent_folder}"'):
     chapter = get_chapter(folder)
     if not chapter:
-        tqdm.write(f'[WARN] Skipping "{folder}" because chapter number could not be inferred.')
+        tqdm.write(f'[WARN] Skipping "{folder}". Chapter number could not be inferred.')
         continue
     try:
       ch_num = float(chapter)
@@ -77,7 +77,7 @@ def process_parent_folder(parent_folder, chapter_ranges):
         break
 
   play_notification_sound()
-  print(f'Finished processing "{parent_folder}".\n')
+  print(f'[LOG] Finished processing "{parent_folder}".\n')
 
 def get_chapter(folder_name):
   match = re.search(r'(Ch(?:apter)?|Ep(?:isode)?)\.?\s*(\d+(?:\.\d+)?)', folder_name, re.IGNORECASE)

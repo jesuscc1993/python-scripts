@@ -16,7 +16,7 @@ def main():
 
   rename_and_copy_files(src_path, dest_path, matches_only)
 
-  print(f'Finished copying "{src_path}" to "{dest_path}".\n')
+  print(f'[LOG] Finished copying "{src_path}" to "{dest_path}".\n')
   main()
 
 def rename_and_copy_files(src_path, dest_path, matches_only):
@@ -35,13 +35,13 @@ def backup_file(file_path):
 
     if not os.path.isfile(bak_path):
       os.rename(file_path, bak_path)
-      print(f'Saved backup file "{bak_path}".')
+      print(f'[LOG] Saved backup file "{bak_path}".')
     else:
-      print(f'Backup file "{bak_path}" already exists and will be reused.')
+      print(f'[LOG] Backup file "{bak_path}" already exists and will be reused.')
 
 if __name__ == '__main__':
   try:
     main()
   except Exception as ex:
-    print(f'An unexpected error occurred: {ex}')
+    print(f'[ERROR] An unexpected error occurred: {ex}')
     input('Press Enter to exit...')

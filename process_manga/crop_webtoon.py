@@ -25,7 +25,7 @@ def process_image(file_path):
       blank_free_image = crop_blanks(img)
       save_image_splits(blank_free_image, file_path)
   except Exception as ex:
-    print(f'Failed to process {file_path}: {ex}')
+    print(f'[ERROR] Could not process {file_path}: {ex}')
 
 def is_blank_strip(image_strip):
   gray_strip = image_strip.convert('L')
@@ -87,7 +87,7 @@ def save_image_splits(img, original_path):
         save_image_to_path(split_image, split_file_path, True)
       os.remove(original_path)
     except Exception as ex:
-      print(f'Failed to save split images for {original_path}: {ex}')
+      print(f'[ERROR] Could not save split images for {original_path}: {ex}')
       for i in range(num_splits):
         split_file_path = f"{base_name}.{i + 1}{ext}"
         if os.path.exists(split_file_path):
@@ -96,7 +96,7 @@ def save_image_splits(img, original_path):
     try:
       save_image_to_path(img, original_path)
     except Exception as ex:
-      print(f'Failed to save image {original_path}: {ex}')
+      print(f'[ERROR] Could not save image {original_path}: {ex}')
 
 if __name__ == '__main__':
   try:

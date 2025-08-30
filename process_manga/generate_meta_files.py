@@ -19,7 +19,7 @@ def prompt_parent_folder():
   if not parent_folder:
     return
   if not os.path.isdir(parent_folder):
-    print(f'The specified path "{parent_folder}" is not a directory.')
+    print(f'[ERROR] The specified path "{parent_folder}" is not a directory.')
   else:
     process_parent_folder(parent_folder)
     play_notification_sound()
@@ -41,14 +41,14 @@ def process_folder(folder_path):
     try:
       file_path = os.path.join(folder_path, filename)
       if os.path.exists(file_path):
-        print(f'File "{file_path}" already exists. Skipping...')
+        print(f'[DEBUG] Skipping "{file_path}". File already exists.')
       else:
         open(file_path, 'w').close()
         os.system(f'attrib +h "{file_path}"')
-        print(f'Successfully created hidden file "{file_path}".')
+        print(f'[LOG] Successfully created hidden file "{file_path}".')
 
     except Exception as ex:
-      print(f'ERROR: Failed to create "{filename}": {ex}')
+      print(f'[ERROR] Could not create "{filename}": {ex}')
 
 if __name__ == '__main__':
   try:

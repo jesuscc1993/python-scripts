@@ -5,7 +5,7 @@ import os
 def main():
   parent_folder = input('Enter the folder path to process:\n').strip(' "\'')
   if not os.path.isdir(parent_folder):
-    print(f'The specified path "{parent_folder}" is not a directory.')
+    print(f'[ERROR] The specified path "{parent_folder}" is not a directory.')
     return
 
   recursive = input('\nRun recursively in subfolders? (y|n). Default: n:\n').strip().lower() == 'y'
@@ -44,19 +44,19 @@ def process_folder(folder_path):
 
         with open(desktop_ini_path, 'w') as desktop_ini:
           config.write(desktop_ini)
-        print(f'Updated folder "{folder_path}" with IconResource "{relative_icon_path}"')
+        print(f'[LOG] Updated folder "{folder_path}" with IconResource "{relative_icon_path}".')
       else:
-        print(f'Skipping folder "{folder_path}" with IconResource "{icon_resource}"')
+        print(f'[DEBUG] Skipping folder "{folder_path}" with IconResource "{icon_resource}".')
 
       ctypes.windll.kernel32.SetFileAttributesW(desktop_ini_path, 0x02 | 0x04)
   except PermissionError:
-    print(f'Permission denied for "{desktop_ini_path}"')
+    print(f'[ERROR] Permission denied for "{desktop_ini_path}"')
   except Exception as ex:
-    print(f'An error occurred while processing {desktop_ini_path}: {ex}')
+    print(f'[ERROR] Could not process "{desktop_ini_path}": {ex}')
 
 if __name__ == '__main__':
   try:
     main()
   except Exception as ex:
-    print(f'An unexpected error occurred: {ex}')
+    print(f'[ERROR] An unexpected error occurred: {ex}')
   input('\nPress Enter to exit...')

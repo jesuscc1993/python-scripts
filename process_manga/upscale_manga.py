@@ -30,7 +30,7 @@ def process_image(file_path):
     )
 
   except Exception as ex:
-    print(f'Error processing "{file_path}": {ex}')
+    print(f'[ERROR] Could not process "{file_path}": {ex}')
 
 if __name__ == '__main__':
   try:

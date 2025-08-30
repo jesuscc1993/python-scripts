@@ -12,7 +12,7 @@ ICON_SIZE = 256
 def prompt_path(prompt_message, optional = False):
   path = input(prompt_message).strip(' "\'')
   if not path or not os.path.isdir(path):
-    print(f'[WARN] The specified path "{path}" is not a directory.')
+    print(f'[ERROR] The specified path "{path}" is not a directory.')
     if not optional: sys.exit(1)
     return None
   print('')

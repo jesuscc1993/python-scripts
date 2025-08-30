@@ -33,14 +33,14 @@ def process_directory(dir_path):
 
       if os.path.exists(dest_file_path) and os.path.getsize(dest_file_path) == 0:
         os.remove(dest_file_path)
-        print(f'No subtitles found for "{file_name}". Removed empty subtitle file.')
+        print(f'[WARN] No subtitles found for "{file_name}". Removed empty subtitle file.')
       else:
-        print(f'Extracted subtitles for "{file_name}".')
+        print(f'[LOG] Extracted subtitles for "{file_name}".')
 
 def prompt_path(prompt_message, optional = False):
   path = input(prompt_message).strip(' "\'')
   if not path or not os.path.isdir(path):
-    print(f'The specified path "{path}" is not a directory.')
+    print(f'[ERROR] The specified path "{path}" is not a directory.')
     if not optional: sys.exit(1)
     return None
   print('')
@@ -50,5 +50,5 @@ if __name__ == '__main__':
   try:
     main()
   except Exception as ex:
-    print(f'An unexpected error occurred: {ex}')
+    print(f'[ERROR] An unexpected error occurred: {ex}')
   input('Press Enter to exit...')

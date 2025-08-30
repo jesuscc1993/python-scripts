@@ -11,7 +11,7 @@ def main():
     src_path = prompt_path('Enter the directory containing .bak files to restore:\n')
 
   restore_backups(src_path)
-  print(f'\nFinished restoring .bak files in "{src_path}".\n')
+  print(f'\n[LOG] Finished restoring .bak files in "{src_path}".\n')
   main()
 
 def restore_backups(dir_path):
@@ -22,11 +22,11 @@ def restore_backups(dir_path):
 			og_path = os.path.join(dir_path, og_name)
 
 			shutil.copy2(bak_path, og_path)
-			print(f'Restored "{bak_path}" as "{og_path}".')
+			print(f'[LOG] Restored "{bak_path}" as "{og_path}".')
 
 if __name__ == '__main__':
   try:
     main()
   except Exception as ex:
-    print(f'An unexpected error occurred: {ex}')
+    print(f'[ERROR] An unexpected error occurred: {ex}')
     input('Press Enter to exit...')

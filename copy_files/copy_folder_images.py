@@ -20,7 +20,7 @@ def main():
     dest_path = prompt_path('Enter the path the files will be copied to:\n')
 
   copy_folder_assets(src_path, dest_path)
-  print(f'\nFinished copying "{src_path}" to "{dest_path}".\n')
+  print(f'\n[LOG] Finished copying "{src_path}" to "{dest_path}".\n')
   main()
 
 def copy_folder_assets(src_path, dest_path):
@@ -35,11 +35,11 @@ def copy_folder_assets(src_path, dest_path):
           src_file = os.path.join(item_path, file)
           dest_file = os.path.join(dest_folder, file)
           shutil.copy2(src_file, dest_file)
-          print(f'Copied "{src_file}" to "{dest_file}".')
+          print(f'[LOG] Copied "{src_file}" as "{dest_file}".')
 
 if __name__ == '__main__':
   try:
     main()
   except Exception as ex:
-    print(f'An unexpected error occurred: {ex}')
+    print(f'[ERROR] An unexpected error occurred: {ex}')
     input('Press Enter to exit...')

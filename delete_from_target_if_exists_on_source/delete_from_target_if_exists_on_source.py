@@ -19,7 +19,7 @@ def compare_paths_and_delete_files(src_path, dest_path):
       path_b = path_a.replace(src_path, dest_path, 1)
       if os.path.exists(path_b):
         os.remove(path_b)
-  print(f'Finished deleting from "{dest_path}" the files that already existed in "{src_path}".\n')
+  print(f'[LOG] Finished deleting from "{dest_path}" the files that already existed in "{src_path}".\n')
 
 def delete_empty_folders(parent_folder):
   for root, dirs, _ in os.walk(parent_folder, topdown = False):
@@ -32,7 +32,7 @@ def delete_empty_folders(parent_folder):
 def prompt_path(prompt_message, optional = False):
   path = input(prompt_message).strip(' "\'')
   if not path or not os.path.isdir(path):
-    print(f'The specified path "{path}" is not a directory.')
+    print(f'[ERROR] The specified path "{path}" is not a directory.')
     if not optional: sys.exit(1)
     return None
   print('')
@@ -42,5 +42,5 @@ if __name__ == '__main__':
   try:
     main()
   except Exception as ex:
-    print(f'An unexpected error occurred: {ex}')
+    print(f'[ERROR] An unexpected error occurred: {ex}')
   input('Press Enter to exit...')

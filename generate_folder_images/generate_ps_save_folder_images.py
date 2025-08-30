@@ -12,7 +12,7 @@ def process_folder(folder_path):
   image_path = os.path.join(folder_path, IMAGE_FILENAME)
 
   if not image_path:
-    print(f'No suitable image found in "{folder_path}"')
+    print(f'[WARN] No suitable image found in "{folder_path}"')
     return
 
   with Image.open(image_path) as img:
@@ -22,5 +22,5 @@ if __name__ == '__main__':
   try:
     main()
   except Exception as ex:
-    print(f'An unexpected error occurred: {ex}')
+    print(f'[ERROR] An unexpected error occurred: {ex}')
   input('Press Enter to exit...')

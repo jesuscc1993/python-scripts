@@ -86,7 +86,7 @@ def download_game_assets(appid):
     if response.ok:
       save_asset(response.content, filepath, size)
     else:
-      print(f'Failed to download {key} image.')
+      print(f'[ERROR] Could not download {key} image.')
 
 def save_asset(content, filepath, size = None):
   try:
@@ -95,6 +95,6 @@ def save_asset(content, filepath, size = None):
     img.save(filepath)
     print(f'Saved: {filepath}')
   except Exception:
-    print(f'Failed to save asset at {filepath}')
+    print(f'[ERROR] Could not save asset at {filepath}')
 
 main()

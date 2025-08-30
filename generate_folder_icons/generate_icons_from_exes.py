@@ -71,7 +71,7 @@ def save_icon_to_ini(dir_path, exe_path):
     config[SHELL_SECTION] = {}
 
   if ICON_KEY in config[SHELL_SECTION] and config[SHELL_SECTION][ICON_KEY].strip():
-    print(f'[DEBUG] Icon already set for "{dir_path}". Skipping...')
+    print(f'[DEBUG] Skipping "{dir_path}". A folder icon is already set.')
     return
 
   relative_exe_path = os.path.relpath(exe_path, dir_path)
@@ -88,5 +88,5 @@ if __name__ == '__main__':
   try:
     main()
   except Exception as ex:
-    print(f'An unexpected error occurred: {ex}')
+    print(f'[ERROR] An unexpected error occurred: {ex}')
   input('Press Enter to exit...')
