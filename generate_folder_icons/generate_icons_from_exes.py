@@ -1,5 +1,6 @@
 import configparser
 import os
+import re
 import sys
 
 from _common import prompt_depth, prompt_path
@@ -9,6 +10,8 @@ ENCODING = 'utf-8'
 ICON_KEY = 'IconResource'
 INI_FILENAME = 'desktop.ini'
 SHELL_SECTION = '.ShellClassInfo'
+
+EXE_EXCLUSION_PATTERNS = [r'unins.*', r'CrashHandler.*', r'EOSBootstrapper.*']
 
 def main():
   if len(sys.argv) > 1:
@@ -47,9 +50,11 @@ def main():
   print(f'[LOG] Finished setting icons for "{parent_path}".')
 
 def find_exe(folder):
+  pattern = re.compile('|'.join(EXE_EXCLUSION_PATTERNS), re.IGNORECASE)
+
   for dirpath, _, filenames in os.walk(folder):
     for f in filenames:
-      if f.lower().endswith('.exe') and 'unins' not in f.lower():
+      if f.lower().endswith('.exe') and not pattern.match(f):
         return os.path.join(dirpath, f)
   return None
 
