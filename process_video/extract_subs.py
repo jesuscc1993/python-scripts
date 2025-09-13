@@ -2,9 +2,10 @@ import os
 import subprocess
 import sys
 
+LANGUAGE = 'eng'
 SUBTITLES_PATH = 'subtitles'
-VIDEO_EXTS = ['.mp4', '.mkv']
 SUBTITLE_EXT = '.srt'
+VIDEO_EXTS = ['.mp4', '.mkv']
 
 def main():
   if len(sys.argv) > 1:
@@ -23,19 +24,20 @@ def process_directory(dir_path):
     if ext.lower() in VIDEO_EXTS:
       src_file_path = os.path.join(dir_path, file_name)
       dest_file_path = os.path.join(output_path, name + SUBTITLE_EXT)
+
       cmd = [
         'ffmpeg',
         '-i', src_file_path,
-        '-map', '0:s:0',
+        '-map', f'0:s:m:language:{LANGUAGE}?',
         dest_file_path
       ]
       subprocess.run(cmd, stdout = subprocess.DEVNULL, stderr = subprocess.DEVNULL)
 
       if os.path.exists(dest_file_path) and os.path.getsize(dest_file_path) == 0:
         os.remove(dest_file_path)
-        print(f'[WARN] No subtitles found for "{file_name}". Removed empty subtitle file.')
+        print(f'[WARN] No {LANGUAGE} subtitles found for "{file_name}". Removed empty subtitle file.')
       else:
-        print(f'[LOG] Extracted subtitles for "{file_name}".')
+        print(f'[LOG] Extracted {LANGUAGE} subtitles for "{file_name}".')
 
 def prompt_path(prompt_message, optional = False):
   path = input(prompt_message).strip(' "\'')
