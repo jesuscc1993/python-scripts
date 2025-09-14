@@ -24,7 +24,7 @@ def select_parent_folder(prompt, callback):
 
 def compress_child_folders(parent_folder):
   folders = []
-  for root, dirs, _ in os.walk(parent_folder):
+  for root, dirs, _ in os.walk(parent_folder, topdown = False):
     for dir_name in dirs:
       folders.append(os.path.join(root, dir_name))
 
@@ -52,7 +52,7 @@ def compress_folder(folder_path):
 
   try:
     files = []
-    for root, _, filenames in os.walk(folder_path):
+    for root, _, filenames in os.walk(folder_path, topdown = False):
       for file in filenames:
         files.append(os.path.join(root, file))
 
@@ -69,7 +69,7 @@ def compress_folder(folder_path):
 
 def extract_child_archives(parent_folder):
   archives = []
-  for root, _, files in os.walk(parent_folder):
+  for root, _, files in os.walk(parent_folder, topdown = False):
     for file_name in files:
       if any(file_name.upper().endswith(f'.{ext}') for ext in ZIP_EXTENSIONS):
         archives.append(os.path.join(root, file_name))
