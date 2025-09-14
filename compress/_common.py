@@ -8,6 +8,8 @@ from tqdm import tqdm
 from _settings import FOLDER_OUTPUT_EXTENSION
 from _sound_utils import play_notification_sound
 
+ZIP_EXTENSIONS = ['ZIP', 'CBR', 'CBZ']
+
 def select_parent_folder(prompt, callback):
   parent_folder = input(prompt).strip(' "\'')
   if not parent_folder:
@@ -20,7 +22,7 @@ def select_parent_folder(prompt, callback):
     print(f'[LOG] Finished processing "{parent_folder}".\n')
   select_parent_folder(prompt, callback)
 
-def process_parent_folder(parent_folder):
+def compress_child_folders(parent_folder):
   folders = []
   for root, dirs, _ in os.walk(parent_folder):
     for dir_name in dirs:
@@ -32,11 +34,11 @@ def process_parent_folder(parent_folder):
     os.makedirs(tmp_dir)
 
     with ThreadPoolExecutor() as executor:
-      list(tqdm(executor.map(process_folder, folders), total = len(folders), desc = f'Processing "{parent_folder}"'))
+      list(tqdm(executor.map(compress_folder, folders), total = len(folders), desc = f'Processing "{parent_folder}"'))
 
     shutil.rmtree(tmp_dir, ignore_errors = True)
 
-def process_folder(folder_path):
+def compress_folder(folder_path):
   folder_name = os.path.basename(folder_path)
   tmp_dir = os.path.join(os.path.dirname(folder_path), '.tmp')
 
@@ -64,3 +66,26 @@ def process_folder(folder_path):
 
   except Exception as ex:
     print(f'[ERROR] An error occurred while processing "{folder_name}": {ex}')
+
+def extract_child_archives(parent_folder):
+  archives = []
+  for root, _, files in os.walk(parent_folder):
+    for file_name in files:
+      if any(file_name.upper().endswith(f'.{ext}') for ext in ZIP_EXTENSIONS):
+        archives.append(os.path.join(root, file_name))
+
+  for archive_path in tqdm(archives, desc=f'Processing "{parent_folder}"'):
+    extract_archive(archive_path)
+
+def extract_archive(archive_path):
+  folder_name = os.path.splitext(os.path.basename(archive_path))[0]
+  target_dir = os.path.join(os.path.dirname(archive_path), folder_name)
+
+  if os.path.exists(target_dir):
+    print(f'[DEBUG] Skipping "{archive_path}". Folder exists.')
+    return
+
+  with zipfile.ZipFile(archive_path, 'r') as compressed_file:
+    compressed_file.extractall(target_dir)
+
+  os.remove(archive_path)

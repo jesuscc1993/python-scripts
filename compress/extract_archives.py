@@ -1,14 +1,14 @@
 import sys
 
-from _common import compress_child_folders, select_parent_folder
+from _common import extract_child_archives, select_parent_folder
 
 def main():
   if len(sys.argv) > 1:
-    compress_child_folders(sys.argv[1])
+    extract_child_archives(sys.argv[1])
   else:
     select_parent_folder(
       'Enter the path to the parent folder containing the folders you want to compress:\n',
-      compress_child_folders
+      extract_child_archives
     )
 
 if __name__ == '__main__':

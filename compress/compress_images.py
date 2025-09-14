@@ -1,4 +1,5 @@
 import os
+import sys
 
 from PIL import Image
 from concurrent.futures import ThreadPoolExecutor
@@ -6,21 +7,18 @@ from tqdm import tqdm
 
 from _image_utils import is_image_file
 from _settings import IMAGE_OUTPUT_FORMAT, IMAGE_OUTPUT_EXTENSION, IMAGE_OUTPUT_QUALITY
-from _sound_utils import play_notification_sound
+from _common import select_parent_folder
 
 def main():
-  parent_folder = input('Enter the path to the parent folder containing the folders or images:\n').strip(' "\'')
-  if not parent_folder:
-    return
-  if not os.path.isdir(parent_folder):
-    print(f'[ERROR] The specified path "{parent_folder}" is not a directory.')
+  if len(sys.argv) > 1:
+    compress_child_images(sys.argv[1])
   else:
-    process_images(parent_folder)
-    play_notification_sound()
-    print(f'[LOG] Finished processing "{parent_folder}".\n')
-  main()
+    select_parent_folder(
+      'Enter the path to the parent folder containing the images you want to compress:\n',
+      compress_child_images
+    )
 
-def process_images(root_dir):
+def compress_child_images(root_dir):
   files_to_process = []
 
   for root, _, files in os.walk(root_dir):
@@ -30,10 +28,10 @@ def process_images(root_dir):
         files_to_process.append(file_path)
 
   with ThreadPoolExecutor() as executor, tqdm(total = len(files_to_process), desc = f'Processing "{root_dir}"') as progress:
-    for _ in executor.map(process_image, files_to_process):
+    for _ in executor.map(compress_image, files_to_process):
       progress.update(1)
 
-def process_image(file_path):
+def compress_image(file_path):
   ext = os.path.splitext(file_path)[1].lower()
   name = os.path.splitext(file_path)[0]
   og_path = f'{name}.bak.{ext}'
