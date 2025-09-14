@@ -1,5 +1,6 @@
 import os
 import shutil
+import subprocess
 import zipfile
 
 from concurrent.futures import ThreadPoolExecutor
@@ -26,12 +27,14 @@ def compress_child_folders(parent_folder):
   folders = []
   for root, dirs, _ in os.walk(parent_folder, topdown = False):
     for dir_name in dirs:
-      folders.append(os.path.join(root, dir_name))
+      if dir_name != '.tmp':
+        folders.append(os.path.join(root, dir_name))
 
   if len(folders) > 0:
     tmp_dir = os.path.join(parent_folder, '.tmp')
     shutil.rmtree(tmp_dir, ignore_errors = True)
     os.makedirs(tmp_dir)
+    subprocess.call(['attrib', '+H', str(tmp_dir)])
 
     with ThreadPoolExecutor() as executor:
       list(tqdm(executor.map(compress_folder, folders), total = len(folders), desc = f'Processing "{parent_folder}"'))
