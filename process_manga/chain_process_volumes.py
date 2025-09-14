@@ -9,6 +9,7 @@ SCRIPT_NAMES = [
   'merge_volumes',
   '../compress/compress_folders'
 ]
+
 def process_parent_folder(parent_folder):
   for script in SCRIPT_NAMES:
     abs_path = os.path.abspath(os.path.join(os.path.dirname(__file__), script + '.py'))
