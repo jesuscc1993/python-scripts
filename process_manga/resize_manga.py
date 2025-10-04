@@ -1,6 +1,7 @@
 import sys
 
 from PIL import Image
+from mtlogger import logger
 
 from _common import exit_with_prompt, print_error, process_folder_images, select_parent_folder
 from _image_utils import image_needs_resizing, is_image_uncompressed, resize_image, save_image_to_path
@@ -27,7 +28,7 @@ def process_image(original_path):
         save_image_to_path(img, original_path)
 
   except Exception as ex:
-    print(f'Error processing "{original_path}": {ex}')
+    logger.log(f'Error processing "{original_path}": {ex}')
 
 if __name__ == '__main__':
   try:

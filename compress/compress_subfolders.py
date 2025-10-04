@@ -1,8 +1,9 @@
 import os
 import sys
 
-from _common import compress_child_folders, select_parent_folder
 from mtlogger import logger
+
+from _common import compress_child_folders, select_parent_folder
 
 def main():
   if len(sys.argv) > 1:

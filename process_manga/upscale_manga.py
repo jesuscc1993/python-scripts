@@ -2,8 +2,9 @@ import os
 import subprocess
 import sys
 
-from _common import exit_with_prompt, print_error, process_folder_images, select_parent_folder
 from mtlogger import logger
+
+from _common import exit_with_prompt, print_error, process_folder_images, select_parent_folder
 
 binary_path = os.path.join(os.path.dirname(__file__), 'binaries/realesrgan/realesrgan-ncnn-vulkan.exe')
 

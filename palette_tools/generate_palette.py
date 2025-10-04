@@ -34,7 +34,7 @@ def extract_colors(image_path):
 
 def create_palette_image(colors, output_path):
   if len(colors) > 255:
-    return print('ERROR: Palette supports a maximum of 256 colors (transparency included)')
+    return logger.error('Palette supports a maximum of 256 colors (transparency included)')
 
   columns = MIN_COLS * math.ceil(math.sqrt(len(colors)) / MIN_COLS)
   rows = (len(colors) + columns - 1) // columns
@@ -56,7 +56,7 @@ def create_palette_image(colors, output_path):
     draw.rectangle([x, y, x + SQUARE_SIZE, y + SQUARE_SIZE], fill=i + 1)
 
   palette_img.save(output_path, format = 'PNG', save_all = False)
-  print(f'Saved "{output_path}".')
+  logger.log(f'Saved "{output_path}".')
 
 if __name__ == '__main__':
   try:

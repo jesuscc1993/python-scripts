@@ -2,8 +2,9 @@ import os
 import shutil
 import sys
 
-from _common import prompt_file, rename_with_timestamp, BACKUP_EXT, BACKUP_PATH
 from mtlogger import logger
+
+from _common import prompt_file, rename_with_timestamp, BACKUP_EXT, BACKUP_PATH
 
 def main():
   if len(sys.argv) > 1:
@@ -12,7 +13,7 @@ def main():
     bak_file_path = prompt_file('Enter the path to the file to restore:\n')
 
   restore_file(bak_file_path)
-  print()
+  logger.log()
 
 def restore_file(bak_file_path):
   bak_dir_path = os.path.dirname(bak_file_path)

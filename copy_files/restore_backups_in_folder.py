@@ -2,8 +2,9 @@ import os
 import shutil
 import sys
 
-from _common import prompt_path
 from mtlogger import logger
+
+from _common import prompt_path
 
 def main():
   if len(sys.argv) > 1:
@@ -12,7 +13,7 @@ def main():
     src_path = prompt_path('Enter the directory containing .bak files to restore:\n')
 
   restore_backups(src_path)
-  print(f'\n[LOG] Finished restoring .bak files in "{src_path}".\n')
+  logger.log(f'\nFinished restoring .bak files in "{src_path}".\n')
   main()
 
 def restore_backups(dir_path):

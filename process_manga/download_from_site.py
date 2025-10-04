@@ -13,7 +13,7 @@ from _sound_utils import play_notification_sound
 def main():
   base_url = input('Enter the url to download from (replace chapter with a %s placeholder):\n').strip(' "\'')
   if not base_url:
-    print(f'The url must be defined.')
+    logger.log(f'The url must be defined.')
     return
 
   css_selector = input('\nEnter the CSS selector for the image container(s):\n').strip() or 'body'
@@ -23,12 +23,12 @@ def main():
     if chapter_count < 0:
       raise ValueError()
   except ValueError:
-    print('\n[ERROR] Chapter count must be a positive integer.')
+    logger.error('\nChapter count must be a positive integer.')
     return
-  print('')
+  logger.log()
 
   download_all_chapters(base_url, css_selector, chapter_count)
-  print('')
+  logger.log()
 
   play_notification_sound()
   logger.log(f'Finished downloading from "{base_url}".\n')

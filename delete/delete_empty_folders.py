@@ -22,7 +22,7 @@ def delete_empty_folders(parent_folder):
       except OSError:
         pass
   if none_deleted:
-    print('[LOG] No empty folders were found.')
+    logger.log('No empty folders were found.')
 
 if __name__ == '__main__':
   try:

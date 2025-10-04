@@ -24,7 +24,7 @@ def main():
 
 def prompt_parent_folder():
   parent_folder = input('Enter the path to the parent folder containing the chapter folders you want to prefix:\n')
-  print('')
+  logger.log()
   if os.path.isdir(parent_folder):
     return parent_folder
   else:
@@ -34,9 +34,9 @@ def prompt_parent_folder():
 
 def prompt_chapter_ranges():
   ranges_input = input('Enter the last chapter for each volume, separated by commas (e.g. 12,24,36):\n')
-  print('')
+  logger.log()
   if not ranges_input:
-    print('[ERROR] No ranges were provided.')
+    logger.error('No ranges were provided.')
     return None
   try:
     chapter_bounds = sorted([float(x.strip()) for x in ranges_input.split(',')])
@@ -44,7 +44,7 @@ def prompt_chapter_ranges():
     logger.error(f'Invalid input: {ex}')
     return None
   if len(chapter_bounds) < 1:
-    print('[ERROR] At least one boundary is required.')
+    logger.error('At least one boundary is required.')
     return None
 
   ranges = []

@@ -16,7 +16,7 @@ def prompt_path(prompt_message, optional = False):
     logger.error(f'The specified path "{path}" is not a directory.')
     if not optional: sys.exit(1)
     return None
-  print('')
+  logger.log()
   return path
 
 def prompt_file(prompt_message, optional = False):
@@ -26,7 +26,7 @@ def prompt_file(prompt_message, optional = False):
     if not optional:
       sys.exit(1)
     return None
-  print('')
+  logger.log()
   return file_path
 
 def rename_with_timestamp(dir_path, src_file_path):

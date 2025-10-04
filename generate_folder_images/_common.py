@@ -17,7 +17,7 @@ def process_parent_folder(process_folder):
       logger.error(f'The specified path "{target_folder}" is not a directory.')
       return
 
-    print('')
+    logger.log()
     process_folder(target_folder)
 
   else:
@@ -25,7 +25,7 @@ def process_parent_folder(process_folder):
       logger.error(f'The specified path "{parent_folder}" is not a directory.')
       return
 
-    print('')
+    logger.log()
 
   for root, dirs, _ in os.walk(parent_folder):
     for dir_name in dirs:

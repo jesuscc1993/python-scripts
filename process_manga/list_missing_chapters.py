@@ -2,6 +2,8 @@ import os
 import re
 import sys
 
+from mtlogger import logger
+
 from _common import exit_with_prompt, print_error, select_parent_folder
 
 def main():
@@ -21,16 +23,16 @@ def process_parent_folder(directory):
         chapters.add(int(match.group(1)))
 
   if not chapters:
-    print('No chapters found.')
+    logger.log('No chapters found.')
     return
 
   missing_chapters = sorted(set(range(1, max(chapters) + 1)) - chapters)
   if missing_chapters:
-    print(f'\nChapters missing in "{directory}":')
+    logger.log(f'\nChapters missing in "{directory}":')
     for ch in missing_chapters:
-      print(f' {ch:03d}')
+      logger.log(f' {ch:03d}')
   else:
-    print(f'\nNo chapters found missing in "{directory}".')
+    logger.log(f'\nNo chapters found missing in "{directory}".')
 
 if __name__ == '__main__':
   try:

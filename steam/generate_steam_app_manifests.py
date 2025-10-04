@@ -37,12 +37,12 @@ APP_MANIFEST_TEMPLATE = '''"AppState"
 def main():
   folder = input('Enter the path of your steam games folder: ').strip()
   if not folder or not os.path.isdir(folder):
-    print('Invalid folder path.')
+    logger.log('Invalid folder path.')
     return
 
   games_folders = [d for d in os.listdir(folder) if os.path.isdir(os.path.join(folder, d))]
   if not games_folders:
-    print('No game folders found.')
+    logger.log('No game folders found.')
     return
 
   owned_games = {sanitize_name(g['name']): g['appid'] for g in get_owned_games(steam_api_key, steam_user_id)}
@@ -74,7 +74,7 @@ def main():
 
     with open(filepath, 'w', encoding = 'utf-8') as f:
       f.write(content)
-      print(f'Created manifest for "{game}" -> {filepath}')
+      logger.log(f'Created manifest for "{game}" -> {filepath}')
 
 def get_owned_games(api_key, steam_id):
   url = f'https://api.steampowered.com/IPlayerService/GetOwnedGames/v1/?key={api_key}&steamid={steam_id}&include_appinfo=true'

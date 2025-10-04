@@ -16,7 +16,7 @@ def prompt_path(prompt_message, optional = False):
     logger.error(f'The specified path "{path}" is not a directory.')
     if not optional: sys.exit(1)
     return None
-  print('')
+  logger.log()
   return path
 
 def prompt_depth():
@@ -26,7 +26,7 @@ def prompt_depth():
       raise ValueError()
     return depth
   except ValueError:
-    print('\n[ERROR] Depth must be a positive integer.')
+    logger.error('\nDepth must be a positive integer.')
     return
 
 def process_parent_folder(parent_folder, depth, image_filenames):
@@ -46,7 +46,7 @@ def process_parent_folder(parent_folder, depth, image_filenames):
       process_folder(item_path, image_filenames)
 
   play_notification_sound()
-  print(f'\n[LOG] Finished setting icons for "{parent_folder}".')
+  logger.log(f'\nFinished setting icons for "{parent_folder}".')
 
 def process_folder(folder_path, image_filenames):
   image_path = None

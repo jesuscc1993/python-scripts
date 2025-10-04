@@ -47,7 +47,7 @@ def prompt_path(prompt_message, optional = False):
     logger.error(f'The specified path "{path}" is not a directory.')
     if not optional: sys.exit(1)
     return None
-  print('')
+  logger.log()
   return path
 
 if __name__ == '__main__':

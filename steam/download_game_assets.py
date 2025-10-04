@@ -36,7 +36,7 @@ def main():
 
     items = search_game(name)
     if not items:
-      print('[WARN] No results found.')
+      logger.warn('No results found.')
       continue
 
     items = [
@@ -46,25 +46,25 @@ def main():
 
     if len(items) == 1:
       choice = 1
-      print(f'\n1. {items[0].get(RESPONSE_NAME)} ({items[0].get("id")})')
+      logger.log(f'\n1. {items[0].get(RESPONSE_NAME)} ({items[0].get("id")})')
     else:
-      print('\nSelect a result (default = 1):')
+      logger.log('\nSelect a result (default = 1):')
       for i, item in enumerate(items, 1):
-        print(f"{i}. {item.get(RESPONSE_NAME)} ({item.get('id')})")
+        logger.log(f"{i}. {item.get(RESPONSE_NAME)} ({item.get('id')})")
 
       try:
         choice = int(input('').strip() or '1')
         if not (1 <= choice <= len(items)):
-          print('[ERROR] Invalid selection.')
+          logger.error('Invalid selection.')
           continue
       except ValueError:
-        print('[ERROR] Invalid input.')
+        logger.error('Invalid input.')
         continue
 
-    print('')
+    logger.log()
     selected = items[choice - 1]
     download_game_assets(selected.get('id'))
-    print('')
+    logger.log()
 
 def search_game(name):
   params = SEARCH_PARAMS.copy()
@@ -94,7 +94,7 @@ def save_asset(content, filepath, size = None):
     img = Image.open(BytesIO(content))
     if size: img = img.resize(size, Image.LANCZOS)
     img.save(filepath)
-    print(f'Saved: {filepath}')
+    logger.log(f'Saved: {filepath}')
   except Exception:
     logger.error(f'Could not save asset at {filepath}')
 

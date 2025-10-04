@@ -3,9 +3,10 @@ import os
 import re
 import sys
 
+from mtlogger import logger
+
 from _common import prompt_depth, prompt_path
 from _sound_utils import play_notification_sound
-from mtlogger import logger
 
 ENCODING = 'utf-8'
 ICON_KEY = 'IconResource'

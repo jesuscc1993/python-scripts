@@ -16,7 +16,7 @@ def main():
   if not os.path.isdir(parent_folder):
     logger.error(f'The specified path "{parent_folder}" is not a directory.')
   else:
-    print('')
+    logger.log()
 
     for pdf_file in Path(parent_folder).glob('*.pdf'):
       pdf_to_webp(parent_folder, str(pdf_file))

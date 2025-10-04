@@ -2,8 +2,9 @@ import os
 import shutil
 import sys
 
-from _common import prompt_path
 from mtlogger import logger
+
+from _common import prompt_path
 
 def main():
   if len(sys.argv) > 2:

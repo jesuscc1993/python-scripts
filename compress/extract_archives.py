@@ -1,7 +1,8 @@
 import sys
 
-from _common import extract_child_archives, select_parent_folder
 from mtlogger import logger
+
+from _common import extract_child_archives, select_parent_folder
 
 def main():
   if len(sys.argv) > 1:

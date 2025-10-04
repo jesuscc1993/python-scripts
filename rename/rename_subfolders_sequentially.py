@@ -17,8 +17,8 @@ def main():
     new_path = os.path.join(parent_dir, new_name)
 
     os.rename(old_path, new_path)
-    print(f'Renamed "{old_name}" to "{new_name}".')
-  print(f'\nFinished processing "{parent_dir}".')
+    logger.log(f'Renamed "{old_name}" to "{new_name}".')
+  logger.log(f'\nFinished processing "{parent_dir}".')
 
 if __name__ == '__main__':
   try:

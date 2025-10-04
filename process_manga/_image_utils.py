@@ -1,6 +1,7 @@
 import os
 
 from PIL import Image
+from mtlogger import logger
 
 from _settings import LONG_STRIP_ASPECT_RATIO, MAX_HEIGHT, MAX_WIDTH, OUTPUT_FORMAT, OUTPUT_EXTENSION, OUTPUT_QUALITY
 
@@ -58,4 +59,4 @@ def save_image_to_path(img, original_path, keep = False):
       os.remove(original_path)
 
   except Exception as ex:
-    print(f'Error processing "{original_path}": {ex}')
+    logger.error(f'Error processing "{original_path}": {ex}')

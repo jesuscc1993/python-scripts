@@ -1,7 +1,8 @@
 import sys
 
-from _common import process_parent_folder, prompt_depth, prompt_path
 from mtlogger import logger
+
+from _common import process_parent_folder, prompt_depth, prompt_path
 
 IMAGE_FILENAMES = ['ICON0.PNG']
 

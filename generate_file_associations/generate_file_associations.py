@@ -3,15 +3,16 @@ import json
 import os
 import winreg
 
-from _registry import add_registry_entry, delete_registry_entry, get_registry_value
 from mtlogger import logger
+
+from _registry import add_registry_entry, delete_registry_entry, get_registry_value
 
 ASSOCIATIONS_JSON = './associations.json'
 FILE_EXTS = 'Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts'
 
 def main():
   if ctypes.windll.shell32.IsUserAnAdmin() == 0:
-    print('[ERROR] Admin privileges required. Please run as administrator.')
+    logger.error('Admin privileges required. Please run as administrator.')
     return
 
   associations = get_associations()
@@ -65,7 +66,7 @@ def main():
 
       logger.log(f'Saved registry key "HKEY_CLASSES_ROOT\\{file_type}" for extension "HKEY_CLASSES_ROOT\\.{ext}".\n')
 
-  print('[LOG] Registry entries saved successfully.')
+  logger.log('Registry entries saved successfully.')
 
 def get_associations():
   with open(ASSOCIATIONS_JSON, 'r') as associations:

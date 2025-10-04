@@ -2,8 +2,9 @@ import os
 import shutil
 import sys
 
-from _common import prompt_path
 from mtlogger import logger
+
+from _common import prompt_path
 
 FILES_TO_COPY = {
   'cover.jpg',
@@ -21,7 +22,7 @@ def main():
     dest_path = prompt_path('Enter the path the files will be copied to:\n')
 
   copy_folder_assets(src_path, dest_path)
-  print(f'\n[LOG] Finished copying "{src_path}" to "{dest_path}".\n')
+  logger.log(f'\nFinished copying "{src_path}" to "{dest_path}".\n')
   main()
 
 def copy_folder_assets(src_path, dest_path):

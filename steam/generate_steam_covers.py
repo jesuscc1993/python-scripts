@@ -35,13 +35,13 @@ def main():
 
 def prompt_params():
   parent_folder = input('Enter the path to the parent folder containing your Steam saves:\n').strip(' "\'')
-  print('')
+  logger.log()
 
   cover_type = input('Enter cover type (capsule, header, or library). Default is capsule:\n').strip().lower() or 'capsule'
-  print('')
+  logger.log()
 
   override_existing = input('Override existing images? (y|n). Default: n:\n').strip().lower() == 'y'
-  print('')
+  logger.log()
 
   return parent_folder, cover_type, override_existing
 
@@ -55,7 +55,7 @@ def generate_covers(parent_folder, cover_type, override_existing):
       process_folder(folder_path, folder_name, cover_url, override_existing)
 
   play_notification_sound()
-  print('\n[LOG] Finished generating cover images.')
+  logger.log('\nFinished generating cover images.')
 
 def process_folder(folder_path, folder_name, cover_url, override_existing):
   cover_path = os.path.join(folder_path, TARGET_NAME)

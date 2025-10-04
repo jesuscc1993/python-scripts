@@ -11,7 +11,7 @@ class LogLevel(Enum):
   WARN = 'WARN'
 
 class Logger:
-  def format(self, level: LogLevel, msg: str):
+  def format(self, level: LogLevel, msg: str = ''):
     color = {
       LogLevel.DEBUG: Fore.CYAN,
       LogLevel.ERROR: Fore.RED,
@@ -19,21 +19,21 @@ class Logger:
       LogLevel.LOG: Fore.LIGHTBLACK_EX,
       LogLevel.WARN: Fore.YELLOW
     }.get(level, '')
-    return f"{color}[{level.value}] {msg}"
+    return f"{color}{msg}"
 
-  def debug(self, msg: str):
+  def debug(self, msg: str = ''):
     print(self.format(LogLevel.DEBUG, msg))
 
-  def error(self, msg: str):
+  def error(self, msg: str = ''):
     print(self.format(LogLevel.ERROR, msg))
 
-  def info(self, msg: str):
+  def info(self, msg: str = ''):
     print(self.format(LogLevel.INFO, msg))
 
-  def log(self, msg: str):
+  def log(self, msg: str = ''):
     print(self.format(LogLevel.LOG, msg))
 
-  def warn(self, msg: str):
+  def warn(self, msg: str = ''):
     print(self.format(LogLevel.WARN, msg))
 
 logger = Logger()
