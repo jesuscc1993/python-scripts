@@ -3,11 +3,11 @@ import sys
 
 def main():
   if len(sys.argv) > 2:
-    src_path = sys.argv[1]
-    dest_path = sys.argv[2]
+    dest_path = sys.argv[1]
+    src_path = sys.argv[2]
   else:
-    src_path = prompt_path('Enter the source path (source of truth):\n')
-    dest_path = prompt_path('Enter the target path (files will be deleted here):\n')
+    dest_path = prompt_path('Delete from path:\n')
+    src_path = prompt_path('...files that exist on path:\n')
 
   compare_paths_and_delete_files(src_path, dest_path)
   delete_empty_folders(dest_path)
@@ -19,6 +19,7 @@ def compare_paths_and_delete_files(src_path, dest_path):
       path_b = path_a.replace(src_path, dest_path, 1)
       if os.path.exists(path_b):
         os.remove(path_b)
+        print(f'[DEBUG] Deleted "{path_b}".')
   print(f'[LOG] Finished deleting from "{dest_path}" the files that already existed in "{src_path}".\n')
 
 def delete_empty_folders(parent_folder):
