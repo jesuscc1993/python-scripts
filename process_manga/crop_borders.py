@@ -2,6 +2,7 @@ import numpy
 import sys
 
 from PIL import Image
+from mtlogger import logger
 
 from _common import exit_with_prompt, print_error, process_folder_images, select_parent_folder
 from _image_utils import resize_image, save_image_to_path
@@ -25,7 +26,7 @@ def process_image(file_path):
         img = resize_image(img)
         save_image_to_path(img, file_path)
   except Exception as ex:
-    print(f'[ERROR] Could not process {file_path}: {ex}')
+    logger.error(f'Could not process {file_path}: {ex}')
 
 def crop_blanks(img):
   np_img = numpy.array(img)

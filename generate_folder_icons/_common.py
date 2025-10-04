@@ -2,6 +2,7 @@ import os
 import sys
 
 from PIL import Image
+from mtlogger import logger
 
 from _sound_utils import play_notification_sound
 
@@ -12,7 +13,7 @@ ICON_SIZE = 256
 def prompt_path(prompt_message, optional = False):
   path = input(prompt_message).strip(' "\'')
   if not path or not os.path.isdir(path):
-    print(f'[ERROR] The specified path "{path}" is not a directory.')
+    logger.error(f'The specified path "{path}" is not a directory.')
     if not optional: sys.exit(1)
     return None
   print('')
@@ -60,7 +61,7 @@ def process_folder(folder_path, image_filenames):
     png_to_ico(image_path, ico_path)
     set_folder_icon(folder_path)
   else:
-    print(f'[DEBUG] No suitable image found in "{folder_path}"')
+    logger.debug(f'No suitable image found in "{folder_path}"')
 
 def png_to_ico(image_path, ico_path):
   try:
@@ -76,7 +77,7 @@ def png_to_ico(image_path, ico_path):
       background.paste(img, offset)
       background.save(ico_path, format='ICO', sizes=[(ICON_SIZE, ICON_SIZE)])
   except Exception as ex:
-    print(f'[ERROR] Error converting "{image_path}" to ICO: {ex}')
+    logger.error(f'Error converting "{image_path}" to ICO: {ex}')
 
 def set_folder_icon(folder_path):
   try:
@@ -94,8 +95,8 @@ def set_folder_icon(folder_path):
     os.system(f'attrib +h "{icon_path}"')
     os.system(f'attrib +s "{folder_path}"')
 
-    print(f'[LOG] Saved "{icon_path}" and "{desktop_ini_path}".')
+    logger.log(f'Saved "{icon_path}" and "{desktop_ini_path}".')
   except PermissionError:
-    print(f'[WARN] Permission denied: "{desktop_ini_path}". You may need to run the script as an administrator.')
+    logger.warn(f' Permission denied: "{desktop_ini_path}". You may need to run the script as an administrator.')
   except Exception as ex:
-    print(f'[ERROR] Error setting folder icon to "{folder_path}": {ex}')
+    logger.error(f'Error setting folder icon to "{folder_path}": {ex}')

@@ -5,6 +5,7 @@ import winsound
 
 from PIL import Image
 from io import BytesIO
+from mtlogger import logger
 
 # settings
 JPEG_FORMAT = 'JPEG'
@@ -60,7 +61,7 @@ def process_folder(folder_path, folder_name, cover_url, override_existing):
   cover_path = os.path.join(folder_path, TARGET_NAME)
 
   if os.path.exists(cover_path) and not override_existing:
-    print(f'[DEBUG] Skipping {folder_name}. A {TARGET_NAME} file is already contained within.')
+    logger.debug(f'Skipping {folder_name}. A {TARGET_NAME} file is already contained within.')
     return
 
   image_url = cover_url.format(folder_name)
@@ -75,9 +76,9 @@ def process_folder(folder_path, folder_name, cover_url, override_existing):
 
     resized_img = img.resize((new_width, new_height), Image.LANCZOS)
     resized_img.save(cover_path, JPEG_FORMAT, quality = JPEG_QUALITY)
-    print(f'[LOG] Generated cover image for game ID {folder_name}.')
+    logger.log(f'Generated cover image for game ID {folder_name}.')
   else:
-    print(f'[ERROR] Could not download image for game ID {folder_name} (status code {response.status_code}).')
+    logger.error(f'Could not download image for game ID {folder_name} (status code {response.status_code}).')
 
 def play_notification_sound():
   winsound.MessageBeep(winsound.MB_ICONASTERISK)
@@ -86,5 +87,5 @@ if __name__ == '__main__':
   try:
     main()
   except Exception as ex:
-    print(f'[ERROR] An unexpected error occurred: {ex}')
+    logger.error(f'An unexpected error occurred: {ex}')
   input('Press Enter to exit...')

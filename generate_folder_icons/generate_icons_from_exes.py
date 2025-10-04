@@ -5,6 +5,7 @@ import sys
 
 from _common import prompt_depth, prompt_path
 from _sound_utils import play_notification_sound
+from mtlogger import logger
 
 ENCODING = 'utf-8'
 ICON_KEY = 'IconResource'
@@ -43,11 +44,11 @@ def main():
         save_icon_to_ini(child_path, exe_path)
 
       except Exception as e:
-        print(f'[ERROR] Could not process "{child_path}": {e}')
+        logger.error(f'Could not process "{child_path}": {e}')
         continue
 
   play_notification_sound()
-  print(f'[LOG] Finished setting icons for "{parent_path}".')
+  logger.log(f'Finished setting icons for "{parent_path}".')
 
 def find_exe(folder):
   pattern = re.compile('|'.join(EXE_EXCLUSION_PATTERNS), re.IGNORECASE)
@@ -71,7 +72,7 @@ def save_icon_to_ini(dir_path, exe_path):
     config[SHELL_SECTION] = {}
 
   if ICON_KEY in config[SHELL_SECTION] and config[SHELL_SECTION][ICON_KEY].strip():
-    print(f'[DEBUG] Skipping "{dir_path}". A folder icon is already set.')
+    logger.debug(f'Skipping "{dir_path}". A folder icon is already set.')
     return
 
   relative_exe_path = os.path.relpath(exe_path, dir_path)
@@ -79,7 +80,7 @@ def save_icon_to_ini(dir_path, exe_path):
 
   with open(ini_path, 'w', encoding = ENCODING) as ini:
     config.write(ini)
-    print(f'[DEBUG] Set icon for {dir_path}.')
+    logger.debug(f'Set icon for {dir_path}.')
 
   os.system(f'attrib +h "{ini_path}"')
   os.system(f'attrib +s +r "{dir_path}"')
@@ -88,5 +89,5 @@ if __name__ == '__main__':
   try:
     main()
   except Exception as ex:
-    print(f'[ERROR] An unexpected error occurred: {ex}')
+    logger.error(f'An unexpected error occurred: {ex}')
   input('Press Enter to exit...')

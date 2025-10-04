@@ -2,6 +2,7 @@ import os
 import sys
 
 from concurrent.futures import ThreadPoolExecutor
+from mtlogger import logger
 
 from _common import exit_with_prompt, print_error
 from _sound_utils import play_notification_sound
@@ -19,7 +20,7 @@ def prompt_parent_folder():
   if not parent_folder:
     return
   if not os.path.isdir(parent_folder):
-    print(f'[ERROR] The specified path "{parent_folder}" is not a directory.')
+    logger.error(f'The specified path "{parent_folder}" is not a directory.')
   else:
     process_parent_folder(parent_folder)
     play_notification_sound()
@@ -41,14 +42,14 @@ def process_folder(folder_path):
     try:
       file_path = os.path.join(folder_path, filename)
       if os.path.exists(file_path):
-        print(f'[DEBUG] Skipping "{file_path}". File already exists.')
+        logger.debug(f'Skipping "{file_path}". File already exists.')
       else:
         open(file_path, 'w').close()
         os.system(f'attrib +h "{file_path}"')
-        print(f'[LOG] Successfully created hidden file "{file_path}".')
+        logger.log(f'Successfully created hidden file "{file_path}".')
 
     except Exception as ex:
-      print(f'[ERROR] Could not create "{filename}": {ex}')
+      logger.error(f'Could not create "{filename}": {ex}')
 
 if __name__ == '__main__':
   try:

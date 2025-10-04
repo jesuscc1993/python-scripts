@@ -3,6 +3,7 @@ import sys
 
 from PIL import Image
 from concurrent.futures import ThreadPoolExecutor
+from mtlogger import logger
 from tqdm import tqdm
 
 from _image_utils import is_image_file
@@ -52,5 +53,5 @@ if __name__ == '__main__':
   try:
     main()
   except Exception as ex:
-    print(f'[ERROR] An unexpected error occurred: {ex}')
+    logger.error(f'An unexpected error occurred: {ex}')
     input('Press Enter to exit...')

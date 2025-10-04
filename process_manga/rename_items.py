@@ -3,6 +3,7 @@ import re
 import sys
 
 from concurrent.futures import ThreadPoolExecutor
+from mtlogger import logger
 from tqdm import tqdm
 
 from _common import exit_with_prompt, print_error
@@ -19,7 +20,7 @@ def prompt_parent_folder():
   if not parent_folder:
     return
   if not os.path.isdir(parent_folder):
-    print(f'[ERROR] The specified path "{parent_folder}" is not a directory.')
+    logger.error(f'The specified path "{parent_folder}" is not a directory.')
   else:
     process_parent_folder(parent_folder)
     play_notification_sound()

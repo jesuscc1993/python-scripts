@@ -1,9 +1,11 @@
 import os
 
+from mtlogger import logger
+
 def main():
   parent_folder = input('Enter the path to the parent folder containing the folders or images:\n').strip(' "\'')
   if not os.path.isdir(parent_folder):
-    print(f'[ERROR] The specified path "{parent_folder}" is not a directory.')
+    logger.error(f'The specified path "{parent_folder}" is not a directory.')
   else:
     delete_empty_folders(parent_folder)
 
@@ -16,7 +18,7 @@ def delete_empty_folders(parent_folder):
       try:
         os.rmdir(dir_path)
         none_deleted = False
-        print(f'[LOG] Deleted empty folder: "{dir_path}"')
+        logger.log(f'Deleted empty folder: "{dir_path}"')
       except OSError:
         pass
   if none_deleted:
@@ -26,5 +28,5 @@ if __name__ == '__main__':
   try:
     main()
   except Exception as ex:
-    print(f'[ERROR] An unexpected error occurred: {ex}')
+    logger.error(f'An unexpected error occurred: {ex}')
   input('Press Enter to exit...')

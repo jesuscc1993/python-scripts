@@ -1,5 +1,7 @@
 import winreg
 
+from mtlogger import logger
+
 IMAGE_EXTENSIONS = [
   'bmp',
   'dds',
@@ -25,7 +27,7 @@ def update_key(key_name):
   try:
     with winreg.OpenKey(winreg.HKEY_CLASSES_ROOT, key_name, 0, winreg.KEY_SET_VALUE) as subkey:
       winreg.SetValueEx(subkey, '', 0, winreg.REG_SZ, 'Image File')
-      print(f'[DEBUG] Updated "{key_name}".')
+      logger.debug(f'Updated "{key_name}".')
   except FileNotFoundError:
     pass
 
@@ -33,5 +35,5 @@ if __name__ == '__main__':
   try:
     main()
   except Exception as ex:
-    print(f'[ERROR] An unexpected error occurred: {ex}')
+    logger.error(f'An unexpected error occurred: {ex}')
   input('\nPress Enter to exit...')

@@ -4,6 +4,7 @@ import subprocess
 import zipfile
 
 from concurrent.futures import ThreadPoolExecutor
+from mtlogger import logger
 from tqdm import tqdm
 
 from _settings import FOLDER_OUTPUT_EXTENSION
@@ -16,11 +17,11 @@ def select_parent_folder(prompt, callback):
   if not parent_folder:
     return
   if not os.path.isdir(parent_folder):
-    print(f'[ERROR] The specified path "{parent_folder}" is not a directory.')
+    logger.error(f'The specified path "{parent_folder}" is not a directory.')
   else:
     callback(parent_folder)
     play_notification_sound()
-    print(f'[LOG] Finished processing "{parent_folder}".\n')
+    logger.log(f'Finished processing "{parent_folder}".\n')
   select_parent_folder(prompt, callback)
 
 def compress_child_folders(parent_folder):
@@ -50,7 +51,7 @@ def compress_folder(folder_path):
   final_zip_path = os.path.join(os.path.dirname(folder_path), zip_filename)
 
   if os.path.exists(final_zip_path):
-    print(f'[DEBUG] Skipping "{folder_path}". A compressed file with the same name already exists.')
+    logger.debug(f'Skipping "{folder_path}". A compressed file with the same name already exists.')
     return
 
   try:
@@ -68,7 +69,7 @@ def compress_folder(folder_path):
       shutil.rmtree(folder_path)
 
   except Exception as ex:
-    print(f'[ERROR] An error occurred while processing "{folder_name}": {ex}')
+    logger.error(f'An error occurred while processing "{folder_name}": {ex}')
 
 def extract_child_archives(parent_folder):
   archives = []
@@ -85,7 +86,7 @@ def extract_archive(archive_path):
   target_dir = os.path.join(os.path.dirname(archive_path), folder_name)
 
   if os.path.exists(target_dir):
-    print(f'[DEBUG] Skipping "{archive_path}". Folder exists.')
+    logger.debug(f'Skipping "{archive_path}". Folder exists.')
     return
 
   with zipfile.ZipFile(archive_path, 'r') as compressed_file:

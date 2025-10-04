@@ -4,6 +4,7 @@ import urllib
 
 from bs4 import BeautifulSoup
 from concurrent.futures import ThreadPoolExecutor
+from mtlogger import logger
 from tqdm import tqdm
 
 from _common import exit_with_prompt, print_error
@@ -30,7 +31,7 @@ def main():
   print('')
 
   play_notification_sound()
-  print(f'[LOG] Finished downloading from "{base_url}".\n')
+  logger.log(f'Finished downloading from "{base_url}".\n')
   main()
 
 def download_all_chapters(base_url, css_selector, chapter_count):
@@ -57,7 +58,7 @@ def download_images_from_chapter(base_url, css_selector, chapter_number):
     if images:
       os.makedirs(folder, exist_ok = True)
     else:
-      print(f'[WARN] Found no images for selector {css_selector} on URL "{chapter_url}".')
+      logger.warn(f' Found no images for selector {css_selector} on URL "{chapter_url}".')
 
     for i, img in enumerate(images):
       src = img.get('src')
@@ -69,7 +70,7 @@ def download_images_from_chapter(base_url, css_selector, chapter_number):
         with open(img_name, 'wb') as f:
           f.write(img_data)
   except Exception as ex:
-    print(f'[ERROR] Could not download chapter {chapter_number}: {ex}')
+    logger.error(f'Could not download chapter {chapter_number}: {ex}')
 
 def pad_string(string, width = 3):
   return str(string).zfill(width)

@@ -4,6 +4,7 @@ import os
 import winreg
 
 from _registry import add_registry_entry, delete_registry_entry, get_registry_value
+from mtlogger import logger
 
 ASSOCIATIONS_JSON = './associations.json'
 FILE_EXTS = 'Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts'
@@ -62,7 +63,7 @@ def main():
 
           add_registry_entry(winreg.HKEY_CLASSES_ROOT, f'{shell_key}\\command', '', command)
 
-      print(f'[LOG] Saved registry key "HKEY_CLASSES_ROOT\\{file_type}" for extension "HKEY_CLASSES_ROOT\\.{ext}".\n')
+      logger.log(f'Saved registry key "HKEY_CLASSES_ROOT\\{file_type}" for extension "HKEY_CLASSES_ROOT\\.{ext}".\n')
 
   print('[LOG] Registry entries saved successfully.')
 
@@ -78,5 +79,5 @@ if __name__ == '__main__':
   try:
     main()
   except Exception as ex:
-    print(f'[ERROR] An unexpected error occurred: {ex}')
+    logger.error(f'An unexpected error occurred: {ex}')
   input('\nPress Enter to exit...')

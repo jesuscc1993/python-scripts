@@ -1,9 +1,11 @@
 import os
-import requests
-from PIL import Image
-from io import BytesIO
-from concurrent.futures import ThreadPoolExecutor
 import re
+import requests
+
+from PIL import Image
+from concurrent.futures import ThreadPoolExecutor
+from io import BytesIO
+from mtlogger import logger
 
 # MAX_COVER_WIDTH = 300
 # MAX_COVER_HEIGHT = 450
@@ -52,7 +54,7 @@ def get_cover_image(query):
     return f'https:{cover_url.replace("t_thumb", "t_cover_big")}' if cover_url else None
 
   except Exception as ex:
-    print(f'[ERROR] Could not fetch cover image: {ex}')
+    logger.error(f'Could not fetch cover image: {ex}')
   return None
 
 def download_image(image_url):
@@ -61,7 +63,7 @@ def download_image(image_url):
     response.raise_for_status()
     return Image.open(BytesIO(response.content))
   except Exception as ex:
-    print(f'[ERROR] Could not download image: {ex}')
+    logger.error(f'Could not download image: {ex}')
     return None
 
 # def resize_image(img):
@@ -78,22 +80,22 @@ def save_image(img, save_path):
     if img.mode != 'RGB':
       img = img.convert('RGB')
     img.save(save_path, format='JPEG')
-    print(f'[LOG] Saved: "{save_path}"')
+    logger.log(f'Saved: "{save_path}"')
   except Exception as ex:
-    print(f'[ERROR] Could not save "{img}": {ex}')
+    logger.error(f'Could not save "{img}": {ex}')
 
 def process_folder(folder_name, container_folder):
   folder_path = os.path.join(container_folder, folder_name)
 
   if os.path.isfile(os.path.join(folder_path, FOLDER_IMAGE_NAME)):
-    print(f'[DEBUG] Skipping "{folder_name}". "{FOLDER_IMAGE_NAME}" already exists')
+    logger.debug(f'Skipping "{folder_name}". "{FOLDER_IMAGE_NAME}" already exists')
     return
 
   if os.path.isdir(folder_path):
     try:
       image_url = get_cover_image(folder_name)
       if not image_url:
-        print(f'[WARN] No cover found for "{folder_name}".')
+        logger.warn(f' No cover found for "{folder_name}".')
         return
       img = download_image(image_url)
       if img:
@@ -101,7 +103,7 @@ def process_folder(folder_name, container_folder):
         save_path = os.path.join(folder_path, FOLDER_IMAGE_NAME)
         save_image(img, save_path)
     except Exception as ex:
-      print(f'[ERROR] Could not process folder "{folder_name}": {ex}')
+      logger.error(f'Could not process folder "{folder_name}": {ex}')
 
 def main():
   container_folder = input('Enter the path to the folder containing your games:\n').strip(' "\'') or os.getcwd()
@@ -116,5 +118,5 @@ if __name__ == '__main__':
   try:
     main()
   except Exception as ex:
-    print(f'[ERROR] An unexpected error occurred: {ex}')
+    logger.error(f'An unexpected error occurred: {ex}')
   input('\nPress Enter to exit...')

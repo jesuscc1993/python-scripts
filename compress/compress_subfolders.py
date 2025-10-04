@@ -2,6 +2,7 @@ import os
 import sys
 
 from _common import compress_child_folders, select_parent_folder
+from mtlogger import logger
 
 def main():
   if len(sys.argv) > 1:
@@ -22,5 +23,5 @@ if __name__ == '__main__':
   try:
     main()
   except Exception as ex:
-    print(f'[ERROR] An unexpected error occurred: {ex}')
+    logger.error(f'An unexpected error occurred: {ex}')
     input('Press Enter to exit...')

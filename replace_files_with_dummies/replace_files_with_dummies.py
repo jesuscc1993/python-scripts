@@ -2,6 +2,7 @@ import os
 import re
 
 from concurrent.futures import ThreadPoolExecutor
+from mtlogger import logger
 from tqdm import tqdm
 
 from _sound_utils import play_notification_sound
@@ -11,12 +12,12 @@ def main():
   if not parent_folder:
     return
   if not os.path.isdir(parent_folder):
-    print(f'[ERROR] The specified path "{parent_folder}" is not a directory.')
+    logger.error(f'The specified path "{parent_folder}" is not a directory.')
   else:
     pattern = re.compile(input('Enter the pattern files need to match (regex):\n').strip(' "\''))
     process_files(parent_folder, pattern)
     play_notification_sound()
-    print(f'[LOG] Finished processing "{parent_folder}".\n')
+    logger.log(f'Finished processing "{parent_folder}".\n')
   main()
 
 def process_files(parent_folder, pattern):
@@ -40,5 +41,5 @@ if __name__ == '__main__':
   try:
     main()
   except Exception as ex:
-    print(f'[ERROR] An unexpected error occurred: {ex}')
+    logger.error(f'An unexpected error occurred: {ex}')
     input('Press Enter to exit...')

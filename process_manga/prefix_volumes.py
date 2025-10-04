@@ -2,6 +2,7 @@ import os
 import re
 import sys
 
+from mtlogger import LogLevel, logger
 from tqdm import tqdm
 
 from _common import exit_with_prompt, print_error
@@ -28,7 +29,7 @@ def prompt_parent_folder():
     return parent_folder
   else:
     if parent_folder:
-      print(f'[ERROR] The specified path "{parent_folder}" is not a directory.')
+      logger.error(f'The specified path "{parent_folder}" is not a directory.')
     return None
 
 def prompt_chapter_ranges():
@@ -40,7 +41,7 @@ def prompt_chapter_ranges():
   try:
     chapter_bounds = sorted([float(x.strip()) for x in ranges_input.split(',')])
   except Exception as ex:
-    print(f'[ERROR] Invalid input: {ex}')
+    logger.error(f'Invalid input: {ex}')
     return None
   if len(chapter_bounds) < 1:
     print('[ERROR] At least one boundary is required.')
@@ -59,7 +60,7 @@ def process_parent_folder(parent_folder, chapter_ranges):
   for folder in tqdm(folders, desc=f'Processing "{parent_folder}"'):
     chapter = get_chapter(folder)
     if not chapter:
-        tqdm.write(f'[WARN] Skipping "{folder}". Chapter number could not be inferred.')
+        tqdm.write(logger.format(LogLevel.WARN, f'Skipping "{folder}". Chapter number could not be inferred.'))
         continue
     try:
       ch_num = float(chapter)
@@ -77,7 +78,7 @@ def process_parent_folder(parent_folder, chapter_ranges):
         break
 
   play_notification_sound()
-  print(f'[LOG] Finished processing "{parent_folder}".\n')
+  logger.log(f'Finished processing "{parent_folder}".\n')
 
 def get_chapter(folder_name):
   match = re.search(r'(Ch(?:apter)?|Ep(?:isode)?)\.?\s*(\d+(?:\.\d+)?)', folder_name, re.IGNORECASE)

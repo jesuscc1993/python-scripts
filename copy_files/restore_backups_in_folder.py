@@ -3,6 +3,7 @@ import shutil
 import sys
 
 from _common import prompt_path
+from mtlogger import logger
 
 def main():
   if len(sys.argv) > 1:
@@ -22,11 +23,11 @@ def restore_backups(dir_path):
 			og_path = os.path.join(dir_path, og_name)
 
 			shutil.copy2(bak_path, og_path)
-			print(f'[LOG] Restored "{bak_path}" as "{og_path}".')
+			logger.log(f'Restored "{bak_path}" as "{og_path}".')
 
 if __name__ == '__main__':
   try:
     main()
   except Exception as ex:
-    print(f'[ERROR] An unexpected error occurred: {ex}')
+    logger.error(f'An unexpected error occurred: {ex}')
     input('Press Enter to exit...')

@@ -3,6 +3,7 @@ import shutil
 import sys
 
 from datetime import datetime
+from mtlogger import logger
 
 BACKUP_EXT = '.bak'
 BACKUP_PATH = 'backups'
@@ -12,7 +13,7 @@ WATCH_INTERVAL = 60
 def prompt_path(prompt_message, optional = False):
   path = input(prompt_message).strip(' "\'')
   if not path or not os.path.isdir(path):
-    print(f'[ERROR] The specified path "{path}" is not a directory.')
+    logger.error(f'The specified path "{path}" is not a directory.')
     if not optional: sys.exit(1)
     return None
   print('')
@@ -21,7 +22,7 @@ def prompt_path(prompt_message, optional = False):
 def prompt_file(prompt_message, optional = False):
   file_path = input(prompt_message).strip(' "\'')
   if not file_path or not os.path.isfile(file_path):
-    print(f'[ERROR] The specified file "{file_path}" does not exist.')
+    logger.error(f'The specified file "{file_path}" does not exist.')
     if not optional:
       sys.exit(1)
     return None
@@ -38,4 +39,4 @@ def rename_with_timestamp(dir_path, src_file_path):
     stamped_file_name = f'{file_stem.replace(BACKUP_EXT, '')}.{timestamp}{file_ext}'
     stamped_file_path = os.path.join(dir_path, stamped_file_name)
     shutil.move(src_file_path, stamped_file_path)
-    print(f'[LOG] Backed up existing "{file_name}" as "{stamped_file_name}"')
+    logger.log(f'Backed up existing "{file_name}" as "{stamped_file_name}"')

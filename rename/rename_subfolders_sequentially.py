@@ -1,5 +1,7 @@
 import os
 
+from mtlogger import logger
+
 def main():
   parent_dir = input('Enter the path to the folder containing your folders:\n').strip(' "\'')
 
@@ -22,5 +24,5 @@ if __name__ == '__main__':
   try:
     main()
   except Exception as ex:
-    print(f'[ERROR] An unexpected error occurred: {ex}')
+    logger.error(f'An unexpected error occurred: {ex}')
   input('Press Enter to exit...')

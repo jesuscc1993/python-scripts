@@ -3,6 +3,7 @@ import shutil
 import sys
 
 from _common import prompt_path
+from mtlogger import logger
 
 def main():
   if len(sys.argv) > 2:
@@ -26,11 +27,11 @@ def backup_updated_files(src_path, dest_path):
 
       if not os.path.exists(dest_file) or os.path.getmtime(src_file) > os.path.getmtime(dest_file):
         shutil.copy2(src_file, dest_file)
-        print(f'[LOG] Backed up "{src_file}" as "{dest_file}".')
+        logger.log(f'Backed up "{src_file}" as "{dest_file}".')
 
 if __name__ == '__main__':
   try:
     main()
   except Exception as ex:
-    print(f'[ERROR] An unexpected error occurred: {ex}')
+    logger.error(f'An unexpected error occurred: {ex}')
     input('Press Enter to exit...')

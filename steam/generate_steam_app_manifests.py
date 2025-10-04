@@ -1,6 +1,8 @@
 import os
 import re
 import requests
+
+from mtlogger import logger
 from pathlib import Path
 
 from _env import steam_api_key, steam_user_id
@@ -53,12 +55,12 @@ def main():
     sanitized = sanitize_name(game)
     app_id = owned_games.get(sanitized)
     if not app_id:
-      print(f'[WARN] Skipping "{game}": no matching Steam appid found.')
+      logger.warn(f' Skipping "{game}": no matching Steam appid found.')
       continue
 
     filepath = os.path.join(steam_apps_path, f'appmanifest_{app_id}.acf')
     if os.path.exists(filepath):
-      print(f'[DEBUG] Skipping "{game}": Manifest already exists ({filepath}).')
+      logger.debug(f'Skipping "{game}": Manifest already exists ({filepath}).')
       continue
 
     name = game
@@ -85,5 +87,5 @@ if __name__ == '__main__':
   try:
     main()
   except Exception as ex:
-    print(f'[ERROR] An unexpected error occurred: {ex}')
+    logger.error(f'An unexpected error occurred: {ex}')
   input('Press Enter to exit...')

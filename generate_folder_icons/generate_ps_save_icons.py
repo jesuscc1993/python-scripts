@@ -1,6 +1,7 @@
 import sys
 
 from _common import process_parent_folder, prompt_depth, prompt_path
+from mtlogger import logger
 
 IMAGE_FILENAMES = ['ICON0.PNG']
 
@@ -18,5 +19,5 @@ if __name__ == '__main__':
   try:
     main()
   except Exception as ex:
-    print(f'[ERROR] An unexpected error occurred: {ex}')
+    logger.error(f'An unexpected error occurred: {ex}')
   input('Press Enter to exit...')

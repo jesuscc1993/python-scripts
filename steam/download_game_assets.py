@@ -3,6 +3,7 @@ import requests
 
 from PIL import Image
 from io import BytesIO
+from mtlogger import logger
 
 # settings
 TERMS_BLACKLIST = ['soundtrack', 'artbook']
@@ -86,7 +87,7 @@ def download_game_assets(appid):
     if response.ok:
       save_asset(response.content, filepath, size)
     else:
-      print(f'[ERROR] Could not download {key} image.')
+      logger.error(f'Could not download {key} image.')
 
 def save_asset(content, filepath, size = None):
   try:
@@ -95,6 +96,6 @@ def save_asset(content, filepath, size = None):
     img.save(filepath)
     print(f'Saved: {filepath}')
   except Exception:
-    print(f'[ERROR] Could not save asset at {filepath}')
+    logger.error(f'Could not save asset at {filepath}')
 
 main()

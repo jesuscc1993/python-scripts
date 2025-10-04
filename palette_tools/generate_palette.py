@@ -4,6 +4,7 @@ import os
 
 from PIL import Image, ImageDraw
 from collections import Counter
+from mtlogger import logger
 
 SQUARE_SIZE = 40
 MIN_COLS = 4
@@ -61,5 +62,5 @@ if __name__ == '__main__':
   try:
     main()
   except Exception as ex:
-    print(f'[ERROR] An unexpected error occurred: {ex}')
+    logger.error(f'An unexpected error occurred: {ex}')
   input('Press Enter to exit...')

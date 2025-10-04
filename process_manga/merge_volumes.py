@@ -4,6 +4,7 @@ import shutil
 import sys
 
 from concurrent.futures import ThreadPoolExecutor
+from mtlogger import LogLevel, logger
 from tqdm import tqdm
 
 from _common import delete_empty_folders, exit_with_prompt, print_error, select_parent_folder
@@ -22,7 +23,7 @@ def process_parent_folder(root_dir):
     if os.path.isdir(folder_path):
       volume, chapter = get_volume_and_chapter(folder)
       if not volume or not chapter:
-        tqdm.write(f'[WARN] Skipping "{folder}". Volume or chapter numbers could not be inferred.')
+        tqdm.write(logger.format(LogLevel.WARN, f'Skipping "{folder}". Volume or chapter numbers could not be inferred.'))
         continue
 
       output_path = os.path.join(root_dir, f'Vol.{volume.zfill(2)}')

@@ -1,7 +1,9 @@
 import pymupdf
 import os
+
 from PIL import Image
 from concurrent.futures import ThreadPoolExecutor
+from mtlogger import logger
 from pathlib import Path
 
 OUTPUT_FORMAT = 'WEBP'
@@ -12,7 +14,7 @@ RESOLUTION_SCALE = 1.5
 def main():
   parent_folder = input('Enter the path to the parent folder containing the PDF files:\n').strip(' "\'')
   if not os.path.isdir(parent_folder):
-    print(f'[ERROR] The specified path "{parent_folder}" is not a directory.')
+    logger.error(f'The specified path "{parent_folder}" is not a directory.')
   else:
     print('')
 
@@ -27,7 +29,7 @@ def process_page(pdf_document, page_number, output_path):
   img = Image.frombytes('RGB', (pixmap.width, pixmap.height), pixmap.samples)
   img_path = os.path.join(output_path, f'{page_number + 1:03}.{OUTPUT_EXTENSION}')
   img.save(img_path, OUTPUT_FORMAT, quality = OUTPUT_QUALITY)
-  print(f'[LOG] Saved: "{img_path}".')
+  logger.log(f'Saved: "{img_path}".')
 
 def pdf_to_webp(parent_folder, pdf_path):
   pdf_name = Path(pdf_path).stem
@@ -43,12 +45,12 @@ def pdf_to_webp(parent_folder, pdf_path):
       for page_number in range(num_pages)
     ]
 
-  print(f'[LOG] Saved: "{output_path}".\n')
+  logger.log(f'Saved: "{output_path}".\n')
   pdf_document.close()
 
 if __name__ == '__main__':
   try:
     main()
   except Exception as ex:
-    print(f'[ERROR] An unexpected error occurred: {ex}')
+    logger.error(f'An unexpected error occurred: {ex}')
   input('Press Enter to exit...')

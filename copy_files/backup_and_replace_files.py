@@ -3,6 +3,7 @@ import sys
 import shutil
 
 from _common import prompt_path
+from mtlogger import logger
 
 def main():
   if len(sys.argv) > 2:
@@ -16,7 +17,7 @@ def main():
 
   rename_and_copy_files(src_path, dest_path, matches_only)
 
-  print(f'[LOG] Finished copying "{src_path}" to "{dest_path}".\n')
+  logger.log(f'Finished copying "{src_path}" to "{dest_path}".\n')
   main()
 
 def rename_and_copy_files(src_path, dest_path, matches_only):
@@ -35,13 +36,13 @@ def backup_file(file_path):
 
     if not os.path.isfile(bak_path):
       os.rename(file_path, bak_path)
-      print(f'[LOG] Saved backup file "{bak_path}".')
+      logger.log(f'Saved backup file "{bak_path}".')
     else:
-      print(f'[LOG] Backup file "{bak_path}" already exists and will be reused.')
+      logger.log(f'Backup file "{bak_path}" already exists and will be reused.')
 
 if __name__ == '__main__':
   try:
     main()
   except Exception as ex:
-    print(f'[ERROR] An unexpected error occurred: {ex}')
+    logger.error(f'An unexpected error occurred: {ex}')
     input('Press Enter to exit...')

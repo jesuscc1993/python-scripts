@@ -2,6 +2,8 @@ import os
 import subprocess
 import sys
 
+from mtlogger import logger
+
 LANGUAGE = 'eng'
 SUBTITLES_PATH = 'subtitles'
 SUBTITLE_EXT = '.srt'
@@ -35,14 +37,14 @@ def process_directory(dir_path):
 
       if os.path.exists(dest_file_path) and os.path.getsize(dest_file_path) == 0:
         os.remove(dest_file_path)
-        print(f'[WARN] No {LANGUAGE} subtitles found for "{file_name}". Removed empty subtitle file.')
+        logger.warn(f' No {LANGUAGE} subtitles found for "{file_name}". Removed empty subtitle file.')
       else:
-        print(f'[LOG] Extracted {LANGUAGE} subtitles for "{file_name}".')
+        logger.log(f'Extracted {LANGUAGE} subtitles for "{file_name}".')
 
 def prompt_path(prompt_message, optional = False):
   path = input(prompt_message).strip(' "\'')
   if not path or not os.path.isdir(path):
-    print(f'[ERROR] The specified path "{path}" is not a directory.')
+    logger.error(f'The specified path "{path}" is not a directory.')
     if not optional: sys.exit(1)
     return None
   print('')
@@ -52,5 +54,5 @@ if __name__ == '__main__':
   try:
     main()
   except Exception as ex:
-    print(f'[ERROR] An unexpected error occurred: {ex}')
+    logger.error(f'An unexpected error occurred: {ex}')
   input('Press Enter to exit...')
