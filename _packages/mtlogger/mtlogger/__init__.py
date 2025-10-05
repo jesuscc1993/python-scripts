@@ -16,7 +16,7 @@ class Logger:
       LogLevel.DEBUG: Fore.CYAN,
       LogLevel.ERROR: Fore.RED,
       LogLevel.INFO: Fore.GREEN,
-      LogLevel.LOG: Fore.LIGHTBLACK_EX,
+      LogLevel.LOG: '',
       LogLevel.WARN: Fore.YELLOW
     }.get(level, '')
     return f"{color}{msg}"
