@@ -1,6 +1,6 @@
 import os
 import sys
-import tkinter as tk
+import tkinter
 
 from PIL import Image, ImageTk
 from mtlogger import logger
@@ -14,7 +14,7 @@ if not os.path.isfile(image_path):
   logger.error(f'File "{image_path}" does not exist')
   sys.exit(1)
 
-root = tk.Tk()
+root = tkinter.Tk()
 root.overrideredirect(True)
 root.attributes('-topmost', True)
 root.wm_attributes('-transparentcolor', 'magenta')
@@ -25,7 +25,7 @@ width, height = image.size
 
 root.geometry(f'{width}x{height}+0+0')
 
-canvas = tk.Canvas(
+canvas = tkinter.Canvas(
   root,
   width = width,
   height = height,
