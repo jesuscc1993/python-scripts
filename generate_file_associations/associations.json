@@ -145,6 +145,10 @@
         { "class": "bak", "ext": "backup_04" },
         { "class": "bak", "ext": "backup_05" }
       ]
+    },
+    {
+      "type_name": "Font File",
+      "types": ["otf", "ttf", "woff", "woff2"]
     }
   ]
 }

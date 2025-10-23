@@ -73,6 +73,9 @@ def get_associations():
     return json.load(associations)
 
 def get_icon_path(icons_path, name):
+  if name == None:
+    return None
+
   path = os.path.join(icons_path, f'{name.upper()}.ico')
   return path if os.path.exists(path) else None
 
