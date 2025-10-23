@@ -21,4 +21,4 @@ if __name__ == '__main__':
     main()
   except Exception as ex:
     logger.error(f'An unexpected error occurred: {ex}')
-  input('Press Enter to exit...')
+    input('Press Enter to exit...')
