@@ -40,31 +40,31 @@
         "yml",
         {
           "ext": "gitconfig",
-          "parent": "json"
+          "extends": "json"
         },
         {
           "ext": "gitignore",
-          "parent": "json"
+          "extends": "json"
         },
         {
           "ext": "jsonc",
-          "parent": "json"
+          "extends": "json"
         },
         {
           "ext": "map",
-          "parent": "json"
+          "extends": "json"
         },
         {
           "ext": "jsx",
-          "parent": "js"
+          "extends": "js"
         },
         {
           "ext": "scss",
-          "parent": "sass"
+          "extends": "sass"
         },
         {
           "ext": "tsx",
-          "parent": "ts"
+          "extends": "ts"
         }
       ]
     },
@@ -116,10 +116,35 @@
         "sfc",
         "smc",
         "wbfs",
-        {
-          "ext": "xci",
-          "parent": "nsp"
-        }
+        { "extends": "nsp", "ext": "xci" }
+      ]
+    },
+    {
+      "fallback_icon": "BAK",
+      "type_name": "Backup File",
+      "types": [
+        "bak",
+        { "extends": "bak", "ext": "bak" },
+        { "extends": "bak", "ext": "bak1" },
+        { "extends": "bak", "ext": "bak2" },
+        { "extends": "bak", "ext": "bak3" },
+        { "extends": "bak", "ext": "bak4" },
+        { "extends": "bak", "ext": "bak5" },
+        { "extends": "bak", "ext": "bak_1" },
+        { "extends": "bak", "ext": "bak_2" },
+        { "extends": "bak", "ext": "bak_3" },
+        { "extends": "bak", "ext": "bak_4" },
+        { "extends": "bak", "ext": "bak_5" },
+        { "extends": "bak", "ext": "backup1" },
+        { "extends": "bak", "ext": "backup2" },
+        { "extends": "bak", "ext": "backup3" },
+        { "extends": "bak", "ext": "backup4" },
+        { "extends": "bak", "ext": "backup5" },
+        { "extends": "bak", "ext": "backup_1" },
+        { "extends": "bak", "ext": "backup_2" },
+        { "extends": "bak", "ext": "backup_3" },
+        { "extends": "bak", "ext": "backup_4" },
+        { "extends": "bak", "ext": "backup_5" }
       ]
     }
   ]

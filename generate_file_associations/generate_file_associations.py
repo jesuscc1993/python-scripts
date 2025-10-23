@@ -24,17 +24,17 @@ def main():
     fallback_icon = mapping.get('fallback_icon')
     icons_path = mapping.get('icons_path') or root_icons_path
 
-    for type in mapping.get('types'):
-      if isinstance(type, str):
-        ext = type
-        ext_icon = type
+    for type_mapping in mapping.get('types'):
+      if isinstance(type_mapping, str):
+        ext = type_mapping
+        type = type_mapping
       else:
-        ext = type.get('ext')
-        ext_icon = type.get('parent')
+        ext = type_mapping.get('ext')
+        type = type_mapping.get('extends')
 
-      ext_icon_path = get_icon_path(icons_path, ext_icon.upper())
+      ext_icon_path = get_icon_path(icons_path, type.upper())
       fallback_icon_path = get_icon_path(icons_path, fallback_icon)
-      file_type = get_registry_value(winreg.HKEY_CLASSES_ROOT, f'.{ext}', '') or f'{ext.lower()}file'
+      file_type = get_registry_value(winreg.HKEY_CLASSES_ROOT, f'.{ext}', '') or f'{type.lower()}file'
 
       delete_registry_entry(winreg.HKEY_CURRENT_USER, f'{FILE_EXTS}\\.{ext}\\UserChoice')
       add_registry_entry(winreg.HKEY_CLASSES_ROOT, f'.{ext}', '', file_type)
