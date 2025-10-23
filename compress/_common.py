@@ -7,7 +7,6 @@ from concurrent.futures import ThreadPoolExecutor
 from mtlogger import logger
 from tqdm import tqdm
 
-from _settings import FOLDER_OUTPUT_EXTENSION
 from _sound_utils import play_notification_sound
 
 ZIP_EXTENSIONS = ['ZIP', 'CBR', 'CBZ']
@@ -24,7 +23,7 @@ def select_parent_folder(prompt, callback):
     logger.log(f'Finished processing "{parent_folder}".\n')
   select_parent_folder(prompt, callback)
 
-def compress_child_folders(parent_folder):
+def compress_child_folders(parent_folder, output_extension = ZIP_EXTENSIONS[0]):
   folders = []
   for root, dirs, _ in os.walk(parent_folder, topdown = False):
     for dir_name in dirs:
@@ -38,15 +37,18 @@ def compress_child_folders(parent_folder):
     subprocess.call(['attrib', '+H', str(tmp_dir)])
 
     with ThreadPoolExecutor() as executor:
-      list(tqdm(executor.map(compress_folder, folders), total = len(folders), desc = f'Processing "{parent_folder}"'))
+      list(tqdm(
+        executor.map(lambda folder: compress_folder(folder, output_extension), folders),
+        total = len(folders), desc = f'Processing "{parent_folder}"'
+      ))
 
     shutil.rmtree(tmp_dir, ignore_errors = True)
 
-def compress_folder(folder_path):
+def compress_folder(folder_path, output_extension = ZIP_EXTENSIONS[0]):
   folder_name = os.path.basename(folder_path)
   tmp_dir = os.path.join(os.path.dirname(folder_path), '.tmp')
 
-  zip_filename = f'{folder_name}.{FOLDER_OUTPUT_EXTENSION}'
+  zip_filename = f'{folder_name}.{output_extension.lower()}'
   tmp_zip_path = os.path.join(tmp_dir, zip_filename)
   final_zip_path = os.path.join(os.path.dirname(folder_path), zip_filename)
 
