@@ -123,6 +123,7 @@
         { "class": "bak", "ext": "bak_03" },
         { "class": "bak", "ext": "bak_04" },
         { "class": "bak", "ext": "bak_05" },
+        { "class": "bak", "ext": "backup" },
         { "class": "bak", "ext": "backup1" },
         { "class": "bak", "ext": "backup2" },
         { "class": "bak", "ext": "backup3" },
