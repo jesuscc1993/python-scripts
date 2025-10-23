@@ -27,14 +27,14 @@ def main():
     for type_mapping in mapping.get('types'):
       if isinstance(type_mapping, str):
         ext = type_mapping
-        type = type_mapping
+        class_name = type_mapping
       else:
         ext = type_mapping.get('ext')
-        type = type_mapping.get('extends')
+        class_name = type_mapping.get('class')
 
-      ext_icon_path = get_icon_path(icons_path, type.upper())
+      ext_icon_path = get_icon_path(icons_path, ext) or get_icon_path(icons_path, class_name)
       fallback_icon_path = get_icon_path(icons_path, fallback_icon)
-      file_type = get_registry_value(winreg.HKEY_CLASSES_ROOT, f'.{ext}', '') or f'{type.lower()}file'
+      file_type = get_registry_value(winreg.HKEY_CLASSES_ROOT, f'.{ext}', '') or f'{class_name.lower()}file'
 
       delete_registry_entry(winreg.HKEY_CURRENT_USER, f'{FILE_EXTS}\\.{ext}\\UserChoice')
       add_registry_entry(winreg.HKEY_CLASSES_ROOT, f'.{ext}', '', file_type)
@@ -73,7 +73,7 @@ def get_associations():
     return json.load(associations)
 
 def get_icon_path(icons_path, name):
-  path = os.path.join(icons_path, f'{name}.ico')
+  path = os.path.join(icons_path, f'{name.upper()}.ico')
   return path if os.path.exists(path) else None
 
 if __name__ == '__main__':

@@ -1,5 +1,5 @@
 {
-  "icons_path": "Z:\\Images\\Icons\\Packs\\File Types\\ICO",
+  "icons_path": "Z:\\Images\\Icons\\Packs\\File Types W11\\ico",
   "mappings": [
     {
       "fallback_icon": "_plain_text",
@@ -21,7 +21,12 @@
         "inf",
         "ini",
         "js",
+        { "class": "js", "ext": "jsx" },
         "json",
+        { "class": "json", "ext": "gitconfig" },
+        { "class": "json", "ext": "gitignore" },
+        { "class": "json", "ext": "jsonc" },
+        { "class": "json", "ext": "map" },
         "info",
         "keys",
         "less",
@@ -30,42 +35,16 @@
         "md",
         "nfo",
         "sass",
+        { "class": "sass", "ext": "scss" },
         "settings",
         "srt",
         "ts",
+        { "class": "ts", "ext": "tsx" },
         "txt",
         "vdf",
         "xml",
         "yaml",
-        "yml",
-        {
-          "ext": "gitconfig",
-          "extends": "json"
-        },
-        {
-          "ext": "gitignore",
-          "extends": "json"
-        },
-        {
-          "ext": "jsonc",
-          "extends": "json"
-        },
-        {
-          "ext": "map",
-          "extends": "json"
-        },
-        {
-          "ext": "jsx",
-          "extends": "js"
-        },
-        {
-          "ext": "scss",
-          "extends": "sass"
-        },
-        {
-          "ext": "tsx",
-          "extends": "ts"
-        }
+        "yml"
       ]
     },
     {
@@ -116,7 +95,7 @@
         "sfc",
         "smc",
         "wbfs",
-        { "extends": "nsp", "ext": "xci" }
+        { "class": "nsp", "ext": "xci" }
       ]
     },
     {
@@ -124,27 +103,46 @@
       "type_name": "Backup File",
       "types": [
         "bak",
-        { "extends": "bak", "ext": "bak" },
-        { "extends": "bak", "ext": "bak1" },
-        { "extends": "bak", "ext": "bak2" },
-        { "extends": "bak", "ext": "bak3" },
-        { "extends": "bak", "ext": "bak4" },
-        { "extends": "bak", "ext": "bak5" },
-        { "extends": "bak", "ext": "bak_1" },
-        { "extends": "bak", "ext": "bak_2" },
-        { "extends": "bak", "ext": "bak_3" },
-        { "extends": "bak", "ext": "bak_4" },
-        { "extends": "bak", "ext": "bak_5" },
-        { "extends": "bak", "ext": "backup1" },
-        { "extends": "bak", "ext": "backup2" },
-        { "extends": "bak", "ext": "backup3" },
-        { "extends": "bak", "ext": "backup4" },
-        { "extends": "bak", "ext": "backup5" },
-        { "extends": "bak", "ext": "backup_1" },
-        { "extends": "bak", "ext": "backup_2" },
-        { "extends": "bak", "ext": "backup_3" },
-        { "extends": "bak", "ext": "backup_4" },
-        { "extends": "bak", "ext": "backup_5" }
+        { "class": "bak", "ext": "bak1" },
+        { "class": "bak", "ext": "bak2" },
+        { "class": "bak", "ext": "bak3" },
+        { "class": "bak", "ext": "bak4" },
+        { "class": "bak", "ext": "bak5" },
+        { "class": "bak", "ext": "bak01" },
+        { "class": "bak", "ext": "bak02" },
+        { "class": "bak", "ext": "bak03" },
+        { "class": "bak", "ext": "bak04" },
+        { "class": "bak", "ext": "bak05" },
+        { "class": "bak", "ext": "bak_1" },
+        { "class": "bak", "ext": "bak_2" },
+        { "class": "bak", "ext": "bak_3" },
+        { "class": "bak", "ext": "bak_4" },
+        { "class": "bak", "ext": "bak_5" },
+        { "class": "bak", "ext": "bak_01" },
+        { "class": "bak", "ext": "bak_02" },
+        { "class": "bak", "ext": "bak_03" },
+        { "class": "bak", "ext": "bak_04" },
+        { "class": "bak", "ext": "bak_05" },
+        { "class": "bak", "ext": "backup1" },
+        { "class": "bak", "ext": "backup2" },
+        { "class": "bak", "ext": "backup3" },
+        { "class": "bak", "ext": "backup4" },
+        { "class": "bak", "ext": "backup5" },
+        { "class": "bak", "ext": "backup01" },
+        { "class": "bak", "ext": "backup02" },
+        { "class": "bak", "ext": "backup03" },
+        { "class": "bak", "ext": "backup04" },
+        { "class": "bak", "ext": "backup05" },
+        { "class": "bak", "ext": "backup_1" },
+        { "class": "bak", "ext": "backup_2" },
+        { "class": "bak", "ext": "backup_3" },
+        { "class": "bak", "ext": "backup_4" },
+        { "class": "bak", "ext": "backup_5" },
+        { "class": "bak", "ext": "backup_01" },
+        { "class": "bak", "ext": "backup_02" },
+        { "class": "bak", "ext": "backup_03" },
+        { "class": "bak", "ext": "backup_04" },
+        { "class": "bak", "ext": "backup_05" }
       ]
     }
   ]
