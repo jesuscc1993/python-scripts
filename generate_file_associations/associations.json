@@ -99,6 +99,16 @@
       ]
     },
     {
+      "type_name": "Save File",
+      "types": [
+        "sav",
+        { "class": "save", "ext": "dsv" },
+        { "class": "save", "ext": "gci" },
+        { "class": "save", "ext": "mcd" },
+        { "class": "save", "ext": "srm" }
+      ]
+    },
+    {
       "fallback_icon": "BAK",
       "type_name": "Backup File",
       "types": [
