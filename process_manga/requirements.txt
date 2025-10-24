@@ -1,3 +1,5 @@
+beautifulsoup4
 numpy
 pillow
+requests
 tqdm
