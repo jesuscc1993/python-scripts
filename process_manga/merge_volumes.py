@@ -1,5 +1,4 @@
 import os
-import re
 import shutil
 import sys
 
@@ -7,7 +6,7 @@ from concurrent.futures import ThreadPoolExecutor
 from mtlogger import LogLevel, logger
 from tqdm import tqdm
 
-from _common import delete_empty_folders, exit_with_prompt, print_error, select_parent_folder
+from _common import delete_empty_folders, exit_with_prompt, get_volume_and_chapter, print_error, select_parent_folder
 
 def main():
   if len(sys.argv) > 1:
@@ -40,10 +39,6 @@ def process_parent_folder(root_dir):
       progress.update(1)
 
   delete_empty_folders(root_dir)
-
-def get_volume_and_chapter(folder_name):
-  match = re.search(r'(Vol(?:ume)?)\.?\s*(\d+(?:\.\d+)?).*?(Ch(?:apter)?|Ep(?:isode)?)\.?\s*(\d+(?:\.\d+)?)', folder_name, re.IGNORECASE)
-  return (match.group(2), match.group(4)) if match else (None, None)
 
 def get_sanitized_chapter(chapter):
   parts = chapter.split('.')

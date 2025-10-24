@@ -1,4 +1,5 @@
 import os
+import re
 
 from concurrent.futures import ThreadPoolExecutor
 from mtlogger import logger
@@ -6,6 +7,9 @@ from tqdm import tqdm
 
 from _image_utils import is_image_file
 from _sound_utils import play_notification_sound
+
+VOL_REGEX = r'(Vol(?:ume)?)\.?\s*(\d+(?:\.\d+)?)'
+CH_REGEX  = r'(Ch(?:apter)?|Ep(?:isode)?)\.?\s*(\d+(?:\.\d+)?)'
 
 def select_parent_folder(prompt, callback):
   parent_folder = input(prompt).strip(' "\'')
@@ -40,6 +44,18 @@ def delete_empty_folders(folder_path):
         os.rmdir(dir_path)
       except OSError:
         pass
+
+def get_volume_and_chapter(filename):
+  vol_match = re.search(VOL_REGEX, filename, re.IGNORECASE)
+  ch_match  = re.search(CH_REGEX, filename, re.IGNORECASE)
+  volume  = vol_match.group(2) if vol_match else None
+  chapter = ch_match.group(2) if ch_match else None
+  return (volume, chapter)
+
+def get_chapter(filename):
+  ch_match = re.search(CH_REGEX, filename, re.IGNORECASE)
+  chapter = ch_match.group(2) if ch_match else None
+  return chapter
 
 def print_error(error):
   logger.error(f'An unexpected error occurred: {error}')

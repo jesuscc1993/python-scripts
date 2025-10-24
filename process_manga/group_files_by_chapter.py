@@ -7,7 +7,7 @@ from concurrent.futures import ThreadPoolExecutor
 from mtlogger import LogLevel, logger
 from tqdm import tqdm
 
-from _common import delete_empty_folders, exit_with_prompt, print_error, select_parent_folder
+from _common import exit_with_prompt, get_chapter, print_error, select_parent_folder
 
 def main():
   if len(sys.argv) > 1:
@@ -35,10 +35,6 @@ def process_parent_folder(root_dir):
   with ThreadPoolExecutor() as executor, tqdm(total = len(files_to_process), desc = f'Processing "{root_dir}"') as progress:
     for _ in executor.map(process_file, files_to_process):
       progress.update(1)
-
-def get_chapter(filename):
-  match = re.search(r'(Ch(?:apter)?|Ep(?:isode)?)\.?\s*(\d+(?:\.\d+)?)', filename, re.IGNORECASE)
-  return match.group(2) if match else None
 
 def process_file(params):
   src, target_folder, chapter = params

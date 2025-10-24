@@ -1,11 +1,10 @@
 import os
-import re
 import sys
 
 from mtlogger import LogLevel, logger
 from tqdm import tqdm
 
-from _common import exit_with_prompt, print_error
+from _common import exit_with_prompt, get_chapter, print_error
 from _sound_utils import play_notification_sound
 
 def main():
@@ -79,10 +78,6 @@ def process_parent_folder(parent_folder, chapter_ranges):
 
   play_notification_sound()
   logger.log(f'Finished processing "{parent_folder}".\n')
-
-def get_chapter(folder_name):
-  match = re.search(r'(Ch(?:apter)?|Ep(?:isode)?)\.?\s*(\d+(?:\.\d+)?)', folder_name, re.IGNORECASE)
-  return match.group(2) if match else None
 
 if __name__ == '__main__':
   try:
