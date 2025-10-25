@@ -1,6 +1,7 @@
 import os
 import sys
 import tkinter
+import ctypes
 
 from PIL import Image, ImageTk
 from mtlogger import logger
@@ -37,5 +38,24 @@ canvas.pack()
 canvas.create_image(0, 0, anchor = 'nw', image = photo_image)
 
 root.lift()
-root.bind('<Escape>', lambda e: root.destroy())
+
+GWL_EXSTYLE = -20
+WS_EX_LAYERED = 0x00080000
+WS_EX_TRANSPARENT = 0x00000020
+hwnd = ctypes.windll.user32.GetParent(root.winfo_id())
+style = ctypes.windll.user32.GetWindowLongW(hwnd, GWL_EXSTYLE)
+ctypes.windll.user32.SetWindowLongW(hwnd, GWL_EXSTYLE, style | WS_EX_LAYERED | WS_EX_TRANSPARENT)
+
+def hide_overlay(e):
+  root.attributes('-alpha', 0.0)
+
+def show_overlay(e):
+  root.attributes('-alpha', 1.0)
+
+def close_overlay(e):
+  root.destroy()
+
+root.bind('<KeyPress-Control_L>', hide_overlay)
+root.bind('<KeyRelease-Control_L>', show_overlay)
+root.bind('<Escape>', close_overlay)
 root.mainloop()
