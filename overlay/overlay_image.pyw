@@ -6,6 +6,10 @@ import ctypes
 from PIL import Image, ImageTk
 from mtlogger import logger
 
+GWL_EX_STYLE = -20
+WS_EX_LAYERED = 0x00080000
+WS_EX_TRANSPARENT = 0x00000020
+
 if len(sys.argv) > 1:
   image_path = sys.argv[1]
 else:
@@ -39,12 +43,9 @@ canvas.create_image(0, 0, anchor = 'nw', image = photo_image)
 
 root.lift()
 
-GWL_EXSTYLE = -20
-WS_EX_LAYERED = 0x00080000
-WS_EX_TRANSPARENT = 0x00000020
 hwnd = ctypes.windll.user32.GetParent(root.winfo_id())
-style = ctypes.windll.user32.GetWindowLongW(hwnd, GWL_EXSTYLE)
-ctypes.windll.user32.SetWindowLongW(hwnd, GWL_EXSTYLE, style | WS_EX_LAYERED | WS_EX_TRANSPARENT)
+style = ctypes.windll.user32.GetWindowLongW(hwnd, GWL_EX_STYLE)
+ctypes.windll.user32.SetWindowLongW(hwnd, GWL_EX_STYLE, style | WS_EX_LAYERED | WS_EX_TRANSPARENT)
 
 def hide_overlay(e):
   root.attributes('-alpha', 0.0)
