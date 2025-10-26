@@ -52,7 +52,7 @@
       "shell": [
         {
           "command": "\"Z:\\Software\\Development\\Notepad++\\notepad++.exe\" \"%1\"",
-          "icon": "\"Z:\\Software\\Development\\Notepad++\\notepad++.exe\"",
+          "icon": "Z:\\Software\\Development\\Notepad++\\notepad++.exe",
           "key": "edit",
           "label": "Edit with Notepad++"
         }
@@ -64,7 +64,7 @@
       "shell": [
         {
           "command": "\"Z:\\Software\\Compression\\WinRAR\\WinRAR.exe\" \"%1\"",
-          "icon": "\"Z:\\Software\\Compression\\WinRAR\\WinRAR.exe\"",
+          "icon": "Z:\\Software\\Compression\\WinRAR\\WinRAR.exe",
           "key": "open_in_winrar",
           "label": "Open in WinRAR"
         }
@@ -77,7 +77,7 @@
       "shell": [
         {
           "command": "\"Z:\\Software\\Development\\Notepad++\\notepad++.exe\" \"%1\"",
-          "icon": "\"Z:\\Software\\Development\\Notepad++\\notepad++.exe\"",
+          "icon": "Z:\\Software\\Development\\Notepad++\\notepad++.exe",
           "key": "edit",
           "label": "Edit with Notepad++"
         }
