@@ -48,6 +48,19 @@
       ]
     },
     {
+      "fallback_icon": "_plain_text",
+      "shell": [
+        {
+          "command": "\"Z:\\Software\\Development\\Notepad++\\notepad++.exe\" \"%1\"",
+          "icon": "\"Z:\\Software\\Development\\Notepad++\\notepad++.exe\"",
+          "key": "edit",
+          "label": "Edit with Notepad++"
+        }
+      ],
+      "type_name": "Text File",
+      "types": ["html"]
+    },
+    {
       "shell": [
         {
           "command": "\"Z:\\Software\\Compression\\WinRAR\\WinRAR.exe\" \"%1\"",
@@ -66,11 +79,11 @@
           "command": "\"Z:\\Software\\Development\\Notepad++\\notepad++.exe\" \"%1\"",
           "icon": "\"Z:\\Software\\Development\\Notepad++\\notepad++.exe\"",
           "key": "edit",
-          "label": "Edit in Notepad++"
+          "label": "Edit with Notepad++"
         }
       ],
-      "type_name": "Text File",
-      "types": ["ahk", "bat", "html", "ps1", "py", "rb", "reg", "sh"]
+      "type_name": "Script File",
+      "types": ["ahk", "bat", "ps1", "py", "rb", "reg", "sh"]
     },
     {
       "shell": [
