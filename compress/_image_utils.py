@@ -4,6 +4,7 @@ PNG_EXTENSION = '.png'
 WEBP_EXTENSION = '.webp'
 
 FILE_EXCLUSIONS = ['folder.jpg', 'cover.jpg']
+WEBP_DIMENSION_LIMIT = 16383
 
 def is_image_file(filename):
   name = filename.lower()
