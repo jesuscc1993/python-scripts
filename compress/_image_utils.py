@@ -1,7 +1,5 @@
 import numpy
 
-from PIL import Image
-
 JPEG_EXTENSION = '.jpeg'
 JPG_EXTENSION = '.jpg'
 PNG_EXTENSION = '.png'
