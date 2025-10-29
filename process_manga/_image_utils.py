@@ -17,7 +17,10 @@ def is_image_file(filename):
   return name.endswith((JPG_EXTENSION, JPEG_EXTENSION, PNG_EXTENSION, WEBP_EXTENSION)) and name not in FILE_EXCLUSIONS
 
 def is_image_uncompressed(filename):
-  return filename.lower().endswith((PNG_EXTENSION))
+  return filename.lower().endswith(PNG_EXTENSION)
+
+def is_image_optimally_compressed(filename):
+  return filename.lower().endswith(WEBP_EXTENSION)
 
 def get_max_dimensions(img):
   width, height = img.size

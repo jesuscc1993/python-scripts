@@ -4,7 +4,7 @@ from PIL import Image
 from mtlogger import logger
 
 from _common import exit_with_prompt, print_error, process_folder_images, select_parent_folder
-from _image_utils import image_needs_resizing, is_image_uncompressed, resize_image, save_image_to_path
+from _image_utils import image_needs_resizing, is_image_optimally_compressed, resize_image, save_image_to_path
 
 def main():
   if len(sys.argv) > 1:
@@ -19,7 +19,7 @@ def process_image(original_path):
   try:
     with Image.open(original_path) as img:
       needs_resizing = image_needs_resizing(img)
-      needs_compression = is_image_uncompressed(original_path)
+      needs_compression = not is_image_optimally_compressed(original_path)
 
       if needs_resizing:
         img = resize_image(img)
