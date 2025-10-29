@@ -7,7 +7,7 @@ from mtlogger import logger
 from tqdm import tqdm
 
 from _image_utils import is_image_file
-from _settings import IMAGE_OUTPUT_FORMAT, IMAGE_OUTPUT_EXTENSION, IMAGE_OUTPUT_QUALITY
+from _settings import IMAGE_OUTPUT_FORMAT, IMAGE_OUTPUT_EXTENSION, IMAGE_OUTPUT_LOSSLESS_COMPRESSION, IMAGE_OUTPUT_QUALITY
 from _common import select_parent_folder
 
 def main():
@@ -41,7 +41,12 @@ def compress_image(file_path):
   os.rename(file_path, og_path)
 
   with Image.open(og_path) as img:
-    img.save(output_path, IMAGE_OUTPUT_FORMAT, quality = IMAGE_OUTPUT_QUALITY)
+    img.save(
+      output_path,
+      IMAGE_OUTPUT_FORMAT,
+      lossless = IMAGE_OUTPUT_LOSSLESS_COMPRESSION,
+      quality = 100 if IMAGE_OUTPUT_LOSSLESS_COMPRESSION else IMAGE_OUTPUT_QUALITY
+    )
 
   if os.path.getsize(output_path) < os.path.getsize(og_path):
     os.remove(og_path)
