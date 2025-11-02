@@ -1,4 +1,5 @@
 import os
+import re
 import shutil
 import sys
 import winsound
@@ -45,8 +46,8 @@ def process_parent_folder(root_dir):
       progress.update(1)
 
 def get_group_name(filename):
-  parts = filename.rsplit('-', 1)
-  return parts[0].strip() if len(parts) > 1 else filename
+  parts = re.split(r'(?:-|S\d+)', filename)
+  return (parts[0] if len(parts) > 1 else filename).strip()
 
 def process_file(params):
   src, target_folder = params
