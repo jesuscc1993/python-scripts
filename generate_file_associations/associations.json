@@ -179,6 +179,7 @@
         { "class": "video", "ext": "bik" },
         { "class": "video", "ext": "bk2" },
         { "class": "video", "ext": "usm" },
+        { "class": "video", "ext": "webm" },
         { "class": "video", "ext": "wmv" }
       ]
     }
