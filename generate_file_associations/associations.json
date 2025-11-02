@@ -172,6 +172,15 @@
     {
       "type_name": "Font File",
       "types": ["otf", "ttf", "woff", "woff2"]
+    },
+    {
+      "type_name": "Video File",
+      "types": [
+        { "class": "video", "ext": "bik" },
+        { "class": "video", "ext": "bk2" },
+        { "class": "video", "ext": "usm" },
+        { "class": "video", "ext": "wmv" }
+      ]
     }
   ]
 }
