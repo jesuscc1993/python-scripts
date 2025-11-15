@@ -39,12 +39,12 @@ def compress_image(file_path):
   try:
     ext = os.path.splitext(file_path)[1].lower()
     name = os.path.splitext(file_path)[0]
-    og_path = f'{name}.bak{ext}'
+    backup_path = f'{name}.bak{ext}'
     output_path = f'{name}.{output_ext}'
 
-    os.rename(file_path, og_path)
+    os.rename(file_path, backup_path)
 
-    with Image.open(og_path) as img:
+    with Image.open(backup_path) as img:
       if output_ext == 'webp':
         if img.width > WEBP_DIMENSION_LIMIT or img.height > WEBP_DIMENSION_LIMIT:
           logger.warn(f'Skipping "{file_path}" as the image\'s dimensions  ({img.width}px x {img.height}px) exceed WebP\'s limit of {WEBP_DIMENSION_LIMIT}px.')
@@ -57,10 +57,11 @@ def compress_image(file_path):
         quality = 100 if IMAGE_OUTPUT_LOSSLESS_COMPRESSION else IMAGE_OUTPUT_QUALITY
       )
 
-    if os.path.exists(output_path) and os.path.getsize(output_path) < os.path.getsize(og_path):
-      os.remove(og_path)
+    if os.path.exists(output_path) and os.path.getsize(output_path) < os.path.getsize(backup_path):
+      os.remove(backup_path)
     else:
       os.remove(output_path)
+      os.rename(backup_path, file_path)
 
   except Exception as ex:
     logger.error(f'Failed to compress "{file_path}": {ex}')
