@@ -6,11 +6,11 @@ from concurrent.futures import ThreadPoolExecutor
 from mtlogger import logger
 from tqdm import tqdm
 
-from _image_utils import WEBP_DIMENSION_LIMIT, is_image_file
+from _image_utils import WEBP_DIMENSION_LIMIT, WEBP_EXTENSION, is_image_file
 from _settings import IMAGE_OUTPUT_FORMAT, IMAGE_OUTPUT_LOSSLESS_COMPRESSION, IMAGE_OUTPUT_QUALITY
 from _common import select_parent_folder
 
-output_ext = IMAGE_OUTPUT_FORMAT.lower()
+output_ext = f'.{IMAGE_OUTPUT_FORMAT.lower()}'
 
 def main():
   if len(sys.argv) > 1:
@@ -27,7 +27,7 @@ def compress_child_images(root_dir):
   for root, _, files in os.walk(root_dir):
     for file in files:
       ext = os.path.splitext(file)[1].lower()
-      if is_image_file(file) and ext != f'.{output_ext}':
+      if is_image_file(file) and ext != output_ext:
         file_path = os.path.join(root, file)
         files_to_process.append(file_path)
 
@@ -37,15 +37,14 @@ def compress_child_images(root_dir):
 
 def compress_image(file_path):
   try:
-    ext = os.path.splitext(file_path)[1].lower()
-    name = os.path.splitext(file_path)[0]
-    backup_path = f'{name}.bak{ext}'
-    output_path = f'{name}.{output_ext}'
+    name, ext = os.path.splitext(file_path)
+    backup_path = f'{name}.bak{ext.lower()}'
+    output_path = f'{name}{output_ext}'
 
     os.rename(file_path, backup_path)
 
     with Image.open(backup_path) as img:
-      if output_ext == 'webp':
+      if output_ext == WEBP_EXTENSION:
         if img.width > WEBP_DIMENSION_LIMIT or img.height > WEBP_DIMENSION_LIMIT:
           logger.warn(f'Skipping "{file_path}" as the image\'s dimensions  ({img.width}px x {img.height}px) exceed WebP\'s limit of {WEBP_DIMENSION_LIMIT}px.')
           return
