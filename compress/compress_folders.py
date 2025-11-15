@@ -2,14 +2,14 @@ import sys
 
 from mtlogger import logger
 
-from _common import compress_child_folders, select_parent_folder, ZIP_EXTENSIONS
+from _common import compress_child_folders, select_parent_folder, ZIP_TYPES
 
 def main():
   if len(sys.argv) > 1:
     path = sys.argv[1]
-    ext = sys.argv[2] if len(sys.argv) > 2 else ZIP_EXTENSIONS[0]
+    type = sys.argv[2] if len(sys.argv) > 2 else ZIP_TYPES[0]
     depth = int(sys.argv[3]) if len(sys.argv) > 3 else 1
-    compress_child_folders(path, ext, depth)
+    compress_child_folders(path, type, depth)
   else:
     select_parent_folder(
       'Enter the path to the parent folder containing the folders you want to compress:\n',

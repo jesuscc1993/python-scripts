@@ -8,7 +8,7 @@ from tqdm import tqdm
 
 from _image_utils import WEBP_DIMENSION_LIMIT, WEBP_EXTENSION, is_image_file
 from _settings import IMAGE_OUTPUT_FORMAT, IMAGE_OUTPUT_LOSSLESS_COMPRESSION, IMAGE_OUTPUT_QUALITY
-from _common import select_parent_folder
+from _common import BAK_EXTENSION, select_parent_folder
 
 output_ext = f'.{IMAGE_OUTPUT_FORMAT.lower()}'
 
@@ -38,7 +38,7 @@ def compress_child_images(root_dir):
 def compress_image(file_path):
   try:
     name, ext = os.path.splitext(file_path)
-    backup_path = f'{name}.bak{ext.lower()}'
+    backup_path = f'{name}{BAK_EXTENSION}{ext.lower()}'
     output_path = f'{name}{output_ext}'
 
     os.rename(file_path, backup_path)
@@ -60,7 +60,7 @@ def compress_image(file_path):
       os.remove(backup_path)
     else:
       os.remove(output_path)
-      os.rename(backup_path, file_path)
+      # os.rename(backup_path, file_path)
 
   except Exception as ex:
     logger.error(f'Failed to compress "{file_path}": {ex}')

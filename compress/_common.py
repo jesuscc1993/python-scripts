@@ -9,7 +9,10 @@ from tqdm import tqdm
 
 from _sound_utils import play_notification_sound
 
-ZIP_EXTENSIONS = ['ZIP', 'CBR', 'CBZ']
+BAK_TYPE = 'BAK'
+ZIP_TYPES = ['ZIP', 'CBR', 'CBZ']
+
+BAK_EXTENSION = f'.{BAK_TYPE.lower()}'
 
 def select_parent_folder(prompt, callback):
   parent_folder = input(prompt).strip(' "\'')
@@ -23,7 +26,7 @@ def select_parent_folder(prompt, callback):
     logger.log(f'Finished processing "{parent_folder}".\n')
   select_parent_folder(prompt, callback)
 
-def compress_child_folders(parent_folder, output_extension = ZIP_EXTENSIONS[0], depth = 1):
+def compress_child_folders(parent_folder, output_type = ZIP_TYPES[0], depth = 1):
   if depth < 1:
     logger.error('Depth must be 1 or greater.')
     return
@@ -44,18 +47,18 @@ def compress_child_folders(parent_folder, output_extension = ZIP_EXTENSIONS[0], 
   if len(folders) > 0:
     with ThreadPoolExecutor() as executor:
       list(tqdm(
-        executor.map(lambda folder: compress_folder(folder, output_extension), folders),
+        executor.map(lambda folder: compress_folder(folder, output_type), folders),
         total = len(folders),
         desc = f'Processing "{parent_folder}"'
       ))
 
-def compress_folder(folder_path, output_extension):
+def compress_folder(folder_path, output_type):
   folder_name = os.path.basename(folder_path)
 
   parent_dir = os.path.dirname(folder_path)
   tmp_dir = os.path.join(parent_dir, '.tmp')
 
-  zip_filename = f'{folder_name}.{output_extension.lower()}'
+  zip_filename = f'{folder_name}.{output_type.lower()}'
   tmp_zip_path = os.path.join(tmp_dir, zip_filename)
   final_zip_path = os.path.join(parent_dir, zip_filename)
 
@@ -90,7 +93,7 @@ def extract_child_archives(parent_folder):
   archives = []
   for root, _, files in os.walk(parent_folder, topdown = False):
     for file_name in files:
-      if any(file_name.upper().endswith(f'.{ext}') for ext in ZIP_EXTENSIONS):
+      if any(file_name.upper().endswith(f'.{ext}') for ext in ZIP_TYPES):
         archives.append(os.path.join(root, file_name))
 
   for archive_path in tqdm(archives, desc=f'Processing "{parent_folder}"'):
