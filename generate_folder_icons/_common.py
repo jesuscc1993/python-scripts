@@ -63,10 +63,10 @@ def process_folder(folder_path, image_filenames):
   else:
     logger.debug(f'No suitable image found in "{folder_path}"')
 
-def png_to_ico(image_path, ico_path):
+def png_to_ico(image_path, icon_path, icon_sizes = [ICON_SIZE]):
   try:
-    if os.path.exists(ico_path):
-      os.unlink(ico_path)
+    if os.path.exists(icon_path):
+      os.unlink(icon_path)
 
     with Image.open(image_path) as img:
       if img.width < ICON_SIZE:
@@ -75,7 +75,7 @@ def png_to_ico(image_path, ico_path):
       background = Image.new('RGBA', (ICON_SIZE, ICON_SIZE), (0, 0, 0, 0))
       offset = (int((ICON_SIZE - img.size[0]) / 2), int((ICON_SIZE - img.size[1]) / 2))
       background.paste(img, offset)
-      background.save(ico_path, format='ICO', sizes=[(ICON_SIZE, ICON_SIZE)])
+      background.save(icon_path, format='ICO', sizes=[(s, s) for s in icon_sizes])
   except Exception as ex:
     logger.error(f'Error converting "{image_path}" to ICO: {ex}')
 

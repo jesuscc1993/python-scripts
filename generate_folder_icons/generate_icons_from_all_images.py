@@ -5,7 +5,17 @@ from mtlogger import logger
 
 from _common import png_to_ico, prompt_path
 
-IMAGE_EXTS = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff', '.webp']
+IMAGE_EXTS = [
+  '.avif',
+  '.bmp',
+  '.gif',
+  '.jpeg',
+  '.jpg',
+  '.png',
+  '.tiff',
+  '.webp',
+]
+ICON_SIZES = [16, 32, 48, 256]
 
 def main():
   if len(sys.argv) > 1:
@@ -19,7 +29,7 @@ def main():
       if ext in IMAGE_EXTS:
         image_path = os.path.join(root, image_path)
         ico_path = os.path.join(root, os.path.splitext(image_path)[0] + '.ico')
-        png_to_ico(image_path, ico_path)
+        png_to_ico(image_path, ico_path, ICON_SIZES)
         logger.log(f'Generated "{ico_path}".')
 
 if __name__ == '__main__':
