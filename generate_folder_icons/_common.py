@@ -8,7 +8,8 @@ from _sound_utils import play_notification_sound
 
 DESKTOP_INI_FILENAME = 'desktop.ini'
 ICON_FILENAME = 'icon.ico'
-ICON_SIZE = 256
+MAX_ICON_SIZE = 256
+DEFAULT_ICON_SIZES = [16, 256]
 
 def prompt_path(prompt_message, optional = False):
   path = input(prompt_message).strip(' "\'')
@@ -58,24 +59,24 @@ def process_folder(folder_path, image_filenames):
 
   if image_path:
     ico_path = os.path.join(folder_path, ICON_FILENAME)
-    png_to_ico(image_path, ico_path)
+    image_to_ico(image_path, ico_path)
     set_folder_icon(folder_path)
   else:
     logger.debug(f'No suitable image found in "{folder_path}"')
 
-def png_to_ico(image_path, icon_path, icon_sizes = [ICON_SIZE]):
+def image_to_ico(image_path, icon_path, icon_sizes = DEFAULT_ICON_SIZES):
   try:
     if os.path.exists(icon_path):
       os.unlink(icon_path)
 
     with Image.open(image_path) as img:
-      if img.width < ICON_SIZE:
-        img = img.resize((ICON_SIZE, int(ICON_SIZE * img.height / img.width)), resample=Image.LANCZOS)
-      img.thumbnail((ICON_SIZE, ICON_SIZE), Image.LANCZOS)
-      background = Image.new('RGBA', (ICON_SIZE, ICON_SIZE), (0, 0, 0, 0))
-      offset = (int((ICON_SIZE - img.size[0]) / 2), int((ICON_SIZE - img.size[1]) / 2))
+      if img.width < MAX_ICON_SIZE:
+        img = img.resize((MAX_ICON_SIZE, int(MAX_ICON_SIZE * img.height / img.width)), resample = Image.LANCZOS)
+      img.thumbnail((MAX_ICON_SIZE, MAX_ICON_SIZE), Image.LANCZOS)
+      background = Image.new('RGBA', (MAX_ICON_SIZE, MAX_ICON_SIZE), (0, 0, 0, 0))
+      offset = (int((MAX_ICON_SIZE - img.size[0]) / 2), int((MAX_ICON_SIZE - img.size[1]) / 2))
       background.paste(img, offset)
-      background.save(icon_path, format='ICO', sizes=[(s, s) for s in icon_sizes])
+      background.save(icon_path, format = 'ICO', sizes = [(s, s) for s in icon_sizes])
   except Exception as ex:
     logger.error(f'Error converting "{image_path}" to ICO: {ex}')
 

@@ -3,7 +3,7 @@ import sys
 
 from mtlogger import logger
 
-from _common import png_to_ico, prompt_path
+from _common import image_to_ico, prompt_path
 
 IMAGE_EXTS = [
   '.avif',
@@ -29,7 +29,7 @@ def main():
       if ext in IMAGE_EXTS:
         image_path = os.path.join(root, image_path)
         ico_path = os.path.join(root, os.path.splitext(image_path)[0] + '.ico')
-        png_to_ico(image_path, ico_path, ICON_SIZES)
+        image_to_ico(image_path, ico_path, ICON_SIZES)
         logger.log(f'Generated "{ico_path}".')
 
 if __name__ == '__main__':
