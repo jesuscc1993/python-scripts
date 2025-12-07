@@ -11,7 +11,7 @@ from _sound_utils import play_notification_sound
 VOL_REGEX = r'(Vol(?:ume)?)\.?\s*(\d+(?:\.\d+)?)'
 CH_REGEX  = r'(Ch(?:apter)?|Ep(?:isode)?)\.?\s*(\d+(?:\.\d+)?)'
 
-def select_parent_folder(prompt, callback, options = None):
+def select_parent_folder(prompt, callback, options = {}):
   log_success = options.get('log_success', False)
   loop = options.get('loop', True)
 
