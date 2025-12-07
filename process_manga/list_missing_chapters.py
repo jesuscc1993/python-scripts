@@ -26,10 +26,10 @@ def process_parent_folder(directory):
     return
 
   expected_chapters = set(range(1, max(found_chapters) + 1))
-  missing_chapters = sorted(expected_chapters - found_chapters)
+  missing_chapters = expected_chapters - found_chapters
   if missing_chapters:
     logger.log(f'\nChapters missing in "{directory}":')
-    for ch in missing_chapters:
+    for ch in sorted(missing_chapters):
       logger.log(f' {ch:03d}')
   else:
     logger.log(f'\nNo chapters found missing in "{directory}".')
