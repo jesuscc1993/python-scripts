@@ -14,19 +14,19 @@ def main():
 
 def process_parent_folder(directory):
   pattern = re.compile(r'(?:Ch(?:apter)?|Ep(?:isode)?)\.?\s*(\d+)', re.IGNORECASE)
-  chapters = set()
+  found_chapters = set()
 
   for entry in os.scandir(directory):
-    if entry.is_file() or entry.is_dir():
-      match = pattern.search(entry.name)
-      if match:
-        chapters.add(int(match.group(1)))
+    match = pattern.search(entry.name)
+    if match:
+      found_chapters.add(int(match.group(1)))
 
-  if not chapters:
+  if not found_chapters:
     logger.log('No chapters found.')
     return
 
-  missing_chapters = sorted(set(range(1, max(chapters) + 1)) - chapters)
+  expected_chapters = set(range(1, max(found_chapters) + 1))
+  missing_chapters = sorted(expected_chapters - found_chapters)
   if missing_chapters:
     logger.log(f'\nChapters missing in "{directory}":')
     for ch in missing_chapters:
