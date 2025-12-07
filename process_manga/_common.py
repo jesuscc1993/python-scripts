@@ -11,7 +11,10 @@ from _sound_utils import play_notification_sound
 VOL_REGEX = r'(Vol(?:ume)?)\.?\s*(\d+(?:\.\d+)?)'
 CH_REGEX  = r'(Ch(?:apter)?|Ep(?:isode)?)\.?\s*(\d+(?:\.\d+)?)'
 
-def select_parent_folder(prompt, callback):
+def select_parent_folder(prompt, callback, options = None):
+  log_success = options.get('log_success', False)
+  loop = options.get('loop', True)
+
   parent_folder = input(prompt).strip(' "\'')
   if not parent_folder:
     return
@@ -20,8 +23,14 @@ def select_parent_folder(prompt, callback):
   else:
     callback(parent_folder)
     play_notification_sound()
+
+  if log_success:
     logger.log(f'Finished processing "{parent_folder}".\n')
-  select_parent_folder(prompt, callback)
+
+  if loop:
+    select_parent_folder(prompt, callback)
+  else:
+    input('')
 
 def process_folder_images(folder_path, callback):
   files_to_process = []

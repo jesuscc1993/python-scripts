@@ -10,7 +10,11 @@ def main():
   if len(sys.argv) > 1:
     process_parent_folder(sys.argv[1])
   else:
-    select_parent_folder('Enter the path to the parent folder containing the chapter folders:\n', process_parent_folder)
+    select_parent_folder(
+      'Enter the path to the parent folder containing the chapter folders:\n',
+      process_parent_folder,
+      { 'log_success': False, 'loop': False }
+    )
 
 def process_parent_folder(directory):
   pattern = re.compile(r'(?:Ch(?:apter)?|Ep(?:isode)?)\.?\s*(\d+)', re.IGNORECASE)
@@ -22,7 +26,7 @@ def process_parent_folder(directory):
       found_chapters.add(int(match.group(1)))
 
   if not found_chapters:
-    logger.log('No chapters found.')
+    logger.log('No chapters found in "{directory}".')
     return
 
   expected_chapters = set(range(1, max(found_chapters) + 1))
