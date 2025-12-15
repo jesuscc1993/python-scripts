@@ -12,9 +12,13 @@ from _common import BAK_EXTENSION, select_parent_folder
 
 output_ext = f'.{IMAGE_OUTPUT_FORMAT.lower()}'
 
+root_dir = sys.argv[1] if len(sys.argv) > 1 else None
+lossless = sys.argv[2].lower() == 'true' if len(sys.argv) > 2 else IMAGE_OUTPUT_LOSSLESS_COMPRESSION
+quality = int(sys.argv[3]) if len(sys.argv) > 3 else IMAGE_OUTPUT_QUALITY
+
 def main():
-  if len(sys.argv) > 1:
-    compress_child_images(sys.argv[1])
+  if root_dir:
+    compress_child_images(root_dir)
   else:
     select_parent_folder(
       'Enter the path to the parent folder containing the images you want to compress:\n',
@@ -46,14 +50,14 @@ def compress_image(file_path):
     with Image.open(backup_path) as img:
       if output_ext == WEBP_EXTENSION:
         if img.width > WEBP_DIMENSION_LIMIT or img.height > WEBP_DIMENSION_LIMIT:
-          logger.warn(f'Skipping "{file_path}" as the image\'s dimensions  ({img.width}px x {img.height}px) exceed WebP\'s limit of {WEBP_DIMENSION_LIMIT}px.')
+          logger.warn(f'Skipping "{file_path}" as the image\'s dimensions ({img.width}px x {img.height}px) exceed WebP\'s limit of {WEBP_DIMENSION_LIMIT}px.')
           return
 
       img.save(
         output_path,
         IMAGE_OUTPUT_FORMAT,
-        lossless = IMAGE_OUTPUT_LOSSLESS_COMPRESSION,
-        quality = 100 if IMAGE_OUTPUT_LOSSLESS_COMPRESSION else IMAGE_OUTPUT_QUALITY
+        lossless = lossless,
+        quality = 100 if lossless else quality
       )
 
     if os.path.exists(output_path) and os.path.getsize(output_path) < os.path.getsize(backup_path):
