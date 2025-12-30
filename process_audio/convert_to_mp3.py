@@ -3,7 +3,9 @@ import os
 import sys
 import subprocess
 
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from mtlogger import logger
+from tqdm import tqdm
 
 AUDIO_EXTS = [
   '.aac',
@@ -23,19 +25,44 @@ def main():
   parent_path = sys.argv[1] if len(sys.argv) > 1 else prompt_path('Enter the folder path to process:\n')
   bitrate = sys.argv[2] if len(sys.argv) > 2 else MP3_BITRATE
 
+  files_to_convert = []
   for root, _, filenames in os.walk(parent_path):
     for og_filename in filenames:
       ext = os.path.splitext(og_filename)[1].lower()
       if ext in AUDIO_EXTS:
         new_filename = os.path.splitext(og_filename)[0] + MP3_EXT
-        input_path = os.path.join(root, og_filename)
-        output_path = os.path.join(root, new_filename)
-        try:
-          convert_to_mp3(input_path, output_path, bitrate)
-          os.remove(input_path)
-          logger.log(f'Converted "{og_filename}" to "{new_filename}".')
-        except Exception as ex:
-          logger.error(f'Failed to convert "{input_path}": {ex}')
+
+        files_to_convert.append((
+          os.path.join(root, og_filename),
+          os.path.join(root, new_filename),
+          og_filename,
+          new_filename
+        ))
+
+  with ThreadPoolExecutor() as executor:
+    futures = [
+      executor.submit(
+        worker,
+        input_path,
+        output_path,
+        og_filename,
+        new_filename,
+        bitrate
+      )
+      for input_path, output_path, og_filename, new_filename in files_to_convert
+    ]
+    for _ in tqdm(as_completed(futures), total = len(futures), desc = "Converting files to MP3"):
+      pass
+
+  tqdm.write("Finished converting files to MP3.")
+
+def worker(input_path, output_path, og_filename, new_filename, bitrate):
+  try:
+    convert_to_mp3(input_path, output_path, bitrate)
+    os.remove(input_path)
+    tqdm.write(f'Converted "{og_filename}" to "{new_filename}".')
+  except Exception as ex:
+    tqdm.write(f'Failed to convert "{input_path}": {ex}')
 
 def convert_to_mp3(input_path, output_path, bitrate):
   result = subprocess.run(
