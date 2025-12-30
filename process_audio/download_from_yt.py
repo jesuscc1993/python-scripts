@@ -13,20 +13,24 @@ YTDL_OPTIONS = {
 }
 
 def main():
-  video_url = sys.argv[1] if len(sys.argv) > 1 else prompt_video()
+  youtube_url = sys.argv[1] if len(sys.argv) > 1 else prompt_url()
   output_path = sys.argv[2] if len(sys.argv) > 2 else os.path.join(os.getcwd(), 'output')
 
-  download_video(output_path, video_url)
+  download_from_yt(output_path, youtube_url)
 
-def prompt_video():
+def prompt_url():
   return input('Enter a YouTube video/playlist URL/ID: ').strip()
 
-def download_video(output_path, video_url):
-  with YoutubeDL({
-    **YTDL_OPTIONS,
-    'outtmpl': os.path.join(output_path, '%(title)s.%(ext)s')
-  }) as ydl:
-    ydl.download([video_url])
+def download_from_yt(output_path, youtube_url):
+  try:
+    with YoutubeDL({
+      **YTDL_OPTIONS,
+      'outtmpl': os.path.join(output_path, '%(title)s.%(ext)s')
+    }) as ydl:
+      ydl.download([youtube_url])
+      print('Download complete.')
+  except Exception as e:
+    logger.error(f'Download failed: {e}')
 
 if __name__ == '__main__':
   try:

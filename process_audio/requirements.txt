@@ -1,1 +1,2 @@
+spotdl
 yt_dlp
