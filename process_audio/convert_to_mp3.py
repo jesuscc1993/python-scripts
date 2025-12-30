@@ -30,6 +30,7 @@ def main():
         output_path = os.path.join(root, os.path.splitext(audio_file)[0] + '.mp3')
         try:
           convert_to_mp3(input_path, output_path, bitrate)
+          os.remove(input_path)
           logger.log(f'Converted "{input_path}" to "{output_path}".')
         except Exception as ex:
           logger.error(f'Failed to convert "{input_path}": {ex}')
