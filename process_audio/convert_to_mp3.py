@@ -35,15 +35,19 @@ def main():
           logger.error(f'Failed to convert "{input_path}": {ex}')
 
 def convert_to_mp3(input_path, output_path, bitrate):
-  cmd = [
-    'ffmpeg',
-    '-y',
-    '-i', input_path,
-    '-codec:a', 'libmp3lame',
-    '-b:a', bitrate,
-    output_path
-  ]
-  result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+  result = subprocess.run(
+    [
+      'ffmpeg',
+      '-i', input_path,
+      '-b:a', bitrate,
+      '-codec:a', 'libmp3lame',
+      '-map', 'a',
+      '-y',
+      output_path
+    ],
+    stdout = subprocess.PIPE,
+    stderr = subprocess.PIPE
+  )
   if result.returncode != 0:
     raise RuntimeError(result.stderr.decode('utf-8'))
 
