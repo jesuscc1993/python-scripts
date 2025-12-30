@@ -17,21 +17,23 @@ AUDIO_EXTS = [
   '.wma',
 ]
 MP3_BITRATE = '320k'
+MP3_EXT = '.mp3'
 
 def main():
   parent_path = sys.argv[1] if len(sys.argv) > 1 else prompt_path('Enter the folder path to process:\n')
   bitrate = sys.argv[2] if len(sys.argv) > 2 else MP3_BITRATE
 
-  for root, _, files in os.walk(parent_path):
-    for audio_file in files:
-      ext = os.path.splitext(audio_file)[1].lower()
+  for root, _, filenames in os.walk(parent_path):
+    for og_filename in filenames:
+      ext = os.path.splitext(og_filename)[1].lower()
       if ext in AUDIO_EXTS:
-        input_path = os.path.join(root, audio_file)
-        output_path = os.path.join(root, os.path.splitext(audio_file)[0] + '.mp3')
+        new_filename = os.path.splitext(og_filename)[0] + MP3_EXT
+        input_path = os.path.join(root, og_filename)
+        output_path = os.path.join(root, new_filename)
         try:
           convert_to_mp3(input_path, output_path, bitrate)
           os.remove(input_path)
-          logger.log(f'Converted "{input_path}" to "{output_path}".')
+          logger.log(f'Converted "{og_filename}" to "{new_filename}".')
         except Exception as ex:
           logger.error(f'Failed to convert "{input_path}": {ex}')
 
