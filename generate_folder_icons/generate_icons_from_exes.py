@@ -13,7 +13,7 @@ ICON_KEY = 'IconResource'
 INI_FILENAME = 'desktop.ini'
 SHELL_SECTION = '.ShellClassInfo'
 
-EXE_EXCLUSION_PATTERNS = [r'unins.*', r'CrashHandler.*', r'EOSBootstrapper.*']
+EXE_EXCLUSION_PATTERNS = [r'unins', r'CrashHandler', r'EOSBootstrapper']
 
 def main():
   if len(sys.argv) > 1:
@@ -56,7 +56,7 @@ def find_exe(folder):
 
   for dirpath, _, filenames in os.walk(folder):
     for f in filenames:
-      if f.lower().endswith('.exe') and not pattern.match(f):
+      if f.lower().endswith('.exe') and not pattern.search(f):
         return os.path.join(dirpath, f)
   return None
 
