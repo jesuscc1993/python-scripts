@@ -1,12 +1,12 @@
 import os
 import re
-import shutil
 import sys
-import winsound
 
 from concurrent.futures import ThreadPoolExecutor
 from mtlogger import logger
 from tqdm import tqdm
+
+from _common import select_parent_folder, process_file
 
 PROTOCOL_MAP = {
   'com.epicgames.launcher': 'Epic Games'
@@ -18,30 +18,15 @@ def main():
   else:
     select_parent_folder('Enter the path to the parent folder containing the files you want to group:\n', process_parent_folder)
 
-def select_parent_folder(prompt, callback):
-  parent_folder = input(prompt).strip(' "\'')
-  if not parent_folder:
-    return
-  if not os.path.isdir(parent_folder):
-    logger.error(f'The specified path "{parent_folder}" is not a directory.')
-  else:
-    callback(parent_folder)
-    play_notification_sound()
-    logger.log(f'Finished processing "{parent_folder}".\n')
-  select_parent_folder(prompt, callback)
-
-def play_notification_sound():
-  winsound.MessageBeep(winsound.MB_ICONASTERISK)
-
 def process_parent_folder(root_dir):
   files_to_process = []
 
   for item in os.listdir(root_dir):
     src = os.path.join(root_dir, item)
-    if os.path.isfile(src) and src.lower().endswith('.url'):
-      client_name = get_client_name(src)
-      if client_name:
-        output_path = os.path.join(root_dir, client_name)
+    if should_process_item(src):
+      group_name = get_group_name(item)
+      if group_name:
+        output_path = os.path.join(root_dir, group_name)
         if not os.path.exists(output_path):
           os.makedirs(output_path)
         files_to_process.append((src, output_path))
@@ -50,7 +35,10 @@ def process_parent_folder(root_dir):
     for _ in executor.map(process_file, files_to_process):
       progress.update(1)
 
-def get_client_name(url_file):
+def should_process_item(item_path):
+  return os.path.isfile(item_path) and item_path.lower().endswith('.url')
+
+def get_group_name(url_file):
   try:
     with open(url_file, 'r', encoding='utf-8') as f:
       for line in f:
@@ -65,11 +53,6 @@ def get_client_name(url_file):
   except Exception as e:
     logger.error(f'Failed to read {url_file}: {e}')
   return None
-
-def process_file(params):
-  src, target_folder = params
-  dest = os.path.join(target_folder, os.path.basename(src))
-  shutil.move(src, dest)
 
 if __name__ == '__main__':
   try:
