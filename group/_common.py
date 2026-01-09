@@ -5,6 +5,8 @@ import winsound
 
 from mtlogger import logger
 
+FILE_BLACKLIST = ['desktop.ini']
+
 def select_parent_folder(prompt, callback):
   parent_folder = input(prompt).strip(' "\'')
   if not parent_folder:
