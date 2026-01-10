@@ -6,7 +6,13 @@ from concurrent.futures import ThreadPoolExecutor
 from mtlogger import logger
 from tqdm import tqdm
 
-from _common import FILE_BLACKLIST, select_parent_folder, process_file
+from _common import select_parent_folder, process_file
+
+FILE_BLACKLIST = [
+  r'desktop.ini',
+  r'.*\.url',
+  r'.*\.lnk'
+]
 
 def main():
   if len(sys.argv) > 1:
@@ -32,7 +38,14 @@ def process_parent_folder(root_dir):
       progress.update(1)
 
 def should_process_item(item_path):
-  return os.path.isfile(item_path) and os.path.basename(item_path) not in FILE_BLACKLIST
+  if not os.path.isfile(item_path):
+    return False
+
+  for pattern in FILE_BLACKLIST:
+    if re.fullmatch(pattern, os.path.basename(item_path)):
+      return False
+
+  return True
 
 def get_group_name(filename):
   name = re.sub(r'\[[^\]]*\]|\{[^\}]*\}', '', filename)
