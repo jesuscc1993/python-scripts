@@ -11,8 +11,9 @@ from mtlogger import logger
 JPEG_FORMAT = 'JPEG'
 JPEG_QUALITY = 100
 TARGET_NAME = 'folder.jpg'
-TARGET_HEIGHT = 168
-TARGET_WIDTH = 256
+RESIZE_HEIGHT = 168
+RESIZE_WIDTH = 294
+CROP_SIZE = 256
 
 COVER_URL_MAP = {
   'capsule': 'https://cdn.cloudflare.steamstatic.com/steam/apps/{}/capsule_616x353.jpg',
@@ -70,12 +71,25 @@ def process_folder(folder_path, folder_name, cover_url, override_existing):
   if response.status_code == 200:
     img = Image.open(BytesIO(response.content))
 
-    new_scale = max(TARGET_WIDTH / img.width, TARGET_HEIGHT / img.height)
+    new_scale = max(RESIZE_WIDTH / img.width, RESIZE_HEIGHT / img.height)
     new_width = int(img.width * new_scale)
     new_height = int(img.height * new_scale)
 
     resized_img = img.resize((new_width, new_height), Image.LANCZOS)
-    resized_img.save(cover_path, JPEG_FORMAT, quality = JPEG_QUALITY)
+
+    x0 = 0
+    y0 = 0
+    x1 = new_width
+    y1 = new_height
+    if new_width > CROP_SIZE:
+      x0 = (new_width - CROP_SIZE) // 2
+      x1 = x0 + CROP_SIZE
+    if new_height > CROP_SIZE:
+      y0 = (new_height - CROP_SIZE) // 2
+      y1 = y0 + CROP_SIZE
+    cropped_img = resized_img.crop((x0, y0, x1, y1))
+    cropped_img.save(cover_path, JPEG_FORMAT, quality = JPEG_QUALITY)
+
     logger.log(f'Generated cover image for game ID {folder_name}.')
   else:
     logger.error(f'Could not download image for game ID {folder_name} (status code {response.status_code}).')
