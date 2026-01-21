@@ -10,7 +10,7 @@ from _sound_utils import play_notification_sound
 
 NUM_REGEX = r'\.?\s*(\d+(?:\.\d+)?)'
 VOL_REGEX = rf'(?:Vol(?:ume)?){NUM_REGEX}'
-CH_REGEX  = rf'(?:Ch(?:ap)(?:ter)?|Ep(?:isode)?){NUM_REGEX}'
+CH_REGEX  = rf'(?:Ch(?:ap(?:ter)?)?|Ep(?:isode)?){NUM_REGEX}'
 
 def select_parent_folder(prompt, callback, options = {}):
   log_success = options.get('log_success', False)
