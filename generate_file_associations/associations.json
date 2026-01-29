@@ -74,6 +74,10 @@
       "types": ["apk", "iso", "jar"]
     },
     {
+      "type_name": "Package File",
+      "types": ["pak", "pkg", "ucas", "utoc"]
+    },
+    {
       "fallback_icon": "_plain_text",
       "shell": [
         {
