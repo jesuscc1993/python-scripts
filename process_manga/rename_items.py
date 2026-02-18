@@ -6,7 +6,7 @@ from concurrent.futures import ThreadPoolExecutor
 from mtlogger import logger
 from tqdm import tqdm
 
-from _common import exit_with_prompt, print_error
+from _common import VOLUME_REGEX, CHAPTER_REGEX, exit_with_prompt, print_error
 from _sound_utils import play_notification_sound
 
 def main():
@@ -16,7 +16,7 @@ def main():
     prompt_parent_folder()
 
 def prompt_parent_folder():
-  parent_folder = input('Enter the path to the image you want to rename:\n')
+  parent_folder = input('Enter the path to the parent folder containing the chapter folders you want to rename:\n')
   if not parent_folder:
     return
   if not os.path.isdir(parent_folder):
@@ -42,8 +42,8 @@ def process_item(root, item_name):
 
 def get_processed_name(name):
   new_name = re.sub(r'\s+', ' ', name)
-  new_name = re.sub(r'\b(chapter|ch)\b\.*\s*', 'Ch.', new_name, flags = re.IGNORECASE)
-  new_name = re.sub(r'\b(volume|vol)\b\.*\s*', 'Vol.', new_name, flags = re.IGNORECASE)
+  new_name = re.sub(rf'\b({CHAPTER_REGEX})\b\.?\s*', 'Ch.', new_name, flags = re.IGNORECASE)
+  new_name = re.sub(rf'\b({VOLUME_REGEX})\b\.?\s*', 'Vol.', new_name, flags = re.IGNORECASE)
   return new_name
 
 if __name__ == '__main__':

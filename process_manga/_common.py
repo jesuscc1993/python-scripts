@@ -8,9 +8,11 @@ from tqdm import tqdm
 from _image_utils import is_image_file
 from _sound_utils import play_notification_sound
 
-NUM_REGEX = r'\.?\s*(\d+(?:\.\d+)?)'
-VOL_REGEX = rf'(?:Vol(?:ume)?){NUM_REGEX}'
-CH_REGEX  = rf'(?:Ch(?:ap(?:ter)?)?|Ep(?:isode)?){NUM_REGEX}'
+NUMBER_REGEX = r'\.?\s*(\d+(?:\.\d+)?)'
+VOLUME_REGEX = r'Vol(?:ume)?'
+CHAPTER_REGEX = r'Ch(?:ap(?:ter)?)?|Ep(?:isode)?'
+VOLUME_NUMBER_REGEX = rf'(?:{VOLUME_REGEX}){NUMBER_REGEX}'
+CHAPTER_NUMBER_REGEX  = rf'(?:{CHAPTER_REGEX}){NUMBER_REGEX}'
 
 def select_parent_folder(prompt, callback, options = {}):
   log_success = options.get('log_success', False)
@@ -56,14 +58,14 @@ def delete_empty_folders(folder_path):
         pass
 
 def get_volume_and_chapter(filename):
-  vol_match = re.search(VOL_REGEX, filename, re.IGNORECASE)
-  ch_match  = re.search(CH_REGEX, filename, re.IGNORECASE)
+  vol_match = re.search(VOLUME_NUMBER_REGEX, filename, re.IGNORECASE)
+  ch_match  = re.search(CHAPTER_NUMBER_REGEX, filename, re.IGNORECASE)
   volume  = vol_match.group(1) if vol_match else None
   chapter = ch_match.group(1) if ch_match else None
   return (volume, chapter)
 
 def get_chapter(filename):
-  ch_match = re.search(CH_REGEX, filename, re.IGNORECASE)
+  ch_match = re.search(CHAPTER_NUMBER_REGEX, filename, re.IGNORECASE)
   chapter = ch_match.group(1) if ch_match else None
   return chapter
 
