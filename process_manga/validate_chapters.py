@@ -26,7 +26,7 @@ def process_parent_folder(directory):
       found_chapters.add(float(chapter))
 
     if entry.is_dir():
-      process_chapter_folder(entry.path)
+      process_chapter_folder(entry.path, chapter)
 
   if not found_chapters:
     logger.log(f'No chapters found in "{directory_name}".')
@@ -42,7 +42,7 @@ def process_parent_folder(directory):
   else:
     logger.log(f'\nNo chapters found missing in "{directory}".')
 
-def process_chapter_folder(directory):
+def process_chapter_folder(directory, chapter):
   directory_name = os.path.basename(directory)
   pattern = re.compile(r'(\d+)', re.IGNORECASE)
   found_pages = set()
@@ -54,14 +54,14 @@ def process_chapter_folder(directory):
         found_pages.add(float(match.group(1)))
 
   if not found_pages:
-    logger.log(f'- All pages missing in "{directory_name}".')
+    logger.log(f'- [Ch.{chapter}] All pages missing.')
     return
 
   expected_pages = set(range(1, int(max(found_pages)) + 1))
   missing_pages = expected_pages - found_pages
   if missing_pages:
     logger.log(
-      f'- {len(missing_pages)} pages missing in "{directory_name}": '
+      f'- [Ch.{chapter}] {len(missing_pages)} page(s) missing: '
       f'{" ".join(f"{p:02d}" for p in sorted(missing_pages))}'
     )
 
