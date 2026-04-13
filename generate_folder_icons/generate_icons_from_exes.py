@@ -13,7 +13,13 @@ ICON_KEY = 'IconResource'
 INI_FILENAME = 'desktop.ini'
 SHELL_SECTION = '.ShellClassInfo'
 
-EXE_EXCLUSION_PATTERNS = [r'unins', r'CrashHandler', r'EOSBootstrapper']
+EXE_EXCLUSION_PATTERNS = [
+  r'CrashHandler',
+  r'EOSBootstrapper',
+  r'ModManager',
+  r'Updat',
+  r'Unins'
+]
 
 def main():
   if len(sys.argv) > 1:
