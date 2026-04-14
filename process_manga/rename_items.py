@@ -41,9 +41,22 @@ def process_item(root, item_name):
     os.rename(old_path, new_path)
 
 def get_processed_name(name):
-  new_name = re.sub(r'\s+', ' ', name)
-  new_name = re.sub(rf'\b({CHAPTER_REGEX})\b\.?\s*', 'Ch.', new_name, flags = re.IGNORECASE)
-  new_name = re.sub(rf'\b({VOLUME_REGEX})\b\.?\s*', 'Vol.', new_name, flags = re.IGNORECASE)
+  new_name = re.sub(r'\s+', ' ', name).strip()
+
+  new_name = re.sub(
+    rf'\b({CHAPTER_REGEX})\b\.?\s*(\d+)',
+    lambda match: f'Ch.{int(match.group(2)):03}',
+    new_name,
+    flags = re.IGNORECASE
+  )
+
+  new_name = re.sub(
+    rf'\b({VOLUME_REGEX})\b\.?\s*(\d+)',
+    lambda match: f'Vol.{int(match.group(2)):02}',
+    new_name,
+    flags = re.IGNORECASE
+  )
+
   return new_name
 
 if __name__ == '__main__':
