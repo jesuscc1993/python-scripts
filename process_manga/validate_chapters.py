@@ -20,7 +20,7 @@ def process_parent_folder(directory):
   directory_name = os.path.basename(directory)
   found_chapters = set()
 
-  for entry in os.scandir(directory):
+  for entry in sorted(os.scandir(directory), key = get_sort_key):
     chapter = get_chapter(entry.name)
     if chapter:
       found_chapters.add(float(chapter))
@@ -37,13 +37,12 @@ def process_parent_folder(directory):
   if missing_chapters:
     logger.log(
       f'\nChapters missing in "{directory_name}": '
-      f'{" ".join(f"{ch:03d}" for ch in sorted(missing_chapters))}'
+      f'{" ".join(format_chapter(ch) for ch in sorted(missing_chapters))}'
     )
   else:
     logger.log(f'\nNo chapters found missing in "{directory}".')
 
 def process_chapter_folder(directory, chapter):
-  directory_name = os.path.basename(directory)
   pattern = re.compile(r'(\d+)', re.IGNORECASE)
   found_pages = set()
 
@@ -54,16 +53,24 @@ def process_chapter_folder(directory, chapter):
         found_pages.add(float(match.group(1)))
 
   if not found_pages:
-    logger.log(f'- [Ch.{chapter}] All pages missing.')
+    logger.log(f'- [Ch.{format_chapter(chapter)}] All pages missing.')
     return
 
   expected_pages = set(range(1, int(max(found_pages)) + 1))
   missing_pages = expected_pages - found_pages
   if missing_pages:
     logger.log(
-      f'- [Ch.{chapter}] {len(missing_pages)} page(s) missing: '
+      f'- [Ch.{format_chapter(chapter)}] {len(missing_pages):02d} page(s) missing: '
       f'{" ".join(f"{p:02d}" for p in sorted(missing_pages))}'
     )
+
+def get_sort_key(entry):
+  chapter = get_chapter(entry.name)
+  return (0, float(chapter)) if chapter is not None else (1, entry.name.lower())
+
+def format_chapter(chapter):
+  integer, dot, decimal = f'{float(chapter):g}'.partition('.')
+  return f'{int(integer):03d}{dot}{decimal}'
 
 if __name__ == '__main__':
   try:
