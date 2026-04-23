@@ -1,4 +1,5 @@
 import os
+import subprocess
 import sys
 
 from mtlogger import LogLevel, logger
@@ -78,6 +79,11 @@ def process_parent_folder(parent_folder, chapter_ranges):
 
   play_notification_sound()
   logger.log(f'Finished processing "{parent_folder}".\n')
+
+  merge_input = input('Merge volumes? (y)/n\n').strip().lower()
+  if merge_input != 'n':
+    merge_script = os.path.join(os.path.dirname(__file__), 'merge_volumes.py')
+    subprocess.run([sys.executable, merge_script, parent_folder], check = True)
 
 if __name__ == '__main__':
   try:

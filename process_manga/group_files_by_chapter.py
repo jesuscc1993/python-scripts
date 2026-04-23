@@ -8,6 +8,7 @@ from mtlogger import LogLevel, logger
 from tqdm import tqdm
 
 from _common import exit_with_prompt, get_chapter, print_error, select_parent_folder
+from _sound_utils import play_notification_sound
 
 def main():
   if len(sys.argv) > 1:
@@ -15,26 +16,29 @@ def main():
   else:
     select_parent_folder('Enter the path to the folder containing the files you want to group by chapter:\n', process_parent_folder)
 
-def process_parent_folder(root_dir):
+def process_parent_folder(parent_folder):
   files_to_process = []
 
-  for item in os.listdir(root_dir):
-    item_path = os.path.join(root_dir, item)
+  for item in os.listdir(parent_folder):
+    item_path = os.path.join(parent_folder, item)
     if os.path.isfile(item_path):
       chapter = get_chapter(item)
       if not chapter:
         tqdm.write(logger.format(LogLevel.WARN, f'Skipping "{item}". Chapter number could not be inferred.'))
         continue
 
-      output_path = os.path.join(root_dir, f'Ch.{chapter.zfill(2)}')
+      output_path = os.path.join(parent_folder, f'Ch.{chapter.zfill(2)}')
       if not os.path.exists(output_path):
         os.makedirs(output_path)
 
       files_to_process.append((item_path, output_path, chapter))
 
-  with ThreadPoolExecutor() as executor, tqdm(total = len(files_to_process), desc = f'Processing "{root_dir}"') as progress:
+  with ThreadPoolExecutor() as executor, tqdm(total = len(files_to_process), desc = f'Processing "{parent_folder}"') as progress:
     for _ in executor.map(process_file, files_to_process):
       progress.update(1)
+
+  play_notification_sound()
+  logger.log(f'Finished processing "{parent_folder}".\n')
 
 def process_file(params):
   src, target_folder, chapter = params
