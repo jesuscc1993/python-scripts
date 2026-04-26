@@ -45,12 +45,19 @@ def compress_child_folders(parent_folder, output_type = ZIP_TYPES[0], depth = 1)
         folders.append(folder_path)
 
   if len(folders) > 0:
-    with ThreadPoolExecutor() as executor:
-      list(tqdm(
-        executor.map(lambda folder: compress_folder(folder, output_type), folders),
-        total = len(folders),
-        desc = f'Processing "{parent_folder}"'
-      ))
+    tmp_dir = os.path.join(parent_folder, '.tmp')
+    os.makedirs(tmp_dir, exist_ok = True)
+    subprocess.call(['attrib', '+H', str(tmp_dir)])
+
+    try:
+      with ThreadPoolExecutor() as executor:
+        list(tqdm(
+          executor.map(lambda folder: compress_folder(folder, output_type), folders),
+          total = len(folders),
+          desc = f'Processing "{parent_folder}"'
+        ))
+    finally:
+      shutil.rmtree(tmp_dir, ignore_errors = True)
 
 def compress_folder(folder_path, output_type):
   folder_name = os.path.basename(folder_path)
@@ -73,9 +80,6 @@ def compress_folder(folder_path, output_type):
         files.append(os.path.join(root, file))
 
     if len(files) > 0:
-      os.makedirs(tmp_dir, exist_ok = True)
-      subprocess.call(['attrib', '+H', str(tmp_dir)])
-
       with zipfile.ZipFile(tmp_zip_path, 'w', zipfile.ZIP_DEFLATED) as compressed_file:
         for file_path in files:
           compressed_file.write(file_path, os.path.relpath(file_path, folder_path))
@@ -85,9 +89,6 @@ def compress_folder(folder_path, output_type):
 
   except Exception as ex:
     logger.error(f'An error occurred while processing "{folder_name}": {ex}')
-
-  finally:
-    shutil.rmtree(tmp_dir, ignore_errors = True)
 
 def extract_child_archives(parent_folder):
   archives = []
