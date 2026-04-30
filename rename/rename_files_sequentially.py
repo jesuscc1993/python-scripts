@@ -1,26 +1,17 @@
 import os
 
+from _common import process_items
 from mtlogger import logger
-from natsort import natsorted
 
 def main():
   parent_dir = input('Enter the path to the folder containing your files:\n').strip(' "\'')
+  print()
+
+  name_pattern = input('Enter the name pattern pattern (optional; use $ for number interpolation):\n').strip() or '$'
+  print()
 
   items = [f for f in os.listdir(parent_dir) if os.path.isfile(os.path.join(parent_dir, f)) and not f.startswith('.')]
-  items = natsorted(items)
-
-  total_items = len(items)
-  num_digits = len(str(total_items))
-
-  for index, old_name in enumerate(items, start = 1):
-    file_extension = os.path.splitext(old_name)[1]
-    new_name = f'{str(index).zfill(num_digits)}{file_extension}'
-    old_path = os.path.join(parent_dir, old_name)
-    new_path = os.path.join(parent_dir, new_name)
-
-    os.rename(old_path, new_path)
-    logger.log(f'Renamed "{old_name}" to "{new_name}".')
-  logger.log(f'\nFinished processing "{parent_dir}".')
+  process_items(parent_dir, items, name_pattern)
 
 if __name__ == '__main__':
   try:
