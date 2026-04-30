@@ -1,12 +1,13 @@
 import os
 
 from mtlogger import logger
+from natsort import natsorted
 
 def main():
   parent_dir = input('Enter the path to the folder containing your folders:\n').strip(' "\'')
 
   items = [f for f in os.listdir(parent_dir) if os.path.isdir(os.path.join(parent_dir, f)) and not f.startswith('.')]
-  items.sort()
+  items = natsorted(items)
 
   total_items = len(items)
   num_digits = len(str(total_items))
