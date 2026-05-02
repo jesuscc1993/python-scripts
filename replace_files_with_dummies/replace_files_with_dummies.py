@@ -17,7 +17,7 @@ def main():
     pattern = re.compile(input('Enter the pattern files need to match (regex):\n').strip(' "\''))
     process_files(parent_folder, pattern)
     play_notification_sound()
-    logger.log(f'Finished processing "{parent_folder}".\n')
+    logger.info(f'Finished processing "{parent_folder}".\n')
   main()
 
 def process_files(parent_folder, pattern):

@@ -55,7 +55,7 @@ def main():
         continue
 
   play_notification_sound()
-  logger.log(f'Finished setting icons for "{parent_path}".')
+  logger.info(f'Finished setting icons for "{parent_path}".')
 
 def find_exe(folder):
   pattern = re.compile('|'.join(EXE_EXCLUSION_PATTERNS), re.IGNORECASE)

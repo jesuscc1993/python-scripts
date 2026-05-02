@@ -78,7 +78,7 @@ def process_parent_folder(parent_folder, chapter_ranges):
         break
 
   play_notification_sound()
-  logger.log(f'Finished processing "{parent_folder}".\n')
+  logger.info(f'Finished processing "{parent_folder}".\n')
 
   merge_input = input('Merge volumes? (y)/n\n').strip().lower()
   if merge_input != 'n':

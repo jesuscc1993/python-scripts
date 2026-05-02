@@ -14,7 +14,7 @@ def select_parent_folder(prompt, callback):
   else:
     callback(parent_folder)
     play_notification_sound()
-    logger.log(f'Finished processing "{parent_folder}".\n')
+    logger.info(f'Finished processing "{parent_folder}".\n')
   select_parent_folder(prompt, callback)
 
 def play_notification_sound():

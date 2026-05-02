@@ -38,7 +38,7 @@ def process_parent_folder(parent_folder):
       progress.update(1)
 
   play_notification_sound()
-  logger.log(f'Finished processing "{parent_folder}".\n')
+  logger.info(f'Finished processing "{parent_folder}".\n')
 
 def process_file(params):
   src, target_folder, chapter = params

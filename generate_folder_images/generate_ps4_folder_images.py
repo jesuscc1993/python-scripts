@@ -40,7 +40,7 @@ def download_game_cover(game_id, folder_path):
 
   img = Image.open(BytesIO(image_response.content))
   save_resized_image(img, folder_path)
-  logger.log(f'Successfully processed game ID {game_id}.')
+  logger.info(f'Successfully processed game ID {game_id}.')
 
 if __name__ == '__main__':
   try:

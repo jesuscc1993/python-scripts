@@ -46,7 +46,7 @@ def process_folder(folder_path):
       else:
         open(file_path, 'w').close()
         os.system(f'attrib +h "{file_path}"')
-        logger.log(f'Successfully created hidden file "{file_path}".')
+        logger.info(f'Successfully created hidden file "{file_path}".')
 
     except Exception as ex:
       logger.error(f'Could not create "{filename}": {ex}')

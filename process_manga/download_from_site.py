@@ -31,7 +31,7 @@ def main():
   logger.log()
 
   play_notification_sound()
-  logger.log(f'Finished downloading from "{base_url}".\n')
+  logger.info(f'Finished downloading from "{base_url}".\n')
   main()
 
 def download_all_chapters(base_url, css_selector, chapter_count):

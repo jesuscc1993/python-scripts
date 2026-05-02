@@ -29,18 +29,18 @@ def process_parent_folder(directory):
       process_chapter_folder(entry.path, chapter)
 
   if not found_chapters:
-    logger.log(f'No chapters found in "{directory_name}".')
+    logger.info(f'No chapters found in "{directory_name}".')
     return
 
   expected_chapters = set(range(1, int(max(found_chapters)) + 1))
   missing_chapters = expected_chapters - found_chapters
   if missing_chapters:
-    logger.log(
+    logger.warn(
       f'\nChapters missing in "{directory_name}": '
       f'{" ".join(format_chapter(ch) for ch in sorted(missing_chapters))}'
     )
   else:
-    logger.log(f'\nNo chapters found missing in "{directory}".')
+    logger.info(f'\nNo chapters found missing in "{directory}".')
 
 def process_chapter_folder(directory, chapter):
   pattern = re.compile(r'(\d+)', re.IGNORECASE)

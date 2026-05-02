@@ -18,7 +18,7 @@ def main():
 
   rename_and_copy_files(src_path, dest_path, matches_only)
 
-  logger.log(f'Finished copying "{src_path}" to "{dest_path}".\n')
+  logger.info(f'Finished copying "{src_path}" to "{dest_path}".\n')
   main()
 
 def rename_and_copy_files(src_path, dest_path, matches_only):

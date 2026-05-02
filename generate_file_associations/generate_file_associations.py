@@ -66,7 +66,7 @@ def main():
 
       logger.log(f'Saved registry key "HKEY_CLASSES_ROOT\\{file_type}" for extension "HKEY_CLASSES_ROOT\\.{ext}".\n')
 
-  logger.log('Registry entries saved successfully.')
+  logger.info('Registry entries saved successfully.')
 
 def get_associations():
   with open(ASSOCIATIONS_JSON, 'r') as associations:
