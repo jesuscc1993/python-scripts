@@ -53,13 +53,13 @@ def process_chapter_folder(directory, chapter):
         found_pages.add(float(match.group(1)))
 
   if not found_pages:
-    logger.log(f'- [Ch.{format_chapter(chapter)}] All pages missing.')
+    logger.warn(f'- [Ch.{format_chapter(chapter)}] All pages missing.')
     return
 
   expected_pages = set(range(1, int(max(found_pages)) + 1))
   missing_pages = expected_pages - found_pages
   if missing_pages:
-    logger.log(
+    logger.warn(
       f'- [Ch.{format_chapter(chapter)}] {len(missing_pages):02d} page(s) missing: '
       f'{" ".join(f"{p:02d}" for p in sorted(missing_pages))}'
     )

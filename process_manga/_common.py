@@ -73,4 +73,4 @@ def print_error(error):
   logger.error(f'An unexpected error occurred: {error}')
 
 def exit_with_prompt():
-  input('Press Enter to exit...')
+  input('\nPress Enter to exit...')
