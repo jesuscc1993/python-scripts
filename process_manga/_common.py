@@ -1,5 +1,6 @@
 import os
 import re
+import subprocess
 
 from concurrent.futures import ThreadPoolExecutor
 from mtlogger import logger
@@ -68,6 +69,13 @@ def get_chapter(filename):
   ch_match = re.search(CHAPTER_NUMBER_REGEX, filename, re.IGNORECASE)
   chapter = ch_match.group(1) if ch_match else None
   return chapter
+
+def run_scripts_in_sequence(script_names, parent_folder):
+  for script in script_names:
+    abs_path = os.path.abspath(os.path.join(os.path.dirname(__file__), script + '.py'))
+
+    logger.log(f'\nRunning {script}:')
+    subprocess.run(['python', abs_path, parent_folder])
 
 def print_error(error):
   logger.error(f'An unexpected error occurred: {error}')

@@ -3,7 +3,7 @@ import subprocess
 
 from mtlogger import logger
 
-from _common import exit_with_prompt, print_error, select_parent_folder
+from _common import exit_with_prompt, print_error, select_parent_folder, run_scripts_in_sequence
 
 SCRIPT_NAMES = [
   '../compress/extract_archives',
@@ -13,11 +13,7 @@ SCRIPT_NAMES = [
 ]
 
 def process_parent_folder(parent_folder):
-  for script in SCRIPT_NAMES:
-    abs_path = os.path.abspath(os.path.join(os.path.dirname(__file__), script + '.py'))
-
-    logger.log(f'\nRunning {script}:')
-    subprocess.run(['python', abs_path, parent_folder])
+  run_scripts_in_sequence(SCRIPT_NAMES, parent_folder)
 
 if __name__ == '__main__':
   try:
