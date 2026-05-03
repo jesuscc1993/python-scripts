@@ -16,6 +16,7 @@ VOLUME_NUMBER_REGEX = rf'(?:{VOLUME_REGEX}){NUMBER_REGEX}'
 CHAPTER_NUMBER_REGEX  = rf'(?:{CHAPTER_REGEX}){NUMBER_REGEX}'
 
 def select_parent_folder(prompt, callback, options = {}):
+  prompt = prompt or 'Enter the path to the parent folder you want to process:\n'
   log_success = options.get('log_success', False)
   loop = options.get('loop', True)
 
@@ -76,6 +77,8 @@ def run_scripts_in_sequence(script_names, parent_folder):
 
     logger.log(f'\nRunning {script}:')
     subprocess.run(['python', abs_path, parent_folder])
+
+  logger.info(f'\nFinished batch running scripts on "{parent_folder}".\n')
 
 def print_error(error):
   logger.error(f'An unexpected error occurred: {error}')

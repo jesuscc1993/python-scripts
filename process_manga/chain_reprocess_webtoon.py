@@ -1,6 +1,8 @@
 from _common import exit_with_prompt, print_error, select_parent_folder, run_scripts_in_sequence
 
 SCRIPT_NAMES = [
+  '../compress/extract_archives',
+  'crop_webtoon',
   '../compress/compress_folders'
 ]
 
@@ -9,7 +11,7 @@ def process_parent_folder(parent_folder):
 
 if __name__ == '__main__':
   try:
-    select_parent_folder('Enter the path to the parent folder containing the folders you want to compress:\n', process_parent_folder)
+    select_parent_folder(None, process_parent_folder)
   except Exception as ex:
     print_error(ex)
     exit_with_prompt()
