@@ -2,6 +2,8 @@ import json
 import os
 import requests
 
+from natsort import natsorted
+
 from _env import steam_api_key, steam_user_id
 
 OUTPUT_PATH = './output'
@@ -13,7 +15,7 @@ WITH_STATS = None
 
 def main():
   games = get_owned_games(steam_api_key, steam_user_id)
-  filtered_app_ids = sorted(game['appid'] for game in games if filter_game(game))
+  filtered_app_ids = natsorted(game['appid'] for game in games if filter_game(game))
 
   os.makedirs(OUTPUT_PATH, exist_ok = True)
   with open(OUTPUT_FILE, 'w') as f:
