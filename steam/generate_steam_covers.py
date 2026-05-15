@@ -6,6 +6,7 @@ import winsound
 from PIL import Image
 from io import BytesIO
 from mtlogger import logger
+from natsort import natsorted
 
 # settings
 JPEG_FORMAT = 'JPEG'
@@ -49,7 +50,7 @@ def prompt_params():
 def generate_covers(parent_folder, cover_type, override_existing):
   cover_url = COVER_URL_MAP.get(cover_type)
 
-  for folder_name in os.listdir(parent_folder):
+  for folder_name in natsorted(os.listdir(parent_folder)):
     folder_path = os.path.join(parent_folder, folder_name)
 
     if os.path.isdir(folder_path) and folder_name.isdigit():
@@ -60,9 +61,10 @@ def generate_covers(parent_folder, cover_type, override_existing):
 
 def process_folder(folder_path, folder_name, cover_url, override_existing):
   cover_path = os.path.join(folder_path, TARGET_NAME)
+  formatted_name = folder_name.rjust(7)
 
   if os.path.exists(cover_path) and not override_existing:
-    logger.debug(f'Skipping {folder_name}. A {TARGET_NAME} file is already contained within.')
+    logger.debug(f'[{formatted_name}] SKIPPED: {TARGET_NAME} already exists.')
     return
 
   image_url = cover_url.format(folder_name)
@@ -90,9 +92,9 @@ def process_folder(folder_path, folder_name, cover_url, override_existing):
     cropped_img = resized_img.crop((x0, y0, x1, y1))
     cropped_img.save(cover_path, JPEG_FORMAT, quality = JPEG_QUALITY)
 
-    logger.log(f'Generated cover image for game ID {folder_name}.')
+    logger.log(f'[{formatted_name}] SUCCESS: Generated cover image for game ID.')
   else:
-    logger.error(f'Could not download image for game ID {folder_name} (status code {response.status_code}).')
+    logger.error(f'[{formatted_name}] FAILED:  Could not download image for game ID (status code {response.status_code}).')
 
 def play_notification_sound():
   winsound.MessageBeep(winsound.MB_ICONASTERISK)
