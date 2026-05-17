@@ -50,7 +50,7 @@ def extract_subtitles(src_file_path, dest_file_path, file_name):
   cmd = [
     'ffmpeg',
     '-i', src_file_path,
-    '-map', f'0:s:m:language:{LANGUAGE}?',
+    '-map', f'0:s:m:language:{LANGUAGE}:0?',
     dest_file_path
   ]
   subprocess.run(cmd, stdout = subprocess.DEVNULL, stderr = subprocess.DEVNULL)
