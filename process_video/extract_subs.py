@@ -1,4 +1,5 @@
 import os
+import re
 import subprocess
 import sys
 
@@ -51,6 +52,7 @@ def extract_subtitles(src_file_path, dest_file_path, file_name):
     'ffmpeg',
     '-i', src_file_path,
     '-map', f'0:s:m:language:{LANGUAGE}:0?',
+    '-c:s', 'srt',
     dest_file_path
   ]
   subprocess.run(cmd, stdout = subprocess.DEVNULL, stderr = subprocess.DEVNULL)
@@ -60,7 +62,23 @@ def extract_subtitles(src_file_path, dest_file_path, file_name):
     os.rmdir(os.path.dirname(dest_file_path))
     logger.warn(f' No {LANGUAGE} subtitles found for "{file_name}". Removed empty subtitle file.')
   else:
+    strip_html_tags(dest_file_path)
+    preemptively_fix_issues(dest_file_path)
     logger.log(f'Extracted {LANGUAGE} subtitles for "{file_name}".')
+
+def strip_html_tags(file_path):
+  with open(file_path, 'r', encoding = 'utf-8', errors = 'replace') as f:
+    content = f.read()
+  content = re.sub(r'<[^>]+>', '', content)
+  with open(file_path, 'w', encoding = 'utf-8') as f:
+    f.write(content)
+
+def preemptively_fix_issues(file_path):
+  with open(file_path, 'r', encoding = 'utf-8', errors = 'replace') as f:
+    content = f.read()
+  content = re.sub(r'((?:[,!?;:])|(?:(?<!\.)\.(?!\.)))([^\s\d\'"\)\]\-])', r'\1 \2', content)
+  with open(file_path, 'w', encoding = 'utf-8') as f:
+    f.write(content)
 
 def prompt_path(prompt_message, optional = False):
   path = input(prompt_message).strip(' "\'')
