@@ -2,19 +2,17 @@ import re
 
 from functools import partial
 from mtlogger import logger
-from pathlib import Path
+
+from _common import prompt_path
 
 def main():
-  srt_file = input('Enter the path to an SRT file:\n').strip(' "')
-
-  if not Path(srt_file).exists():
-    logger.error(f'File not found: "{srt_file}".')
-    exit(1)
+  srt_file = prompt_path('Enter the path to an SRT file:\n')
 
   try:
-    shift = int(input('\nEnter milliseconds to shift (*/-):\n'))
+    shift = int(input('Enter milliseconds to shift (*/-):\n'))
   except ValueError:
     logger.error('\nPlease enter a valid integer')
+    return
 
   shift_subtitles(srt_file, shift)
 
