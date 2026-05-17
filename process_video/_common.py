@@ -1,8 +1,8 @@
+import os
 import re
 import sys
 
 from mtlogger import logger
-from pathlib import Path
 
 # problematic with things like ?!, ..., etc.
 def add_missing_spaces(file_path):
@@ -21,7 +21,7 @@ def strip_tags_from_subs_file(file_path):
 
 def prompt_path(prompt_message, optional = False):
   path = input(prompt_message).strip(' "\'')
-  if not Path(path).exists():
+  if not os.path.exists(path):
     logger.error(f'The specified path "{path}" does not exist.')
     if not optional: sys.exit(1)
     return None
