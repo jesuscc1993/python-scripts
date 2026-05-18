@@ -1,7 +1,7 @@
 import os
 import sys
 
-from _common import prompt_path, strip_tags_from_subs_file
+from _common import add_missing_spaces, prompt_path, strip_tags_from_subs_file
 from mtlogger import logger
 
 SUBTITLE_EXT = '.srt'
@@ -25,18 +25,12 @@ def process_file(file_path):
 
   dest_file_path = file_path
   strip_tags_from_subs_file(dest_file_path)
+  add_missing_spaces(dest_file_path)
   logger.log(f'Fixed subtitles for "{file_name}".')
 
 def process_directory(dir_path):
   for file_name in os.listdir(dir_path):
     process_file(os.path.join(dir_path, file_name))
-
-def _main():
-  try:
-    main()
-  except Exception as ex:
-    logger.error(f'An unexpected error occurred: {ex}')
-  input('Press Enter to exit...')
 
 if __name__ == '__main__':
   try:

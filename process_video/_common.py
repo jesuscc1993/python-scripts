@@ -4,11 +4,10 @@ import sys
 
 from mtlogger import logger
 
-# problematic with things like ?!, ..., etc.
 def add_missing_spaces(file_path):
   with open(file_path, 'r', encoding = 'utf-8', errors = 'replace') as f:
     content = f.read()
-  content = re.sub(r'((?:[,!?;:])|(?:(?<!\.)\.(?!\.)))([^\s\d\'"\)\]\-<])', r'\1 \2', content)
+  content = re.sub(r'(?<=[a-záéíóúüñ])([.,;:!?]+)([A-ZÁÉÍÓÚÜÑ])', r'\1 \2', content)
   with open(file_path, 'w', encoding = 'utf-8') as f:
     f.write(content)
 
