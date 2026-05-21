@@ -12,9 +12,11 @@ from _common import BAK_EXTENSION, select_parent_folder
 
 output_ext = f'.{IMAGE_OUTPUT_FORMAT.lower()}'
 
+# arg 1
 root_dir = sys.argv[1] if len(sys.argv) > 1 else None
-lossless = sys.argv[2].lower() == 'true' if len(sys.argv) > 2 else IMAGE_OUTPUT_LOSSLESS_COMPRESSION
-quality = int(sys.argv[3]) if len(sys.argv) > 3 else IMAGE_OUTPUT_QUALITY
+# arg 2
+lossless = sys.argv[2].lower() == 'lossless' if len(sys.argv) > 2 else IMAGE_OUTPUT_LOSSLESS_COMPRESSION
+quality = int(sys.argv[2]) if len(sys.argv) > 2 and not lossless else IMAGE_OUTPUT_QUALITY
 
 def main():
   if root_dir:
