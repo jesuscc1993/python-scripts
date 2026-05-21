@@ -5,6 +5,8 @@ JPG_EXTENSION = '.jpg'
 PNG_EXTENSION = '.png'
 WEBP_EXTENSION = '.webp'
 
+LOSSLESS = 'lossless'
+
 FILE_EXCLUSIONS = ['folder.jpg', 'cover.jpg']
 WEBP_DIMENSION_LIMIT = 16383
 

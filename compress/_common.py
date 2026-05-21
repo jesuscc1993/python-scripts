@@ -7,24 +7,10 @@ from concurrent.futures import ThreadPoolExecutor
 from mtlogger import logger
 from tqdm import tqdm
 
-from _sound_utils import play_notification_sound
-
 BAK_TYPE = 'BAK'
 ZIP_TYPES = ['ZIP', 'CBR', 'CBZ']
 
 BAK_EXTENSION = f'.{BAK_TYPE.lower()}'
-
-def select_parent_folder(prompt, callback):
-  parent_folder = input(prompt).strip(' "\'')
-  if not parent_folder:
-    return
-  if not os.path.isdir(parent_folder):
-    logger.error(f'The specified path "{parent_folder}" is not a directory.')
-  else:
-    callback(parent_folder)
-    play_notification_sound()
-    logger.info(f'Finished processing "{parent_folder}".\n')
-  select_parent_folder(prompt, callback)
 
 def compress_child_folders(parent_folder, output_type = ZIP_TYPES[0], depth = 1):
   if depth < 1:

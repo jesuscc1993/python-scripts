@@ -1,33 +1,28 @@
 import os
 import sys
+import winsound
 
 from PIL import Image
 from concurrent.futures import ThreadPoolExecutor
 from mtlogger import logger
+from mtprompt import Prompt
 from tqdm import tqdm
 
-from _image_utils import WEBP_DIMENSION_LIMIT, WEBP_EXTENSION, is_image_file
+from _image_utils import LOSSLESS, WEBP_DIMENSION_LIMIT, WEBP_EXTENSION, is_image_file
 from _settings import IMAGE_OUTPUT_FORMAT, IMAGE_OUTPUT_LOSSLESS_COMPRESSION, IMAGE_OUTPUT_QUALITY
-from _common import BAK_EXTENSION, select_parent_folder
+from _common import BAK_EXTENSION
 
 output_ext = f'.{IMAGE_OUTPUT_FORMAT.lower()}'
 
-# arg 1
-root_dir = sys.argv[1] if len(sys.argv) > 1 else None
-# arg 2
-lossless = sys.argv[2].lower() == 'lossless' if len(sys.argv) > 2 else IMAGE_OUTPUT_LOSSLESS_COMPRESSION
-quality = int(sys.argv[2]) if len(sys.argv) > 2 and not lossless else IMAGE_OUTPUT_QUALITY
-
 def main():
-  if root_dir:
-    compress_child_images(root_dir)
-  else:
-    select_parent_folder(
-      'Enter the path to the parent folder containing the images you want to compress:\n',
-      compress_child_images
-    )
+  root_dir = sys.argv[1] if len(sys.argv) > 1 else Prompt.dir('Enter the path to the directory containing the images you want to compress:')
+  lossless = sys.argv[2].lower() == LOSSLESS if len(sys.argv) > 2 else IMAGE_OUTPUT_LOSSLESS_COMPRESSION
+  quality = int(sys.argv[2]) if len(sys.argv) > 2 and not lossless else IMAGE_OUTPUT_QUALITY
 
-def compress_child_images(root_dir):
+  compress_child_images(root_dir, lossless, quality)
+  logger.info(f'Successfully compressed images in "{root_dir}".')
+
+def compress_child_images(root_dir, lossless, quality):
   files_to_process = []
 
   for root, _, files in os.walk(root_dir):
@@ -38,10 +33,10 @@ def compress_child_images(root_dir):
         files_to_process.append(file_path)
 
   with ThreadPoolExecutor() as executor, tqdm(total = len(files_to_process), desc = f'Processing "{root_dir}"') as progress:
-    for _ in executor.map(compress_image, files_to_process):
+    for _ in executor.map(lambda file_path: compress_image(file_path, lossless, quality), files_to_process):
       progress.update(1)
 
-def compress_image(file_path):
+def compress_image(file_path, lossless, quality):
   try:
     name, ext = os.path.splitext(file_path)
     backup_path = f'{name}{BAK_EXTENSION}{ext.lower()}'
@@ -76,4 +71,6 @@ if __name__ == '__main__':
     main()
   except Exception as ex:
     logger.error(f'An unexpected error occurred: {ex}')
-    input('Press Enter to exit...')
+
+  winsound.MessageBeep()
+  Prompt.enterToExit()
