@@ -1,7 +1,9 @@
 import os
 
-from _common import process_items
 from mtlogger import logger
+from mtprompt import Prompt
+
+from _common import process_items
 
 def main():
   parent_dir = input('Enter the path to the folder containing your files:\n').strip(' "\'')
@@ -17,5 +19,5 @@ if __name__ == '__main__':
   try:
     main()
   except Exception as ex:
-    logger.error(f'An unexpected error occurred: {ex}')
-  input('Press Enter to exit...')
+    logger.unhandledError(ex)
+  Prompt.enterToExit()

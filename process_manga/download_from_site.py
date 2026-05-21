@@ -1,14 +1,13 @@
 import os
+import winsound
 import requests
 import urllib
 
 from bs4 import BeautifulSoup
 from concurrent.futures import ThreadPoolExecutor
 from mtlogger import logger
+from mtprompt import Prompt
 from tqdm import tqdm
-
-from _common import exit_with_prompt, print_error
-from _sound_utils import play_notification_sound
 
 def main():
   base_url = input('Enter the url to download from (replace chapter with a %s placeholder):\n').strip(' "\'')
@@ -30,7 +29,7 @@ def main():
   download_all_chapters(base_url, css_selector, chapter_count)
   logger.log()
 
-  play_notification_sound()
+  winsound.MessageBeep()
   logger.info(f'Finished downloading from "{base_url}".\n')
   main()
 
@@ -79,5 +78,5 @@ if __name__ == '__main__':
   try:
     main()
   except Exception as ex:
-    print_error(ex)
-    exit_with_prompt()
+    logger.unhandledError(ex)
+    Prompt.enterToExit()

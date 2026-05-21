@@ -1,13 +1,13 @@
 import os
 import re
 import subprocess
+import winsound
 
 from concurrent.futures import ThreadPoolExecutor
 from mtlogger import logger
 from tqdm import tqdm
 
 from _image_utils import is_image_file
-from _sound_utils import play_notification_sound
 
 NUMBER_REGEX = r'\.?\s*(\d+(?:\.\d+)?)'
 VOLUME_REGEX = r'Vol(?:ume)?'
@@ -27,7 +27,7 @@ def select_parent_folder(prompt, callback, options = {}):
     logger.error(f'The specified path "{parent_folder}" is not a directory.')
   else:
     callback(parent_folder)
-    play_notification_sound()
+    winsound.MessageBeep()
 
   if log_success:
     logger.info(f'Finished processing "{parent_folder}".\n')
@@ -79,9 +79,3 @@ def run_scripts_in_sequence(script_names, parent_folder):
     subprocess.run(['python', abs_path, parent_folder])
 
   logger.info(f'\nFinished batch running scripts on "{parent_folder}".\n')
-
-def print_error(error):
-  logger.error(f'An unexpected error occurred: {error}')
-
-def exit_with_prompt():
-  input('\nPress Enter to exit...')

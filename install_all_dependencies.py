@@ -1,6 +1,8 @@
 import os
 import subprocess
 
+from mtprompt import Prompt
+
 REQUIREMENTS_FILE = 'requirements.txt'
 
 def main():
@@ -14,5 +16,5 @@ if __name__ == '__main__':
   try:
     main()
   except Exception as ex:
-    print(f'[ERROR] An unexpected error occurred: {ex}')
-  input('\nPress Enter to exit...')
+    print(f'Unhandled error:  {ex}')
+  Prompt.enterToExit()

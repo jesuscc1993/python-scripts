@@ -6,6 +6,7 @@ import winsound
 from PIL import Image
 from io import BytesIO
 from mtlogger import logger
+from mtprompt import Prompt
 from natsort import natsorted
 
 # settings
@@ -56,7 +57,7 @@ def generate_covers(parent_folder, cover_type, override_existing):
     if os.path.isdir(folder_path) and folder_name.isdigit():
       process_folder(folder_path, folder_name, cover_url, override_existing)
 
-  play_notification_sound()
+  winsound.MessageBeep()
   logger.log('\nFinished generating cover images.')
 
 def process_folder(folder_path, folder_name, cover_url, override_existing):
@@ -96,12 +97,9 @@ def process_folder(folder_path, folder_name, cover_url, override_existing):
   else:
     logger.error(f'[{formatted_name}] FAILED:  Could not download image for game ID (status code {response.status_code}).')
 
-def play_notification_sound():
-  winsound.MessageBeep(winsound.MB_ICONASTERISK)
-
 if __name__ == '__main__':
   try:
     main()
   except Exception as ex:
-    logger.error(f'An unexpected error occurred: {ex}')
-  input('Press Enter to exit...')
+    logger.unhandledError(ex)
+  Prompt.enterToExit()

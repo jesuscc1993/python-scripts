@@ -35,7 +35,7 @@ def process_parent_folder(process_folder):
         continue
       process_folder(item_path)
 
-  winsound.MessageBeep(winsound.MB_ICONASTERISK)
+  winsound.MessageBeep()
   logger.info(f'Finished generating icons.')
 
 def save_resized_image(img, folder_path):

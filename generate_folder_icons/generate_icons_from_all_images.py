@@ -2,6 +2,7 @@ import os
 import sys
 
 from mtlogger import logger
+from mtprompt import Prompt
 
 from _common import image_to_ico, prompt_path
 
@@ -36,5 +37,5 @@ if __name__ == '__main__':
   try:
     main()
   except Exception as ex:
-    logger.error(f'An unexpected error occurred: {ex}')
-  input('Press Enter to exit...')
+    logger.unhandledError(ex)
+  Prompt.enterToExit()

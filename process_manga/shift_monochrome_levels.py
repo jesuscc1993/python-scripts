@@ -2,8 +2,10 @@ import numpy
 import sys
 
 from PIL import Image
+from mtlogger import logger
+from mtprompt import Prompt
 
-from _common import exit_with_prompt, print_error, process_folder_images, select_parent_folder
+from _common import process_folder_images, select_parent_folder
 
 SCAN_AREA = 0.8
 BLACK_THRESHOLD = 51
@@ -64,5 +66,5 @@ if __name__ == '__main__':
   try:
     main()
   except Exception as ex:
-    print_error(ex)
-    exit_with_prompt()
+    logger.unhandledError(ex)
+    Prompt.enterToExit()

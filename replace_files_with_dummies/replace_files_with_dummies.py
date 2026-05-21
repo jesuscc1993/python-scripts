@@ -1,11 +1,11 @@
 import os
 import re
+import winsound
 
 from concurrent.futures import ThreadPoolExecutor
 from mtlogger import logger
+from mtprompt import Prompt
 from tqdm import tqdm
-
-from _sound_utils import play_notification_sound
 
 def main():
   parent_folder = input('Enter the path to the parent folder containing the files:\n').strip(' "\'')
@@ -16,7 +16,7 @@ def main():
   else:
     pattern = re.compile(input('Enter the pattern files need to match (regex):\n').strip(' "\''))
     process_files(parent_folder, pattern)
-    play_notification_sound()
+    winsound.MessageBeep()
     logger.info(f'Finished processing "{parent_folder}".\n')
   main()
 
@@ -41,5 +41,5 @@ if __name__ == '__main__':
   try:
     main()
   except Exception as ex:
-    logger.error(f'An unexpected error occurred: {ex}')
-    input('Press Enter to exit...')
+    logger.unhandledError(ex)
+    Prompt.enterToExit()

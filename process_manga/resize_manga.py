@@ -2,8 +2,9 @@ import sys
 
 from PIL import Image
 from mtlogger import logger
+from mtprompt import Prompt
 
-from _common import exit_with_prompt, print_error, process_folder_images, select_parent_folder
+from _common import process_folder_images, select_parent_folder
 from _image_utils import image_needs_resizing, is_image_optimally_compressed, resize_image, save_image_to_path
 
 def main():
@@ -34,5 +35,5 @@ if __name__ == '__main__':
   try:
     main()
   except Exception as ex:
-    print_error(ex)
-    exit_with_prompt()
+    logger.unhandledError(ex)
+    Prompt.enterToExit()

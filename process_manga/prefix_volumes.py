@@ -1,12 +1,13 @@
 import os
 import subprocess
 import sys
+import winsound
 
 from mtlogger import LogLevel, logger
+from mtprompt import Prompt
 from tqdm import tqdm
 
-from _common import exit_with_prompt, get_chapter, print_error
-from _sound_utils import play_notification_sound
+from _common import get_chapter
 
 def main():
   if len(sys.argv) > 1:
@@ -60,8 +61,8 @@ def process_parent_folder(parent_folder, chapter_ranges):
   for folder in tqdm(folders, desc=f'Processing "{parent_folder}"'):
     chapter = get_chapter(folder)
     if not chapter:
-        tqdm.write(logger.format(LogLevel.WARN, f'Skipping "{folder}". Chapter number could not be inferred.'))
-        continue
+      tqdm.write(logger.format(LogLevel.WARN, f'Skipping "{folder}". Chapter number could not be inferred.'))
+      continue
     try:
       ch_num = float(chapter)
     except ValueError:
@@ -77,7 +78,7 @@ def process_parent_folder(parent_folder, chapter_ranges):
         os.rename(old_path, new_path)
         break
 
-  play_notification_sound()
+  winsound.MessageBeep()
   logger.info(f'Finished processing "{parent_folder}".\n')
 
   merge_input = input('Merge volumes? (y)/n\n').strip().lower()
@@ -89,5 +90,5 @@ if __name__ == '__main__':
   try:
     main()
   except Exception as ex:
-    print_error(ex)
-    exit_with_prompt()
+    logger.unhandledError(ex)
+    Prompt.enterToExit()

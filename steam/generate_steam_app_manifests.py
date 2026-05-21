@@ -3,6 +3,7 @@ import re
 import requests
 
 from mtlogger import logger
+from mtprompt import Prompt
 from pathlib import Path
 
 from _env import steam_api_key, steam_user_id
@@ -87,5 +88,5 @@ if __name__ == '__main__':
   try:
     main()
   except Exception as ex:
-    logger.error(f'An unexpected error occurred: {ex}')
-  input('Press Enter to exit...')
+    logger.unhandledError(ex)
+  Prompt.enterToExit()

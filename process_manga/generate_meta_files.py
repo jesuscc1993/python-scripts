@@ -1,11 +1,10 @@
 import os
 import sys
+import winsound
 
 from concurrent.futures import ThreadPoolExecutor
 from mtlogger import logger
-
-from _common import exit_with_prompt, print_error
-from _sound_utils import play_notification_sound
+from mtprompt import Prompt
 
 META_FILES = ['.noxml', '.nomedia']
 
@@ -23,8 +22,6 @@ def prompt_parent_folder():
     logger.error(f'The specified path "{parent_folder}" is not a directory.')
   else:
     process_parent_folder(parent_folder)
-    play_notification_sound()
-    exit_with_prompt()
 
 def process_parent_folder(parent_folder):
   folders_to_process = [parent_folder]
@@ -55,5 +52,7 @@ if __name__ == '__main__':
   try:
     main()
   except Exception as ex:
-    print_error(ex)
-    exit_with_prompt()
+    logger.unhandledError(ex)
+
+  winsound.MessageBeep()
+  Prompt.enterToExit()

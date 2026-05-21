@@ -1,6 +1,7 @@
 import winreg
 
 from mtlogger import logger
+from mtprompt import Prompt
 
 IMAGE_EXTENSIONS = [
   'bmp',
@@ -35,5 +36,5 @@ if __name__ == '__main__':
   try:
     main()
   except Exception as ex:
-    logger.error(f'An unexpected error occurred: {ex}')
-  input('\nPress Enter to exit...')
+    logger.unhandledError(ex)
+  Prompt.enterToExit()

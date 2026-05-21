@@ -5,6 +5,7 @@ import os
 from PIL import Image, ImageDraw
 from collections import Counter
 from mtlogger import logger
+from mtprompt import Prompt
 
 SQUARE_SIZE = 40
 MIN_COLS = 4
@@ -62,5 +63,5 @@ if __name__ == '__main__':
   try:
     main()
   except Exception as ex:
-    logger.error(f'An unexpected error occurred: {ex}')
-  input('Press Enter to exit...')
+    logger.unhandledError(ex)
+  Prompt.enterToExit()

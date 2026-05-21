@@ -6,6 +6,7 @@ from PIL import Image
 from bs4 import BeautifulSoup
 from io import BytesIO
 from mtlogger import logger
+from mtprompt import Prompt
 
 from _common import process_parent_folder, save_resized_image
 
@@ -46,5 +47,5 @@ if __name__ == '__main__':
   try:
     main()
   except Exception as ex:
-    logger.error(f'An unexpected error occurred: {ex}')
-  input('Press Enter to exit...')
+    logger.unhandledError(ex)
+  Prompt.enterToExit()

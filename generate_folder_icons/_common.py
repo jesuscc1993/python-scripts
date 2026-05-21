@@ -1,10 +1,9 @@
 import os
 import sys
+import winsound
 
 from PIL import Image
 from mtlogger import logger
-
-from _sound_utils import play_notification_sound
 
 DESKTOP_INI_FILENAME = 'desktop.ini'
 ICON_FILENAME = 'icon.ico'
@@ -46,7 +45,7 @@ def process_parent_folder(parent_folder, depth, image_filenames):
       item_path = os.path.join(root, dir_name)
       process_folder(item_path, image_filenames)
 
-  play_notification_sound()
+  winsound.MessageBeep()
   logger.log(f'\nFinished setting icons for "{parent_folder}".')
 
 def process_folder(folder_path, image_filenames):

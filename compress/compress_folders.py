@@ -18,7 +18,7 @@ if __name__ == '__main__':
   try:
     main()
   except Exception as ex:
-    logger.error(f'An unexpected error occurred: {ex}')
+    logger.unhandledError(ex)
 
   winsound.MessageBeep()
   Prompt.enterToExit()

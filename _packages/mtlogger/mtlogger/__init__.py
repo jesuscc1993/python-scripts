@@ -36,4 +36,7 @@ class Logger:
   def warn(self, msg: str = ''):
     print(self.format(LogLevel.WARN, msg))
 
+  def unhandledError(self, msg: str = ''):
+    print(self.format(LogLevel.ERROR, f'Unhandled error: {msg}'))
+
 logger = Logger()

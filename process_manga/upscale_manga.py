@@ -3,8 +3,9 @@ import subprocess
 import sys
 
 from mtlogger import logger
+from mtprompt import Prompt
 
-from _common import exit_with_prompt, print_error, process_folder_images, select_parent_folder
+from _common import process_folder_images, select_parent_folder
 
 binary_path = os.path.join(os.path.dirname(__file__), 'binaries/realesrgan/realesrgan-ncnn-vulkan.exe')
 
@@ -38,5 +39,5 @@ if __name__ == '__main__':
   try:
     main()
   except Exception as ex:
-    print_error(ex)
-    exit_with_prompt()
+    logger.unhandledError(ex)
+    Prompt.enterToExit()

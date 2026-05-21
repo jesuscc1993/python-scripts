@@ -3,6 +3,7 @@ import ctypes
 import os
 
 from mtlogger import logger
+from mtprompt import Prompt
 
 def main():
   parent_folder = input('Enter the folder path to process:\n').strip(' "\'')
@@ -60,5 +61,5 @@ if __name__ == '__main__':
   try:
     main()
   except Exception as ex:
-    logger.error(f'An unexpected error occurred: {ex}')
-  input('\nPress Enter to exit...')
+    logger.unhandledError(ex)
+  Prompt.enterToExit()

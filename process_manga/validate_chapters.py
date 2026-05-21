@@ -3,8 +3,9 @@ import re
 import sys
 
 from mtlogger import logger
+from mtprompt import Prompt
 
-from _common import get_chapter, exit_with_prompt, print_error, select_parent_folder
+from _common import get_chapter, select_parent_folder
 
 def main():
   if len(sys.argv) > 1:
@@ -76,5 +77,5 @@ if __name__ == '__main__':
   try:
     main()
   except Exception as ex:
-    print_error(ex)
-    exit_with_prompt()
+    logger.unhandledError(ex)
+    Prompt.enterToExit()
