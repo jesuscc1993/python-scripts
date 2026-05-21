@@ -24,12 +24,9 @@ def should_process_item(item_path):
   return True
 
 def get_group_name(filename):
-  name = re.sub(r'\[[^\]]*\]|\{[^\}]*\}', '', filename)
-  if '-' in name:
-    name = name[:name.rfind('-')].strip()
-  name = os.path.splitext(name)[0].strip()
-  name = re.sub(r'\s+', ' ', name)
-  return name
+  parts = re.split(r'(?:-|S\d+)', filename)
+  group_name = parts[0] if len(parts) > 1 else filename
+  return os.path.splitext(group_name)[0].strip()
 
 if __name__ == '__main__':
   try:
