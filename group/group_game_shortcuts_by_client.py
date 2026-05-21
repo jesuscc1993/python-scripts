@@ -13,9 +13,9 @@ PROTOCOL_MAP = {
 }
 
 def main():
-  root_dir = sys.argv[1] if len(sys.argv) > 1 else Prompt.dir('Enter the path to the directory containing the files you want to group:')
+  parent_dir = sys.argv[1] if len(sys.argv) > 1 else Prompt.dir('Enter the path to the directory containing the files you want to group:')
 
-  process_parent_folder(root_dir, should_process_item, get_group_name)
+  process_parent_folder(parent_dir, should_process_item, get_group_name)
 
 def should_process_item(item_path):
   return os.path.isfile(item_path) and item_path.lower().endswith('.url')

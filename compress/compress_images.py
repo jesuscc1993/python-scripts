@@ -15,24 +15,24 @@ from _common import BAK_EXTENSION
 output_ext = f'.{IMAGE_OUTPUT_FORMAT.lower()}'
 
 def main():
-  root_dir = sys.argv[1] if len(sys.argv) > 1 else Prompt.dir('Enter the path to the directory containing the images you want to compress:')
+  parent_dir = sys.argv[1] if len(sys.argv) > 1 else Prompt.dir('Enter the path to the directory containing the images you want to compress:')
   lossless = sys.argv[2].lower() == LOSSLESS if len(sys.argv) > 2 else IMAGE_OUTPUT_LOSSLESS_COMPRESSION
   quality = int(sys.argv[2]) if len(sys.argv) > 2 and not lossless else IMAGE_OUTPUT_QUALITY
 
-  compress_child_images(root_dir, lossless, quality)
-  logger.info(f'Successfully compressed images in "{root_dir}".')
+  compress_child_images(parent_dir, lossless, quality)
+  logger.info(f'Successfully compressed images in "{parent_dir}".')
 
-def compress_child_images(root_dir, lossless, quality):
+def compress_child_images(parent_dir, lossless, quality):
   files_to_process = []
 
-  for root, _, files in os.walk(root_dir):
+  for root, _, files in os.walk(parent_dir):
     for file in files:
       ext = os.path.splitext(file)[1].lower()
       if is_image_file(file) and ext != output_ext:
         file_path = os.path.join(root, file)
         files_to_process.append(file_path)
 
-  with ThreadPoolExecutor() as executor, tqdm(total = len(files_to_process), desc = f'Processing "{root_dir}"') as progress:
+  with ThreadPoolExecutor() as executor, tqdm(total = len(files_to_process), desc = f'Processing "{parent_dir}"') as progress:
     for _ in executor.map(lambda file_path: compress_image(file_path, lossless, quality), files_to_process):
       progress.update(1)
 

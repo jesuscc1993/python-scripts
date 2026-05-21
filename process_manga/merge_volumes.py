@@ -14,18 +14,18 @@ def main():
   else:
     select_parent_folder('Enter the path to the parent folder containing the volume folders you want to merge:\n', process_parent_folder)
 
-def process_parent_folder(root_dir):
+def process_parent_folder(parent_dir):
   files_to_process = []
 
-  for folder in os.listdir(root_dir):
-    folder_path = os.path.join(root_dir, folder)
+  for folder in os.listdir(parent_dir):
+    folder_path = os.path.join(parent_dir, folder)
     if os.path.isdir(folder_path):
       volume, chapter = get_volume_and_chapter(folder)
       if not volume or not chapter:
         tqdm.write(logger.format(LogLevel.WARN, f'Skipping "{folder}". Volume or chapter numbers could not be inferred.'))
         continue
 
-      output_path = os.path.join(root_dir, f'Vol.{volume.zfill(2)}')
+      output_path = os.path.join(parent_dir, f'Vol.{volume.zfill(2)}')
       if not os.path.exists(output_path):
         os.makedirs(output_path)
 
@@ -34,11 +34,11 @@ def process_parent_folder(root_dir):
         if os.path.isfile(src):
           files_to_process.append((src, output_path, get_sanitized_chapter(chapter)))
 
-  with ThreadPoolExecutor() as executor, tqdm(total = len(files_to_process), desc = f'Processing "{root_dir}"') as progress:
+  with ThreadPoolExecutor() as executor, tqdm(total = len(files_to_process), desc = f'Processing "{parent_dir}"') as progress:
     for _ in executor.map(process_file, files_to_process):
       progress.update(1)
 
-  delete_empty_folders(root_dir)
+  delete_empty_folders(parent_dir)
 
 def get_sanitized_chapter(chapter):
   parts = chapter.split('.')
