@@ -11,11 +11,12 @@ from _constants import BINARY_BLACKLIST, ROM_EXTS, BINARY_BY_PLATFORM
 def main():
   binaries_dir = sys.argv[1] if len(sys.argv) > 1 else Prompt.dir('Enter the path to the directory containing the emulator binaries:')
   roms_dir = sys.argv[2] if len(sys.argv) > 2 else Prompt.dir('\nEnter the path to the directory containing the ROMs:')
+  out_dir = sys.argv[3] if len(sys.argv) > 3 else os.path.join(roms_dir, 'shortcuts')
 
   binaries = find_binaries(binaries_dir)
   roms_by_platform = find_roms(roms_dir)
 
-  generate_shortcuts(binaries, roms_by_platform, roms_dir)
+  generate_shortcuts(binaries, roms_by_platform, out_dir)
 
 def find_binaries(binaries_dir):
   binaries = {}
@@ -68,16 +69,16 @@ def find_roms(roms_dir):
 
   return roms_by_platform
 
-def generate_shortcuts(binaries, roms_by_platform, roms_dir):
+def generate_shortcuts(binaries, roms_by_platform, out_dir):
   for platform, roms in roms_by_platform.items():
     binary = find_binary_for_platform(platform, binaries)
     if not binary:
       logger.warn(f'No binary found for platform: {platform}')
       continue
 
-    out_dir = os.path.join(roms_dir, 'shortcuts', platform)
-    os.makedirs(out_dir, exist_ok=True)
-    generate_shortcuts_for_platform(binary, roms, out_dir)
+    platform_out_dir = os.path.join(out_dir, platform)
+    os.makedirs(platform_out_dir, exist_ok=True)
+    generate_shortcuts_for_platform(binary, roms, platform_out_dir)
 
 def find_binary_for_platform(platform, binaries):
   platform_key = platform.lower()
@@ -103,8 +104,9 @@ def generate_shortcuts_for_platform(binary, roms, out_dir):
 
 def generate_rom_shortcut(binary, rom, out_dir):
   try:
-    basename = os.path.splitext(os.path.basename(rom))[0]
-    shortcut_path = os.path.join(out_dir, basename.replace('꞉', '-') + '.lnk')
+    rom_name = os.path.splitext(os.path.basename(rom))[0]
+    rom_name = rom_name.replace('[*]', '').replace('꞉', '-')
+    shortcut_path = os.path.join(out_dir, rom_name + '.lnk')
 
     if Dispatch is not None:
       shell = Dispatch('WScript.Shell')
