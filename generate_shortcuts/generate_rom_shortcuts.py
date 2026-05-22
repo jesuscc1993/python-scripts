@@ -1,4 +1,5 @@
 import os
+import re
 import sys
 import winsound
 
@@ -105,7 +106,8 @@ def generate_shortcuts_for_platform(binary, roms, out_dir):
 def generate_rom_shortcut(binary, rom, out_dir):
   try:
     rom_name = os.path.splitext(os.path.basename(rom))[0]
-    rom_name = rom_name.replace('[*]', '').replace('꞉', '-')
+    # rom_name = re.sub(r'\[.*?\]', '', rom_name)
+    rom_name = rom_name.replace('꞉', '-')
     shortcut_path = os.path.join(out_dir, rom_name + '.lnk')
 
     if Dispatch is not None:
