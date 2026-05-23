@@ -4,8 +4,7 @@ import winsound
 from PIL import Image
 from mtlogger import logger
 
-FOLDER_IMAGE_FILENAME = 'folder.jpg'
-FOLDER_IMAGE_SIZE = 256
+from _constants import FOLDER_IMAGE_FILENAME, FOLDER_IMAGE_SIZE
 
 def process_parent_folder(process_folder):
   parent_folder = input('Enter the path to the parent folder containing the folders you want to generate icons for.\nLeave empty instead to provide and process a single folder instead.\nPARENT_FOLDER: ').strip(' "\'')
@@ -38,6 +37,9 @@ def process_parent_folder(process_folder):
   winsound.MessageBeep()
   logger.info(f'Finished generating icons.')
 
+def resize_image(img, w, h):
+  return img.resize((w, h), Image.LANCZOS)
+
 def save_resized_image(img, folder_path):
   original_width, original_height = img.size
 
@@ -49,7 +51,7 @@ def save_resized_image(img, folder_path):
       new_height = FOLDER_IMAGE_SIZE
       new_width = int((FOLDER_IMAGE_SIZE / original_height) * original_width)
 
-    img = img.resize((new_width, new_height), Image.LANCZOS)
+    img = resize_image(img, new_width, new_height)
 
   if img.mode == 'RGBA':
     background = Image.new('RGBA', img.size, (255, 255, 255, 0))

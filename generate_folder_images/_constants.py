@@ -1,0 +1,7 @@
+JPEG_FORMAT = 'JPEG'
+JPEG_QUALITY = 100
+
+FOLDER_IMAGE_FILENAME = 'folder.jpg'
+FOLDER_IMAGE_W = 256
+FOLDER_IMAGE_H = 168 # 256 in most Windows versions; 168 starting with Windows 11
+FOLDER_IMAGE_SIZE = FOLDER_IMAGE_W

@@ -9,13 +9,19 @@ from mtlogger import logger
 from mtprompt import Prompt
 from natsort import natsorted
 
-# settings
-JPEG_FORMAT = 'JPEG'
-JPEG_QUALITY = 100
-TARGET_NAME = 'folder.jpg'
-RESIZE_HEIGHT = 168
+from _common import resize_image
+from _constants import JPEG_FORMAT, JPEG_QUALITY, FOLDER_IMAGE_FILENAME, FOLDER_IMAGE_H, FOLDER_IMAGE_W
+
+ID_LENGTH = 7
+
+CAPSULE_H = 353
+CAPSULE_W = 616
+
+RESIZE_HEIGHT = FOLDER_IMAGE_H
+# RESIZE_WIDTH = math.ceil(CAPSULE_W * RESIZE_HEIGHT // CAPSULE_H)
 RESIZE_WIDTH = 294
-CROP_SIZE = 256
+
+CROP_SIZE = FOLDER_IMAGE_W
 
 COVER_URL_MAP = {
   'capsule': 'https://cdn.cloudflare.steamstatic.com/steam/apps/{}/capsule_616x353.jpg',
@@ -61,11 +67,11 @@ def generate_covers(parent_folder, cover_type, override_existing):
   logger.log('\nFinished generating cover images.')
 
 def process_folder(folder_path, folder_name, cover_url, override_existing):
-  cover_path = os.path.join(folder_path, TARGET_NAME)
-  formatted_name = folder_name.rjust(7)
+  cover_path = os.path.join(folder_path, FOLDER_IMAGE_FILENAME)
+  formatted_name = folder_name.rjust(ID_LENGTH)
 
   if os.path.exists(cover_path) and not override_existing:
-    logger.debug(f'[{formatted_name}] SKIPPED: {TARGET_NAME} already exists.')
+    logger.debug(f'[{formatted_name}] SKIPPED: {FOLDER_IMAGE_FILENAME} already exists.')
     return
 
   image_url = cover_url.format(folder_name)
@@ -73,29 +79,39 @@ def process_folder(folder_path, folder_name, cover_url, override_existing):
 
   if response.status_code == 200:
     img = Image.open(BytesIO(response.content))
-
-    new_scale = max(RESIZE_WIDTH / img.width, RESIZE_HEIGHT / img.height)
-    new_width = int(img.width * new_scale)
-    new_height = int(img.height * new_scale)
-
-    resized_img = img.resize((new_width, new_height), Image.LANCZOS)
-
-    x0 = 0
-    y0 = 0
-    x1 = new_width
-    y1 = new_height
-    if new_width > CROP_SIZE:
-      x0 = (new_width - CROP_SIZE) // 2
-      x1 = x0 + CROP_SIZE
-    if new_height > CROP_SIZE:
-      y0 = (new_height - CROP_SIZE) // 2
-      y1 = y0 + CROP_SIZE
-    cropped_img = resized_img.crop((x0, y0, x1, y1))
-    cropped_img.save(cover_path, JPEG_FORMAT, quality = JPEG_QUALITY)
+    img = resize_image_to_fill(img, RESIZE_WIDTH, RESIZE_HEIGHT)
+    img = crop_image(img, CROP_SIZE)
+    img.save(cover_path, JPEG_FORMAT, quality = JPEG_QUALITY)
 
     logger.log(f'[{formatted_name}] SUCCESS: Generated cover image for game ID.')
   else:
-    logger.error(f'[{formatted_name}] FAILED:  Could not download image for game ID (status code {response.status_code}).')
+    logger.error(f'[{formatted_name}] FAILED: Could not download image for game ID (status code {response.status_code}).')
+
+def resize_image_to_fill(img, w, h):
+  new_scale = max(w / img.width, h / img.height)
+  new_width = int(img.width * new_scale)
+  new_height = int(img.height * new_scale)
+
+  return resize_image(img, new_width, new_height)
+
+def crop_image(img, crop_size):
+  new_width = img.width
+  new_height = img.height
+
+  x0 = 0
+  y0 = 0
+  x1 = new_width
+  y1 = new_height
+
+  if new_width > crop_size:
+    x0 = (new_width - crop_size) // 2
+    x1 = x0 + crop_size
+
+  if new_height > crop_size:
+    y0 = (new_height - crop_size) // 2
+    y1 = y0 + crop_size
+
+  return img.crop((x0, y0, x1, y1))
 
 if __name__ == '__main__':
   try:
