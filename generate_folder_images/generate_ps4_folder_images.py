@@ -30,7 +30,7 @@ def download_game_cover(game_id, folder_path):
   soup = BeautifulSoup(response.text, 'html.parser')
   image_tag = soup.select_one('.wp-post-image')
   if not (image_tag and 'src' in image_tag.attrs):
-    logger.warn(f' No cover image found for game ID {game_id}.')
+    logger.warn(f'No cover image found for game ID {game_id}.')
     return
 
   image_url = image_tag['src']

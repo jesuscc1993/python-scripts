@@ -52,7 +52,7 @@ def extract_subtitles(src_file_path, dest_file_path, file_name):
   if os.path.exists(dest_file_path):
     if os.path.getsize(dest_file_path) == 0:
       os.remove(dest_file_path)
-      logger.warn(f' No {LANGUAGE} subtitles found for "{file_name}". Removed empty subtitle file.')
+      logger.warn(f'No {LANGUAGE} subtitles found for "{file_name}". Removed empty subtitle file.')
     else:
       strip_tags_from_subs_file(dest_file_path)
       logger.log(f'Extracted {LANGUAGE} subtitles for "{file_name}".')

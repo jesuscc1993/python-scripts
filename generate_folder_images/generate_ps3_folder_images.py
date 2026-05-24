@@ -38,7 +38,7 @@ def download_game_cover(game_id, folder_path):
   soup = BeautifulSoup(response.text, 'html.parser')
   game_link = soup.select_one('.mw-search-result-heading a')
   if not (game_link and 'href' in game_link.attrs):
-    logger.warn(f' No game found for ID {game_id}.')
+    logger.warn(f'No game found for ID {game_id}.')
     return
 
   game_page_url = f'{BASE_URL}{game_link["href"]}'
