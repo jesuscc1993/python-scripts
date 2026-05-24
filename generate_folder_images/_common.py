@@ -1,41 +1,37 @@
 import os
+import sys
 import winsound
 
 from PIL import Image
 from mtlogger import logger
+from mtprompt import Prompt
 
 from _constants import FOLDER_IMAGE_FILENAME, FOLDER_IMAGE_SIZE
 
 def process_parent_folder(process_folder):
-  parent_folder = input('Enter the path to the parent folder containing the folders you want to generate icons for.\nLeave empty instead to provide and process a single folder instead.\nPARENT_FOLDER: ').strip(' "\'')
-
-  if parent_folder == '':
-    target_folder = input('\nEnter the path to the specific folder you want to generate an icon for:\nFOLDER: ')
-
-    if not os.path.isdir(target_folder):
-      logger.error(f'The specified path "{target_folder}" is not a directory.')
-      return
-
-    logger.log()
-    process_folder(target_folder)
-
+  if len(sys.argv) > 1:
+    parent_folder = sys.argv[1]
   else:
-    if not os.path.isdir(parent_folder):
-      logger.error(f'The specified path "{parent_folder}" is not a directory.')
-      return
+    parent_folder = Prompt.dir('Enter the path to the parent folder containing the folders you want to generate icons for.\nLeave empty instead to provide and process a single folder instead.\nPARENT_FOLDER: ', optional=True)
 
-    logger.log()
+    if not parent_folder:
+      target_folder = Prompt.dir('\nEnter the path to the specific folder you want to generate an icon for:\nFOLDER: ')
+
+      logger.log()
+      process_folder(target_folder)
+
+  logger.log('Generating cover images...')
 
   for root, dirs, _ in os.walk(parent_folder):
     for dir_name in dirs:
       item_path = os.path.join(root, dir_name)
       if os.path.exists(os.path.join(item_path, FOLDER_IMAGE_FILENAME)):
-        logger.debug(f'Skipping "{item_path}". "{FOLDER_IMAGE_FILENAME}" is already contained within.')
+        logger.dim(f'  [{dir_name}] "{FOLDER_IMAGE_FILENAME}" already exists.')
         continue
       process_folder(item_path)
 
   winsound.MessageBeep()
-  logger.info(f'Finished generating icons.')
+  logger.log(f'Finished generating cover images.')
 
 def resize_image(img, w, h):
   return img.resize((w, h), Image.LANCZOS)
