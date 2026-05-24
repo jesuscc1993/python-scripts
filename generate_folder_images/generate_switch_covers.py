@@ -34,7 +34,7 @@ def prompt_params():
   parent_folder = input('Enter the path to the parent folder containing your Switch saves:\n').strip(' "\'')
   logger.log()
 
-  override_existing = input('Override existing images? (y|n). Default: n:\n').strip().lower() == 'y'
+  override_existing = input('Override existing images? (y/N):\n').strip().lower() == 'y'
   logger.log()
 
   return parent_folder, override_existing

@@ -81,8 +81,8 @@ def process_parent_folder(parent_folder, chapter_ranges):
   winsound.MessageBeep()
   logger.info(f'Finished processing "{parent_folder}".\n')
 
-  merge_input = input('Merge volumes? (y)/n\n').strip().lower()
-  if merge_input != 'n':
+  merge_input = input('Merge volumes? (Y/n)\n').strip().lower() != 'n'
+  if merge_input:
     merge_script = os.path.join(os.path.dirname(__file__), 'merge_volumes.py')
     subprocess.run([sys.executable, merge_script, parent_folder], check = True)
 

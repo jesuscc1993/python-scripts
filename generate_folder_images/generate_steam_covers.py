@@ -49,7 +49,7 @@ def prompt_params():
   cover_type = input('Enter cover type (capsule, header, or library). Default is capsule:\n').strip().lower() or 'capsule'
   logger.log()
 
-  override_existing = input('Override existing images? (y|n). Default: n:\n').strip().lower() == 'y'
+  override_existing = input('Override existing images? (y/N):\n').strip().lower() == 'y'
   logger.log()
 
   return parent_folder, cover_type, override_existing

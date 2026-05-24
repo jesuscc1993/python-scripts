@@ -11,7 +11,7 @@ def main():
     logger.error(f'The specified path "{parent_folder}" is not a directory.')
     return
 
-  recursive = input('\nRun recursively in subfolders? (y|n). Default: n:\n').strip().lower() == 'y'
+  recursive = input('\nRun recursively in subfolders? (y/N):\n').strip().lower() == 'y'
   process_subfolders(parent_folder, recursive, is_root = True)
 
 def process_subfolders(base_path, recursive, is_root = False):

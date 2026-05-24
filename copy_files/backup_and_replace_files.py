@@ -15,7 +15,7 @@ def main():
   else:
     src_path = prompt_path('Enter the path containing the files to copy:\n')
     dest_path = prompt_path('Enter the path the files will be copied to:\n')
-    matches_only = input('Matches only? (y/n): ').strip().lower() == 'n'
+    matches_only = input('Matches only? (Y/n): ').strip().lower() == 'n'
 
   rename_and_copy_files(src_path, dest_path, matches_only)
 
