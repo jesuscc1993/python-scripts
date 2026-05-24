@@ -40,6 +40,8 @@ def prompt_params():
   return parent_folder, override_existing
 
 def generate_covers(parent_folder, override_existing):
+  logger.log('Generating cover images...')
+
   mapping = load_switch_mapping()
 
   for folder_name in natsorted(os.listdir(parent_folder)):
@@ -56,12 +58,12 @@ def process_folder(folder_path, folder_name, entry, override_existing):
   cover_path = os.path.join(folder_path, FOLDER_IMAGE_FILENAME)
 
   if os.path.exists(cover_path) and not override_existing:
-    logger.debug(f'[{formatted_name}] SKIPPED: {FOLDER_IMAGE_FILENAME} already exists.')
+    logger.dim(f'  [{formatted_name}] {FOLDER_IMAGE_FILENAME} already exists.')
     return
 
   image_url = entry.get('iconUrl') if entry else None
   if not image_url:
-    logger.debug(f'[{formatted_name}] SKIPPED: no cover found.')
+    logger.dim(f'  [{formatted_name}] no cover found.')
     return
 
   response = requests.get(image_url)
@@ -71,9 +73,9 @@ def process_folder(folder_path, folder_name, entry, override_existing):
     img = resize_image(img, FOLDER_IMAGE_W, FOLDER_IMAGE_W)
     img.save(cover_path, JPEG_FORMAT, quality = JPEG_QUALITY)
 
-    logger.log(f'[{formatted_name}] SUCCESS: Generated cover image for game ID.')
+    logger.success(f'[{formatted_name}] Generated cover image.')
   else:
-    logger.error(f'[{formatted_name}] FAILED: Could not download image for game ID (status code {response.status_code}).')
+    logger.failure(f'[{formatted_name}] Could not download image (status code {response.status_code}).')
 
 def read_cached_mapping(path):
   if not os.path.exists(path) or time.time() - os.path.getmtime(path) >= CACHE_TTL:
