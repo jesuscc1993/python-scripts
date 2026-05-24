@@ -12,7 +12,7 @@ from mtprompt import Prompt
 from natsort import natsorted
 
 from _common import resize_image
-from _constants import JPEG_FORMAT, JPEG_QUALITY, FOLDER_IMAGE_FILENAME, FOLDER_IMAGE_W
+from _constants import JPEG_FORMAT, JPEG_QUALITY, FOLDER_IMAGE_FILENAME, FOLDER_IMAGE_W, REQ_TIMEOUT
 
 ID_LENGTH = 16
 SWITCH_MAPPING_URL = 'https://www.eliboa.com/switch/nsw_titles.php?export=json'
@@ -21,10 +21,8 @@ CACHE_TTL = 24 * 60 * 60
 
 def main():
   if len(sys.argv) > 1:
-    override_existing = False
-
     parent_folder = sys.argv[1]
-    if len(sys.argv) > 2: override_existing = sys.argv[2].lower() == 'y'
+    override_existing = sys.argv[2].lower() == 'y' if len(sys.argv) > 2 else False
   else:
     parent_folder, override_existing = prompt_params()
 
@@ -95,7 +93,7 @@ def load_switch_mapping():
     pass
 
   try:
-    resp = requests.get(SWITCH_MAPPING_URL, timeout=30)
+    resp = requests.get(SWITCH_MAPPING_URL, timeout=REQ_TIMEOUT)
     resp.raise_for_status()
     mapping = resp.json().get('game_titles', {})
 

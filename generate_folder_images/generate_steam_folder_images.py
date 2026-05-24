@@ -31,12 +31,9 @@ COVER_URL_MAP = {
 
 def main():
   if len(sys.argv) > 1:
-    cover_type = 'capsule'
-    override_existing = False
-
     parent_folder = sys.argv[1]
-    if len(sys.argv) > 2: cover_type = sys.argv[2]
-    if len(sys.argv) > 3: override_existing = sys.argv[3].lower() == 'y'
+    cover_type = sys.argv[2] if len(sys.argv) > 2 else 'capsule'
+    override_existing = sys.argv[3].lower() == 'y' if len(sys.argv) > 3 else False
   else:
     parent_folder, cover_type, override_existing = prompt_params()
 

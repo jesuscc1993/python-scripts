@@ -1,34 +1,81 @@
 import os
 import re
 import requests
+import sys
+import winsound
 
 from PIL import Image
-from concurrent.futures import ThreadPoolExecutor
 from io import BytesIO
 from mtlogger import logger
 from mtprompt import Prompt
+from natsort import natsorted
 
-# MAX_COVER_WIDTH = 300
-# MAX_COVER_HEIGHT = 450
+from _common import resize_image
+from _constants import JPEG_FORMAT, JPEG_QUALITY, FOLDER_IMAGE_FILENAME, FOLDER_IMAGE_W, REQ_TIMEOUT
 
 CLIENT_ID = os.getenv('TWITCH_CLIENT_ID')
 CLIENT_SECRET = os.getenv('TWITCH_CLIENT_SECRET')
 
-TWITCH_AUTH_URL = "https://id.twitch.tv/oauth2/token"
+TWITCH_AUTH_URL = 'https://id.twitch.tv/oauth2/token'
 IGDB_API_URL = 'https://api.igdb.com/v4/games'
-FOLDER_IMAGE_NAME = 'folder.jpg'
+
+ACCESS_TOKEN = None
+
+def main():
+  if len(sys.argv) > 1:
+    parent_folder = sys.argv[1]
+    override_existing = sys.argv[2].lower() == 'y' if len(sys.argv) > 2 else False
+  else:
+    parent_folder, override_existing = prompt_params()
+
+  generate_covers(parent_folder, override_existing)
+
+def prompt_params():
+  parent_folder = input('Enter the path to the parent folder containing your games:\n').strip(' "\'')
+  logger.log()
+
+  override_existing = input('Override existing images? (y/N):\n').strip().lower() == 'y'
+  logger.log()
+
+  return parent_folder, override_existing
+
+def generate_covers(parent_folder, override_existing):
+  if not os.path.isdir(parent_folder):
+    logger.error(f'The specified path "{parent_folder}" is not a directory.')
+    return
+
+  logger.log('Generating cover images...')
+
+  for folder_name in natsorted(os.listdir(parent_folder)):
+    folder_path = os.path.join(parent_folder, folder_name)
+
+    if os.path.isdir(folder_path):
+      process_folder(folder_path, folder_name, override_existing)
+
+  winsound.MessageBeep()
+  logger.log('\nFinished generating cover images.')
 
 def get_access_token():
+  global ACCESS_TOKEN
+
+  if ACCESS_TOKEN:
+    return ACCESS_TOKEN
+
+  if not CLIENT_ID or not CLIENT_SECRET:
+    raise ValueError('TWITCH_CLIENT_ID and TWITCH_CLIENT_SECRET must be set.')
+
   response = requests.post(
     TWITCH_AUTH_URL,
     params={
       'client_id': CLIENT_ID,
       'client_secret': CLIENT_SECRET,
       'grant_type': 'client_credentials'
-    }
+    },
+    timeout=REQ_TIMEOUT
   )
   response.raise_for_status()
-  return response.json().get('access_token')
+  ACCESS_TOKEN = response.json().get('access_token')
+  return ACCESS_TOKEN
 
 def split_camel_case(name):
   return re.sub(r'([a-z])([A-Z])', r'\1 \2', name)
@@ -46,7 +93,8 @@ def get_cover_image(query):
         'Authorization': f'Bearer {access_token}',
         'Content-Type': 'application/json'
       },
-      data=body
+      data=body,
+      timeout=REQ_TIMEOUT
     )
     response.raise_for_status()
 
@@ -60,60 +108,44 @@ def get_cover_image(query):
 
 def download_image(image_url):
   try:
-    response = requests.get(image_url)
+    response = requests.get(image_url, timeout=REQ_TIMEOUT)
     response.raise_for_status()
     return Image.open(BytesIO(response.content))
   except Exception as ex:
     logger.error(f'Could not download image: {ex}')
     return None
 
-# def resize_image(img):
-#   width, height = img.size
-#   if width > MAX_COVER_WIDTH or height > MAX_COVER_HEIGHT:
-#     ratio = min(MAX_COVER_WIDTH / width, MAX_COVER_HEIGHT / height)
-#     new_width = int(width * ratio)
-#     new_height = int(height * ratio)
-#     return img.resize((new_width, new_height), Image.LANCZOS)
-#   return img
-
 def save_image(img, save_path):
   try:
     if img.mode != 'RGB':
       img = img.convert('RGB')
-    img.save(save_path, format='JPEG')
-    logger.log(f'Saved: "{save_path}"')
+    img = resize_image(img, FOLDER_IMAGE_W, FOLDER_IMAGE_W)
+    img.save(save_path, JPEG_FORMAT, quality = JPEG_QUALITY)
   except Exception as ex:
     logger.error(f'Could not save "{img}": {ex}')
 
-def process_folder(folder_name, container_folder):
-  folder_path = os.path.join(container_folder, folder_name)
+def process_folder(folder_path, folder_name, override_existing):
+  cover_path = os.path.join(folder_path, FOLDER_IMAGE_FILENAME)
 
-  if os.path.isfile(os.path.join(folder_path, FOLDER_IMAGE_NAME)):
-    logger.debug(f'Skipping "{folder_name}". "{FOLDER_IMAGE_NAME}" already exists')
+  if os.path.exists(cover_path) and not override_existing:
+    logger.dim(f'  [{folder_name}] {FOLDER_IMAGE_FILENAME} already exists.')
     return
 
-  if os.path.isdir(folder_path):
-    try:
-      image_url = get_cover_image(folder_name)
-      if not image_url:
-        logger.warn(f' No cover found for "{folder_name}".')
-        return
-      img = download_image(image_url)
-      if img:
-        # img = resize_image(img)
-        save_path = os.path.join(folder_path, FOLDER_IMAGE_NAME)
-        save_image(img, save_path)
-    except Exception as ex:
-      logger.error(f'Could not process folder "{folder_name}": {ex}')
+  try:
+    image_url = get_cover_image(folder_name)
+    if not image_url:
+      logger.dim(f'  [{folder_name}] no cover found.')
+      return
 
-def main():
-  container_folder = input('Enter the path to the folder containing your games:\n').strip(' "\'') or os.getcwd()
+    img = download_image(image_url)
+    if not img:
+      logger.failure(f'[{folder_name}] Could not download image.')
+      return
 
-  with ThreadPoolExecutor() as executor:
-    _ = [
-      executor.submit(process_folder, folder_name, container_folder)
-      for folder_name in os.listdir(container_folder) if os.path.isdir(os.path.join(container_folder, folder_name))
-    ]
+    save_image(img, cover_path)
+    logger.success(f'[{folder_name}] Generated cover image.')
+  except Exception as ex:
+    logger.failure(f'[{folder_name}] Could not process folder: {ex}')
 
 if __name__ == '__main__':
   try:
