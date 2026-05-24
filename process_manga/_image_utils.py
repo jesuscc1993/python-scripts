@@ -62,4 +62,4 @@ def save_image_to_path(img, original_path, keep = False):
       os.remove(original_path)
 
   except Exception as ex:
-    logger.error(f'Error processing "{original_path}": {ex}')
+    logger.error(f'Error processing "{original_path}":\n{ex}')

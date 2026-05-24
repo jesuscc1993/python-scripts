@@ -27,7 +27,7 @@ def process_image(file_path):
         img = resize_image(img)
         save_image_to_path(img, file_path)
   except Exception as ex:
-    logger.error(f'Could not process {file_path}: {ex}')
+    logger.error(f'Could not process {file_path}:\n{ex}')
 
 def crop_blanks(img):
   np_img = numpy.array(img)

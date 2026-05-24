@@ -28,11 +28,12 @@ def process_folder(folder_path):
   download_game_cover(game_id, folder_path)
 
 def download_game_cover(game_id, folder_path):
-  search_url = SEARCH_URL.format(game_id = game_id)
-  response = requests.get(search_url)
-
-  if response.status_code != 200:
-    logger.error(f'Could not access the search results for {game_id}. Status code: {response.status_code}')
+  try:
+    search_url = SEARCH_URL.format(game_id = game_id)
+    response = requests.get(search_url)
+    response.raise_for_status()
+  except Exception as ex:
+    logger.error(f'Could not access the search results for {game_id}:\n{ex}')
     return
 
   soup = BeautifulSoup(response.text, 'html.parser')
@@ -41,22 +42,26 @@ def download_game_cover(game_id, folder_path):
     logger.warn(f'No game found for ID {game_id}.')
     return
 
-  game_page_url = f'{BASE_URL}{game_link["href"]}'
-  game_response = requests.get(game_page_url)
-  if game_response.status_code != 200:
-    logger.error(f'Could not access the game page. Status code: {game_response.status_code}')
+  try:
+    game_page_url = f'{BASE_URL}{game_link["href"]}'
+    game_response = requests.get(game_page_url)
+    game_response.raise_for_status()
+  except Exception as ex:
+    logger.error(f'Could not fetch game data for ID {game_id}:\n{ex}')
     return
 
   game_soup = BeautifulSoup(game_response.text, 'html.parser')
   image_tag = game_soup.select_one('.citizen-body-container .image img')
   if not (image_tag and 'src' in image_tag.attrs):
-    logger.warn(f' Cover image not found for game ID {game_id}.')
+    logger.warn(f'Cover image not found for game ID {game_id}.')
     return
 
-  image_url = f'{BASE_URL}{image_tag["src"]}'
-  image_response = requests.get(image_url)
-  if image_response.status_code != 200:
-    logger.error(f'Could not download image from {image_url}.')
+  try:
+    image_url = f'{BASE_URL}{image_tag["src"]}'
+    image_response = requests.get(image_url)
+    image_response.raise_for_status()
+  except Exception as ex:
+    logger.error(f'Could not download {image_url}:\n{ex}')
     return
 
   img = Image.open(BytesIO(image_response.content))

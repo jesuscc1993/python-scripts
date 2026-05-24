@@ -64,7 +64,7 @@ def compress_image(file_path, lossless, quality):
       os.rename(backup_path, file_path)
 
   except Exception as ex:
-    logger.error(f'Failed to compress "{file_path}": {ex}')
+    logger.error(f'Failed to compress "{file_path}":\n{ex}')
 
 if __name__ == '__main__':
   try:

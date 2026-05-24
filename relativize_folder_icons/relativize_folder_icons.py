@@ -55,7 +55,7 @@ def process_folder(folder_path):
   except PermissionError:
     logger.error(f'Permission denied for "{desktop_ini_path}"')
   except Exception as ex:
-    logger.error(f'Could not process "{desktop_ini_path}": {ex}')
+    logger.error(f'Could not process "{desktop_ini_path}":\n{ex}')
 
 if __name__ == '__main__':
   try:

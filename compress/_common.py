@@ -74,7 +74,7 @@ def compress_folder(folder_path, output_type):
       shutil.rmtree(folder_path)
 
   except Exception as ex:
-    logger.error(f'An error occurred while processing "{folder_name}": {ex}')
+    logger.error(f'An error occurred while processing "{folder_name}":\n{ex}')
 
 def extract_child_archives(parent_folder):
   archives = []

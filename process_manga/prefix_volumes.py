@@ -42,7 +42,7 @@ def prompt_chapter_ranges():
   try:
     chapter_bounds = sorted([float(x.strip()) for x in ranges_input.split(',')])
   except Exception as ex:
-    logger.error(f'Invalid input: {ex}')
+    logger.error(f'Invalid input:\n{ex}')
     return None
   if len(chapter_bounds) < 1:
     logger.error('At least one boundary is required.')

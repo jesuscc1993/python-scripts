@@ -70,24 +70,32 @@ def search_game(name):
   params = SEARCH_PARAMS.copy()
   params['term'] = name
 
-  response = session.get(SEARCH_URL, params = params, headers = headers)
-  return response.json().get('items', []) if response.ok else []
+  try:
+    response = session.get(SEARCH_URL, params = params, headers = headers)
+    response.raise_for_status()
+    return response.json().get('items', [])
+  except Exception as ex:
+    logger.error(f'Error searching for game "{name}":\n{ex}')
+    return []
 
 def download_game_assets(appid):
   output_dir = os.path.join(os.getcwd(), OUTPUT_FOLDER)
   os.makedirs(output_dir, exist_ok = True)
 
-  for key, data in COVER_URL_MAP.items():
+  for _, data in COVER_URL_MAP.items():
     url = data['url'].format(appid)
     filename = data['dest'].format(appid)
     size = data.get('size')
     filepath = os.path.join(output_dir, filename)
 
-    response = session.get(url, headers = headers)
-    if response.ok:
-      save_asset(response.content, filepath, size)
-    else:
-      logger.error(f'Could not download {key} image.')
+    try:
+      response = session.get(url, headers = headers)
+      response.raise_for_status()
+    except Exception as ex:
+      logger.error(f'Could not download {url}:\n{ex}')
+      continue
+
+    save_asset(response.content, filepath, size)
 
 def save_asset(content, filepath, size = None):
   try:
@@ -95,7 +103,7 @@ def save_asset(content, filepath, size = None):
     if size: img = img.resize(size, Image.LANCZOS)
     img.save(filepath)
     logger.log(f'Saved: {filepath}')
-  except Exception:
-    logger.error(f'Could not save asset at {filepath}')
+  except Exception as ex:
+    logger.error(f'Could not save {filepath}:\n{ex}')
 
 main()

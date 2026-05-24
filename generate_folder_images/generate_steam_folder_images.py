@@ -52,9 +52,12 @@ def prompt_params():
   return parent_folder, cover_type, override_existing
 
 def generate_covers(parent_folder, cover_type, override_existing):
-  logger.log('Generating cover images...')
-
   cover_url = COVER_URL_MAP.get(cover_type)
+  if not cover_url:
+    logger.error(f'Invalid cover type "{cover_type}". Must be one of: {", ".join(COVER_URL_MAP)}.')
+    return
+
+  logger.log('Generating cover images...')
 
   for folder_name in natsorted(os.listdir(parent_folder)):
     folder_path = os.path.join(parent_folder, folder_name)
@@ -73,18 +76,20 @@ def process_folder(folder_path, folder_name, cover_url, override_existing):
     logger.dim(f'  [{formatted_name}] {FOLDER_IMAGE_FILENAME} already exists.')
     return
 
-  image_url = cover_url.format(folder_name)
-  response = requests.get(image_url)
+  try:
+    image_url = cover_url.format(folder_name)
+    response = requests.get(image_url)
+    response.raise_for_status()
+  except Exception as ex:
+    logger.failure(f'[{formatted_name}] Could not download {image_url}:\n{ex}')
+    return
 
-  if response.status_code == 200:
-    img = Image.open(BytesIO(response.content))
-    img = resize_image_to_fill(img, RESIZE_WIDTH, RESIZE_HEIGHT)
-    img = crop_image(img, CROP_SIZE)
-    img.save(cover_path, JPEG_FORMAT, quality = JPEG_QUALITY)
+  img = Image.open(BytesIO(response.content))
+  img = resize_image_to_fill(img, RESIZE_WIDTH, RESIZE_HEIGHT)
+  img = crop_image(img, CROP_SIZE)
+  img.save(cover_path, JPEG_FORMAT, quality = JPEG_QUALITY)
 
-    logger.success(f'[{formatted_name}] Generated cover image.')
-  else:
-    logger.failure(f'[{formatted_name}] Could not download image (status code {response.status_code}).')
+  logger.success(f'[{formatted_name}] Generated cover image.')
 
 def resize_image_to_fill(img, w, h):
   new_scale = max(w / img.width, h / img.height)

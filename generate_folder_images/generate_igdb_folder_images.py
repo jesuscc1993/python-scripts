@@ -64,18 +64,23 @@ def get_access_token():
   if not CLIENT_ID or not CLIENT_SECRET:
     raise ValueError('TWITCH_CLIENT_ID and TWITCH_CLIENT_SECRET must be set.')
 
-  response = requests.post(
-    TWITCH_AUTH_URL,
-    params={
-      'client_id': CLIENT_ID,
-      'client_secret': CLIENT_SECRET,
-      'grant_type': 'client_credentials'
-    },
-    timeout=REQ_TIMEOUT
-  )
-  response.raise_for_status()
-  ACCESS_TOKEN = response.json().get('access_token')
-  return ACCESS_TOKEN
+  try:
+    response = requests.post(
+      TWITCH_AUTH_URL,
+      params={
+        'client_id': CLIENT_ID,
+        'client_secret': CLIENT_SECRET,
+        'grant_type': 'client_credentials'
+      },
+      timeout=REQ_TIMEOUT
+    )
+    response.raise_for_status()
+    ACCESS_TOKEN = response.json().get('access_token')
+    return ACCESS_TOKEN
+  except Exception as ex:
+    logger.error(f'Could not get access token:\n{ex}')
+
+  return None
 
 def split_camel_case(name):
   return re.sub(r'([a-z])([A-Z])', r'\1 \2', name)
@@ -103,7 +108,8 @@ def get_cover_image(query):
     return f'https:{cover_url.replace("t_thumb", "t_cover_big")}' if cover_url else None
 
   except Exception as ex:
-    logger.error(f'Could not fetch cover image: {ex}')
+    logger.error(f'Could not fetch data for game {query}:\n{ex}')
+
   return None
 
 def download_image(image_url):
@@ -112,8 +118,9 @@ def download_image(image_url):
     response.raise_for_status()
     return Image.open(BytesIO(response.content))
   except Exception as ex:
-    logger.error(f'Could not download image: {ex}')
-    return None
+    logger.error(f'Could not download {image_url}:\n{ex}')
+
+  return None
 
 def save_image(img, save_path):
   try:
@@ -122,7 +129,7 @@ def save_image(img, save_path):
     img = resize_image(img, FOLDER_IMAGE_W, FOLDER_IMAGE_W)
     img.save(save_path, JPEG_FORMAT, quality = JPEG_QUALITY)
   except Exception as ex:
-    logger.error(f'Could not save "{img}": {ex}')
+    logger.error(f'Could not save "{save_path}":\n{ex}')
 
 def process_folder(folder_path, folder_name, override_existing):
   cover_path = os.path.join(folder_path, FOLDER_IMAGE_FILENAME)
@@ -139,13 +146,13 @@ def process_folder(folder_path, folder_name, override_existing):
 
     img = download_image(image_url)
     if not img:
-      logger.failure(f'[{folder_name}] Could not download image.')
+      logger.failure(f'[{folder_name}] Could not download {image_url}.')
       return
 
     save_image(img, cover_path)
     logger.success(f'[{folder_name}] Generated cover image.')
   except Exception as ex:
-    logger.failure(f'[{folder_name}] Could not process folder: {ex}')
+    logger.failure(f'[{folder_name}] Could not process folder:\n{ex}')
 
 if __name__ == '__main__':
   try:

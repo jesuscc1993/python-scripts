@@ -33,7 +33,7 @@ def process_image(file_path):
     )
 
   except Exception as ex:
-    logger.error(f'Could not process "{file_path}": {ex}')
+    logger.error(f'Could not process "{file_path}":\n{ex}')
 
 if __name__ == '__main__':
   try:

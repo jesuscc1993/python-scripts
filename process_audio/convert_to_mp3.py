@@ -63,7 +63,7 @@ def worker(input_path, output_path, og_filename, new_filename, bitrate):
     os.remove(input_path)
     tqdm.write(f'Converted "{og_filename}" to "{new_filename}".')
   except Exception as ex:
-    tqdm.write(f'Failed to convert "{input_path}": {ex}')
+    tqdm.write(f'Failed to convert "{input_path}":\n{ex}')
 
 def convert_to_mp3(input_path, output_path, bitrate):
   result = subprocess.run(

@@ -29,7 +29,7 @@ def process_image(original_path):
         save_image_to_path(img, original_path)
 
   except Exception as ex:
-    logger.log(f'Error processing "{original_path}": {ex}')
+    logger.log(f'Error processing "{original_path}":\n{ex}')
 
 if __name__ == '__main__':
   try:

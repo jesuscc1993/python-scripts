@@ -20,11 +20,12 @@ def process_folder(folder_path):
   download_game_cover(game_id, folder_path)
 
 def download_game_cover(game_id, folder_path):
-  url = TITLE_URL.format(game_id=re.sub(r'([A-Za-z]+)(\d+)', r'\1/\2', game_id))
-
-  response = requests.get(url)
-  if response.status_code != 200:
-    logger.error(f'Could not access {url}. Status code: {response.status_code}')
+  try:
+    url = TITLE_URL.format(game_id=re.sub(r'([A-Za-z]+)(\d+)', r'\1/\2', game_id))
+    response = requests.get(url)
+    response.raise_for_status()
+  except Exception as ex:
+    logger.error(f'Could not fetch game data {url}:\n{ex}')
     return
 
   soup = BeautifulSoup(response.text, 'html.parser')
@@ -33,10 +34,12 @@ def download_game_cover(game_id, folder_path):
     logger.warn(f'No cover image found for game ID {game_id}.')
     return
 
-  image_url = image_tag['src']
-  image_response = requests.get(image_url)
-  if image_response.status_code != 200:
-    logger.error(f'Could not download image from {image_url}.')
+  try:
+    image_url = image_tag['src']
+    image_response = requests.get(image_url)
+    image_response.raise_for_status()
+  except Exception as ex:
+    logger.error(f'Could not download {image_url}:\n{ex}')
     return
 
   img = Image.open(BytesIO(image_response.content))

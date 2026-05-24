@@ -64,16 +64,18 @@ def process_folder(folder_path, folder_name, entry, override_existing):
     logger.dim(f'  [{formatted_name}] no cover found.')
     return
 
-  response = requests.get(image_url)
+  try:
+    response = requests.get(image_url)
+    response.raise_for_status()
+  except Exception as ex:
+    logger.failure(f'[{formatted_name}] Could not download {image_url}:\n{ex}')
+    return
 
-  if response.status_code == 200:
-    img = Image.open(BytesIO(response.content))
-    img = resize_image(img, FOLDER_IMAGE_W, FOLDER_IMAGE_W)
-    img.save(cover_path, JPEG_FORMAT, quality = JPEG_QUALITY)
+  img = Image.open(BytesIO(response.content))
+  img = resize_image(img, FOLDER_IMAGE_W, FOLDER_IMAGE_W)
+  img.save(cover_path, JPEG_FORMAT, quality = JPEG_QUALITY)
 
-    logger.success(f'[{formatted_name}] Generated cover image.')
-  else:
-    logger.failure(f'[{formatted_name}] Could not download image (status code {response.status_code}).')
+  logger.success(f'[{formatted_name}] Generated cover image.')
 
 def read_cached_mapping(path):
   if not os.path.exists(path) or time.time() - os.path.getmtime(path) >= CACHE_TTL:
@@ -103,7 +105,7 @@ def load_switch_mapping():
 
     return mapping
   except Exception as ex:
-    logger.error(f'Failed to load switch mapping: {ex}')
+    logger.error(f'Failed to load switch mapping:\n{ex}')
 
     try:
       if os.path.exists(path):

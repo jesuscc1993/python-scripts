@@ -121,7 +121,7 @@ def generate_rom_shortcut(binary, rom, out_dir):
       logger.info(f'Created shortcut for "{shortcut_path}"')
 
   except Exception as ex:
-    logger.error(f'Failed to create shortcut for "{rom}": {ex}')
+    logger.error(f'Failed to create shortcut for "{rom}":\n{ex}')
 
 if __name__ == '__main__':
   try:
