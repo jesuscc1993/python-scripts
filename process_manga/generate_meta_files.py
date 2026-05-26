@@ -39,11 +39,11 @@ def process_folder(folder_path):
     try:
       file_path = os.path.join(folder_path, filename)
       if os.path.exists(file_path):
-        logger.debug(f'Skipping "{file_path}". File already exists.')
+        logger.dim(f'Skipping "{file_path}". File already exists.')
       else:
         open(file_path, 'w').close()
         os.system(f'attrib +h "{file_path}"')
-        logger.info(f'Successfully created hidden file "{file_path}".')
+        logger.success(f'Created hidden file "{file_path}".')
 
     except Exception as ex:
       logger.error(f'Could not create "{filename}":\n{ex}')

@@ -20,7 +20,7 @@ def main():
   quality = int(sys.argv[2]) if len(sys.argv) > 2 and not lossless else IMAGE_OUTPUT_QUALITY
 
   compress_child_images(parent_dir, lossless, quality)
-  logger.info(f'Successfully compressed images in "{parent_dir}".')
+  logger.success(f'Compressed images in "{parent_dir}".')
 
 def compress_child_images(parent_dir, lossless, quality):
   files_to_process = []

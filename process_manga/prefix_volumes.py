@@ -79,7 +79,7 @@ def process_parent_folder(parent_folder, chapter_ranges):
         break
 
   winsound.MessageBeep()
-  logger.info(f'Finished processing "{parent_folder}".\n')
+  logger.success(f'Finished prefixing volumes in "{parent_folder}".\n')
 
   merge_input = input('Merge volumes? (Y/n)\n').strip().lower() != 'n'
   if merge_input:

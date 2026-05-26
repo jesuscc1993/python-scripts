@@ -61,7 +61,7 @@ def process_folder(folder_path, image_filenames):
     image_to_ico(image_path, ico_path)
     set_folder_icon(folder_path)
   else:
-    logger.debug(f'No suitable image found in "{folder_path}"')
+    logger.warn(f'No suitable image found in "{folder_path}"')
 
 def image_to_ico(image_path, icon_path, icon_sizes = DEFAULT_ICON_SIZES):
   try:
@@ -95,8 +95,8 @@ def set_folder_icon(folder_path):
     os.system(f'attrib +h "{icon_path}"')
     os.system(f'attrib +s "{folder_path}"')
 
-    logger.log(f'Saved "{icon_path}" and "{desktop_ini_path}".')
+    logger.success(f'Saved "{icon_path}" and "{desktop_ini_path}".')
   except PermissionError:
-    logger.warn(f' Permission denied: "{desktop_ini_path}". You may need to run the script as an administrator.')
+    logger.warn(f'Permission denied: "{desktop_ini_path}". You may need to run the script as an administrator.')
   except Exception as ex:
     logger.error(f'Error setting folder icon to "{folder_path}":\n{ex}')

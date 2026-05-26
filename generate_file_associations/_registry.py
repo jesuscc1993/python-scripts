@@ -14,7 +14,7 @@ def add_registry_entry(root, path, name, value):
   try:
     with winreg.CreateKey(root, path) as key:
       winreg.SetValueEx(key, name, 0, winreg.REG_SZ, value)
-      logger.info(f' Set registry entry "{get_registry_key(root, path, name)}" with value "{value}"')
+      logger.success(f'Set registry key "{get_registry_key(root, path, name)}" with value "{value}"')
   except Exception as ex:
     logger.error(f'Could not add registry entry for "{get_registry_key(root, path)}":\n{ex}')
 
@@ -22,13 +22,13 @@ def delete_registry_entry(root, path, name = None):
   try:
     if not name:
       winreg.DeleteKey(root, path)
-      logger.log(f'Deleted key: "{get_registry_key(root, path)}"')
+      logger.success(f'Deleted registry key: "{get_registry_key(root, path)}"')
     else:
       with winreg.OpenKey(root, path, 0, winreg.KEY_SET_VALUE) as key:
         winreg.DeleteValue(key, name)
-        logger.log(f'Deleted value: "{get_registry_key(root, path, name)}"')
+        logger.success(f'Deleted registry value: "{get_registry_key(root, path, name)}"')
   except FileNotFoundError:
-    logger.warn(f' Could not find registry entry "{get_registry_key(root, path, name)}"')
+    logger.warn(f'Could not find registry entry "{get_registry_key(root, path, name)}"')
   except Exception as ex:
     logger.error(f'Could not delete registry entry "{get_registry_key(root, path)}":\n{ex}')
 

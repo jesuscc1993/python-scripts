@@ -48,7 +48,7 @@ def shift_subtitles(srt_path, ms_to_shift):
   with open(srt_path, 'w', encoding='utf-8') as f:
     f.write(new_content)
 
-  logger.info(f'\nSubtitles shifted by {ms_to_shift}ms')
+  logger.success(f'\nSubtitles shifted by {ms_to_shift}ms')
 
 if __name__ == '__main__':
   try:

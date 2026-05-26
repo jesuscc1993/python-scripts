@@ -19,7 +19,7 @@ def main():
 
   rename_and_copy_files(src_path, dest_path, matches_only)
 
-  logger.info(f'Finished copying "{src_path}" to "{dest_path}".\n')
+  logger.success(f'Finished copying files from "{src_path}" to "{dest_path}".\n')
   main()
 
 def rename_and_copy_files(src_path, dest_path, matches_only):
@@ -40,7 +40,7 @@ def backup_file(file_path):
       os.rename(file_path, bak_path)
       logger.log(f'Saved backup file "{bak_path}".')
     else:
-      logger.log(f'Backup file "{bak_path}" already exists and will be reused.')
+      logger.dim(f'Backup file "{bak_path}" already exists and will be reused.')
 
 if __name__ == '__main__':
   try:

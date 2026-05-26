@@ -30,7 +30,7 @@ def main():
   logger.log()
 
   winsound.MessageBeep()
-  logger.info(f'Finished downloading from "{base_url}".\n')
+  logger.success(f'Finished downloading from "{base_url}".\n')
   main()
 
 def download_all_chapters(base_url, css_selector, chapter_count):
@@ -57,7 +57,7 @@ def download_images_from_chapter(base_url, css_selector, chapter_number):
     if images:
       os.makedirs(folder, exist_ok = True)
     else:
-      logger.warn(f' Found no images for selector {css_selector} on URL "{chapter_url}".')
+      logger.warn(f'Found no images for selector {css_selector} on URL "{chapter_url}".')
 
     for i, img in enumerate(images):
       src = img.get('src')

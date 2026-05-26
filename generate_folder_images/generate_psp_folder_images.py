@@ -22,7 +22,7 @@ def process_folder(folder_path):
     game_id = match.group(1)
     game_id = re.sub(r'([A-Za-z]+)(\d+)', r'\1-\2', game_id)
   else:
-    logger.warn(f' Could not extract a valid game ID from "{folder_path}"')
+    logger.warn(f'Could not extract a valid game ID from "{folder_path}"')
     return
 
   download_game_cover(game_id, folder_path)
@@ -53,7 +53,7 @@ def download_game_cover(game_id, folder_path):
   game_soup = BeautifulSoup(game_response.text, 'html.parser')
   image_tag = game_soup.select_one('.wp-post-image')
   if not (image_tag and 'src' in image_tag.attrs):
-    logger.warn(f' Cover image not found for game ID {game_id}.')
+    logger.warn(f'Cover image not found for game ID {game_id}.')
     return
 
   try:

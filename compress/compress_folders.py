@@ -12,7 +12,7 @@ def main():
   depth = int(sys.argv[3]) if len(sys.argv) > 3 else 1
 
   compress_child_folders(parent_dir, type, depth)
-  logger.info(f'Successfully compressed folders in "{parent_dir}".')
+  logger.success(f'Compressed folders in "{parent_dir}".')
 
 if __name__ == '__main__':
   try:

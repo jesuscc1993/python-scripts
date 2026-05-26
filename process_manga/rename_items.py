@@ -32,7 +32,7 @@ def process_parent_folder(parent_folder):
     with ThreadPoolExecutor() as executor:
       list(tqdm(executor.map(lambda item: process_item(root, item), all_items), total = len(all_items), desc=f'Processing "{root}"'))
 
-  logger.info(f'Finished processing "{parent_folder}".')
+  logger.success(f'Finished renaming items in "{parent_folder}".')
 
 def process_item(root, item_name):
   new_name = get_processed_name(item_name)

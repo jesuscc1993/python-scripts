@@ -33,7 +33,7 @@ def find_binaries(binaries_dir):
       key = name.lower()
       path = os.path.join(root, file)
       if any(blacklisted in key for blacklisted in BINARY_BLACKLIST):
-        logger.debug(f'Skipping blacklisted binary: "{path}"')
+        logger.dim(f'Skipping blacklisted binary: "{path}"')
         continue
       if key in binaries:
         logger.debug(f'Multiple binaries found for {key}, using: "{path}"')
@@ -118,7 +118,7 @@ def generate_rom_shortcut(binary, rom, out_dir):
       sc.WorkingDirectory = os.path.dirname(binary)
       sc.IconLocation = binary
       sc.save()
-      logger.info(f'Created shortcut for "{shortcut_path}"')
+      logger.success(f'Created shortcut for "{shortcut_path}"')
 
   except Exception as ex:
     logger.error(f'Failed to create shortcut for "{rom}":\n{ex}')

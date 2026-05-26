@@ -41,7 +41,7 @@ def process_parent_folder(parent_dir):
     for _ in executor.map(process_file, files_to_process):
       progress.update(1)
 
-  logger.info(f'Finished processing "{parent_dir}".\n')
+  logger.success(f'Finished grouping files in "{parent_dir}".\n')
 
 def should_process_item(item_path):
   if not os.path.isfile(item_path):

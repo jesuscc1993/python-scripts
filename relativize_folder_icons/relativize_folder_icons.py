@@ -47,9 +47,9 @@ def process_folder(folder_path):
 
         with open(desktop_ini_path, 'w') as desktop_ini:
           config.write(desktop_ini)
-        logger.log(f'Updated folder "{folder_path}" with IconResource "{relative_icon_path}".')
+        logger.success(f'Updated folder "{folder_path}" with IconResource "{relative_icon_path}".')
       else:
-        logger.debug(f'Skipping folder "{folder_path}" with IconResource "{icon_resource}".')
+        logger.dim(f'Skipping folder "{folder_path}" with IconResource "{icon_resource}".')
 
       ctypes.windll.kernel32.SetFileAttributesW(desktop_ini_path, 0x02 | 0x04)
   except PermissionError:

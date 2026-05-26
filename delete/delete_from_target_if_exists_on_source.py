@@ -23,7 +23,7 @@ def compare_paths_and_delete_files(src_path, dest_path):
       if os.path.exists(path_b):
         os.remove(path_b)
         logger.debug(f'Deleted "{path_b}".')
-  logger.info(f'Finished deleting from "{dest_path}" the files that already existed in "{src_path}".\n')
+  logger.success(f'Finished deleting from "{dest_path}" files that already existed in "{src_path}".\n')
 
 def delete_empty_folders(parent_folder):
   for root, dirs, _ in os.walk(parent_folder, topdown = False):

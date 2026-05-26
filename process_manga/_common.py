@@ -30,7 +30,7 @@ def select_parent_folder(prompt, callback, options = {}):
     winsound.MessageBeep()
 
   if log_success:
-    logger.info(f'Finished processing "{parent_folder}".\n')
+    logger.success(f'Finished processing "{parent_folder}".\n')
 
   if loop:
     select_parent_folder(prompt, callback)
@@ -81,4 +81,4 @@ def run_scripts_in_sequence(script_names, parent_folder):
     logger.log(f'\nRunning {script}:')
     subprocess.run(['python', abs_path, parent_folder], env=env)
 
-  logger.info(f'\nFinished batch running scripts on "{parent_folder}".\n')
+  logger.success(f'\nFinished batch running scripts on "{parent_folder}".\n')

@@ -31,7 +31,7 @@ def restore_file(bak_file_path):
 
   if os.path.exists(og_file_path):
     if os.path.getmtime(bak_file_path) == os.path.getmtime(og_file_path):
-      logger.debug(f'Skipping "{bak_file_name}". Both "{bak_file_name}" and "{og_file_name}" have the same timestamp.')
+      logger.dim(f'Skipping "{bak_file_name}". Both "{bak_file_name}" and "{og_file_name}" have the same timestamp.')
       return
 
     rename_with_timestamp(bak_dir_path, og_file_path)

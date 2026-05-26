@@ -28,7 +28,7 @@ def process_parent_folder(parent_dir, should_process_item, get_group_name):
     for _ in executor.map(process_file, files_to_process):
       progress.update(1)
 
-  logger.info(f'Successfully grouped files in "{parent_dir}".')
+  logger.success(f'Finished grouping files in "{parent_dir}".')
 
 def process_file(params):
   src, target_folder = params
