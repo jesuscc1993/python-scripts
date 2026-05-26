@@ -27,4 +27,5 @@ class Prompt:
 
   @staticmethod
   def enterToExit():
-    input('\nPress Enter to exit...')
+    if not os.getenv('NO_ENTER_TO_EXIT'):
+      input('\nPress Enter to exit...')
