@@ -31,8 +31,13 @@ def main():
   generate_covers(parent_folder, override_existing)
 
 def prompt_params():
-  parent_folder = Prompt.dir('Enter the path to the parent folder containing your games')
-  override_existing = Prompt.bool('Override existing images?', default=False)
+  parent_folder = Prompt.dir(
+    'Enter the path to the parent folder containing your games'
+    )
+  override_existing = Prompt.bool(
+    'Override existing images?',
+    default=False
+  )
 
   return parent_folder, override_existing
 

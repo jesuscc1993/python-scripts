@@ -12,8 +12,12 @@ def main():
     src_path = sys.argv[1]
     dest_path = sys.argv[2]
   else:
-    src_path = Prompt.dir('Enter the path containing the files to copy')
-    dest_path = Prompt.str('Enter the path the files will be copied to')
+    src_path = Prompt.dir(
+      'Enter the path containing the files to copy'
+    )
+    dest_path = Prompt.str(
+      'Enter the path the files will be copied to'
+    )
 
   try:
     enforce_unique_path(src_path, dest_path)

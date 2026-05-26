@@ -13,9 +13,16 @@ def main():
     dest_path = sys.argv[2]
     matches_only = (sys.argv[3] if len(sys.argv) > 3 else 'n').strip().lower() == 'n'
   else:
-    src_path = Prompt.dir('Enter the path containing the files to copy')
-    dest_path = Prompt.str('Enter the path the files will be copied to')
-    matches_only = Prompt.bool('Matches only?', default=True)
+    src_path = Prompt.dir(
+      'Enter the path containing the files to copy'
+    )
+    dest_path = Prompt.str(
+      'Enter the path the files will be copied to'
+    )
+    matches_only = Prompt.bool(
+      'Matches only?',
+      default=True
+    )
 
   try:
     enforce_unique_path(src_path, dest_path)

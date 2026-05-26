@@ -11,7 +11,9 @@ def main():
   if len(sys.argv) > 1:
     bak_file_path = sys.argv[1]
   else:
-    bak_file_path = Prompt.file('Enter the path to the file to restore')
+    bak_file_path = Prompt.file(
+      'Enter the path to the file to restore'
+    )
 
   restore_file(bak_file_path)
 

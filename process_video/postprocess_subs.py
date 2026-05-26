@@ -12,7 +12,9 @@ def main():
   if len(sys.argv) > 1:
     input_path = sys.argv[1]
   else:
-    input_path = Prompt.path('Enter the path to an SRT file or directory')
+    input_path = Prompt.path(
+      'Enter the path to an SRT file or directory'
+    )
 
   if os.path.isfile(input_path):
     process_file(input_path)

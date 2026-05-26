@@ -13,14 +13,20 @@ OUTPUT_QUALITY = 100
 RESOLUTION_SCALE = 1.5
 
 def main():
-  parent_folder = input('Enter the path to the parent folder containing the PDF files:\n').strip(' "\'')
-  if not os.path.isdir(parent_folder):
-    logger.error(f'The specified path "{parent_folder}" is not a directory.')
-  else:
-    logger.log()
+  parent_folder = Prompt.dir(
+    'Enter the path to the parent folder containing the PDF files'
+  )
 
-    for pdf_file in Path(parent_folder).glob('*.pdf'):
-      pdf_to_webp(parent_folder, str(pdf_file))
+  process_parent_folder(parent_folder)
+
+def process_parent_folder(parent_folder):
+  pdf_files = list(Path(parent_folder).glob('*.pdf'))
+  if not pdf_files:
+    logger.warn(f'No PDF files found in "{parent_folder}".')
+    return
+
+  for pdf_file in pdf_files:
+    pdf_to_webp(parent_folder, str(pdf_file))
 
 def process_page(pdf_document, page_number, output_path):
   page = pdf_document.load_page(page_number)

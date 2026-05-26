@@ -9,8 +9,12 @@ def main():
     dest_path = sys.argv[1]
     src_path = sys.argv[2]
   else:
-    dest_path = Prompt.dir('Delete from path')
-    src_path = Prompt.dir('...files that exist on path')
+    dest_path = Prompt.dir(
+      'Delete from path'
+    )
+    src_path = Prompt.dir(
+      '...files that exist on path'
+    )
 
   compare_paths_and_delete_files(src_path, dest_path)
   delete_empty_folders(dest_path)

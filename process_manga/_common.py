@@ -5,6 +5,7 @@ import winsound
 
 from concurrent.futures import ThreadPoolExecutor
 from mtlogger import logger
+from mtprompt import Prompt
 from tqdm import tqdm
 
 from _image_utils import is_image_file
@@ -36,7 +37,7 @@ def select_parent_folder(prompt, callback, options = {}):
     logger.hr()
     select_parent_folder(prompt, callback)
   else:
-    input('')
+    Prompt.enter_to_exit()
 
 def process_folder_images(folder_path, callback):
   files_to_process = []

@@ -13,12 +13,14 @@ def process_parent_folder(process_folder):
     parent_folder = sys.argv[1]
   else:
     parent_folder = Prompt.dir(
-      'Enter the path to the parent folder containing the folders you want to generate icons for.\nLeave empty instead to provide and process a single folder instead.\nPARENT_FOLDER: ',
+      'Enter the path to the parent folder containing the folders you want to generate icons for.\nLeave empty to provide and process a single folder instead',
       optional=True
     )
 
     if not parent_folder:
-      target_folder = Prompt.dir('Enter the path to the specific folder you want to generate an icon for:\nFOLDER: ')
+      target_folder = Prompt.dir(
+        'Enter the path to the specific folder you want to generate an icon for'
+      )
 
       logger.log()
       process_folder(target_folder)

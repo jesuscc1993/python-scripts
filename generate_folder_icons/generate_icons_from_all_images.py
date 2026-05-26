@@ -22,7 +22,9 @@ def main():
   if len(sys.argv) > 1:
     parent_path = sys.argv[1]
   else:
-    parent_path = Prompt.dir('Enter the path to the directory containing the images you want to process')
+    parent_path = Prompt.dir(
+      'Enter the path to the directory containing the images you want to process'
+    )
 
   for root, _, files in os.walk(parent_path):
     for image_path in files:

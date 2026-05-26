@@ -4,7 +4,9 @@ from mtlogger import logger
 from mtprompt import Prompt
 
 def main():
-  parent_folder = Prompt.dir('Enter the path to the parent directory containing the folders or images')
+  parent_folder = Prompt.dir(
+    'Enter the path to the parent directory containing the folders or images'
+  )
 
   delete_empty_folders(parent_folder)
 

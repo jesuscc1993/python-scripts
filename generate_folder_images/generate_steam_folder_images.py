@@ -40,14 +40,18 @@ def main():
   generate_covers(parent_folder, cover_type, override_existing)
 
 def prompt_params():
-  parent_folder = Prompt.dir('Enter the path to the parent folder containing your Steam saves')
-  logger.log()
-
-  cover_type = input('Enter cover type (capsule, header, or library). Default is capsule:\n').strip().lower() or 'capsule'
-  logger.log()
-
-  override_existing = input('Override existing images? (y/N):\n').strip().lower() == 'y'
-  logger.log()
+  parent_folder = Prompt.dir(
+    'Enter the path to the parent folder containing your Steam saves'
+    )
+  cover_type = Prompt.str(
+    'Enter cover type [capsule | header | library]',
+    default='capsule',
+    optional=True
+  )
+  override_existing = Prompt.bool(
+    'Override existing images?',
+    default=False
+  )
 
   return parent_folder, cover_type, override_existing
 

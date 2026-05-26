@@ -7,13 +7,12 @@ from mtprompt import Prompt
 from _common import prompt_path
 
 def main():
-  srt_file = Prompt.file('Enter the path to an SRT file')
-
-  try:
-    shift = int(input('Enter milliseconds to shift (*/-):\n'))
-  except ValueError:
-    logger.error('\nPlease enter a valid integer')
-    return
+  srt_file = Prompt.file(
+    'Enter the path to an SRT file'
+  )
+  shift = Prompt.int(
+    'Enter milliseconds to shift (+/-)'
+  )
 
   shift_subtitles(srt_file, shift)
 

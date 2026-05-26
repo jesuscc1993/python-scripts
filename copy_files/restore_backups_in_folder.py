@@ -9,7 +9,9 @@ def main():
   if len(sys.argv) > 1:
     src_path = sys.argv[1]
   else:
-    src_path = Prompt.dir('Enter the directory containing .bak files to restore')
+    src_path = Prompt.dir(
+      'Enter the directory containing .bak files to restore'
+    )
 
   restore_backups(src_path)
 

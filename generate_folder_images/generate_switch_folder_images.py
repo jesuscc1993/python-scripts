@@ -29,11 +29,13 @@ def main():
   generate_covers(parent_folder, override_existing)
 
 def prompt_params():
-  parent_folder = input('Enter the path to the parent folder containing your Switch saves:\n').strip(' "\'')
-  logger.log()
-
-  override_existing = input('Override existing images? (y/N):\n').strip().lower() == 'y'
-  logger.log()
+  parent_folder = Prompt.dir(
+    'Enter the path to the parent folder containing your Switch saves'
+  )
+  override_existing = Prompt.bool(
+    'Override existing images?',
+    default=False
+  )
 
   return parent_folder, override_existing
 

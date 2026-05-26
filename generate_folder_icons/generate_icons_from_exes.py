@@ -25,8 +25,14 @@ def main():
     parent_path = sys.argv[1]
     depth = int(sys.argv[2]) if len(sys.argv) > 2 else 1
   else:
-    parent_path = Prompt.dir('Enter the path to the directory containing the exes you want to process')
-    depth = Prompt.prompt_depth()
+    parent_path = Prompt.dir(
+      'Enter the path to the directory containing the exes you want to process'
+    )
+    depth = Prompt.int(
+      'Enter the depth for processing subfolders',
+      default=1,
+      optional=True
+    )
 
   parent_path = os.path.abspath(parent_path)
   parent_depth = parent_path.rstrip(os.sep).count(os.sep)
@@ -49,12 +55,12 @@ def main():
 
         save_icon_to_ini(child_path, exe_path)
 
-      except Exception as e:
-        logger.error(f'Could not process "{child_path}": {e}')
+      except Exception as ex:
+        logger.error(f'Could not process "{child_path}": {ex}')
         continue
 
   winsound.MessageBeep()
-  logger.success(f'Finished setting icons for "{parent_path}".')
+  logger.success(f'Finished setting icons for "{parent_path}".', prefix_newline=True)
 
 def find_exe(folder):
   pattern = re.compile('|'.join(EXE_EXCLUSION_PATTERNS), re.IGNORECASE)
@@ -71,8 +77,16 @@ def save_icon_to_ini(dir_path, exe_path):
   config = configparser.ConfigParser()
   config.optionxform = str
 
-  if os.path.exists(ini_path):
-    config.read(ini_path, encoding = ENCODING)
+  encoding = ENCODING
+  try:
+    if os.path.exists(ini_path):
+      config.read(ini_path, encoding=encoding)
+  except Exception as ex:
+    try:
+      encoding = 'cp1252'
+      config.read(ini_path, encoding=encoding)
+    except Exception as ex:
+      logger.error(f'Failed to read {ini_path}: {ex}')
 
   if SHELL_SECTION not in config:
     config[SHELL_SECTION] = {}
@@ -84,7 +98,7 @@ def save_icon_to_ini(dir_path, exe_path):
   relative_exe_path = os.path.relpath(exe_path, dir_path)
   config[SHELL_SECTION][ICON_KEY] = f'{relative_exe_path},0'
 
-  with open(ini_path, 'w', encoding = ENCODING) as ini:
+  with open(ini_path, 'w', encoding=encoding) as ini:
     config.write(ini)
     logger.success(f'Set icon for {dir_path}.')
 

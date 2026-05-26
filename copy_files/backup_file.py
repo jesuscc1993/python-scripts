@@ -13,7 +13,9 @@ def main():
     og_file_path = sys.argv[1]
     watch = sys.argv[2] == 'watch' if len(sys.argv) > 2 else False
   else:
-    og_file_path = Prompt.file('Enter the path to the file to backup')
+    og_file_path = Prompt.file(
+      'Enter the path to the file to backup'
+    )
     watch = False
 
   if watch:

@@ -10,21 +10,17 @@ from mtprompt import Prompt
 from tqdm import tqdm
 
 def main():
-  base_url = input('Enter the url to download from (replace chapter with a %s placeholder):\n').strip(' "\'')
-  if not base_url:
-    logger.log(f'The url must be defined.')
-    return
-
-  css_selector = input('\nEnter the CSS selector for the image container(s):\n').strip() or 'body'
-
-  try:
-    chapter_count = int(input('\nEnter the chapter count:\n').strip() or '1')
-    if chapter_count < 0:
-      raise ValueError()
-  except ValueError:
-    logger.error('\nChapter count must be a positive integer.')
-    return
-  logger.log()
+  base_url = Prompt.str(
+    'Enter the url to download from (replace chapter with a %s placeholder)'
+  )
+  css_selector = Prompt.str(
+    '\nEnter the CSS selector for the image container(s)',
+    default='body'
+  )
+  chapter_count = Prompt.int(
+    'Enter the chapter count',
+    default = 1
+  )
 
   download_all_chapters(base_url, css_selector, chapter_count)
   logger.log()

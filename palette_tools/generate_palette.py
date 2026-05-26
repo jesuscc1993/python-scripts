@@ -11,7 +11,10 @@ SQUARE_SIZE = 40
 MIN_COLS = 4
 
 def main():
-  src_path = input('Enter the path to the image you want to generate the palette for:\n').strip(' "\'')
+  src_path = Prompt.file(
+    'Enter the path to the image you want to generate the palette for'
+  )
+
   generate_palette(src_path)
 
 def generate_palette(image_path):

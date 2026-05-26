@@ -32,8 +32,8 @@ def get_group_name(url_file):
               return PROTOCOL_MAP[protocol]
             parts = re.split(r'[-_]', protocol)
             return ' '.join(p.capitalize() for p in parts)
-  except Exception as e:
-    logger.error(f'Failed to read {url_file}: {e}')
+  except Exception as ex:
+    logger.error(f'Failed to read {url_file}: {ex}')
   return None
 
 if __name__ == '__main__':

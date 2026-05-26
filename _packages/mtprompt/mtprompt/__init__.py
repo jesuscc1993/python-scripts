@@ -14,14 +14,41 @@ class Prompt:
     prompt = prompt.strip(' "\'')
 
     while True:
-      string = input(f'{prompt}:\n')
+      val = input(format_prompt(prompt, default))
 
-      if not string and not optional:
+      if not val and not optional:
         logger.error('A string is required.\n')
         continue
 
       logger.log()
-      return string if string else default
+      return val if val else default
+
+
+  @staticmethod
+  def int(
+    prompt = '',
+    *,
+    optional = False,
+    default: int = None
+  ):
+    prompt = prompt.strip(' "\'')
+
+    while True:
+      val = input(format_prompt(prompt, default))
+
+      if not val and not optional:
+        logger.error('An integer is required.\n')
+        continue
+
+      if val != '':
+        try:
+          val = int(val)
+        except ValueError:
+          logger.error(f'Input "{val}" is not an integer.\n')
+          continue
+
+      logger.log()
+      return val if val else default
 
   @staticmethod
   def bool(
@@ -65,18 +92,18 @@ class Prompt:
     prompt = prompt.strip(' "\'')
 
     while True:
-      path = input(format_prompt(prompt, default)).strip(' "')
+      val = input(format_prompt(prompt, default)).strip(' "')
 
-      if not path and not optional:
-        logger.error('A path path is required.\n')
+      if not val and not optional:
+        logger.error('A path is required.\n')
         continue
 
-      if path and not os.path.exists(path):
-        logger.error(f'Path "{path}" is not a path.\n')
+      if val and not os.path.exists(val):
+        logger.error(f'Path "{val}" does not exist.\n')
         continue
 
       logger.log()
-      return path if path else default
+      return val if val else default
 
   @staticmethod
   def dir(
@@ -88,18 +115,18 @@ class Prompt:
     prompt = prompt.strip(' "\'')
 
     while True:
-      directory = input(format_prompt(prompt, default)).strip(' "')
+      val = input(format_prompt(prompt, default)).strip(' "')
 
-      if not directory and not optional:
+      if not val and not optional:
         logger.error('A directory path is required.\n')
         continue
 
-      if directory and not os.path.isdir(directory):
-        logger.error(f'Path "{directory}" is not a directory.\n')
+      if val and not os.path.isdir(val):
+        logger.error(f'Path "{val}" is not a directory.\n')
         continue
 
       logger.log()
-      return directory if directory else default
+      return val if val else default
 
   @staticmethod
   def file(
@@ -111,41 +138,18 @@ class Prompt:
     prompt = prompt.strip(' "\'')
 
     while True:
-      file = input(format_prompt(prompt, default)).strip(' "')
+      val = input(format_prompt(prompt, default)).strip(' "')
 
-      if not file and not optional:
+      if not val and not optional:
         logger.error('A file path is required.\n')
         continue
 
-      if file and not os.path.isfile(file):
-        logger.error(f'Path "{file}" is not a file.\n')
+      if val and not os.path.isfile(val):
+        logger.error(f'Path "{val}" is not a file.\n')
         continue
 
       logger.log()
-      return file if file else default
-
-  @staticmethod
-  def prompt_depth(
-    prompt = 'Enter the depth for processing subfolders',
-    *,
-    optional = False,
-    default: int = 1
-  ):
-    while True:
-      try:
-        depth = int(input(format_prompt(prompt, default)).strip() or default)
-        if depth < 0:
-          raise ValueError()
-      except ValueError:
-        logger.error('Depth must be a positive integer.')
-        continue
-
-      if not depth and not optional:
-        logger.error('A depth is required.\n')
-        continue
-
-      logger.log()
-      return depth if depth else default
+      return val if val else default
 
   @staticmethod
   def enter_to_exit():
