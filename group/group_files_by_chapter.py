@@ -16,7 +16,7 @@ CHAPTER_REGEX = r'Ch(?:ap(?:ter)?)?|Ep(?:isode)?'
 CHAPTER_NUMBER_REGEX  = rf'(?:{CHAPTER_REGEX}){NUMBER_REGEX}'
 
 def main():
-  parent_dir = sys.argv[1] if len(sys.argv) > 1 else Prompt.dir('Enter the path to the directory containing the files you want to group:')
+  parent_dir = sys.argv[1] if len(sys.argv) > 1 else Prompt.dir('Enter the path to the directory containing the files you want to group')
 
   process_parent_folder(parent_dir)
 
@@ -28,7 +28,7 @@ def process_parent_folder(parent_dir):
     if should_process_item(item_path):
       chapter = get_chapter(item)
       if not chapter:
-        tqdm.write(logger.format(LogLevel.WARN, f'Skipping "{item}". Chapter number could not be inferred.'))
+        tqdm.write(logger.formatLevel(LogLevel.WARN, f'Skipping "{item}". Chapter number could not be inferred.'))
         continue
 
       output_path = os.path.join(parent_dir, f'Ch.{chapter.zfill(2)}')
@@ -77,4 +77,4 @@ if __name__ == '__main__':
     logger.unhandledError(ex)
 
   winsound.MessageBeep()
-  Prompt.enterToExit()
+  Prompt.enter_to_exit()

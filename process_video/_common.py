@@ -19,12 +19,3 @@ def strip_tags_from_subs_file(file_path):
   content = re.sub(r'</?font\b[^>]*>', '', content, flags = re.IGNORECASE)
   with open(file_path, 'w', encoding = ENCODING) as f:
     f.write(content)
-
-def prompt_path(prompt_message, optional = False):
-  path = input(prompt_message).strip(' "\'')
-  if not os.path.exists(path):
-    logger.error(f'The specified path "{path}" does not exist.')
-    if not optional: sys.exit(1)
-    return None
-  logger.log()
-  return path

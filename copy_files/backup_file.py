@@ -6,14 +6,14 @@ import time
 from mtlogger import logger
 from mtprompt import Prompt
 
-from _common import prompt_file, rename_with_timestamp, BACKUP_EXT, BACKUP_PATH, WATCH_INTERVAL
+from _common import rename_with_timestamp, BACKUP_EXT, BACKUP_PATH, WATCH_INTERVAL
 
 def main():
   if len(sys.argv) > 1:
     og_file_path = sys.argv[1]
     watch = sys.argv[2] == 'watch' if len(sys.argv) > 2 else False
   else:
-    og_file_path = prompt_file('Enter the path to the file to backup:\n')
+    og_file_path = Prompt.file('Enter the path to the file to backup')
     watch = False
 
   if watch:
@@ -23,7 +23,6 @@ def main():
       time.sleep(WATCH_INTERVAL)
   else:
     backup_file(og_file_path)
-    logger.log()
 
 def backup_file(og_file_path):
   og_dir_path = os.path.dirname(og_file_path)
@@ -47,11 +46,12 @@ def backup_file(og_file_path):
     rename_with_timestamp(bak_dir_path, bak_file_path)
 
   shutil.copy2(og_file_path, bak_file_path)
-  logger.log(f'Backed up "{og_file_name}" as "{bak_file_name}"')
+  logger.success(f'Backed up "{og_file_name}" as "{bak_file_name}"')
 
 if __name__ == '__main__':
   try:
     main()
   except Exception as ex:
     logger.unhandledError(ex)
-    Prompt.enterToExit()
+
+  Prompt.enter_to_exit()

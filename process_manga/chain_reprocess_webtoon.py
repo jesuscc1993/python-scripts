@@ -6,7 +6,8 @@ from _common import select_parent_folder, run_scripts_in_sequence
 SCRIPT_NAMES = [
   '../compress/extract_archives',
   'crop_webtoon',
-  '../compress/compress_folders'
+  '../compress/compress_folders',
+  'rename_items'
 ]
 
 def process_parent_folder(parent_folder):
@@ -17,4 +18,4 @@ if __name__ == '__main__':
     select_parent_folder(None, process_parent_folder)
   except Exception as ex:
     logger.unhandledError(ex)
-    Prompt.enterToExit()
+    Prompt.enter_to_exit()

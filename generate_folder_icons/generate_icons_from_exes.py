@@ -7,8 +7,6 @@ import winsound
 from mtlogger import logger
 from mtprompt import Prompt
 
-from _common import prompt_depth, prompt_path
-
 ENCODING = 'utf-8'
 ICON_KEY = 'IconResource'
 INI_FILENAME = 'desktop.ini'
@@ -27,8 +25,8 @@ def main():
     parent_path = sys.argv[1]
     depth = int(sys.argv[2]) if len(sys.argv) > 2 else 1
   else:
-    parent_path = prompt_path('Enter the folder path to process:\n')
-    depth = prompt_depth()
+    parent_path = Prompt.dir('Enter the path to the directory containing the exes you want to process')
+    depth = Prompt.prompt_depth()
 
   parent_path = os.path.abspath(parent_path)
   parent_depth = parent_path.rstrip(os.sep).count(os.sep)
@@ -98,4 +96,4 @@ if __name__ == '__main__':
     main()
   except Exception as ex:
     logger.unhandledError(ex)
-  Prompt.enterToExit()
+  Prompt.enter_to_exit()

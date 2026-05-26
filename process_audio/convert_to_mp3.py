@@ -23,7 +23,7 @@ MP3_BITRATE = '320k'
 MP3_EXT = '.mp3'
 
 def main():
-  parent_path = sys.argv[1] if len(sys.argv) > 1 else prompt_path('Enter the folder path to process:\n')
+  parent_path = sys.argv[1] if len(sys.argv) > 1 else Prompt.dir('Enter the folder path to process')
   bitrate = sys.argv[2] if len(sys.argv) > 2 else MP3_BITRATE
 
   files_to_convert = []
@@ -82,18 +82,9 @@ def convert_to_mp3(input_path, output_path, bitrate):
   if result.returncode != 0:
     raise RuntimeError(result.stderr.decode('utf-8'))
 
-def prompt_path(prompt_message, optional = False):
-  path = input(prompt_message).strip(' "\'')
-  if not path or not os.path.isdir(path):
-    logger.error(f'The specified path "{path}" is not a directory.')
-    if not optional: sys.exit(1)
-    return None
-  logger.log()
-  return path
-
 if __name__ == '__main__':
   try:
     main()
   except Exception as ex:
     logger.unhandledError(ex)
-  Prompt.enterToExit()
+  Prompt.enter_to_exit()

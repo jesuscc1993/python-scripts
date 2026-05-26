@@ -9,7 +9,7 @@ from mtprompt import Prompt
 from _common import FILE_BLACKLIST, process_parent_folder
 
 def main():
-  parent_dir = sys.argv[1] if len(sys.argv) > 1 else Prompt.dir('Enter the path to the directory containing the files you want to group:')
+  parent_dir = sys.argv[1] if len(sys.argv) > 1 else Prompt.dir('Enter the path to the directory containing the files you want to group')
 
   process_parent_folder(parent_dir, should_process_item, get_group_name)
 
@@ -38,4 +38,4 @@ if __name__ == '__main__':
     logger.unhandledError(ex)
 
   winsound.MessageBeep()
-  Prompt.enterToExit()
+  Prompt.enter_to_exit()

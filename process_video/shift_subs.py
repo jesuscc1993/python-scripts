@@ -7,7 +7,7 @@ from mtprompt import Prompt
 from _common import prompt_path
 
 def main():
-  srt_file = prompt_path('Enter the path to an SRT file:\n')
+  srt_file = Prompt.file('Enter the path to an SRT file')
 
   try:
     shift = int(input('Enter milliseconds to shift (*/-):\n'))
@@ -48,11 +48,14 @@ def shift_subtitles(srt_path, ms_to_shift):
   with open(srt_path, 'w', encoding='utf-8') as f:
     f.write(new_content)
 
-  logger.success(f'\nSubtitles shifted by {ms_to_shift}ms')
+  logger.success(
+    f'Subtitles shifted by {ms_to_shift}ms',
+    prefix_newline=True
+  )
 
 if __name__ == '__main__':
   try:
     main()
   except Exception as ex:
     logger.unhandledError(ex)
-  Prompt.enterToExit()
+  Prompt.enter_to_exit()

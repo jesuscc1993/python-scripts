@@ -35,10 +35,11 @@ def prompt_parent_folder():
 
 def prompt_chapter_ranges():
   ranges_input = input('Enter the last chapter for each volume, separated by commas (e.g. 12,24,36):\n')
-  logger.log()
   if not ranges_input:
     logger.error('No ranges were provided.')
     return None
+
+  logger.log()
   try:
     chapter_bounds = sorted([float(x.strip()) for x in ranges_input.split(',')])
   except Exception as ex:
@@ -61,7 +62,7 @@ def process_parent_folder(parent_folder, chapter_ranges):
   for folder in tqdm(folders, desc=f'Processing "{parent_folder}"'):
     chapter = get_chapter(folder)
     if not chapter:
-      tqdm.write(logger.format(LogLevel.WARN, f'Skipping "{folder}". Chapter number could not be inferred.'))
+      tqdm.write(logger.formatLevel(LogLevel.WARN, f'Skipping "{folder}". Chapter number could not be inferred.'))
       continue
     try:
       ch_num = float(chapter)
@@ -91,4 +92,4 @@ if __name__ == '__main__':
     main()
   except Exception as ex:
     logger.unhandledError(ex)
-    Prompt.enterToExit()
+    Prompt.enter_to_exit()

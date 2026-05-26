@@ -22,7 +22,7 @@ def main():
   if len(sys.argv) > 1:
     parent_path = sys.argv[1]
   else:
-    parent_path = prompt_path('Enter the folder path to process:\n')
+    parent_path = Prompt.dir('Enter the path to the directory containing the images you want to process')
 
   for root, _, files in os.walk(parent_path):
     for image_path in files:
@@ -38,4 +38,4 @@ if __name__ == '__main__':
     main()
   except Exception as ex:
     logger.unhandledError(ex)
-  Prompt.enterToExit()
+  Prompt.enter_to_exit()

@@ -15,7 +15,7 @@ def main():
   if len(sys.argv) > 1:
     input_path = sys.argv[1]
   else:
-    input_path = prompt_path('Enter the path to a video file or directory:\n')
+    input_path = Prompt.path('Enter the path to a video file or directory')
 
   if os.path.isfile(input_path):
     process_file(input_path)
@@ -62,4 +62,4 @@ if __name__ == '__main__':
     main()
   except Exception as ex:
     logger.unhandledError(ex)
-  Prompt.enterToExit()
+  Prompt.enter_to_exit()

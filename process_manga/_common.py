@@ -33,6 +33,7 @@ def select_parent_folder(prompt, callback, options = {}):
     logger.success(f'Finished processing "{parent_folder}".\n')
 
   if loop:
+    logger.hr()
     select_parent_folder(prompt, callback)
   else:
     input('')
@@ -78,7 +79,10 @@ def run_scripts_in_sequence(script_names, parent_folder):
   for script in script_names:
     abs_path = os.path.abspath(os.path.join(os.path.dirname(__file__), script + '.py'))
 
-    logger.log(f'\nRunning {script}:')
+    logger.dim(f'\nRunning {script}:')
     subprocess.run(['python', abs_path, parent_folder], env=env)
 
-  logger.success(f'\nFinished batch running scripts on "{parent_folder}".\n')
+  logger.info(
+    f'Finished batch running scripts on "{parent_folder}".\n',
+    prefix_newline=True
+  )

@@ -16,6 +16,8 @@ def main():
 def process_parent_folder(folder_path):
   process_folder_images(folder_path, process_image)
 
+  logger.success(f'Finished resizing images in "{folder_path}".')
+
 def process_image(original_path):
   try:
     with Image.open(original_path) as img:
@@ -29,11 +31,11 @@ def process_image(original_path):
         save_image_to_path(img, original_path)
 
   except Exception as ex:
-    logger.log(f'Error processing "{original_path}":\n{ex}')
+    logger.error(f'Error processing "{original_path}":\n{ex}')
 
 if __name__ == '__main__':
   try:
     main()
   except Exception as ex:
     logger.unhandledError(ex)
-    Prompt.enterToExit()
+    Prompt.enter_to_exit()

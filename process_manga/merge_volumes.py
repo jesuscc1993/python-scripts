@@ -3,7 +3,7 @@ import shutil
 import sys
 
 from concurrent.futures import ThreadPoolExecutor
-from mtlogger import logger
+from mtlogger import LogLevel, logger
 from mtprompt import Prompt
 from tqdm import tqdm
 
@@ -23,7 +23,7 @@ def process_parent_folder(parent_dir):
     if os.path.isdir(folder_path):
       volume, chapter = get_volume_and_chapter(folder)
       if not volume or not chapter:
-        tqdm.write(logger.format(LogLevel.WARN, f'Skipping "{folder}". Volume or chapter numbers could not be inferred.'))
+        tqdm.write(logger.formatLevel(LogLevel.WARN, f'Skipping "{folder}". Volume or chapter numbers could not be inferred.'))
         continue
 
       output_path = os.path.join(parent_dir, f'Vol.{volume.zfill(2)}')
@@ -40,6 +40,8 @@ def process_parent_folder(parent_dir):
       progress.update(1)
 
   delete_empty_folders(parent_dir)
+
+  logger.success(f'Finished merging volumes in "{parent_dir}".')
 
 def get_sanitized_chapter(chapter):
   parts = chapter.split('.')
@@ -64,4 +66,4 @@ if __name__ == '__main__':
     main()
   except Exception as ex:
     logger.unhandledError(ex)
-    Prompt.enterToExit()
+    Prompt.enter_to_exit()

@@ -5,16 +5,15 @@ import sys
 from mtlogger import logger
 from mtprompt import Prompt
 
-from _common import prompt_file, rename_with_timestamp, BACKUP_EXT, BACKUP_PATH
+from _common import rename_with_timestamp, BACKUP_EXT, BACKUP_PATH
 
 def main():
   if len(sys.argv) > 1:
     bak_file_path = sys.argv[1]
   else:
-    bak_file_path = prompt_file('Enter the path to the file to restore:\n')
+    bak_file_path = Prompt.file('Enter the path to the file to restore')
 
   restore_file(bak_file_path)
-  logger.log()
 
 def restore_file(bak_file_path):
   bak_dir_path = os.path.dirname(bak_file_path)
@@ -44,4 +43,5 @@ if __name__ == '__main__':
     main()
   except Exception as ex:
     logger.unhandledError(ex)
-    Prompt.enterToExit()
+
+  Prompt.enter_to_exit()

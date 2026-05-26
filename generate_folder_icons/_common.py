@@ -10,25 +10,6 @@ ICON_FILENAME = 'icon.ico'
 MAX_ICON_SIZE = 256
 DEFAULT_ICON_SIZES = [16, 256]
 
-def prompt_path(prompt_message, optional = False):
-  path = input(prompt_message).strip(' "\'')
-  if not path or not os.path.isdir(path):
-    logger.error(f'The specified path "{path}" is not a directory.')
-    if not optional: sys.exit(1)
-    return None
-  logger.log()
-  return path
-
-def prompt_depth():
-  try:
-    depth = int(input('Enter the depth for processing subfolders (default: 1):\n').strip() or 1)
-    if depth < 0:
-      raise ValueError()
-    return depth
-  except ValueError:
-    logger.error('\nDepth must be a positive integer.')
-    return
-
 def process_parent_folder(parent_folder, depth, image_filenames):
   process_folder(parent_folder, image_filenames)
 

@@ -18,6 +18,8 @@ def main():
 def process_parent_folder(folder_path):
   process_folder_images(folder_path, process_image)
 
+  logger.success(f'Finished cropping borders in "{folder_path}".')
+
 def process_image(file_path):
   try:
     with Image.open(file_path) as img:
@@ -52,4 +54,4 @@ if __name__ == '__main__':
     main()
   except Exception as ex:
     logger.unhandledError(ex)
-    Prompt.enterToExit()
+    Prompt.enter_to_exit()

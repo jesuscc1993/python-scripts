@@ -41,7 +41,10 @@ def process_parent_folder(directory):
       f'{" ".join(format_chapter(ch) for ch in sorted(missing_chapters))}'
     )
   else:
-    logger.success(f'\nNo chapters found missing in "{directory}".')
+    logger.success(
+      f'No chapters found missing in "{directory}".',
+      prefix_newline=True
+    )
 
 def process_chapter_folder(directory, chapter):
   pattern = re.compile(r'(\d+)', re.IGNORECASE)
@@ -78,4 +81,4 @@ if __name__ == '__main__':
     main()
   except Exception as ex:
     logger.unhandledError(ex)
-    Prompt.enterToExit()
+    Prompt.enter_to_exit()

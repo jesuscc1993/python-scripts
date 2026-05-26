@@ -15,10 +15,11 @@ from _common import BAK_EXTENSION
 output_ext = f'.{IMAGE_OUTPUT_FORMAT.lower()}'
 
 def main():
-  parent_dir = sys.argv[1] if len(sys.argv) > 1 else Prompt.dir('Enter the path to the directory containing the images you want to compress:')
+  parent_dir = sys.argv[1] if len(sys.argv) > 1 else Prompt.dir('Enter the path to the directory containing the images you want to compress')
   lossless = sys.argv[2].lower() == LOSSLESS if len(sys.argv) > 2 else IMAGE_OUTPUT_LOSSLESS_COMPRESSION
   quality = int(sys.argv[2]) if len(sys.argv) > 2 and not lossless else IMAGE_OUTPUT_QUALITY
 
+  logger.log(f'Compressing images in "{parent_dir}"...')
   compress_child_images(parent_dir, lossless, quality)
   logger.success(f'Compressed images in "{parent_dir}".')
 
@@ -73,4 +74,4 @@ if __name__ == '__main__':
     logger.unhandledError(ex)
 
   winsound.MessageBeep()
-  Prompt.enterToExit()
+  Prompt.enter_to_exit()

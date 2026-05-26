@@ -5,7 +5,7 @@ import sys
 from mtlogger import logger
 from mtprompt import Prompt
 
-from _common import prompt_path
+from _common import enforce_unique_path
 
 FILES_TO_COPY = {
   'cover.jpg',
@@ -19,12 +19,14 @@ def main():
     src_path = sys.argv[1]
     dest_path = sys.argv[2]
   else:
-    src_path = prompt_path('Enter the path containing the files to copy:\n')
-    dest_path = prompt_path('Enter the path the files will be copied to:\n')
+    src_path = Prompt.dir('Enter the path containing the files to copy')
+    dest_path = Prompt.dir('Enter the path the files will be copied to')
 
-  copy_folder_assets(src_path, dest_path)
-  logger.log(f'\nFinished copying "{src_path}" to "{dest_path}".\n')
-  main()
+  try:
+    enforce_unique_path(src_path, dest_path)
+    copy_folder_assets(src_path, dest_path)
+  except ValueError as ex:
+    logger.error(ex)
 
 def copy_folder_assets(src_path, dest_path):
   for item in os.listdir(src_path):
@@ -38,11 +40,14 @@ def copy_folder_assets(src_path, dest_path):
           src_file = os.path.join(item_path, file)
           dest_file = os.path.join(dest_folder, file)
           shutil.copy2(src_file, dest_file)
-          logger.log(f'Copied "{src_file}" as "{dest_file}".')
+          logger.debug(f'Copied "{src_file}" as "{dest_file}".')
+
+  logger.success(f'Finished copying "{src_path}" to "{dest_path}".')
 
 if __name__ == '__main__':
   try:
     main()
   except Exception as ex:
     logger.unhandledError(ex)
-    Prompt.enterToExit()
+
+  Prompt.enter_to_exit()

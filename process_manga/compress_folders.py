@@ -15,4 +15,4 @@ if __name__ == '__main__':
     select_parent_folder('Enter the path to the parent folder containing the folders you want to compress:\n', process_parent_folder)
   except Exception as ex:
     logger.unhandledError(ex)
-    Prompt.enterToExit()
+    Prompt.enter_to_exit()

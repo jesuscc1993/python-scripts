@@ -58,6 +58,13 @@ def get_processed_name(name):
     flags = re.IGNORECASE
   )
 
+  new_name = re.sub(
+    r'\.zip$',
+    '.cbz',
+    new_name,
+    flags = re.IGNORECASE
+  )
+
   return new_name
 
 if __name__ == '__main__':
@@ -67,4 +74,4 @@ if __name__ == '__main__':
     logger.unhandledError(ex)
 
   winsound.MessageBeep()
-  Prompt.enterToExit()
+  Prompt.enter_to_exit()

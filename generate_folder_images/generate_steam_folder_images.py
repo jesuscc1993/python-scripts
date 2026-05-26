@@ -40,7 +40,7 @@ def main():
   generate_covers(parent_folder, cover_type, override_existing)
 
 def prompt_params():
-  parent_folder = input('Enter the path to the parent folder containing your Steam saves:\n').strip(' "\'')
+  parent_folder = Prompt.dir('Enter the path to the parent folder containing your Steam saves')
   logger.log()
 
   cover_type = input('Enter cover type (capsule, header, or library). Default is capsule:\n').strip().lower() or 'capsule'
@@ -122,4 +122,4 @@ if __name__ == '__main__':
     main()
   except Exception as ex:
     logger.unhandledError(ex)
-  Prompt.enterToExit()
+  Prompt.enter_to_exit()

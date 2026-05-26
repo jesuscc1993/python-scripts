@@ -10,8 +10,8 @@ from win32com.client import Dispatch
 from _constants import BINARY_BLACKLIST, ROM_EXTS, BINARY_BY_PLATFORM
 
 def main():
-  binaries_dir = sys.argv[1] if len(sys.argv) > 1 else Prompt.dir('Enter the path to the directory containing the emulator binaries:')
-  roms_dir = sys.argv[2] if len(sys.argv) > 2 else Prompt.dir('\nEnter the path to the directory containing the ROMs:')
+  binaries_dir = sys.argv[1] if len(sys.argv) > 1 else Prompt.dir('Enter the path to the directory containing the emulator binaries')
+  roms_dir = sys.argv[2] if len(sys.argv) > 2 else Prompt.dir('Enter the path to the directory containing the ROMs')
   out_dir = sys.argv[3] if len(sys.argv) > 3 else os.path.join(roms_dir, 'shortcuts')
 
   binaries = find_binaries(binaries_dir)
@@ -130,4 +130,4 @@ if __name__ == '__main__':
     logger.unhandledError(ex)
 
   winsound.MessageBeep()
-  Prompt.enterToExit()
+  Prompt.enter_to_exit()

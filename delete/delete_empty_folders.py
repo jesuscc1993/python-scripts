@@ -4,11 +4,9 @@ from mtlogger import logger
 from mtprompt import Prompt
 
 def main():
-  parent_folder = input('Enter the path to the parent folder containing the folders or images:\n').strip(' "\'')
-  if not os.path.isdir(parent_folder):
-    logger.error(f'The specified path "{parent_folder}" is not a directory.')
-  else:
-    delete_empty_folders(parent_folder)
+  parent_folder = Prompt.dir('Enter the path to the parent directory containing the folders or images')
+
+  delete_empty_folders(parent_folder)
 
 def delete_empty_folders(parent_folder):
   none_deleted = True
@@ -22,12 +20,15 @@ def delete_empty_folders(parent_folder):
         logger.log(f'Deleted empty folder: "{dir_path}"')
       except OSError:
         pass
+
   if none_deleted:
     logger.log('No empty folders were found.')
+  else:
+    logger.success('Finished deleting empty folders.')
 
 if __name__ == '__main__':
   try:
     main()
   except Exception as ex:
     logger.unhandledError(ex)
-  Prompt.enterToExit()
+  Prompt.enter_to_exit()
