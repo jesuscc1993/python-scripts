@@ -8,7 +8,8 @@ SCRIPT_NAMES = [
   'prefix_volumes',
   'merge_volumes',
   '../compress/compress_folders',
-  'rename_items'
+  'rename_items',
+  '../rename/rename_zip_to_cbz'
 ]
 
 def process_parent_folder(parent_folder):

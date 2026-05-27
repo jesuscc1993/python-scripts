@@ -3,7 +3,9 @@ import os
 from mtlogger import logger
 from natsort import natsorted
 
-def process_items(parent_dir, items, name_pattern):
+def rename_items_by_sequential_pattern(parent_dir, items, name_pattern):
+  logger.log(f'Renaming items in "{parent_dir}"...')
+
   items = natsorted(items)
   num_digits = len(str(len(items)))
 
@@ -15,5 +17,5 @@ def process_items(parent_dir, items, name_pattern):
     new_path = os.path.join(parent_dir, new_name)
 
     os.rename(old_path, new_path)
-    logger.log(f'Renamed "{old_name}" to "{new_name}".')
-  logger.log(f'\nFinished processing "{parent_dir}".')
+    logger.debug(f'Renamed "{old_name}" to "{new_name}".')
+  logger.success(f'Finished renaming items in "{parent_dir}".')

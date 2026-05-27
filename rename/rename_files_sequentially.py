@@ -1,23 +1,38 @@
 import os
+import sys
+import winsound
 
 from mtlogger import logger
 from mtprompt import Prompt
 
-from _common import process_items
+from _common import rename_items_by_sequential_pattern
 
 def main():
-  parent_dir = input('Enter the path to the folder containing your files:\n').strip(' "\'')
-  print()
+  if len(sys.argv) > 1:
+    parent_dir = sys.argv[1]
+  else:
+    parent_dir = Prompt.dir(
+      'Enter the path to the directory containing your files'
+    )
 
-  name_pattern = input('Enter the name pattern pattern (optional; use $ for number interpolation):\n').strip() or '$'
-  print()
+  name_pattern = Prompt.str(
+    'Enter the name pattern\nUse $ for number interpolation\n',
+    optional=True,
+    default='$'
+  )
 
-  items = [f for f in os.listdir(parent_dir) if os.path.isfile(os.path.join(parent_dir, f)) and not f.startswith('.')]
-  process_items(parent_dir, items, name_pattern)
+  items = [
+    f
+    for f in os.listdir(parent_dir)
+    if os.path.isfile(os.path.join(parent_dir, f)) and not f.startswith('.')
+  ]
+  rename_items_by_sequential_pattern(parent_dir, items, name_pattern)
 
 if __name__ == '__main__':
   try:
     main()
   except Exception as ex:
     logger.unhandledError(ex)
+
+  winsound.MessageBeep()
   Prompt.enter_to_exit()

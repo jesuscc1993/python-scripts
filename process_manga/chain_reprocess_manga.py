@@ -7,7 +7,8 @@ SCRIPT_NAMES = [
   '../compress/extract_archives',
   'resize_manga',
   '../compress/compress_folders',
-  'rename_items'
+  'rename_items',
+  '../rename/rename_zip_to_cbz'
 ]
 
 def process_parent_folder(parent_folder):
