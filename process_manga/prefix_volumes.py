@@ -13,7 +13,9 @@ def main():
   if len(sys.argv) > 1:
     folder = sys.argv[1]
   else:
-    folder = prompt_parent_folder()
+    folder = Prompt.dir(
+      'Enter the path to the parent folder containing the chapter folders you want to prefix'
+    )
 
   if len(sys.argv) > 2:
     ranges = sys.argv[2]
@@ -23,21 +25,8 @@ def main():
   if folder and ranges:
     process_parent_folder(folder, ranges)
 
-def prompt_parent_folder():
-  parent_folder = input('Enter the path to the parent folder containing the chapter folders you want to prefix:\n')
-  logger.log()
-  if os.path.isdir(parent_folder):
-    return parent_folder
-  else:
-    if parent_folder:
-      logger.error(f'The specified path "{parent_folder}" is not a directory.')
-    return None
-
 def prompt_chapter_ranges():
-  ranges_input = input('Enter the last chapter for each volume, separated by commas (e.g. 12,24,36):\n')
-  if not ranges_input:
-    logger.error('No ranges were provided.')
-    return None
+  ranges_input = Prompt.str('Enter the last chapter for each volume, separated by commas (e.g. 12,24,36)')
 
   logger.log()
   try:
@@ -82,7 +71,7 @@ def process_parent_folder(parent_folder, chapter_ranges):
   winsound.MessageBeep()
   logger.success(f'Finished prefixing volumes in "{parent_folder}".\n')
 
-  merge_input = input('Merge volumes? (Y/n)\n').strip().lower() != 'n'
+  merge_input = Prompt.bool('Merge volumes?', default=True)
   if merge_input:
     merge_script = os.path.join(os.path.dirname(__file__), 'merge_volumes.py')
     subprocess.run([sys.executable, merge_script, parent_folder], check = True)

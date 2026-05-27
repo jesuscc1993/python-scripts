@@ -8,7 +8,7 @@ from mtlogger import logger
 from tqdm import tqdm
 
 BAK_TYPE = 'BAK'
-ZIP_TYPES = ['ZIP', 'CBR', 'CBZ']
+ZIP_TYPES = ['ZIP', 'CBZ']
 
 BAK_EXTENSION = f'.{BAK_TYPE.lower()}'
 

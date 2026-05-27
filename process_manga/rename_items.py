@@ -17,13 +17,11 @@ def main():
     prompt_parent_folder()
 
 def prompt_parent_folder():
-  parent_folder = input('Enter the path to the parent folder containing the chapter folders you want to rename:\n')
-  if not parent_folder:
-    return
-  if not os.path.isdir(parent_folder):
-    logger.error(f'The specified path "{parent_folder}" is not a directory.')
-  else:
-    process_parent_folder(parent_folder)
+  parent_folder = Prompt.dir(
+    'Enter the path to the parent folder containing the chapter folders you want to rename'
+  )
+
+  process_parent_folder(parent_folder)
 
 def process_parent_folder(parent_folder):
   for root, dirs, files in os.walk(parent_folder, topdown = False):

@@ -4,7 +4,7 @@ import sys
 from mtlogger import logger
 from mtprompt import Prompt
 
-from _common import image_to_ico, prompt_path
+from _common import image_to_ico
 
 IMAGE_EXTS = [
   '.avif',

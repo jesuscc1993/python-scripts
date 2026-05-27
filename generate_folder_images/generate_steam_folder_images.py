@@ -45,8 +45,7 @@ def prompt_params():
     )
   cover_type = Prompt.str(
     'Enter cover type [capsule | header | library]',
-    default='capsule',
-    optional=True
+    default='capsule'
   )
   override_existing = Prompt.bool(
     'Override existing images?',

@@ -16,7 +16,7 @@ class Prompt:
     while True:
       val = input(format_prompt(prompt, default))
 
-      if not val and not optional:
+      if not val and default is None and not optional:
         logger.error('A string is required.\n')
         continue
 
@@ -36,7 +36,7 @@ class Prompt:
     while True:
       val = input(format_prompt(prompt, default))
 
-      if not val and not optional:
+      if not val and default is None and not optional:
         logger.error('An integer is required.\n')
         continue
 
@@ -75,7 +75,7 @@ class Prompt:
       else:
         boolean = default
 
-      if boolean is None and not optional:
+      if boolean is None and default is None and not optional:
         logger.error('A value is required.\n')
         continue
 
@@ -94,7 +94,7 @@ class Prompt:
     while True:
       val = input(format_prompt(prompt, default)).strip(' "')
 
-      if not val and not optional:
+      if not val and default is None and not optional:
         logger.error('A path is required.\n')
         continue
 
@@ -117,7 +117,7 @@ class Prompt:
     while True:
       val = input(format_prompt(prompt, default)).strip(' "')
 
-      if not val and not optional:
+      if not val and default is None and not optional:
         logger.error('A directory path is required.\n')
         continue
 
@@ -140,7 +140,7 @@ class Prompt:
     while True:
       val = input(format_prompt(prompt, default)).strip(' "')
 
-      if not val and not optional:
+      if not val and default is None and not optional:
         logger.error('A file path is required.\n')
         continue
 
@@ -159,4 +159,4 @@ class Prompt:
 def format_prompt(prompt: str, default: str = None):
   formatted_prompt = prompt.strip(' ')
   formatted_default = f'(default: {default})' if default else ''
-  return f'{formatted_prompt}{' ' if formatted_default and not formatted_prompt.endswith('\n') else ''}{formatted_default}:\n'
+  return f'{formatted_prompt}{' ' if formatted_default and not formatted_prompt.endswith('\n') else ''}{formatted_default}{":\n" if formatted_prompt or formatted_default else ""}'

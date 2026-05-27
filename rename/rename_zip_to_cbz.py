@@ -18,13 +18,18 @@ def main():
 def rename_zip_to_cbz(parent_dir: str):
   logger.log(f'Renaming ZIP files to CBZ in "{parent_dir}"...')
 
-  with os.scandir(parent_dir) as items:
-    for item in items:
-      if item.is_file() and item.name.lower().endswith('.zip'):
-        new_path = os.path.splitext(item.path)[0] + '.cbz'
-        os.rename(item.path, new_path)
-        logger.debug(f'Renamed "{item.name}" to "{os.path.basename(new_path)}".')
-    logger.success(f'Renamed ZIP files to CBZ in "{parent_dir}".')
+  for root, _, files in os.walk(parent_dir):
+    for name in files:
+      old_path = os.path.join(root, name)
+      new_path = os.path.splitext(old_path)[0] + '.cbz'
+
+      if not name.lower().endswith('.zip') or not os.path.isfile(old_path):
+        continue
+
+      os.rename(old_path, new_path)
+      logger.debug(f'Renamed "{old_path}" to "{new_path}".')
+
+  logger.success(f'Renamed ZIP files to CBZ in "{parent_dir}".')
 
 if __name__ == '__main__':
   try:

@@ -2,7 +2,7 @@ import os
 import subprocess
 import sys
 
-from _common import prompt_path, strip_tags_from_subs_file
+from _common import strip_tags_from_subs_file
 from mtlogger import logger
 from mtprompt import Prompt
 

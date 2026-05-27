@@ -17,7 +17,6 @@ def main():
 
   name_pattern = Prompt.str(
     'Enter the name pattern\nUse $ for number interpolation\n',
-    optional=True,
     default='$'
   )
 

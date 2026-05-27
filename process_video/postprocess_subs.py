@@ -4,7 +4,7 @@ import sys
 from mtlogger import logger
 from mtprompt import Prompt
 
-from _common import add_missing_spaces, prompt_path, strip_tags_from_subs_file
+from _common import add_missing_spaces, strip_tags_from_subs_file
 
 SUBTITLE_EXT = '.srt'
 

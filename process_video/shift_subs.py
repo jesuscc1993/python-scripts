@@ -4,8 +4,6 @@ from functools import partial
 from mtlogger import logger
 from mtprompt import Prompt
 
-from _common import prompt_path
-
 def main():
   srt_file = Prompt.file(
     'Enter the path to an SRT file'

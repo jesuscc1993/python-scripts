@@ -8,17 +8,14 @@ from mtprompt import Prompt
 from tqdm import tqdm
 
 def main():
-  parent_folder = input('Enter the path to the parent folder containing the files:\n').strip(' "\'')
-  if not parent_folder:
-    return
-  if not os.path.isdir(parent_folder):
-    logger.error(f'The specified path "{parent_folder}" is not a directory.')
-  else:
-    pattern = re.compile(input('Enter the pattern files need to match (regex):\n').strip(' "\''))
-    process_files(parent_folder, pattern)
-    winsound.MessageBeep()
-    logger.success(f'Finished replacing files in "{parent_folder}".\n')
-  main()
+  parent_folder = Prompt.dir(
+    'Enter the path to the parent folder containing the files'
+  )
+  pattern = re.compile(Prompt.str(
+    'Enter the pattern files need to match (regex)'
+  ))
+
+  process_files(parent_folder, pattern)
 
 def process_files(parent_folder, pattern):
   files_to_process = []
@@ -33,6 +30,8 @@ def process_files(parent_folder, pattern):
     for _ in executor.map(replace_file, files_to_process):
       progress.update(1)
 
+  logger.success(f'Finished replacing files in "{parent_folder}".\n')
+
 def replace_file(file_path):
   with open(file_path, 'w') as file:
     file.write('')
@@ -42,4 +41,6 @@ if __name__ == '__main__':
     main()
   except Exception as ex:
     logger.unhandledError(ex)
-    Prompt.enter_to_exit()
+
+  winsound.MessageBeep()
+  Prompt.enter_to_exit()

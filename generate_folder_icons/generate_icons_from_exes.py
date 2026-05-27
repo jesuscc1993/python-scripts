@@ -30,8 +30,7 @@ def main():
     )
     depth = Prompt.int(
       'Enter the depth for processing subfolders',
-      default=1,
-      optional=True
+      default=1
     )
 
   parent_path = os.path.abspath(parent_path)

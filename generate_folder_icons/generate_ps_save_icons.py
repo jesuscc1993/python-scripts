@@ -17,8 +17,7 @@ def main():
     )
     depth = Prompt.int(
       'Enter the depth for processing subfolders',
-      default=1,
-      optional=True
+      default=1
     )
 
   process_parent_folder(parent_path, depth, IMAGE_FILENAMES)

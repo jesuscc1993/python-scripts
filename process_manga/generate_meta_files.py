@@ -15,13 +15,11 @@ def main():
     prompt_parent_folder()
 
 def prompt_parent_folder():
-  parent_folder = input('Enter the path to the image you want to generate the metadata files for:\n')
-  if not parent_folder:
-    return
-  if not os.path.isdir(parent_folder):
-    logger.error(f'The specified path "{parent_folder}" is not a directory.')
-  else:
-    process_parent_folder(parent_folder)
+  parent_folder = Prompt.dir(
+    'Enter the path to the directory containing the folders you want to generate the metadata files for'
+  )
+
+  process_parent_folder(parent_folder)
 
 def process_parent_folder(parent_folder):
   folders_to_process = [parent_folder]

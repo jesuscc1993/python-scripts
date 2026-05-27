@@ -6,15 +6,18 @@ from mtlogger import logger
 from mtprompt import Prompt
 
 def main():
-  parent_folder = input('Enter the folder path to process:\n').strip(' "\'')
-  if not os.path.isdir(parent_folder):
-    logger.error(f'The specified path "{parent_folder}" is not a directory.')
-    return
-
-  recursive = input('\nRun recursively in subfolders? (y/N):\n').strip().lower() == 'y'
+  parent_folder = Prompt.dir(
+    'Enter the path to the directory containing the folders you want to process'
+  )
+  recursive = Prompt.bool(
+    'Run recursively in subfolders?',
+    default = False
+  )
   process_subfolders(parent_folder, recursive, is_root = True)
 
 def process_subfolders(base_path, recursive, is_root = False):
+  logger.log(f'Processing "{base_path}"...')
+
   for root, dirs, files in os.walk(base_path):
     if is_root and 'desktop.ini' in files:
       process_folder(root)
@@ -23,6 +26,8 @@ def process_subfolders(base_path, recursive, is_root = False):
       for dir in dirs:
         subfolder_path = os.path.join(root, dir)
         process_subfolders(subfolder_path, recursive)
+
+  logger.success(f'Finished processing "{base_path}".')
 
 def process_folder(folder_path):
   desktop_ini_path = os.path.join(folder_path, 'desktop.ini')

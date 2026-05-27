@@ -1,9 +1,11 @@
 import os
 import requests
+import winsound
 
 from PIL import Image
 from io import BytesIO
 from mtlogger import logger
+from mtprompt import Prompt
 
 # settings
 TERMS_BLACKLIST = ['soundtrack', 'artbook']
@@ -31,12 +33,11 @@ headers = {'User-Agent': 'Mozilla/5.0'}
 
 def main():
   while True:
-    name = input('Enter the name of the game: ').strip()
-    if not name: break
-
+    name = Prompt.str('Enter the name of the game')
     items = search_game(name)
     if not items:
       logger.warn('No results found.')
+      logger.hr()
       continue
 
     items = [
@@ -48,23 +49,19 @@ def main():
       choice = 1
       logger.log(f'\n1. {items[0].get(RESPONSE_NAME)} ({items[0].get("id")})')
     else:
-      logger.log('\nSelect a result (default = 1):')
+      logger.log('Matches found:')
       for i, item in enumerate(items, 1):
         logger.log(f"{i}. {item.get(RESPONSE_NAME)} ({item.get('id')})")
 
-      try:
-        choice = int(input('').strip() or '1')
-        if not (1 <= choice <= len(items)):
-          logger.error('Invalid selection.')
-          continue
-      except ValueError:
-        logger.error('Invalid input.')
+      choice = Prompt.int('Select a match', default=1)
+      if not (1 <= choice <= len(items)):
+        logger.error('Invalid selection.')
+        logger.hr()
         continue
 
-    logger.log()
-    selected = items[choice - 1]
-    download_game_assets(selected.get('id'))
-    logger.log()
+      selected = items[choice - 1]
+      download_game_assets(selected.get('id'))
+      break
 
 def search_game(name):
   params = SEARCH_PARAMS.copy()
@@ -102,8 +99,15 @@ def save_asset(content, filepath, size = None):
     img = Image.open(BytesIO(content))
     if size: img = img.resize(size, Image.LANCZOS)
     img.save(filepath)
-    logger.log(f'Saved: {filepath}')
+    logger.success(f'Saved "{filepath}"')
   except Exception as ex:
     logger.error(f'Could not save {filepath}:\n{ex}')
 
-main()
+if __name__ == '__main__':
+  try:
+    main()
+  except Exception as ex:
+    logger.unhandledError(ex)
+
+  winsound.MessageBeep()
+  Prompt.enter_to_exit()

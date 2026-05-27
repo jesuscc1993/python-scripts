@@ -36,13 +36,12 @@ APP_MANIFEST_TEMPLATE = '''"AppState"
 }}'''
 
 def main():
-  folder = input('Enter the path of your steam games folder: ').strip()
-  if not folder or not os.path.isdir(folder):
-    logger.log('Invalid folder path.')
-    return
+  folder = Prompt.dir(
+    'Enter the path of your steam games folder'
+  )
 
-  games_folders = [d for d in os.listdir(folder) if os.path.isdir(os.path.join(folder, d))]
-  if not games_folders:
+  game_folders = [d for d in os.listdir(folder) if os.path.isdir(os.path.join(folder, d))]
+  if not game_folders:
     logger.log('No game folders found.')
     return
 
@@ -52,7 +51,7 @@ def main():
   steam_apps_path = os.path.join(drive, 'SteamLibrary', 'steamapps')
   os.makedirs(steam_apps_path, exist_ok = True)
 
-  for game in games_folders:
+  for game in game_folders:
     sanitized = sanitize_name(game)
     app_id = owned_games.get(sanitized)
     if not app_id:
