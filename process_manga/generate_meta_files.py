@@ -1,4 +1,5 @@
 import os
+import stat
 import sys
 import winsound
 
@@ -36,12 +37,19 @@ def process_folder(folder_path):
   for filename in META_FILES:
     try:
       file_path = os.path.join(folder_path, filename)
+      rel_path = os.path.relpath(file_path, os.path.dirname(folder_path))
+
       if os.path.exists(file_path):
-        logger.dim(f'Skipping "{file_path}". File already exists.')
+        is_hidden = os.stat(file_path).st_file_attributes & stat.FILE_ATTRIBUTE_HIDDEN
+        if is_hidden:
+          logger.dim(f'Skipping "{rel_path}". File already exists.')
+        else:
+          os.system(f'attrib +h "{rel_path}"')
+          logger.success(f'Hid existing "{rel_path}" file.')
       else:
         open(file_path, 'w').close()
-        os.system(f'attrib +h "{file_path}"')
-        logger.success(f'Created hidden file "{file_path}".')
+        os.system(f'attrib +h "{rel_path}"')
+        logger.success(f'Created hidden "{rel_path}" file.')
 
     except Exception as ex:
       logger.error(f'Could not create "{filename}":\n{ex}')
