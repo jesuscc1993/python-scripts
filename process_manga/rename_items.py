@@ -58,12 +58,13 @@ def get_processed_name(name):
     flags = re.IGNORECASE
   )
 
-  new_name = re.sub(
-    r'\.zip$',
-    '.cbz',
-    new_name,
-    flags = re.IGNORECASE
-  )
+  # disabled due to explorer performance impact
+  # new_name = re.sub(
+  #   r'\.zip$',
+  #   '.cbz',
+  #   new_name,
+  #   flags = re.IGNORECASE
+  # )
 
   return new_name
 
