@@ -76,7 +76,8 @@ def set_folder_icon(folder_path):
     os.system(f'attrib +h "{icon_path}"')
     os.system(f'attrib +s "{folder_path}"')
 
-    logger.success(f'Saved "{icon_path}" and "{desktop_ini_path}".')
+    parent_dir = os.path.dirname(folder_path)
+    logger.success(f'Saved "{os.path.relpath(icon_path, parent_dir)}" and "{os.path.relpath(desktop_ini_path, parent_dir)}".')
   except PermissionError:
     logger.warn(f'Permission denied: "{desktop_ini_path}". You may need to run the script as an administrator.')
   except Exception as ex:
