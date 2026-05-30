@@ -12,7 +12,7 @@ from _common import FILE_BLACKLIST
 from mtprompt import Prompt
 
 NUMBER_REGEX = r'\.?\s*(\d+(?:\.\d+)?)'
-CHAPTER_REGEX = r'Ch(?:ap(?:ter)?)?|Ep(?:isode)?'
+CHAPTER_REGEX = r'Ch(?:ap(?:ter)?)?|Ep(?:isode)?|Ep(?:ilogue)?|Sp(?:ecial)?'
 CHAPTER_NUMBER_REGEX  = rf'(?:{CHAPTER_REGEX}){NUMBER_REGEX}'
 
 def main():

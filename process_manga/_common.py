@@ -12,9 +12,10 @@ from _image_utils import is_image_file
 
 NUMBER_REGEX = r'\.?\s*(\d+(?:\.\d+)?)'
 VOLUME_REGEX = r'Vol(?:ume)?'
-CHAPTER_REGEX = r'Ch(?:ap(?:ter)?)?|Ep(?:isode)?'
+CHAPTER_REGEX = r'Ch(?:ap(?:ter)?)?|Ep(?:isode)?|Ep(?:ilogue)?|Sp(?:ecial)?'
 VOLUME_NUMBER_REGEX = rf'(?:{VOLUME_REGEX}){NUMBER_REGEX}'
 CHAPTER_NUMBER_REGEX  = rf'(?:{CHAPTER_REGEX}){NUMBER_REGEX}'
+ITEM_EXTENSIONS = ['cbz', 'zip']
 
 def select_parent_folder(prompt, callback, options = {}):
   prompt = prompt or 'Enter the path to the parent folder you want to process:\n'
