@@ -40,7 +40,8 @@ def process_item(root, item_name):
     os.rename(old_path, new_path)
 
 def get_processed_name(name):
-  new_name = re.sub(r'\s+', ' ', name).strip()
+  new_name = re.sub(r'\s*\{.*\}', '', name).strip()
+  new_name = re.sub(r'\s+', ' ', new_name).strip()
 
   new_name = re.sub(
     rf'\b({CHAPTER_REGEX})\b\.?\s*(\d+)',
