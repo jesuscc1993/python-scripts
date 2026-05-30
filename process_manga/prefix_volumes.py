@@ -1,13 +1,14 @@
 import os
+import re
 import subprocess
 import sys
 import winsound
 
-from mtlogger import LogLevel, logger
+from mtlogger import Fore, LogLevel, logger
 from mtprompt import Prompt
 from tqdm import tqdm
 
-from _common import get_chapter
+from _common import ITEM_EXTENSIONS, get_chapter
 
 def main():
   if len(sys.argv) > 1:
@@ -20,15 +21,33 @@ def main():
   if len(sys.argv) > 2:
     ranges = sys.argv[2]
   else:
-    ranges = prompt_chapter_ranges()
+    ranges = prompt_chapter_ranges(folder)
 
   if folder and ranges:
     process_parent_folder(folder, ranges)
 
-def prompt_chapter_ranges():
-  ranges_input = Prompt.str('Enter the last chapter for each volume, separated by commas (e.g. 12,24,36)')
+def prompt_chapter_ranges(folder):
+  ranges_input = Prompt.str(f'Enter the volume ranges. Supported formats:\n{logger.colorize(Fore.CYAN, " n1, n2, n3, ..., n99")}\n{logger.colorize(Fore.LIGHTBLACK_EX, "  Last chapter for each volume, separated by commas (e.g. 12,24,36)")}\n{logger.colorize(Fore.CYAN, " [n]")}\n{logger.colorize(Fore.LIGHTBLACK_EX, "  fixed chapter count per volume (e.g. [12])")}\n')
 
-  logger.log()
+  match = re.fullmatch(r'\[(\d+)\]', ranges_input.strip())
+  if match:
+    step = int(match.group(1))
+    items = sorted([
+      item
+      for item in os.listdir(folder)
+      if os.path.isdir(os.path.join(folder, item))
+      or os.path.splitext(item)[1].lower().endswith(tuple(ITEM_EXTENSIONS))
+    ])
+    lastChapter = int(get_chapter(items[-1]))
+    chapter_bounds = [i for i in range(step, lastChapter + step, step)]
+    chapter_bounds[-1] = lastChapter
+    ranges = []
+    prev = 0.0
+    for b in chapter_bounds:
+      ranges.append((prev + 1, b + 0.99))
+      prev = b
+    return ranges
+
   try:
     chapter_bounds = sorted([float(x.strip()) for x in ranges_input.split(',')])
   except Exception as ex:
