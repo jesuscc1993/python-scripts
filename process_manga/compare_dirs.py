@@ -14,12 +14,9 @@ def main():
   subfoldersA = get_subfolders(folderA)
   subfoldersB = get_subfolders(folderB)
 
-  mapA = {normalize_name(f): f for f in subfoldersA}
-  mapB = {normalize_name(f): f for f in subfoldersB}
-
-  for item_name in sorted(set(mapA.keys()) | set(mapB.keys())):
-    nameA = mapA.get(item_name)
-    nameB = mapB.get(item_name)
+  for item_name in sorted(set(subfoldersA.keys()) | set(subfoldersB.keys())):
+    nameA = subfoldersA.get(item_name)
+    nameB = subfoldersB.get(item_name)
 
     pathA = os.path.join(folderA, nameA) if nameA else None
     pathB = os.path.join(folderB, nameB) if nameB else None
@@ -44,7 +41,8 @@ def main():
       logger.warn(f'"{item_name}" exists in "{folderB}" but not in "{folderA}".')
 
 def get_subfolders(dir):
-  return [f for f in os.listdir(dir) if os.path.isdir(os.path.join(dir, f))]
+  subfolders = [f for f in os.listdir(dir) if os.path.isdir(os.path.join(dir, f))]
+  return {normalize_name(f): f for f in subfolders}
 
 def normalize_name(name):
   return re.sub(r'\s*(\{.*?\}|\(.*?\))\s*', '', name).strip()
