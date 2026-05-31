@@ -17,8 +17,11 @@ STEAM_OUT_CSS = os.path.join('C:\\', 'Users', 'Txus', 'homebrew', 'themes')
 
 def main():
   logger.log('Creating theme and skin symlinks...\n')
+  link_rainmeter()
+  link_steam()
+  logger.info('Finished creating theme and skin symlinks')
 
-  # Rainmeter
+def link_rainmeter():
   link_dir(
     os.path.join(RAINMETER_OUT, 'HotKey'),
     os.path.join(RAINMETER_IN, 'hotkey')
@@ -39,8 +42,9 @@ def main():
     os.path.join(RAINMETER_OUT, 'MetalTxus - Standalone'),
     os.path.join(RAINMETER_IN, 'standalone-skins')
   )
+  print()
 
-  # Steam SFP
+def link_steam():
   link_file(
     os.path.join(STEAM_OUT_SFP, 'libraryroot.custom.css'),
     os.path.join(STEAM_IN, 'libraryroot.custom.css')
@@ -73,14 +77,11 @@ def main():
     os.path.join(STEAM_OUT_SFP, 'custom-js'),
     os.path.join(STEAM_IN, 'custom-js')
   )
-
-  # Steam CSS
   link_dir(
     os.path.join(STEAM_OUT_CSS, 'mt-custom-css'),
     STEAM_IN
   )
-
-  logger.info('\nFinished creating theme and skin symlinks')
+  print()
 
 if __name__ == '__main__':
   try:

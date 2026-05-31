@@ -33,9 +33,12 @@ def remove_link(location: str) -> None:
   if path.is_symlink():
     path.unlink(missing_ok=True)
   elif path.exists():
-    new_location = location + '.bak'
-    shutil.move(location, new_location)
-    logger.debug(f'  Backed up existing "{location}" as "{new_location}".')
+    if path.is_dir() and not any(path.iterdir()):
+      path.rmdir()
+    else:
+      new_location = location + '.bak'
+      shutil.move(location, new_location)
+      logger.debug(f'  Backed up existing "{location}" as "{new_location}".')
 
 def link_dir(dest: str, src: str, make_dirs: Optional[bool] = True) -> bool:
   return make_link(dest, src, target_is_directory=True, make_dirs=make_dirs)

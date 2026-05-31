@@ -6,20 +6,29 @@ from mtprompt import Prompt
 
 from _common import link_dir, run_as_admin
 
+APPDATA = os.environ.get('APPDATA')
 USERPROFILE = os.environ.get('USERPROFILE')
 
 CONSOLE = os.path.join('Z:\\', 'Games', 'Console')
 EMULATORS = os.path.join(CONSOLE, '- Emulators -')
-
 SAVES = os.path.join('E:\\', 'Saves', 'Consoles')
 TEXTURE_PACKS = os.path.join('Z:\\', 'Projects', 'texture-packs')
 
+CITRA_USER = os.path.join(EMULATORS, '3DS', '_user_')
+DOLPHIN_USER = os.path.join(EMULATORS, 'Wii - GCN', '_user_')
+SWITCH_USER = os.path.join(EMULATORS, 'Switch', '_user_')
+
 def main():
   logger.log('Creating emulator symlinks...\n')
+  link_yuzu()
+  link_citra()
+  link_ryujinx()
+  link_dolphin()
+  link_texture_packs()
+  link_saves()
+  logger.info('Finished creating emulator symlinks')
 
-  # YUZU
-  SWITCH_USER = os.path.join(EMULATORS, 'Switch', '_user_')
-  APPDATA = os.environ.get('APPDATA')
+def link_yuzu():
   link_dir(
     os.path.join(APPDATA, 'Yuzu'),
     SWITCH_USER
@@ -36,9 +45,9 @@ def main():
     os.path.join(EMULATORS, 'yuzu', 'user', 'nand', 'user', 'Contents', 'registered'),
     os.path.join(CONSOLE, 'Switch', 'nca')
   )
+  print()
 
-  # CITRA
-  CITRA_USER = os.path.join(EMULATORS, '3DS', '_user_')
+def link_citra():
   link_dir(
     os.path.join(APPDATA, 'Citra'),
     CITRA_USER
@@ -55,21 +64,23 @@ def main():
     os.path.join(EMULATORS, '3DS', 'Azahar', 'user'),
     CITRA_USER
   )
+  print()
 
-  # RYUJINX
+def link_ryujinx():
   link_dir(
     os.path.join(APPDATA, 'Ryujinx'),
     os.path.join(EMULATORS, 'Switch', 'Ryujinx')
   )
+  print()
 
-  # DOLPHIN
-  DOLPHIN_USER = os.path.join(EMULATORS, 'Wii - GCN', '_user_')
+def link_dolphin():
   link_dir(
     os.path.join(EMULATORS, 'Wii - GCN', 'Dolphin', 'User'),
     DOLPHIN_USER
   )
+  print()
 
-  # TEXTURES
+def link_texture_packs():
   link_dir(
     os.path.join(CITRA_USER, 'load', 'textures'),
     os.path.join(TEXTURE_PACKS, '3DS')
@@ -82,8 +93,9 @@ def main():
     os.path.join(EMULATORS, 'PSP', 'PPSSPP', 'memstick', 'PSP', 'TEXTURES'),
     os.path.join(TEXTURE_PACKS, 'PSP')
   )
+  print()
 
-  # SAVES
+def link_saves():
   link_dir(
     os.path.join(USERPROFILE, 'Documents', 'DuckStation', 'memcards'),
     os.path.join(SAVES, 'PS1')
@@ -136,8 +148,7 @@ def main():
     os.path.join(EMULATORS, 'X360', 'Xenia', 'content'),
     os.path.join(SAVES, 'X360')
   )
-
-  logger.info('\nFinished creating emulator symlinks')
+  print()
 
 if __name__ == '__main__':
   try:
