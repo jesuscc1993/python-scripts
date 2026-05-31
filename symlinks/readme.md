@@ -5,6 +5,8 @@
 Most scripts will read values from ENV. You can either declare them on your OS or add an .en file containing them.
 These are the different keys the scripts may look for:
 
+GAME_SAVES_PATH
+
 STEAM_USER_ID3
 STEAM_USER_ID64
 STEAM_USER_ID64H

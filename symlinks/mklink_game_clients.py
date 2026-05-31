@@ -11,6 +11,7 @@ load_dotenv(os.path.join(os.path.dirname(__file__), '.env'))
 
 USER_PROFILE = os.environ.get('UserProfile')
 PROGRAM_FILES = os.environ.get('ProgramFiles')
+LOCAL_DATA = os.path.join(USER_PROFILE, 'AppData', 'Local')
 
 EPIC_USER_ID = os.environ.get('EPIC_USER_ID')
 STEAM_USER_ID3 = os.environ.get('STEAM_USER_ID3')
@@ -19,17 +20,14 @@ GAME_CLIENTS_SAVES_PATH = os.environ.get('GAME_CLIENTS_SAVES_PATH')
 
 DRIVES = ['D:\\', 'E:\\', 'Z:\\']
 
-LOCALDATA = os.path.join(USER_PROFILE, 'AppData', 'Local')
-LOCALLOWDATA = os.path.join(USER_PROFILE, 'AppData', 'LocalLow')
-
 CLIENTS = os.path.join('Games', 'Clients')
 GAMES = os.path.join('Games', 'PC')
 
-STEAMAPPS = os.path.join('SteamLibrary', 'steamapps')
-STEAMAPPSCOMMON = os.path.join(STEAMAPPS, 'common')
+STEAM_APPS = os.path.join('SteamLibrary', 'steamapps')
+STEAM_APPS_COMMON = os.path.join(STEAM_APPS, 'common')
 
-AMAZONGAMES = 'Amazon Games'
-AMAZONLIBRARY = os.path.join(AMAZONGAMES, 'Library')
+AMAZON_GAMES = 'Amazon Games'
+AMAZON_LIBRARY = os.path.join(AMAZON_GAMES, 'Library')
 
 def main():
   logger.log('Creating game client symlinks...\n')
@@ -44,7 +42,7 @@ def link_steam():
   if STEAM_USER_ID3:
     link_dir(
       os.path.join('D:\\', CLIENTS, 'Steam', 'steamapps'),
-      os.path.join('D:\\', STEAMAPPS)
+      os.path.join('D:\\', STEAM_APPS)
     )
     link_dir(
       os.path.join('D:\\', CLIENTS, 'Steam', 'userdata', STEAM_USER_ID3, 'config', 'grid'),
@@ -52,7 +50,7 @@ def link_steam():
     )
     for drive in DRIVES:
       link_dir(
-        os.path.join(drive, STEAMAPPSCOMMON),
+        os.path.join(drive, STEAM_APPS_COMMON),
         os.path.join(drive, GAMES)
       )
       link_dir(
@@ -69,16 +67,16 @@ def link_steam():
 
 def link_amazon():
   link_dir(
-    os.path.join(LOCALDATA, AMAZONGAMES),
-    os.path.join('D:\\', CLIENTS, AMAZONGAMES)
+    os.path.join(LOCAL_DATA, AMAZON_GAMES),
+    os.path.join('D:\\', CLIENTS, AMAZON_GAMES)
   )
   link_dir(
-    os.path.join(LOCALDATA, AMAZONLIBRARY),
+    os.path.join(LOCAL_DATA, AMAZON_LIBRARY),
     os.path.join('D:\\', GAMES)
   )
   for drive in DRIVES:
     link_dir(
-      os.path.join(drive, AMAZONLIBRARY),
+      os.path.join(drive, AMAZON_LIBRARY),
       os.path.join(drive, GAMES)
     )
   print()
@@ -86,7 +84,7 @@ def link_amazon():
 def link_epic():
   if EPIC_USER_ID:
     link_dir(
-      os.path.join(LOCALDATA, 'EpicGamesLauncher', 'Saved', 'Saves', EPIC_USER_ID),
+      os.path.join(LOCAL_DATA, 'EpicGamesLauncher', 'Saved', 'Saves', EPIC_USER_ID),
       os.path.join(GAME_CLIENTS_SAVES_PATH, 'Epic')
     )
     print()
