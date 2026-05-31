@@ -16,7 +16,7 @@ def main():
   logger.log(f'Generating links for specific game saves...')
 
   script_dir = os.path.dirname(os.path.abspath(__file__))
-  mappings_path = os.path.join(script_dir, 'specific_mappings.json')
+  mappings_path = os.path.join(script_dir, 'specific_game_save_mappings.json')
 
   if not os.path.exists(mappings_path):
     logger.error(f'File not found: "{mappings_path}". Check readme for instructions.')
