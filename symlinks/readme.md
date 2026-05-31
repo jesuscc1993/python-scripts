@@ -17,6 +17,8 @@ EMULATORS_PATH
 EMULATORS_SAVE_PATH
 TEXTURE_PACKS_PATH
 
+SPECIFIC_GAME_SAVES_PATH
+
 You can use [https://www.steamidfinder.com](https://www.steamidfinder.com) to find your Steam ID in the different formats.
 
 ### Specific Game Saves
@@ -32,7 +34,7 @@ To use [mklink_specific_game_saves.py](mklink_specific_game_saves.py), you will 
         "src": str,
         "dest": str,
         "expand": bool, // create folder if it does not exist (default: true)
-        "file": bool // is link a file? (default: false)
+        "isFile": bool // is link a file? (default: false)
       }
     ]
   }

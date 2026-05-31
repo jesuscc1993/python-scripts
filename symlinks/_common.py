@@ -8,25 +8,33 @@ from mtlogger import logger
 from pathlib import Path
 from typing import Optional
 
-def make_link(dest: str, src: str, target_is_directory: bool, make_dirs: Optional[bool] = True) -> bool:
-  if not Path(src).exists():
-    logger.error(f'Source "{src}" does not exist.')
+def make_link(
+  dest: str,
+  src: str,
+  target_is_directory: bool,
+  make_dirs: Optional[bool] = True
+) -> bool:
+  dest_path = os.path.expandvars(dest)
+  src_path = os.path.expandvars(src)
+
+  if not Path(src_path).exists():
+    logger.error(f'Source "{src_path}" does not exist.')
     return
 
   try:
-    remove_link(dest)
+    remove_link(dest_path)
   except Exception as ex:
-    logger.error(f'Failed to remove existing path "{dest}": {ex}')
+    logger.error(f'Failed to remove existing path "{dest_path}": {ex}')
     return
 
   if make_dirs:
-    os.makedirs(os.path.dirname(dest), exist_ok=True)
+    os.makedirs(os.path.dirname(dest_path), exist_ok=True)
 
   try:
-    Path(dest).symlink_to(src, target_is_directory)
-    logger.success(f'Linked "{dest}" to "{src}".')
+    Path(dest_path).symlink_to(src_path, target_is_directory)
+    logger.success(f'Linked "{dest_path}" to "{src_path}".')
   except Exception as ex:
-    logger.error(f'Failed to link "{dest}" to "{src}": {ex}')
+    logger.error(f'Failed to link "{dest_path}" to "{src_path}": {ex}')
 
 def remove_link(location: str) -> None:
   path = Path(location)
