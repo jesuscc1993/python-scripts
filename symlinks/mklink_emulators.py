@@ -45,7 +45,7 @@ def link_yuzu():
     SWITCH_USER
   )
   link_dir(
-    os.path.join(EMULATORS_PATH, 'yuzu', 'user', 'nand', 'user', 'Contents', 'registered'),
+    os.path.join(EMULATORS_PATH, 'Switch', 'yuzu', 'user', 'nand', 'user', 'Contents', 'registered'),
     os.path.join(ROMS_PATH, 'Switch', 'nca')
   )
   print()
