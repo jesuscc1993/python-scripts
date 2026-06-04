@@ -16,8 +16,9 @@ EXE_EXCLUSION_PATTERNS = [
   r'CrashHandler',
   r'EOSBootstrapper',
   r'ModManager',
-  r'Updat',
-  r'Unins'
+  r'Setup',
+  r'Unins',
+  r'Updat'
 ]
 
 def main():
