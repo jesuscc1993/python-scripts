@@ -35,6 +35,7 @@
         "lua",
         "md",
         "nfo",
+        "patch",
         "sass",
         { "class": "sass", "ext": "scss" },
         "settings",
