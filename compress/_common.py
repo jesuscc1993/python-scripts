@@ -12,8 +12,10 @@ ZIP_TYPES = ['ZIP', 'CBZ']
 
 BAK_EXTENSION = f'.{BAK_TYPE.lower()}'
 
-def compress_child_folders(parent_folder, output_type = ZIP_TYPES[0], depth = 1):
-  if depth < 1:
+def compress_child_folders(parent_folder, output_type = ZIP_TYPES[0], min_depth = 1, max_depth = 1):
+  logger.log(f'Compressing folders in "{parent_folder}"...')
+
+  if max_depth < 1:
     logger.error('Depth must be 1 or greater.')
     return
 
@@ -27,7 +29,7 @@ def compress_child_folders(parent_folder, output_type = ZIP_TYPES[0], depth = 1)
       rel_path = os.path.relpath(folder_path, parent_folder)
       current_depth = rel_path.count(os.sep) + 1
 
-      if current_depth == depth:
+      if min_depth <= current_depth <= max_depth:
         folders.append(folder_path)
 
   if len(folders) > 0:
@@ -38,18 +40,20 @@ def compress_child_folders(parent_folder, output_type = ZIP_TYPES[0], depth = 1)
     try:
       with ThreadPoolExecutor() as executor:
         list(tqdm(
-          executor.map(lambda folder: compress_folder(folder, output_type), folders),
+          executor.map(lambda folder: compress_folder(folder, output_type, tmp_dir), folders),
           total = len(folders),
           desc = f'Processing "{parent_folder}"'
         ))
     finally:
       shutil.rmtree(tmp_dir, ignore_errors = True)
 
-def compress_folder(folder_path, output_type):
-  folder_name = os.path.basename(folder_path)
+    logger.success(f'Finished compressing folders in "{parent_folder}".')
+  else:
+    logger.warn(f'No folders found in "{parent_folder}".')
 
+def compress_folder(folder_path, output_type, tmp_dir):
+  folder_name = os.path.basename(folder_path)
   parent_dir = os.path.dirname(folder_path)
-  tmp_dir = os.path.join(parent_dir, '.tmp')
 
   zip_filename = f'{folder_name}.{output_type.lower()}'
   tmp_zip_path = os.path.join(tmp_dir, zip_filename)
