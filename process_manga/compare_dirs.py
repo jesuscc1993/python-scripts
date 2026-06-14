@@ -71,7 +71,10 @@ def get_subfolder_ranges(folder):
       if not lastFound:
         logger.dim(f'Could not determine volume or chapter for "{lastItem}".')
       return None
-    return (firstVolume, lastVolume), (firstChapter, lastChapter)
+
+    volumeRange = (firstVolume, lastVolume) if firstVolume is not None and lastVolume is not None else None
+    chapterRange = (firstChapter, lastChapter) if firstChapter is not None and lastChapter is not None else None
+    return volumeRange, chapterRange
   else:
     return None
 
