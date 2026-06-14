@@ -33,14 +33,18 @@ def process_parent_folder(parent_folder):
   logger.success(f'Finished renaming items in "{parent_folder}".')
 
 def process_item(root, item_name):
-  new_name = get_processed_name(item_name)
-  if item_name != new_name:
-    old_path = os.path.join(root, item_name)
+  item_path = os.path.join(root, item_name)
+  new_name = get_processed_name(item_path)
+  if new_name != item_name:
     new_path = os.path.join(root, new_name)
-    os.rename(old_path, new_path)
+    os.rename(item_path, new_path)
 
-def get_processed_name(name):
-  new_name = re.sub(r'\s*\{.*\}', '', name).strip()
+def get_processed_name(item_path):
+  is_dir = os.path.isdir(item_path)
+  new_name = os.path.basename(item_path)
+
+  if not is_dir:
+    new_name = re.sub(r'\s*\{.*\}', '', new_name).strip()
   new_name = re.sub(r'\s+', ' ', new_name).strip()
 
   new_name = re.sub(
