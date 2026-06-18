@@ -15,7 +15,7 @@ def clear_cache_for_package_manager(cmd, args):
   if exe:
     try:
       formatted_command = f"{cmd} {' '.join(args)}"
-      logger.dim(f"Running: {formatted_command}")
+      logger.trace(f"Running: {formatted_command}")
       subprocess.run([exe] + args, check=True)
     except subprocess.CalledProcessError as e:
       logger.error(f"Error running {formatted_command}: {e}")

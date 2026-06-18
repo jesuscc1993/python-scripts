@@ -81,7 +81,7 @@ def run_scripts_in_sequence(script_names, parent_folder):
   for script in script_names:
     abs_path = os.path.abspath(os.path.join(os.path.dirname(__file__), script + '.py'))
 
-    logger.dim(f'\nRunning {script}:')
+    logger.trace(f'\nRunning {script}:')
     subprocess.run(['python', abs_path, parent_folder], env=env)
 
   logger.info(

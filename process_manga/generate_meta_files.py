@@ -42,7 +42,7 @@ def process_folder(folder_path):
       if os.path.exists(file_path):
         is_hidden = os.stat(file_path).st_file_attributes & stat.FILE_ATTRIBUTE_HIDDEN
         if is_hidden:
-          logger.dim(f'Skipping "{rel_path}". File already exists.')
+          logger.trace(f'Skipping "{rel_path}". File already exists.')
         else:
           os.system(f'attrib +h "{rel_path}"')
           logger.success(f'Hid existing "{rel_path}" file.')

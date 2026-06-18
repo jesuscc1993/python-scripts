@@ -33,7 +33,7 @@ def find_binaries(binaries_dir):
       key = name.lower()
       path = os.path.join(root, file)
       if any(blacklisted in key for blacklisted in BINARY_BLACKLIST):
-        logger.dim(f'Skipping blacklisted binary: "{path}"')
+        logger.trace(f'Skipping blacklisted binary: "{path}"')
         continue
       if key in binaries:
         logger.debug(f'Multiple binaries found for {key}, using: "{path}"')

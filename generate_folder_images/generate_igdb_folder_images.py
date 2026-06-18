@@ -137,13 +137,13 @@ def process_folder(folder_path, folder_name, override_existing):
   cover_path = os.path.join(folder_path, FOLDER_IMAGE_FILENAME)
 
   if os.path.exists(cover_path) and not override_existing:
-    logger.dim(f'  [{folder_name}] {FOLDER_IMAGE_FILENAME} already exists.')
+    logger.trace(f'  [{folder_name}] {FOLDER_IMAGE_FILENAME} already exists.')
     return
 
   try:
     image_url = get_cover_image(folder_name)
     if not image_url:
-      logger.dim(f'  [{folder_name}] no cover found.')
+      logger.trace(f'  [{folder_name}] no cover found.')
       return
 
     img = download_image(image_url)

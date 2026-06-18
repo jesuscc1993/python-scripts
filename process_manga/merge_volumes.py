@@ -23,7 +23,7 @@ def process_parent_folder(parent_dir):
     if os.path.isdir(folder_path):
       volume, chapter = get_volume_and_chapter(folder)
       if not volume or not chapter:
-        tqdm.write(logger.formatLevel(LogLevel.WARN, f'Skipping "{folder}". Volume or chapter numbers could not be inferred.'))
+        tqdm.write(logger.formatWarn(f'Skipping "{folder}". Volume or chapter numbers could not be inferred.'))
         continue
 
       output_path = os.path.join(parent_dir, f'Vol.{volume.zfill(2)}')

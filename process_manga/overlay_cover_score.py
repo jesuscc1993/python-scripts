@@ -91,7 +91,7 @@ def process_cover(dir, cover_img, score, font):
   img = overlay_score(img, score, font)
   img.save(cover_img, quality=100)
 
-  tqdm.write(logger.formatLevel(LogLevel.DEBUG, f'Applied score overlay to "{os.path.basename(dir)}".'))
+  tqdm.write(logger.formatDebug(f'Applied score overlay to "{os.path.basename(dir)}".'))
 
 def resize_cover(img, target_w, target_h):
   scale = max(target_w / img.width, target_h / img.height)

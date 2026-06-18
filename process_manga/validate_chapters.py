@@ -30,7 +30,7 @@ def process_parent_folder(directory):
       process_chapter_folder(entry.path, chapter)
 
   if not found_chapters:
-    logger.dim(f'No chapters found in "{directory_name}".')
+    logger.trace(f'No chapters found in "{directory_name}".')
     return
 
   expected_chapters = set(range(1, int(max(found_chapters)) + 1))

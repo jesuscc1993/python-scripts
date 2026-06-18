@@ -28,7 +28,7 @@ def process_parent_folder(parent_dir):
     if should_process_item(item_path):
       chapter = get_chapter(item)
       if not chapter:
-        tqdm.write(logger.formatLevel(LogLevel.WARN, f'Skipping "{item}". Chapter number could not be inferred.'))
+        tqdm.write(logger.formatWarn(f'Skipping "{item}". Chapter number could not be inferred.'))
         continue
 
       output_path = os.path.join(parent_dir, f'Ch.{chapter.zfill(2)}')

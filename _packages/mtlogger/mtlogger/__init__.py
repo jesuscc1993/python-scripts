@@ -7,6 +7,7 @@ from typing import Optional, TypedDict, Unpack
 init(autoreset = True, wrap = True, convert = True)
 
 class LogLevel(Enum):
+  TRACE = 'TRACE'
   DEBUG = 'DEBUG'
   ERROR = 'ERROR'
   INFO = 'INFO'
@@ -20,6 +21,7 @@ class Logger:
   # core functions
   def formatLevel(self, level: LogLevel, msg = ''):
     color = {
+      LogLevel.TRACE: Fore.LIGHTBLACK_EX,
       LogLevel.DEBUG: Fore.CYAN,
       LogLevel.ERROR: Fore.RED,
       LogLevel.INFO: Fore.GREEN,
@@ -29,28 +31,51 @@ class Logger:
     return self.colorize(color, msg)
 
   def colorize(_, color: str, msg = ''):
-    return f"{color}{msg}{Fore.RESET}"
+    return f"{color}{msg.replace(Fore.RESET, color)}{Fore.RESET}"
 
   def print(_, msg = '', options: Optional[LogOptions] = None):
     prefix_newline = options.get('prefix_newline', False) if options else False
     print(f'{'\n' if prefix_newline else ''}{msg}')
   #
 
-  # classic functions
+  # formatting functions
+  def formatTrace(self, msg = ''):
+    return self.formatLevel(LogLevel.TRACE, msg)
+
+  def formatDebug(self, msg = ''):
+    return self.formatLevel(LogLevel.DEBUG, msg)
+
+  def formatError(self, msg = ''):
+    return self.formatLevel(LogLevel.ERROR, msg)
+
+  def formatInfo(self, msg = ''):
+    return self.formatLevel(LogLevel.INFO, msg)
+
+  def formatLog(self, msg = ''):
+    return self.formatLevel(LogLevel.LOG, msg)
+
+  def formatWarn(self, msg = ''):
+    return self.formatLevel(LogLevel.WARN, msg)
+  #
+
+  # print functions
+  def trace(self, msg = '', **kwargs: Unpack[LogOptions]):
+    self.print(self.formatTrace(msg), LogOptions(**kwargs))
+
   def debug(self, msg = '', **kwargs: Unpack[LogOptions]):
-    self.print(self.formatLevel(LogLevel.DEBUG, msg), LogOptions(**kwargs))
+    self.print(self.formatDebug(msg), LogOptions(**kwargs))
 
   def error(self, msg = '', **kwargs: Unpack[LogOptions]):
-    self.print(self.formatLevel(LogLevel.ERROR, msg), LogOptions(**kwargs))
+    self.print(self.formatError(msg), LogOptions(**kwargs))
 
   def info(self, msg = '', **kwargs: Unpack[LogOptions]):
-    self.print(self.formatLevel(LogLevel.INFO, msg), LogOptions(**kwargs))
+    self.print(self.formatInfo(msg), LogOptions(**kwargs))
 
   def log(self, msg = '', **kwargs: Unpack[LogOptions]):
-    self.print(self.formatLevel(LogLevel.LOG, msg), LogOptions(**kwargs))
+    self.print(self.formatLog(msg), LogOptions(**kwargs))
 
   def warn(self, msg = '', **kwargs: Unpack[LogOptions]):
-    self.print(self.formatLevel(LogLevel.WARN, msg), LogOptions(**kwargs))
+    self.print(self.formatWarn(msg), LogOptions(**kwargs))
   #
 
   # functions with icons
@@ -62,14 +87,11 @@ class Logger:
   #
 
   # other functions
-  def dim(self, msg = '', **kwargs: Unpack[LogOptions]):
-    self.print(self.colorize(Fore.LIGHTBLACK_EX, msg), LogOptions(**kwargs))
-
   def unhandledError(self, msg = '', **kwargs: Unpack[LogOptions]):
-    self.print(self.formatLevel(LogLevel.ERROR, f'Unhandled error: {msg}'), LogOptions(**kwargs))
+    self.print(self.formatError(f'Unhandled error: {msg}'), LogOptions(**kwargs))
 
   def hr(self):
-    self.dim('─' * os.get_terminal_size().columns)
+    self.print(self.colorize(Fore.LIGHTBLACK_EX, '─' * os.get_terminal_size().columns))
   #
 
 logger = Logger()

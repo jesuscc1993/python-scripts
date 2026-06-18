@@ -31,7 +31,7 @@ def process_parent_folder(process_folder):
     for dir_name in dirs:
       item_path = os.path.join(root, dir_name)
       if os.path.exists(os.path.join(item_path, FOLDER_IMAGE_FILENAME)):
-        logger.dim(f'  [{dir_name}] "{FOLDER_IMAGE_FILENAME}" already exists.')
+        logger.trace(f'  [{dir_name}] "{FOLDER_IMAGE_FILENAME}" already exists.')
         continue
       process_folder(item_path)
 

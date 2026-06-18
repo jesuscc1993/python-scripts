@@ -1,44 +1,47 @@
 import os
 import re
+import sys
 import winsound
 
-from mtlogger import logger
+from mtlogger import LogLevel, logger
 from mtprompt import Prompt
 
 from _common import ITEM_EXTENSIONS, get_volume_and_chapter
 
 def main():
-  folderA = Prompt.dir('Enter the path to the first folder you want to compare')
-  folderB = Prompt.dir('Enter the path to the second folder you want to compare')
+  if len(sys.argv) > 2:
+    folder_a = sys.argv[1]
+    folder_b = sys.argv[2]
+  else:
+    folder_a = Prompt.dir('Enter the path to the first folder you want to compare')
+    folder_b = Prompt.dir('Enter the path to the second folder you want to compare')
 
-  subfoldersA = get_subfolders(folderA)
-  subfoldersB = get_subfolders(folderB)
+  subfolders_a = get_subfolders(folder_a)
+  subfolders_b = get_subfolders(folder_b)
 
-  for item_name in sorted(set(subfoldersA.keys()) | set(subfoldersB.keys())):
-    nameA = subfoldersA.get(item_name)
-    nameB = subfoldersB.get(item_name)
+  for item_name in sorted(set(subfolders_a.keys()) | set(subfolders_b.keys())):
+    nameA = subfolders_a.get(item_name)
+    nameB = subfolders_b.get(item_name)
 
-    pathA = os.path.join(folderA, nameA) if nameA else None
-    pathB = os.path.join(folderB, nameB) if nameB else None
+    path_a = os.path.join(folder_a, nameA) if nameA else None
+    path_b = os.path.join(folder_b, nameB) if nameB else None
 
-    if pathA and pathB:
-      rangeA = get_subfolder_ranges(pathA)
-      rangeB = get_subfolder_ranges(pathB)
+    if path_a and path_b:
+      range_a = get_subfolder_ranges(path_a)
+      range_b = get_subfolder_ranges(path_b)
 
-      if rangeA and rangeB:
-        if rangeA == rangeB:
-          logger.log(f'"{item_name}" has the same volumes and chapters in both folders.')
-          logger.success(f'{print_range(rangeA)}')
+      if range_a and range_b:
+        if range_a == range_b:
+          logger.success(f'"{item_name}" has the same volumes and chapters in both folders.')
         else:
-          logger.log(f'"{item_name}" has different volumes or chapters in the folders.')
-          logger.failure(f'[{folderA}]: {print_range(rangeA)}')
-          logger.failure(f'[{folderB}]: {print_range(rangeB)}')
+          logger.log(f'  "{item_name}" has different volumes or chapters in the folders.')
+          logger.failure(f'{logger.formatTrace(f"\"{folder_a}\"")} {print_range(range_a)} | {print_range(range_b)} {logger.formatTrace(f"\"{folder_b}\"")}')
       else:
-        logger.dim(f'Failed to determine ranges for "{item_name}".')
-    elif pathA:
-      logger.warn(f'"{item_name}" exists in "{folderA}" but not in "{folderB}".')
-    elif pathB:
-      logger.warn(f'"{item_name}" exists in "{folderB}" but not in "{folderA}".')
+        logger.trace(f'Failed to determine ranges for "{item_name}".')
+    elif path_a:
+      logger.warn(f'  "{folder_a}" only: "{item_name}".')
+    elif path_b:
+      logger.warn(f'  "{folder_b}" only: "{item_name}".')
 
 def get_subfolders(dir):
   subfolders = [f for f in os.listdir(dir) if os.path.isdir(os.path.join(dir, f))]
@@ -67,9 +70,9 @@ def get_subfolder_ranges(folder):
 
     if firstMissing or lastMissing:
       if firstMissing:
-        logger.dim(f'Could not determine volume or chapter for "{firstItem}".')
+        logger.trace(f'Could not determine volume or chapter for "{firstItem}".')
       if lastMissing:
-        logger.dim(f'Could not determine volume or chapter for "{lastItem}".')
+        logger.trace(f'Could not determine volume or chapter for "{lastItem}".')
       return None
 
     volumeRange = (firstVolume, lastVolume) if firstVolume is not None and lastVolume is not None else None

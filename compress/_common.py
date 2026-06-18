@@ -60,7 +60,7 @@ def compress_folder(folder_path, output_type, tmp_dir):
   final_zip_path = os.path.join(parent_dir, zip_filename)
 
   if os.path.exists(final_zip_path):
-    logger.dim(f'Skipping "{folder_path}". A compressed file with the same name already exists.')
+    logger.trace(f'Skipping "{folder_path}". A compressed file with the same name already exists.')
     return
 
   try:
@@ -95,7 +95,7 @@ def extract_archive(archive_path):
   target_dir = os.path.join(os.path.dirname(archive_path), folder_name)
 
   if os.path.exists(target_dir):
-    logger.dim(f'Skipping "{archive_path}". Folder exists.')
+    logger.trace(f'Skipping "{archive_path}". Folder exists.')
     return
 
   with zipfile.ZipFile(archive_path, 'r') as compressed_file:

@@ -58,12 +58,12 @@ def process_folder(folder_path, folder_name, entry, override_existing):
   cover_path = os.path.join(folder_path, FOLDER_IMAGE_FILENAME)
 
   if os.path.exists(cover_path) and not override_existing:
-    logger.dim(f'  [{formatted_name}] {FOLDER_IMAGE_FILENAME} already exists.')
+    logger.trace(f'  [{formatted_name}] {FOLDER_IMAGE_FILENAME} already exists.')
     return
 
   image_url = entry.get('iconUrl') if entry else None
   if not image_url:
-    logger.dim(f'  [{formatted_name}] no cover found.')
+    logger.trace(f'  [{formatted_name}] no cover found.')
     return
 
   try:

@@ -76,7 +76,7 @@ def process_folder(folder_path, folder_name, cover_url, override_existing):
   formatted_name = folder_name.rjust(ID_LENGTH)
 
   if os.path.exists(cover_path) and not override_existing:
-    logger.dim(f'  [{formatted_name}] {FOLDER_IMAGE_FILENAME} already exists.')
+    logger.trace(f'  [{formatted_name}] {FOLDER_IMAGE_FILENAME} already exists.')
     return
 
   try:
