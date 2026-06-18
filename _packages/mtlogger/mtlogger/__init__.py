@@ -14,24 +14,24 @@ class LogLevel(Enum):
   LOG = 'LOG'
   WARN = 'WARN'
 
+class LevelColor(Enum):
+  TRACE = Fore.LIGHTBLACK_EX
+  DEBUG = Fore.CYAN
+  ERROR = Fore.RED
+  INFO = Fore.GREEN
+  LOG = ''
+  WARN = Fore.YELLOW
+
 class LogOptions(TypedDict, total=False):
   prefix_newline: bool
 
 class Logger:
   # core functions
-  def formatLevel(self, level: LogLevel, msg = ''):
-    color = {
-      LogLevel.TRACE: Fore.LIGHTBLACK_EX,
-      LogLevel.DEBUG: Fore.CYAN,
-      LogLevel.ERROR: Fore.RED,
-      LogLevel.INFO: Fore.GREEN,
-      LogLevel.LOG: '',
-      LogLevel.WARN: Fore.YELLOW
-    }.get(level, '')
-    return self.colorize(color, msg)
-
   def colorize(_, color: str, msg = ''):
     return f"{color}{msg.replace(Fore.RESET, color)}{Fore.RESET}"
+
+  def formatLevel(self, level: LogLevel, msg = ''):
+    return self.colorize(LevelColor[level.name].value, msg)
 
   def print(_, msg = '', options: Optional[LogOptions] = None):
     prefix_newline = options.get('prefix_newline', False) if options else False
