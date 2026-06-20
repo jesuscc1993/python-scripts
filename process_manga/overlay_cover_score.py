@@ -54,10 +54,10 @@ def main():
     for _ in executor.map(lambda dir: process_dir(dir, font), dirs_to_process):
       progress.update(1)
 
-  logger.success(f'Finished merging volumes in "{parent_dir}".')
+  logger.success(f'Finished overlaying scores in "{parent_dir}".')
 
 def tqdm_dim(msg):
-  tqdm.write(logger.colorize(Fore.LIGHTBLACK_EX, msg))
+  tqdm.write(logger.formatTrace(msg))
 
 def find_font(name):
   user_fonts = os.path.join(os.environ.get('LOCALAPPDATA', ''), 'Microsoft', 'Windows', 'Fonts', name)
