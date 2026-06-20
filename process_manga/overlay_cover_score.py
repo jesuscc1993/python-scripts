@@ -143,4 +143,4 @@ if __name__ == '__main__':
     logger.unhandledError(ex)
 
   winsound.MessageBeep()
-  Prompt.enter_to_exit()
+  Prompt.exit_with_timeout()

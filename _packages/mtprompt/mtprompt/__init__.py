@@ -1,4 +1,6 @@
 import os
+import sys
+import threading
 
 from mtlogger import logger
 
@@ -153,8 +155,33 @@ class Prompt:
 
   @staticmethod
   def enter_to_exit():
-    if not os.getenv('NO_ENTER_TO_EXIT'):
-      input('\nPress Enter to exit...')
+    if os.getenv('NO_ENTER_TO_EXIT'):
+      return
+
+    input('\nPress Enter to exit...')
+
+  @staticmethod
+  def exit_with_timeout(timeout = 3):
+    if os.getenv('NO_ENTER_TO_EXIT'):
+      return
+
+    entered = threading.Event()
+
+    def wait_for_input():
+      input('')
+      entered.set()
+
+    thread = threading.Thread(target = wait_for_input, daemon = True)
+    thread.start()
+
+    sys.stdout.write('\n')
+    for remaining in range(timeout, 0, -1):
+      sys.stdout.write(f'\rPress Enter to exit. Terminal will automatically close in {remaining}s...')
+      sys.stdout.flush()
+      if entered.wait(timeout = 1):
+        return
+
+    os._exit(0)
 
 def format_prompt(prompt: str, default: str = None):
   formatted_prompt = prompt.strip(' ')
