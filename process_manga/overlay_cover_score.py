@@ -24,10 +24,16 @@ FONT_NAME = 'Roboto-Regular.ttf'
 FONT_SIZE = 31
 
 FG_GRAY = '#333333'
-BG_LOW = '#FF9191'
-BG_MEDIUM = '#FFCC80'
-BG_HIGH = '#C5E1A5'
-BG_HIGHEST = '#A5D6A7'
+BG_LOWEST = '#FF9191'
+BG_LOW = '#FFCC80'
+BG_MEDIUM = '#FFF480'
+BG_HIGH = '#D6E58A'
+BG_HIGHEST = '#A4E0A4'
+
+VALUE_LOW = 60
+VALUE_MEDIUM = 65
+VALUE_HIGH = 70
+VALUE_HIGHEST = 80
 
 def main():
   if len(sys.argv) > 1:
@@ -124,9 +130,10 @@ def overlay_score(img, score, font):
   return Image.alpha_composite(img, overlay).convert('RGB')
 
 def get_score_color(score):
-  if score < 65: return BG_LOW
-  elif score < 70: return BG_MEDIUM
-  elif score < 75: return BG_HIGH
+  if score < VALUE_LOW: return BG_LOWEST
+  if score < VALUE_MEDIUM: return BG_LOW
+  elif score < VALUE_HIGH: return BG_MEDIUM
+  elif score < VALUE_HIGHEST: return BG_HIGH
   return BG_HIGHEST
 
 if __name__ == '__main__':
