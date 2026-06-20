@@ -23,11 +23,11 @@ OVERLAY_RADIUS = 8
 FONT_NAME = 'Roboto-Regular.ttf'
 FONT_SIZE = 31
 
-FG_GRAY = (51, 51, 51, 255)
-BG_LOW = (255, 145, 145, 255)
-BG_MEDIUM = (255, 204, 128, 255)
-BG_HIGH = (197, 225, 165, 255)
-BG_HIGHEST = (165, 214, 167, 255)
+FG_GRAY = '#333333'
+BG_LOW = '#FF9191'
+BG_MEDIUM = '#FFCC80'
+BG_HIGH = '#C5E1A5'
+BG_HIGHEST = '#A5D6A7'
 
 def main():
   if len(sys.argv) > 1:
