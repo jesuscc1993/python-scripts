@@ -3,7 +3,7 @@ import re
 import sys
 import winsound
 
-from mtlogger import LogLevel, logger
+from mtlogger import logger
 from mtprompt import Prompt
 
 from _common import ITEM_EXTENSIONS, get_volume_and_chapter
@@ -43,9 +43,16 @@ def main():
     elif path_b:
       logger.warn(f'  "{folder_b}" only: "{item_name}".')
 
-def get_subfolders(dir):
-  subfolders = [f for f in os.listdir(dir) if os.path.isdir(os.path.join(dir, f))]
-  return {normalize_name(f): f for f in subfolders}
+def get_subfolders(parent_dir):
+  results = {}
+  for root, dirs, _ in os.walk(parent_dir):
+    if root == parent_dir:
+      continue
+    dirs[:] = [d for d in dirs if not re.fullmatch(r'[\(\[\{].*[\)\]\}]', d)]
+    if not dirs:
+      rel = os.path.relpath(root, parent_dir)
+      results[normalize_name(os.path.basename(rel))] = rel
+  return results
 
 def normalize_name(name):
   return re.sub(r'\s*(\{.*?\}|\(.*?\))\s*', '', name).strip()
