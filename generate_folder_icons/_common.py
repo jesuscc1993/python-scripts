@@ -79,6 +79,9 @@ def set_folder_icon(folder_path):
     os.system(f'attrib +h +s "{desktop_ini_path}"')
     os.system(f'attrib +h "{icon_path}"')
     os.system(f'attrib +s "{folder_path}"')
+
+    # parent_dir = os.path.dirname(folder_path)
+    # tqdm.write(logger.formatDebug(f'Saved "{os.path.relpath(icon_path, parent_dir)}" and "{os.path.relpath(desktop_ini_path, parent_dir)}".'))
   except PermissionError:
     tqdm.write(logger.formatWarn(f'Permission denied: "{desktop_ini_path}". You may need to run the script as an administrator.'))
   except Exception as ex:
