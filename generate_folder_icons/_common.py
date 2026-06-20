@@ -2,8 +2,10 @@ import os
 import sys
 import winsound
 
+from concurrent.futures import ThreadPoolExecutor
 from PIL import Image
 from mtlogger import logger
+from tqdm import tqdm
 
 DESKTOP_INI_FILENAME = 'desktop.ini'
 ICON_FILENAME = 'icon.ico'
@@ -11,11 +13,10 @@ MAX_ICON_SIZE = 256
 DEFAULT_ICON_SIZES = [16, 256]
 
 def process_parent_folder(parent_folder, depth, image_filenames):
-  process_folder(parent_folder, image_filenames)
-
   parent_folder = os.path.abspath(parent_folder)
   parent_depth = parent_folder.rstrip(os.sep).count(os.sep)
 
+  folders_to_process = [parent_folder]
   for root, dirs, _ in os.walk(parent_folder):
     current_depth = root.rstrip(os.sep).count(os.sep) - parent_depth
     if current_depth >= depth:
@@ -23,8 +24,11 @@ def process_parent_folder(parent_folder, depth, image_filenames):
       continue
 
     for dir_name in dirs:
-      item_path = os.path.join(root, dir_name)
-      process_folder(item_path, image_filenames)
+      folders_to_process.append(os.path.join(root, dir_name))
+
+  with ThreadPoolExecutor() as executor, tqdm(total = len(folders_to_process), desc = f'Processing "{parent_folder}"') as progress:
+    for _ in executor.map(lambda f: process_folder(f, image_filenames), folders_to_process):
+      progress.update(1)
 
   winsound.MessageBeep()
   logger.log(f'\nFinished setting icons for "{parent_folder}".')
@@ -42,7 +46,7 @@ def process_folder(folder_path, image_filenames):
     image_to_ico(image_path, ico_path)
     set_folder_icon(folder_path)
   else:
-    logger.warn(f'No suitable image found in "{folder_path}"')
+    tqdm.write(logger.formatWarn(f'No suitable image found in "{folder_path}"'))
 
 def image_to_ico(image_path, icon_path, icon_sizes = DEFAULT_ICON_SIZES):
   try:
@@ -75,10 +79,7 @@ def set_folder_icon(folder_path):
     os.system(f'attrib +h +s "{desktop_ini_path}"')
     os.system(f'attrib +h "{icon_path}"')
     os.system(f'attrib +s "{folder_path}"')
-
-    parent_dir = os.path.dirname(folder_path)
-    logger.success(f'Saved "{os.path.relpath(icon_path, parent_dir)}" and "{os.path.relpath(desktop_ini_path, parent_dir)}".')
   except PermissionError:
-    logger.warn(f'Permission denied: "{desktop_ini_path}". You may need to run the script as an administrator.')
+    tqdm.write(logger.formatWarn(f'Permission denied: "{desktop_ini_path}". You may need to run the script as an administrator.'))
   except Exception as ex:
-    logger.error(f'Error setting folder icon to "{folder_path}":\n{ex}')
+    tqdm.write(logger.formatError(f'Error setting folder icon to "{folder_path}":\n{ex}'))

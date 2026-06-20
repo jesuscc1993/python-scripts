@@ -56,6 +56,12 @@ class Logger:
 
   def formatWarn(self, msg = ''):
     return self.formatLevel(LogLevel.WARN, msg)
+
+  def formatSuccess(self, msg = ''):
+    return f'{self.colorize(Fore.GREEN, "✓")} {msg}'
+
+  def formatFailure(self, msg = ''):
+    return f'{self.colorize(Fore.RED, "✗")} {msg}'
   #
 
   # print functions
@@ -76,14 +82,12 @@ class Logger:
 
   def warn(self, msg = '', **kwargs: Unpack[LogOptions]):
     self.print(self.formatWarn(msg), LogOptions(**kwargs))
-  #
 
-  # functions with icons
   def success(self, msg = '', **kwargs: Unpack[LogOptions]):
-    self.print(f'{self.colorize(Fore.GREEN, "✓")} {msg}', LogOptions(**kwargs))
+    self.print(self.formatSuccess(msg), LogOptions(**kwargs))
 
   def failure(self, msg = '', **kwargs: Unpack[LogOptions]):
-    self.print(f'{self.colorize(Fore.RED, "✗")} {msg}', LogOptions(**kwargs))
+    self.print(self.formatFailure(msg), LogOptions(**kwargs))
   #
 
   # other functions
