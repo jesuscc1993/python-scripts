@@ -1,6 +1,5 @@
 import os
 import sys
-import winsound
 
 from PIL import Image
 from concurrent.futures import ThreadPoolExecutor
@@ -73,5 +72,4 @@ if __name__ == '__main__':
   except Exception as ex:
     logger.unhandledError(ex)
 
-  winsound.MessageBeep()
   Prompt.enter_to_exit()

@@ -44,7 +44,6 @@ def get_max_dimensions(img):
 
   return (width, height)
 
-
 def image_needs_resizing(img):
   return get_max_dimensions(img) is not None
 

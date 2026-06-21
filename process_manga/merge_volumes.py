@@ -3,7 +3,7 @@ import shutil
 import sys
 
 from concurrent.futures import ThreadPoolExecutor
-from mtlogger import LogLevel, logger
+from mtlogger import logger
 from mtprompt import Prompt
 from tqdm import tqdm
 

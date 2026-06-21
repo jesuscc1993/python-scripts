@@ -3,11 +3,10 @@ import os
 import re
 import shutil
 import sys
-import winsound
 
 from PIL import Image, ImageDraw, ImageFont
 from concurrent.futures import ThreadPoolExecutor
-from mtlogger import Fore, LogLevel, logger
+from mtlogger import logger
 from mtprompt import Prompt
 from tqdm import tqdm
 
@@ -142,5 +141,4 @@ if __name__ == '__main__':
   except Exception as ex:
     logger.unhandledError(ex)
 
-  winsound.MessageBeep()
-  Prompt.exit_with_timeout()
+  Prompt.enter_to_exit(timeout=True)

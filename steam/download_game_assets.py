@@ -1,6 +1,5 @@
 import os
 import requests
-import winsound
 
 from PIL import Image
 from io import BytesIO
@@ -109,5 +108,4 @@ if __name__ == '__main__':
   except Exception as ex:
     logger.unhandledError(ex)
 
-  winsound.MessageBeep()
   Prompt.enter_to_exit()

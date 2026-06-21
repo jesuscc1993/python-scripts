@@ -1,8 +1,4 @@
-import os
 import re
-import sys
-
-from mtlogger import logger
 
 ENCODING = 'latin-1'
 

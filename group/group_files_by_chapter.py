@@ -2,10 +2,9 @@ import os
 import re
 import shutil
 import sys
-import winsound
 
 from concurrent.futures import ThreadPoolExecutor
-from mtlogger import LogLevel, logger
+from mtlogger import logger
 from tqdm import tqdm
 
 from _common import FILE_BLACKLIST
@@ -76,5 +75,4 @@ if __name__ == '__main__':
   except Exception as ex:
     logger.unhandledError(ex)
 
-  winsound.MessageBeep()
   Prompt.enter_to_exit()

@@ -2,7 +2,6 @@
 import os
 import re
 import sys
-import winsound
 
 from mal import MangaSearch
 from mtlogger import logger
@@ -82,5 +81,4 @@ if __name__ == '__main__':
   except Exception as ex:
     logger.unhandledError(ex)
 
-  winsound.MessageBeep()
-  Prompt.exit_with_timeout()
+  Prompt.enter_to_exit(timeout=True)

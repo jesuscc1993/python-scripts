@@ -1,5 +1,4 @@
 import os
-import sys
 import winsound
 
 from concurrent.futures import ThreadPoolExecutor

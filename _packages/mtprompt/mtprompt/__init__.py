@@ -1,6 +1,7 @@
 import os
 import sys
 import threading
+import winsound
 
 from mtlogger import logger
 
@@ -24,7 +25,6 @@ class Prompt:
 
       logger.log()
       return val if val else default
-
 
   @staticmethod
   def int(
@@ -154,15 +154,18 @@ class Prompt:
       return val if val else default
 
   @staticmethod
-  def enter_to_exit():
+  def enter_to_exit(timeout = False, sound = True):
+    if sound:
+      winsound.MessageBeep()
+
     if os.getenv('NO_ENTER_TO_EXIT'):
       return
 
-    input('\nPress Enter to exit...')
+    if timeout is True:
+      timeout = 3
 
-  @staticmethod
-  def exit_with_timeout(timeout = 3):
-    if os.getenv('NO_ENTER_TO_EXIT'):
+    if timeout is False or timeout is None:
+      input('\nPress Enter to exit...')
       return
 
     entered = threading.Event()

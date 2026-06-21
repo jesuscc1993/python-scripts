@@ -35,4 +35,5 @@ if __name__ == '__main__':
     main()
   except Exception as ex:
     logger.unhandledError(ex)
+
   Prompt.enter_to_exit()

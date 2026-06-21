@@ -4,7 +4,7 @@ import subprocess
 import sys
 import winsound
 
-from mtlogger import Fore, LogLevel, logger
+from mtlogger import Fore, logger
 from mtprompt import Prompt
 from tqdm import tqdm
 

@@ -1,5 +1,4 @@
 import sys
-import winsound
 
 from mtlogger import logger
 from mtprompt import Prompt
@@ -20,5 +19,4 @@ if __name__ == '__main__':
   except Exception as ex:
     logger.unhandledError(ex)
 
-  winsound.MessageBeep()
   Prompt.enter_to_exit()
