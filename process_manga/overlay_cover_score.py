@@ -1,4 +1,5 @@
 
+import math
 import os
 import re
 import shutil
@@ -106,7 +107,7 @@ def resize_cover(img, target_w, target_h):
   return img.crop((left, top, left + target_w, top + target_h))
 
 def overlay_score(img, score, font):
-  text = f'{score}%'
+  text = format_score(score)
   bg_color = get_score_color(score)
 
   overlay = Image.new('RGBA', img.size, (0, 0, 0, 0))
@@ -127,6 +128,10 @@ def overlay_score(img, score, font):
   draw.text((x + OVERLAY_PADDING + text_offset_x, y + OVERLAY_PADDING + text_offset_y), text, font=font, fill=FG_GRAY)
 
   return Image.alpha_composite(img, overlay).convert('RGB')
+
+def format_score(score):
+  return f'{math.ceil(score)}%'
+  # return f'{math.ceil(score) / 10:.1f}'
 
 def get_score_color(score):
   if score < VALUE_LOW: return BG_LOWEST
