@@ -34,6 +34,10 @@ def main():
       is_file = item.get('isFile', False)
       expand = item.get('expand', True)
 
+      if not dest:
+        dest = os.path.basename(src)
+        # logger.debug(f'  No destination specified for source "{src}". Defaulting to: "{dest}".')
+
       src_path = os.path.join(path_prefix, src)
       dest_path = os.path.join(SPECIFIC_GAME_SAVES_PATH, dest)
 
@@ -55,4 +59,4 @@ if __name__ == '__main__':
   except Exception as ex:
     logger.unhandledError(ex)
 
-  Prompt.enter_to_exit(timeout=True)
+  Prompt.enter_to_exit()

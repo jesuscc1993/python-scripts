@@ -27,8 +27,12 @@ def make_link(
     logger.error(f'Failed to remove existing path "{dest_path}": {ex}')
     return
 
+  dest_dir = os.path.dirname(dest_path)
   if make_dirs:
-    os.makedirs(os.path.dirname(dest_path), exist_ok=True)
+    os.makedirs(dest_dir, exist_ok=True)
+  elif not os.path.isdir(dest_dir):
+    logger.warn(f'  Skipping "{dest_dir}". Destination does not exist.')
+    return
 
   try:
     Path(dest_path).symlink_to(src_path, target_is_directory)
