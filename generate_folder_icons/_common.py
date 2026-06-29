@@ -34,18 +34,29 @@ def process_parent_folder(parent_folder, depth, image_filenames):
 
 def process_folder(folder_path, image_filenames):
   image_path = None
+  ico_path = os.path.join(folder_path, ICON_FILENAME)
+  ico_exists = os.path.exists(ico_path)
+
+  skipped = False
   for image_filename in image_filenames:
     potential_path = os.path.join(folder_path, image_filename)
     if os.path.exists(potential_path):
-      image_path = potential_path
+      if not ico_exists or is_file_newer_than(potential_path, ico_path):
+        image_path = potential_path
+      else:
+        skipped = True
       break
 
   if image_path:
-    ico_path = os.path.join(folder_path, ICON_FILENAME)
     image_to_ico(image_path, ico_path)
     set_folder_icon(folder_path)
+  elif skipped:
+    tqdm.write(logger.formatWarn(f'No image found in "{folder_path}" is newer than the icon.'))
   else:
-    tqdm.write(logger.formatWarn(f'No suitable image found in "{folder_path}"'))
+    tqdm.write(logger.formatWarn(f'No suitable image found in "{folder_path}".'))
+
+def is_file_newer_than(file_a, file_b):
+  return os.path.getmtime(file_a) > os.path.getmtime(file_b)
 
 def image_to_ico(image_path, icon_path, icon_sizes = DEFAULT_ICON_SIZES):
   try:
