@@ -1,6 +1,7 @@
 import ctypes
 import json
 import os
+import sys
 import winreg
 
 from mtlogger import logger
@@ -11,10 +12,14 @@ from _registry import add_registry_entry, delete_registry_entry, get_registry_va
 ASSOCIATIONS_JSON = './associations.json'
 FILE_EXTS = 'Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts'
 
+def run_as_admin():
+  if os.name == 'nt' and not ctypes.windll.shell32.IsUserAnAdmin():
+    params = ' '.join([f'"{arg}"' for arg in sys.argv])
+    ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, params, None, 1)
+    sys.exit(0)
+
 def main():
-  if ctypes.windll.shell32.IsUserAnAdmin() == 0:
-    logger.error('Admin privileges required. Please run as administrator.')
-    return
+  run_as_admin()
 
   associations = get_associations()
   root_icons_path = associations.get('icons_path')
