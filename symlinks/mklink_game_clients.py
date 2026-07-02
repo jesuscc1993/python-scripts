@@ -34,7 +34,9 @@ def main():
   link_amazon()
   link_epic()
   link_ubisoft()
-  link_electronic_arts()
+  # Reversed as the client symlinks to itself
+  # link_electronic_arts()
+  reverse_link_electronic_arts()
   logger.info('Finished creating game client symlinks')
 
 def link_steam():
@@ -108,6 +110,13 @@ def link_electronic_arts():
   link_dir(
     os.path.join(PROGRAM_FILES, 'Electronic Arts', 'EA Desktop', 'EA Desktop'),
     os.path.join('D:\\', CLIENTS, 'EA Desktop')
+  )
+  print()
+
+def reverse_link_electronic_arts():
+  link_dir(
+    os.path.join('D:\\', CLIENTS, 'EA Desktop'),
+    os.path.join(PROGRAM_FILES, 'Electronic Arts', 'EA Desktop', 'EA Desktop'),
   )
   print()
 
