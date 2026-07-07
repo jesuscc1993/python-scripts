@@ -24,10 +24,16 @@ def main():
   parser = argparse.ArgumentParser()
   parser.add_argument('-appid', required = False, type = int)
   parser.add_argument('-appname', required = False)
-  parser.add_argument('-exe', required = True)
+  parser.add_argument('-exe', required = False)
   parser.add_argument('-icon', required = False)
   args = parser.parse_args()
+
   exe, app_name, icon, app_id = args.exe, args.appname, args.icon, args.appid
+  if not exe:
+    exe = Prompt.str('Enter the path to the exe')
+    app_name = Prompt.str('Enter the app name (optional)', default = Path(exe).stem)
+    icon = Prompt.str('Enter the path to the icon (optional)', default = exe)
+    app_id = Prompt.int('Enter the Steam app id (optional)', default = None)
 
   path = Path(STEAM_INSTALL_PATH, 'userdata', STEAM_USER_ID3, 'config', 'shortcuts.vdf')
   data = path.read_bytes()
@@ -40,7 +46,7 @@ def main():
   shortcut_appid = generate_app_id(exe)
 
   if any(g.get('appid') == shortcut_appid for g in inner.values()):
-    logger.warn(f'Skipping: game already present (appid {shortcut_appid})')
+    logger.warn(f'Skipping "{exe}". Game is already present as appid {shortcut_appid}.')
     return
 
   entry['appid'] = shortcut_appid
@@ -55,10 +61,10 @@ def main():
   serialized = serialize_object(root)
   bak_path = path.parent / f'{path.stem}.{int(time.time())}.bak'
   path.rename(bak_path)
-  logger.log(f'Backup saved to {bak_path}')
+  logger.debug(f'Saved backup "{bak_path}"')
 
   path.write_bytes(serialized)
-  logger.log(f'Saved to {path}')
+  logger.success(f'Saved "{path}"')
 
   if app_id is not None:
     grid_path = Path(STEAM_INSTALL_PATH, 'userdata', STEAM_USER_ID3, 'config', 'grid')
