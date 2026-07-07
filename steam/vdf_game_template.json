@@ -1,0 +1,20 @@
+{
+  "AllowDesktopConfig": 1,
+  "AllowOverlay": 1,
+  "Devkit": 0,
+  "DevkitGameID": "",
+  "DevkitOverrideAppID": 0,
+  "Exe": "",
+  "FlatpakAppID": "",
+  "IsHidden": 0,
+  "LastPlayTime": 0,
+  "LaunchOptions": "",
+  "OpenVR": 0,
+  "ShortcutPath": "",
+  "StartDir": "",
+  "appid": -1,
+  "appname": "",
+  "icon": "",
+  "sortas": "",
+  "tags": {}
+}
