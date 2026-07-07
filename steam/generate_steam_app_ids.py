@@ -2,9 +2,13 @@ import json
 import os
 import requests
 
+from dotenv import load_dotenv
 from natsort import natsorted
 
-from _env import steam_api_key, steam_user_id
+load_dotenv(os.path.join(os.path.dirname(__file__), '.env'))
+
+STEAM_API_KEY = os.environ.get('STEAM_API_KEY')
+STEAM_USER_ID3 = os.environ.get('STEAM_USER_ID3')
 
 OUTPUT_PATH = './output'
 OUTPUT_FILE = os.path.join(OUTPUT_PATH, 'app-ids.json')
@@ -14,7 +18,7 @@ PLAYED = None
 WITH_STATS = None
 
 def main():
-  games = get_owned_games(steam_api_key, steam_user_id)
+  games = get_owned_games(STEAM_API_KEY, STEAM_USER_ID3)
   filtered_app_ids = natsorted(game['appid'] for game in games if filter_game(game))
 
   os.makedirs(OUTPUT_PATH, exist_ok = True)

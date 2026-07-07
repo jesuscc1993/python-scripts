@@ -1,9 +1,19 @@
 ## Common
 
-### For features that use the API, you will need to create a `_env.py` file and define the following variables:
+### For features that use the API, you will need to create a `.env` file and define the following variables:
 
-steam_api_key = 'FILL_ME_IN'
-steam_user_id = 'FILL_ME_IN'
+#### Required
+
+STEAM_API_KEY
+STEAM_USER_ID3
+STEAM_INSTALL_PATH
+
+#### Optional
+
+COVER_H
+COVER_W
+HEADER_H
+HEADER_W
 
 ## Generate Steam Covers
 

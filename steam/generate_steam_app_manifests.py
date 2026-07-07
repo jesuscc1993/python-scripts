@@ -2,11 +2,15 @@ import os
 import re
 import requests
 
+from dotenv import load_dotenv
 from mtlogger import logger
 from mtprompt import Prompt
 from pathlib import Path
 
-from _env import steam_api_key, steam_user_id
+load_dotenv(os.path.join(os.path.dirname(__file__), '.env'))
+
+STEAM_API_KEY = os.environ.get('STEAM_API_KEY')
+STEAM_USER_ID3 = os.environ.get('STEAM_USER_ID3')
 
 APP_MANIFEST_TEMPLATE = '''"AppState"
 {{
@@ -45,7 +49,7 @@ def main():
     logger.log('No game folders found.')
     return
 
-  owned_games = {sanitize_name(g['name']): g['appid'] for g in get_owned_games(steam_api_key, steam_user_id)}
+  owned_games = {sanitize_name(g['name']): g['appid'] for g in get_owned_games(STEAM_API_KEY, STEAM_USER_ID3)}
 
   drive = Path(folder).drive
   steam_apps_path = os.path.join(drive, 'SteamLibrary', 'steamapps')
@@ -69,7 +73,7 @@ def main():
       app_id = app_id,
       name = name,
       install_dir = install_dir,
-      steam_user_id = steam_user_id
+      steam_user_id = STEAM_USER_ID3
     )
 
     with open(filepath, 'w', encoding = 'utf-8') as f:
