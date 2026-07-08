@@ -1,12 +1,16 @@
 import argparse
 import binascii
+import configparser
 import json
 import os
+import pythoncom
 import time
 
 from mtlogger import logger
 from mtprompt import Prompt
 from pathlib import Path
+from pathlib import Path
+from win32com.shell import shell # type: ignore
 
 from _common import download_assets_for_app_id
 
@@ -30,10 +34,16 @@ def main():
 
   exe, app_name, icon, app_id = args.exe, args.appname, args.icon, args.appid
   if not exe:
-    exe = Prompt.str('Enter the path to the exe')
-    app_name = Prompt.str('Enter the app name (optional)', default = Path(exe).stem)
-    icon = Prompt.str('Enter the path to the icon (optional)', default = exe)
-    app_id = Prompt.int('Enter the Steam app id (optional)', default = None)
+    exe = Prompt.str('Enter the path to the *.exe | *.lnk | *.url').strip('"')
+    if exe.lower().endswith('.lnk') or exe.lower().endswith('.url'):
+      info = get_shortcut_info(exe)
+      exe = info['target']
+      app_name = app_name or info['name']
+      icon = icon or info['icon']
+
+    app_name = app_name or Prompt.str('Enter the app name (optional)', default = Path(exe).stem)
+    icon = icon or Prompt.str('Enter the path to the icon (optional)', default = exe)
+    app_id = app_id or Prompt.int('Enter the Steam app id (optional)', optional = True)
 
   path = Path(STEAM_INSTALL_PATH, 'userdata', STEAM_USER_ID3, 'config', 'shortcuts.vdf')
   data = path.read_bytes()
@@ -52,8 +62,10 @@ def main():
   entry['appid'] = shortcut_appid
   entry['appname'] = app_name or Path(exe).stem
   entry['Exe'] = exe
-  entry['StartDir'] = str(Path(exe).parent)
+  entry['StartDir'] = str(Path(exe).parent) if Path(exe).is_file() else ''
   entry['icon'] = icon or exe
+
+  logger.debug(f'Generated entry:\n{stringify(entry)}\n')
 
   inner[str(len(inner))] = entry
   root['shortcuts'] = inner
@@ -116,6 +128,58 @@ def serialize_object(obj):
       raise ValueError(f'Unsupported type: {type(value)}')
   result += bytes([TYPE_END])
   return bytes(result)
+
+def get_shortcut_info(path):
+  path = Path(path)
+
+  match path.suffix.lower():
+    case '.lnk':
+      info = get_lnk_info(path)
+    case '.url':
+      info = get_url_info(path)
+    case _:
+      raise ValueError(f'Unsupported shortcut type: {path.suffix}')
+
+  logger.debug(f'Parsed shortcut "{path}":\n{stringify(info)}\n')
+  return info
+
+def get_lnk_info(path):
+  link = pythoncom.CoCreateInstance(
+    shell.CLSID_ShellLink,
+    None,
+    pythoncom.CLSCTX_INPROC_SERVER,
+    shell.IID_IShellLink
+  )
+  link.QueryInterface(pythoncom.IID_IPersistFile).Load(str(path))
+
+  name = Path(path).stem
+  target = link.GetPath(0)[0]
+  icon, _ = link.GetIconLocation()
+  icon = icon or target
+
+  return {
+    'name': name,
+    'target': target,
+    'icon': icon,
+  }
+
+def get_url_info(path):
+  cfg = configparser.ConfigParser(interpolation = None)
+  cfg.read(path, encoding = 'utf-8')
+  shortcut = cfg['InternetShortcut']
+
+  name = Path(path).stem
+  target = shortcut.get('URL', '')
+  icon = shortcut.get('IconFile', '') or target
+
+  return {
+    'icon': icon,
+    'name': name,
+    'target': target,
+  }
+
+def stringify(obj):
+  return json.dumps(obj, indent = 2)
 
 if __name__ == '__main__':
   try:

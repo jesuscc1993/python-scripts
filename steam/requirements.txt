@@ -1,3 +1,4 @@
 Pillow
 natsort
+pywin32
 requests
