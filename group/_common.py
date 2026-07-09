@@ -6,7 +6,9 @@ from mtlogger import logger
 from tqdm import tqdm
 
 FILE_BLACKLIST = [
+  r'cover.jpg',
   r'desktop.ini',
+  r'folder.jpg',
   r'.*\.url',
   r'.*\.lnk'
 ]
