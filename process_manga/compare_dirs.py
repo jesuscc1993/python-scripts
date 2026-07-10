@@ -1,3 +1,4 @@
+import json
 import os
 import re
 import sys
@@ -18,6 +19,10 @@ def main():
   subfolders_a = get_subfolders(folder_a)
   subfolders_b = get_subfolders(folder_b)
 
+  missing_in_a = []
+  missing_in_b = []
+  mismatches = []
+
   for item_name in sorted(set(subfolders_a.keys()) | set(subfolders_b.keys())):
     nameA = subfolders_a.get(item_name)
     nameB = subfolders_b.get(item_name)
@@ -33,14 +38,31 @@ def main():
         if range_a == range_b:
           logger.success(f'"{item_name}" has the same volumes and chapters in both folders.')
         else:
+          mismatches.append(item_name)
           logger.log(f'  "{item_name}" has different volumes or chapters in the folders.')
           logger.failure(f'{logger.formatTrace(f"\"{folder_a}\"")} {print_range(range_a)} | {print_range(range_b)} {logger.formatTrace(f"\"{folder_b}\"")}')
       else:
         logger.trace(f'Failed to determine ranges for "{item_name}".')
     elif path_a:
+      missing_in_b.append(item_name)
       logger.warn(f'  "{folder_a}" only: "{item_name}".')
     elif path_b:
+      missing_in_a.append(item_name)
       logger.warn(f'  "{folder_b}" only: "{item_name}".')
+
+  logger.hr()
+
+  if missing_in_a:
+    logger.warn(f'Missing in "{folder_a}" ({len(missing_in_a)}): {stringify(missing_in_a)}\n')
+
+  if missing_in_b:
+    logger.warn(f'Missing in "{folder_b}" ({len(missing_in_b)}): {stringify(missing_in_b)}\n')
+
+  if mismatches:
+    logger.failure(f'Mismatching ranges ({len(mismatches)}): {stringify(mismatches)}\n')
+
+def stringify(obj):
+  return json.dumps(obj, indent = 2)
 
 def get_subfolders(parent_dir):
   results = {}
