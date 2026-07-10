@@ -43,8 +43,21 @@ def get_processed_name(item_path):
   new_name = os.path.basename(item_path)
 
   if not is_dir:
-    new_name = re.sub(r'\s*\{.*\}', '', new_name).strip()
-  new_name = re.sub(r'\s+', ' ', new_name).strip()
+    # disabled due to explorer performance impact
+    # new_name = re.sub(
+    #   r'\.zip$',
+    #   '.cbz',
+    #   new_name,
+    #   flags = re.IGNORECASE
+    # )
+
+    new_name = re.sub(r'\s*\{.*\}', '', new_name)
+    new_name, ext = os.path.splitext(new_name)
+  else:
+    ext = ''
+
+  new_name = re.sub(r'\s*\(Official\)', '', new_name)
+  new_name = re.sub(r'\s+', ' ', new_name)
 
   new_name = re.sub(
     rf'\b({CHAPTER_REGEX})\b\.?\s*(\d+)',
@@ -60,15 +73,7 @@ def get_processed_name(item_path):
     flags = re.IGNORECASE
   )
 
-  # disabled due to explorer performance impact
-  # new_name = re.sub(
-  #   r'\.zip$',
-  #   '.cbz',
-  #   new_name,
-  #   flags = re.IGNORECASE
-  # )
-
-  return new_name
+  return new_name.strip() + ext
 
 if __name__ == '__main__':
   try:

@@ -14,7 +14,7 @@ def main():
     select_parent_folder(
       'Enter the path to the parent folder containing the chapter folders:\n',
       process_parent_folder,
-      { 'log_success': False, 'loop': False }
+      { 'log_success': False }
     )
 
 def process_parent_folder(directory):
