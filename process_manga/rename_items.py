@@ -65,10 +65,18 @@ def get_processed_name(item_path):
     new_name,
     flags = re.IGNORECASE
   )
+  new_name = re.sub(r'(Ch\.\d+) - \1', r'\1', new_name.strip())
 
   new_name = re.sub(
     rf'\b({VOLUME_REGEX})\b\.?\s*(\d+)',
     lambda match: f'Vol.{int(match.group(2)):02}',
+    new_name,
+    flags = re.IGNORECASE
+  )
+
+  new_name = re.sub(
+    r'(?:-\s*)?\[?(?:(?:the\s+)?end|series finale)\]?',
+    '[END]',
     new_name,
     flags = re.IGNORECASE
   )
