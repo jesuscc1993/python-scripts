@@ -4,7 +4,8 @@ from mtprompt import Prompt
 from _common import select_parent_folder, run_scripts_in_sequence
 
 SCRIPT_NAMES = [
-  '../compress/compress_folders'
+  '../compress/compress_folders',
+  'rename_items'
 ]
 
 def process_parent_folder(parent_folder):
