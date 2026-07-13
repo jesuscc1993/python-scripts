@@ -43,16 +43,13 @@ def get_processed_name(item_path):
   new_name = os.path.basename(item_path)
 
   if not is_dir:
-    # disabled due to explorer performance impact
-    # new_name = re.sub(
-    #   r'\.zip$',
-    #   '.cbz',
-    #   new_name,
-    #   flags = re.IGNORECASE
-    # )
-
     new_name = re.sub(r'\s*\{.*\}', '', new_name)
     new_name, ext = os.path.splitext(new_name)
+
+    # save only volumes as CBZ
+    # saving all chapters has too much of a performance impact
+    if ('Vol.' in new_name):
+      ext = '.cbz'
   else:
     ext = ''
 
