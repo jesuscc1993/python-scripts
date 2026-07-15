@@ -10,12 +10,23 @@ from tqdm import tqdm
 
 from _image_utils import is_image_file
 
+INTEGER_REGEX = r'\.?\s*(\d+)'
 NUMBER_REGEX = r'\.?\s*(\d+(?:\.\d+)?)'
-VOLUME_REGEX = r'Vol(?:ume)?'
-CHAPTER_REGEX = r'Ch(?:ap(?:ter)?)?|Ep(?:isode)?|Ep(?:ilogue)?|Sp(?:ecial)?'
-VOLUME_NUMBER_REGEX = rf'(?:{VOLUME_REGEX}){NUMBER_REGEX}'
-CHAPTER_NUMBER_REGEX  = rf'(?:{CHAPTER_REGEX}){NUMBER_REGEX}'
+
+VOLUME_REGEX = r'\bVol(?:ume)?\b'
+SEASON_REGEX = r'\bSeason\b'
+CHAPTER_REGEX = r'\b(?:Ch(?:ap(?:ter)?)?|Ep(?:isode)?)\b'
+EPILOGUE_REGEX = r'\bEp(?:ilogue)?\b'
+SPECIAL_REGEX = r'\bSp(?:ecial)?\b'
+ENDING_REGEX = r'\bEnd(?:ing)?\b'
+SIDE_STORY_REGEX = r'\bSide Story\b'
+
+VOLUME_NUMBER_REGEX = rf'{VOLUME_REGEX}{NUMBER_REGEX}'
+CHAPTER_NUMBER_REGEX  = rf'{CHAPTER_REGEX}{NUMBER_REGEX}'
+SEASON_NUMBER_REGEX  = rf'{SEASON_REGEX}{NUMBER_REGEX}'
+
 ITEM_EXTENSIONS = ['cbz', 'zip']
+IMAGE_EXTENSIONS = ['webp', 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'tif']
 
 def select_parent_folder(prompt, callback, options = {}):
   prompt = prompt or 'Enter the path to the parent folder you want to process:\n'

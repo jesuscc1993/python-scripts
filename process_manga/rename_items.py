@@ -7,7 +7,7 @@ from mtlogger import logger
 from mtprompt import Prompt
 from tqdm import tqdm
 
-from _common import VOLUME_REGEX, CHAPTER_REGEX
+from _common import CHAPTER_REGEX, ENDING_REGEX, EPILOGUE_REGEX, IMAGE_EXTENSIONS, INTEGER_REGEX, SEASON_REGEX, SIDE_STORY_REGEX, SPECIAL_REGEX, VOLUME_REGEX
 
 def main():
   if len(sys.argv) > 1:
@@ -40,45 +40,63 @@ def process_item(root, item_name):
 
 def get_processed_name(item_path):
   is_dir = os.path.isdir(item_path)
-  new_name = os.path.basename(item_path)
+  base_name = os.path.basename(item_path)
+  new_name = base_name
 
   if not is_dir:
-    new_name = re.sub(r'\s*\{.*\}', '', new_name)
     new_name, ext = os.path.splitext(new_name)
+    ext = ext.lower()
 
-    # save only volumes as CBZ
-    # saving all chapters has too much of a performance impact
-    if ('Vol.' in new_name):
-      ext = '.cbz'
+    # skip images
+    if ext.lstrip('.') in IMAGE_EXTENSIONS:
+      return base_name
+
   else:
     ext = ''
 
-  new_name = re.sub(r'\s*\(Official\)', '', new_name)
-  new_name = re.sub(r'\s+', ' ', new_name)
+  # remove item index
+  new_name = replace(r'\s*\[\d*\]\s*', ' ', new_name)
 
-  new_name = re.sub(
-    rf'\b({CHAPTER_REGEX})\b\.?\s*(\d+)',
-    lambda match: f'Ch.{int(match.group(2)):03}',
-    new_name,
-    flags = re.IGNORECASE
-  )
-  new_name = re.sub(r'(Ch\.\d+) - \1', r'\1', new_name.strip())
+  # remove unnecessary tags
+  new_name = replace(r'\s*\(official\)\s*', ' ', new_name)
 
-  new_name = re.sub(
-    rf'\b({VOLUME_REGEX})\b\.?\s*(\d+)',
-    lambda match: f'Vol.{int(match.group(2)):02}',
-    new_name,
-    flags = re.IGNORECASE
+  # prettify volume number
+  new_name = replace(
+    rf'{VOLUME_REGEX}{INTEGER_REGEX}',
+    lambda match: f'Vol.{int(match.group(1)):02}',
+    new_name
   )
 
-  new_name = re.sub(
-    r'(?:-\s*)?\[?(?:(?:the\s+)?end|series finale)\]?',
-    '[END]',
-    new_name,
-    flags = re.IGNORECASE
+  # prettify chapter number
+  new_name = replace(
+    rf'{CHAPTER_REGEX}{INTEGER_REGEX}',
+    lambda match: f'Ch.{int(match.group(1)):03}',
+    new_name
   )
 
-  return new_name.strip() + ext
+  # shorten common words
+  new_name = replace(rf'{SEASON_REGEX}{INTEGER_REGEX}', r'S\1', new_name)
+  new_name = replace(rf'{EPILOGUE_REGEX}{INTEGER_REGEX}', r'EP\1', new_name)
+  new_name = replace(rf'{SIDE_STORY_REGEX}{INTEGER_REGEX}', r'SS\1', new_name)
+  new_name = replace(rf'{SPECIAL_REGEX}{INTEGER_REGEX}', r'SP\1', new_name)
+  new_name = replace(rf'{ENDING_REGEX}', r'END', new_name)
+
+  # fix duplicate chapter number, sometimes a result of the scraper
+  new_name = replace(r'(Ch\.\d+) - \1', r'\1', new_name)
+
+  # remove remaining unnecessary whitespaces
+  new_name = replace(r'\s+', ' ', new_name).strip()
+
+  if not is_dir:
+    # rename ZIP volumes as CBZ
+    # do not rename chapters as they have too much of a performance impact
+    if (ext == '.zip' and 'Vol.' in new_name):
+      ext = '.cbz'
+
+  return new_name + ext
+
+def replace(pattern, repl, string, flags=re.IGNORECASE):
+  return re.sub(pattern, repl, string, flags=flags)
 
 if __name__ == '__main__':
   try:
