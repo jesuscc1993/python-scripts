@@ -7,7 +7,7 @@ from mtlogger import logger
 from mtprompt import Prompt
 from tqdm import tqdm
 
-from _common import delete_empty_folders, get_volume_and_chapter, select_parent_folder
+from _common import delete_empty_folders, get_volume_and_chapter, select_parent_folder, zfill_float
 
 def main():
   if len(sys.argv) > 1:
@@ -22,11 +22,11 @@ def process_parent_folder(parent_dir):
     folder_path = os.path.join(parent_dir, folder)
     if os.path.isdir(folder_path):
       volume, chapter = get_volume_and_chapter(folder)
-      if not volume or not chapter:
+      if volume is None or chapter is None:
         tqdm.write(logger.formatWarn(f'Skipping "{folder}". Volume or chapter numbers could not be inferred.'))
         continue
 
-      output_path = os.path.join(parent_dir, f'Vol.{volume.zfill(2)}')
+      output_path = os.path.join(parent_dir, f'Vol.{zfill_float(volume, 2)}')
       if not os.path.exists(output_path):
         os.makedirs(output_path)
 
@@ -44,8 +44,8 @@ def process_parent_folder(parent_dir):
   logger.success(f'Finished merging volumes in "{parent_dir}".')
 
 def get_sanitized_chapter(chapter):
-  parts = chapter.split('.')
-  name = f'{int(parts[0]):03d}'
+  parts = zfill_float(chapter, 3).split('.')
+  name = parts[0]
   if len(parts) > 1: name += chr(ord('a') + int(parts[1]) - 1)
   return name
 

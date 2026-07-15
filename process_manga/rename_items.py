@@ -7,7 +7,7 @@ from mtlogger import logger
 from mtprompt import Prompt
 from tqdm import tqdm
 
-from _common import CHAPTER_REGEX, ENDING_REGEX, EPILOGUE_REGEX, IMAGE_EXTENSIONS, INTEGER_REGEX, SEASON_REGEX, SIDE_STORY_REGEX, SPECIAL_REGEX, VOLUME_REGEX
+from _common import CHAPTER_NUMBER_REGEX, ENDING_REGEX, EPILOGUE_REGEX, IMAGE_EXTENSIONS, INTEGER_REGEX, SEASON_REGEX, SIDE_STORY_REGEX, SPECIAL_REGEX, VOLUME_NUMBER_REGEX, zfill_float
 
 def main():
   if len(sys.argv) > 1:
@@ -62,15 +62,15 @@ def get_processed_name(item_path):
 
   # prettify volume number
   new_name = replace(
-    rf'{VOLUME_REGEX}{INTEGER_REGEX}',
-    lambda match: f'Vol.{int(match.group(1)):02}',
+    rf'{VOLUME_NUMBER_REGEX}',
+    lambda match: f'Vol.{zfill_float(match.group(1), 2)}',
     new_name
   )
 
   # prettify chapter number
   new_name = replace(
-    rf'{CHAPTER_REGEX}{INTEGER_REGEX}',
-    lambda match: f'Ch.{int(match.group(1)):03}',
+    rf'{CHAPTER_NUMBER_REGEX}',
+    lambda match: f'Ch.{zfill_float(match.group(1), 3)}',
     new_name
   )
 

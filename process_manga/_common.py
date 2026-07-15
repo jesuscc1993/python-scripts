@@ -23,7 +23,6 @@ SIDE_STORY_REGEX = r'\bSide Story\b'
 
 VOLUME_NUMBER_REGEX = rf'{VOLUME_REGEX}{NUMBER_REGEX}'
 CHAPTER_NUMBER_REGEX  = rf'{CHAPTER_REGEX}{NUMBER_REGEX}'
-SEASON_NUMBER_REGEX  = rf'{SEASON_REGEX}{NUMBER_REGEX}'
 
 ITEM_EXTENSIONS = ['cbz', 'zip']
 IMAGE_EXTENSIONS = ['webp', 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'tif']
@@ -75,9 +74,9 @@ def delete_empty_folders(folder_path):
 
 def get_volume_and_chapter(filename):
   vol_match = re.search(VOLUME_NUMBER_REGEX, filename, re.IGNORECASE)
-  ch_match  = re.search(CHAPTER_NUMBER_REGEX, filename, re.IGNORECASE)
-  volume  = vol_match.group(1) if vol_match else None
-  chapter = ch_match.group(1) if ch_match else None
+  ch_match = re.search(CHAPTER_NUMBER_REGEX, filename, re.IGNORECASE)
+  volume = float(vol_match.group(1)) if vol_match else None
+  chapter = float(ch_match.group(1)) if ch_match else None
   return (volume, chapter)
 
 def get_chapter(filename):
@@ -99,3 +98,7 @@ def run_scripts_in_sequence(script_names, parent_folder):
     f'Finished batch running scripts on "{parent_folder}".\n',
     prefix_newline=True
   )
+
+def zfill_float(value, width):
+  parts = f'{float(value):g}'.split('.')
+  return parts[0].zfill(width) + ('.' + parts[1] if len(parts) > 1 else '')
