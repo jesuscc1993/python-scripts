@@ -18,8 +18,18 @@ def main():
     if 'backup' in dir_path:
       continue
 
-    items_to_process = [f for f in file_names if link_token in f]
+    items_to_process = []
+    for file_name in file_names:
+      if link_token in file_name:
+        item_path = os.path.join(dir_path, file_name)
+        target_path = item_path.replace(link_token, target_token)
+        if os.path.exists(target_path):
+          items_to_process.append(file_name)
+        else:
+          logger.warn(f'File\n"{item_path}"\nmatches link token but target file\n"{target_path}"\ndoes not exist. Skipping...\n')
+
     if not items_to_process:
+      logger.warn(f'No matches found for "{link_token}" in directory "{dir_path}".')
       continue
 
     backup_dir = os.path.join(dir_path, 'backup')
@@ -35,7 +45,7 @@ def main():
 
       link_path = item_path
       os.symlink(target_path, link_path)
-      logger.info(f'Created symlink: {path.relpath(link_path, parent_dir)} -> {path.relpath(target_path, parent_dir)}')
+      logger.info(f'Created symlink:\n"{path.relpath(link_path, parent_dir)}" -> "{path.relpath(target_path, parent_dir)}"')
 
 if __name__ == '__main__':
   try:
