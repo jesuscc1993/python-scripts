@@ -88,7 +88,6 @@ def set_folder_icon(folder_path: str, ico_path: str, override_existing: bool = F
 
     if os.path.exists(desktop_ini_path):
       subprocess.run(['attrib', '-s', folder_path], check=True)
-      subprocess.run(['attrib', '-h', '-s', desktop_ini_path], check=True)
 
     config, encoding = read_ini(desktop_ini_path)
 
@@ -99,7 +98,6 @@ def set_folder_icon(folder_path: str, ico_path: str, override_existing: bool = F
     set_ini_icon(config, ico_path)
     write_ini(desktop_ini_path, encoding, config)
 
-    subprocess.run(['attrib', '+h', '+s', desktop_ini_path], check=True)
     subprocess.run(['attrib', '+s', folder_path], check=True)
   except PermissionError:
     tqdm.write(logger.formatWarn(f'Permission denied: "{desktop_ini_path}". You may need to run the script as an administrator.'))

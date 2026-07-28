@@ -101,6 +101,8 @@ def process_dir(dir_path: str, override_existing: bool = False):
   except Exception as ex:
     logger.error(f'Could not process "{dir_path}": {ex}')
 
+  subprocess.run(['attrib', '+h', '+s', ini_path], check=True)
+
 def calculate_dir_size(dir_path: str) -> int:
   cache_path = os.path.join(dir_path, DIR_SIZE_FILENAME)
 
