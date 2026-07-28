@@ -14,11 +14,13 @@ INI_FILENAME = 'desktop.ini'
 SHELL_SECTION = '.ShellClassInfo'
 
 EXE_EXCLUSION_PATTERNS = [
+  r'BsSndRpt',
   r'CrashHandler',
   r'EOSBootstrapper',
   r'Handler',
   r'ModManager',
   r'Setup',
+  r'Trainer',
   r'Unins',
   r'Updat'
 ]

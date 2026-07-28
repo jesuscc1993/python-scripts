@@ -8,9 +8,9 @@ from configparser import ConfigParser
 from mtlogger import logger
 from tqdm import tqdm
 
-ICON_FILENAME = 'icon.ico'
-MAX_ICON_SIZE = 256
-DEFAULT_ICON_SIZES = [16, 256]
+MAX_ICO_SIZE = 256
+DEFAULT_ICO_SIZES = [16, 48, 256]
+ICO_FILENAME = 'icon.ico'
 
 DESKTOP_INI_FILENAME = 'desktop.ini'
 INI_PREFERRED_ENCODING = 'utf-8'
@@ -41,7 +41,7 @@ def process_parent_folder(parent_folder: str, depth: int, image_filenames: list[
 
 def process_folder(folder_path: str, image_filenames: list[str]):
   image_path = None
-  ico_path = os.path.join(folder_path, ICON_FILENAME)
+  ico_path = os.path.join(folder_path, ICO_FILENAME)
   ico_exists = os.path.exists(ico_path)
 
   skipped = False
@@ -57,7 +57,7 @@ def process_folder(folder_path: str, image_filenames: list[str]):
   if image_path:
     image_to_ico(image_path, ico_path)
     subprocess.run(['attrib', '+h', ico_path], check=True)
-    set_folder_icon(folder_path, ICON_FILENAME)
+    set_folder_icon(folder_path, ICO_FILENAME)
   elif skipped:
     tqdm.write(logger.formatWarn(f'No image found in "{folder_path}" is newer than the icon.'))
   else:
@@ -66,32 +66,33 @@ def process_folder(folder_path: str, image_filenames: list[str]):
 def is_file_newer_than(file_a: str, file_b: str):
   return os.path.getmtime(file_a) > os.path.getmtime(file_b)
 
-def image_to_ico(image_path: str, ico_path: str, icon_sizes: list[int] = DEFAULT_ICON_SIZES):
+def image_to_ico(image_path: str, ico_path: str, icon_sizes: list[int] = DEFAULT_ICO_SIZES):
   try:
     if os.path.exists(ico_path):
       os.unlink(ico_path)
 
     with Image.open(image_path) as img:
-      if img.width < MAX_ICON_SIZE:
-        img = img.resize((MAX_ICON_SIZE, int(MAX_ICON_SIZE * img.height / img.width)), resample = Image.LANCZOS)
-      img.thumbnail((MAX_ICON_SIZE, MAX_ICON_SIZE), Image.LANCZOS)
-      background = Image.new('RGBA', (MAX_ICON_SIZE, MAX_ICON_SIZE), (0, 0, 0, 0))
-      offset = (int((MAX_ICON_SIZE - img.size[0]) / 2), int((MAX_ICON_SIZE - img.size[1]) / 2))
+      if img.width < MAX_ICO_SIZE:
+        img = img.resize((MAX_ICO_SIZE, int(MAX_ICO_SIZE * img.height / img.width)), resample = Image.LANCZOS)
+      img.thumbnail((MAX_ICO_SIZE, MAX_ICO_SIZE), Image.LANCZOS)
+      background = Image.new('RGBA', (MAX_ICO_SIZE, MAX_ICO_SIZE), (0, 0, 0, 0))
+      offset = (int((MAX_ICO_SIZE - img.size[0]) / 2), int((MAX_ICO_SIZE - img.size[1]) / 2))
       background.paste(img, offset)
       background.save(ico_path, format = 'ICO', sizes = [(s, s) for s in icon_sizes])
   except Exception as ex:
     logger.error(f'Error converting "{image_path}" to ICO:\n{ex}')
 
-def set_folder_icon(folder_path: str, ico_path: str):
+def set_folder_icon(folder_path: str, ico_path: str, override_existing: bool = False):
   try:
     desktop_ini_path = os.path.join(folder_path, DESKTOP_INI_FILENAME)
 
     if os.path.exists(desktop_ini_path):
+      subprocess.run(['attrib', '-s', folder_path], check=True)
       subprocess.run(['attrib', '-h', '-s', desktop_ini_path], check=True)
 
     config, encoding = read_ini(desktop_ini_path)
 
-    if get_ini_icon(config):
+    if get_ini_icon(config) and not override_existing:
       logger.trace(f'Skipping "{folder_path}". A folder icon is already set.')
       return
 
@@ -134,8 +135,8 @@ def write_ini(ini_path: str, encoding: str, config: ConfigParser):
 def get_ini_icon(config: ConfigParser):
   return config.get(INI_SHELL_SECTION, INI_ICON_KEY, fallback=None)
 
-def set_ini_icon(config: ConfigParser, ico_path: str):
+def set_ini_icon(config: ConfigParser, ico_path: str, ico_index: int = 0):
   if INI_SHELL_SECTION not in config:
     config[INI_SHELL_SECTION] = {}
 
-  config[INI_SHELL_SECTION][INI_ICON_KEY] = f'{ico_path},0'
+  config[INI_SHELL_SECTION][INI_ICON_KEY] = f'{ico_path},{ico_index}'
