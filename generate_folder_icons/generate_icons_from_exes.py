@@ -1,9 +1,9 @@
-import configparser
 import os
 import re
 import sys
 import winsound
 
+from _common import read_ini, set_folder_icon, write_ini
 from mtlogger import logger
 from mtprompt import Prompt
 
@@ -15,6 +15,7 @@ SHELL_SECTION = '.ShellClassInfo'
 EXE_EXCLUSION_PATTERNS = [
   r'CrashHandler',
   r'EOSBootstrapper',
+  r'Handler',
   r'ModManager',
   r'Setup',
   r'Unins',
@@ -57,57 +58,24 @@ def process_dir(dir_path):
     if not os.path.isdir(dir_path):
       return
 
-    exe_path = find_exe(dir_path)
-    if not exe_path:
+    abs_exe_path = find_exe(dir_path)
+    if not abs_exe_path:
       return
 
-    save_icon_to_ini(dir_path, exe_path)
+    rel_exe_path = os.path.relpath(abs_exe_path, dir_path)
+    set_folder_icon(dir_path, rel_exe_path)
 
   except Exception as ex:
     logger.error(f'Could not process "{dir_path}": {ex}')
 
-def find_exe(folder):
+def find_exe(dir_path):
   pattern = re.compile('|'.join(EXE_EXCLUSION_PATTERNS), re.IGNORECASE)
 
-  for dirpath, _, filenames in os.walk(folder):
+  for dirpath, _, filenames in os.walk(dir_path):
     for f in filenames:
       if f.lower().endswith('.exe') and not pattern.search(f):
         return os.path.join(dirpath, f)
   return None
-
-def save_icon_to_ini(dir_path, exe_path):
-  ini_path = os.path.join(dir_path, INI_FILENAME)
-
-  config = configparser.ConfigParser()
-  config.optionxform = str
-
-  encoding = ENCODING
-  try:
-    if os.path.exists(ini_path):
-      config.read(ini_path, encoding=encoding)
-  except Exception as ex:
-    try:
-      encoding = 'cp1252'
-      config.read(ini_path, encoding=encoding)
-    except Exception as ex:
-      logger.error(f'Failed to read {ini_path}: {ex}')
-
-  if SHELL_SECTION not in config:
-    config[SHELL_SECTION] = {}
-
-  if ICON_KEY in config[SHELL_SECTION] and config[SHELL_SECTION][ICON_KEY].strip():
-    logger.trace(f'Skipping "{dir_path}". A folder icon is already set.')
-    return
-
-  relative_exe_path = os.path.relpath(exe_path, dir_path)
-  config[SHELL_SECTION][ICON_KEY] = f'{relative_exe_path},0'
-
-  with open(ini_path, 'w', encoding=encoding) as ini:
-    config.write(ini)
-    logger.success(f'Set icon for {dir_path}.')
-
-  os.system(f'attrib +h "{ini_path}"')
-  os.system(f'attrib +s +r "{dir_path}"')
 
 if __name__ == '__main__':
   try:

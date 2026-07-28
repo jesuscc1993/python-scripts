@@ -1,17 +1,24 @@
 import os
+import subprocess
 import winsound
 
-from concurrent.futures import ThreadPoolExecutor
 from PIL import Image
+from concurrent.futures import ThreadPoolExecutor
+from configparser import ConfigParser
 from mtlogger import logger
 from tqdm import tqdm
 
-DESKTOP_INI_FILENAME = 'desktop.ini'
 ICON_FILENAME = 'icon.ico'
 MAX_ICON_SIZE = 256
 DEFAULT_ICON_SIZES = [16, 256]
 
-def process_parent_folder(parent_folder, depth, image_filenames):
+DESKTOP_INI_FILENAME = 'desktop.ini'
+INI_PREFERRED_ENCODING = 'utf-8'
+INI_FALLBACK_ENCODING = 'cp1252'
+INI_ICON_KEY = 'IconResource'
+INI_SHELL_SECTION = '.ShellClassInfo'
+
+def process_parent_folder(parent_folder: str, depth: int, image_filenames: list[str]):
   parent_folder = os.path.abspath(parent_folder)
   parent_depth = parent_folder.rstrip(os.sep).count(os.sep)
 
@@ -32,7 +39,7 @@ def process_parent_folder(parent_folder, depth, image_filenames):
   winsound.MessageBeep()
   logger.log(f'\nFinished setting icons for "{parent_folder}".')
 
-def process_folder(folder_path, image_filenames):
+def process_folder(folder_path: str, image_filenames: list[str]):
   image_path = None
   ico_path = os.path.join(folder_path, ICON_FILENAME)
   ico_exists = os.path.exists(ico_path)
@@ -49,19 +56,20 @@ def process_folder(folder_path, image_filenames):
 
   if image_path:
     image_to_ico(image_path, ico_path)
-    set_folder_icon(folder_path)
+    subprocess.run(['attrib', '+h', ico_path], check=True)
+    set_folder_icon(folder_path, ICON_FILENAME)
   elif skipped:
     tqdm.write(logger.formatWarn(f'No image found in "{folder_path}" is newer than the icon.'))
   else:
     tqdm.write(logger.formatWarn(f'No suitable image found in "{folder_path}".'))
 
-def is_file_newer_than(file_a, file_b):
+def is_file_newer_than(file_a: str, file_b: str):
   return os.path.getmtime(file_a) > os.path.getmtime(file_b)
 
-def image_to_ico(image_path, icon_path, icon_sizes = DEFAULT_ICON_SIZES):
+def image_to_ico(image_path: str, ico_path: str, icon_sizes: list[int] = DEFAULT_ICON_SIZES):
   try:
-    if os.path.exists(icon_path):
-      os.unlink(icon_path)
+    if os.path.exists(ico_path):
+      os.unlink(ico_path)
 
     with Image.open(image_path) as img:
       if img.width < MAX_ICON_SIZE:
@@ -70,29 +78,59 @@ def image_to_ico(image_path, icon_path, icon_sizes = DEFAULT_ICON_SIZES):
       background = Image.new('RGBA', (MAX_ICON_SIZE, MAX_ICON_SIZE), (0, 0, 0, 0))
       offset = (int((MAX_ICON_SIZE - img.size[0]) / 2), int((MAX_ICON_SIZE - img.size[1]) / 2))
       background.paste(img, offset)
-      background.save(icon_path, format = 'ICO', sizes = [(s, s) for s in icon_sizes])
+      background.save(ico_path, format = 'ICO', sizes = [(s, s) for s in icon_sizes])
   except Exception as ex:
     logger.error(f'Error converting "{image_path}" to ICO:\n{ex}')
 
-def set_folder_icon(folder_path):
+def set_folder_icon(folder_path: str, ico_path: str):
   try:
     desktop_ini_path = os.path.join(folder_path, DESKTOP_INI_FILENAME)
-    icon_path = os.path.join(folder_path, ICON_FILENAME)
 
     if os.path.exists(desktop_ini_path):
-      os.system(f'attrib -h -s "{desktop_ini_path}"')
+      subprocess.run(['attrib', '-h', '-s', desktop_ini_path], check=True)
 
-    with open(desktop_ini_path, 'w') as desktop_ini:
-      desktop_ini.write('[.ShellClassInfo]\n')
-      desktop_ini.write(f'IconResource={ICON_FILENAME},0\n')
+    config, encoding = read_ini(desktop_ini_path)
 
-    os.system(f'attrib +h +s "{desktop_ini_path}"')
-    os.system(f'attrib +h "{icon_path}"')
-    os.system(f'attrib +s "{folder_path}"')
+    if INI_SHELL_SECTION not in config:
+      config[INI_SHELL_SECTION] = {}
 
-    # parent_dir = os.path.dirname(folder_path)
-    # tqdm.write(logger.formatDebug(f'Saved "{os.path.relpath(icon_path, parent_dir)}" and "{os.path.relpath(desktop_ini_path, parent_dir)}".'))
+    if INI_ICON_KEY in config[INI_SHELL_SECTION] and config[INI_SHELL_SECTION][INI_ICON_KEY].strip():
+      logger.trace(f'Skipping "{folder_path}". A folder icon is already set.')
+      return
+
+    config[INI_SHELL_SECTION][INI_ICON_KEY] = f'{ico_path},0'
+
+    write_ini(desktop_ini_path, encoding, config)
+
+    subprocess.run(['attrib', '+h', '+s', desktop_ini_path], check=True)
+    subprocess.run(['attrib', '+s', folder_path], check=True)
   except PermissionError:
     tqdm.write(logger.formatWarn(f'Permission denied: "{desktop_ini_path}". You may need to run the script as an administrator.'))
   except Exception as ex:
     tqdm.write(logger.formatError(f'Error setting folder icon to "{folder_path}":\n{ex}'))
+
+def read_ini(ini_path: str, encoding: str = INI_PREFERRED_ENCODING):
+  config = ConfigParser()
+  config.optionxform = str
+
+  try:
+    if os.path.exists(ini_path):
+      config.read(ini_path, encoding=encoding)
+  except Exception as ex:
+    try:
+      encoding = INI_FALLBACK_ENCODING
+      config.read(ini_path, encoding=encoding)
+    except Exception as ex:
+      logger.error(f'Failed to read "{ini_path}": {ex}')
+
+  return config, encoding
+
+def write_ini(ini_path: str, encoding: str, config: ConfigParser):
+  if os.path.exists(ini_path):
+    subprocess.run(['attrib', '-h', '-s', ini_path], check=True)
+
+  with open(ini_path, 'w', encoding=encoding) as ini:
+    config.write(ini)
+    logger.success(f'Saved "{ini_path}".')
+
+  subprocess.run(['attrib', '+h', '+s', ini_path], check=True)
