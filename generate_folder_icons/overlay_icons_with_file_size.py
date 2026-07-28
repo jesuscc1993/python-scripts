@@ -14,6 +14,7 @@ from mtprompt import Prompt
 
 from _common import DESKTOP_INI_FILENAME, ICO_FILENAME, MAX_ICO_SIZE, get_ini_icon, read_ini, set_folder_icon
 
+OVERLAY_SMALLER_THAN_GB = False
 ICO_BAK_FILENAME = 'icon.bak.ico'
 DIR_SIZE_FILENAME = 'dir_file_size.txt'
 
@@ -126,9 +127,11 @@ def calculate_dir_size(dir_path: str) -> int:
 def overlay_file_size(dir_path: str, ico_img: Image.Image) -> Image.Image:
   total_size = calculate_dir_size(dir_path)
 
-  label = format_size(total_size)
   img = ico_img.convert('RGBA').copy()
-  width, height = img.size
+  label = format_size(total_size)
+  if not label:
+    return ico_img
+  width, _ = img.size
 
   try:
     font = ImageFont.truetype('segoeuib.ttf', 40)
@@ -159,7 +162,7 @@ def format_size(size_bytes: int) -> str:
   units = ['GB', 'TB', 'PB']
   size = size_bytes / (1024 * 1024 * 1024)
   if size < 1:
-    return f'<1 {units[0]}'
+    return f'<1 {units[0]}' if OVERLAY_SMALLER_THAN_GB else None
   for unit in units:
     if size < 1024 or unit == units[-1]:
       return f'{math.ceil(size)} {unit}'
