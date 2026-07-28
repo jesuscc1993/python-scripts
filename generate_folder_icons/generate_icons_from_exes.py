@@ -3,9 +3,10 @@ import re
 import sys
 import winsound
 
-from _common import read_ini, set_folder_icon, write_ini
 from mtlogger import logger
 from mtprompt import Prompt
+
+from _common import set_folder_icon
 
 ENCODING = 'utf-8'
 ICON_KEY = 'IconResource'
@@ -55,9 +56,6 @@ def main():
 
 def process_dir(dir_path):
   try:
-    if not os.path.isdir(dir_path):
-      return
-
     abs_exe_path = find_exe(dir_path)
     if not abs_exe_path:
       return

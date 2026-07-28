@@ -91,15 +91,11 @@ def set_folder_icon(folder_path: str, ico_path: str):
 
     config, encoding = read_ini(desktop_ini_path)
 
-    if INI_SHELL_SECTION not in config:
-      config[INI_SHELL_SECTION] = {}
-
-    if INI_ICON_KEY in config[INI_SHELL_SECTION] and config[INI_SHELL_SECTION][INI_ICON_KEY].strip():
+    if get_ini_icon(config):
       logger.trace(f'Skipping "{folder_path}". A folder icon is already set.')
       return
 
-    config[INI_SHELL_SECTION][INI_ICON_KEY] = f'{ico_path},0'
-
+    set_ini_icon(config, ico_path)
     write_ini(desktop_ini_path, encoding, config)
 
     subprocess.run(['attrib', '+h', '+s', desktop_ini_path], check=True)
@@ -134,3 +130,12 @@ def write_ini(ini_path: str, encoding: str, config: ConfigParser):
     logger.success(f'Saved "{ini_path}".')
 
   subprocess.run(['attrib', '+h', '+s', ini_path], check=True)
+
+def get_ini_icon(config: ConfigParser):
+  return config.get(INI_SHELL_SECTION, INI_ICON_KEY, fallback=None)
+
+def set_ini_icon(config: ConfigParser, ico_path: str):
+  if INI_SHELL_SECTION not in config:
+    config[INI_SHELL_SECTION] = {}
+
+  config[INI_SHELL_SECTION][INI_ICON_KEY] = f'{ico_path},0'
