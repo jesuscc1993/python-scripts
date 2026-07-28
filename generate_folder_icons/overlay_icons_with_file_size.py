@@ -160,11 +160,10 @@ def format_size(size_bytes: int) -> str:
   size = size_bytes / (1024 * 1024 * 1024)
   if size < 1:
     return f'<1 {units[0]}'
-  for unit in units[:-1]:
-    if size < 1024:
+  for unit in units:
+    if size < 1024 or unit == units[-1]:
       return f'{math.ceil(size)} {unit}'
     size /= 1024
-  return f'{math.ceil(size)} PB'
 
 def get_exe_icon(exe_path: str, index: int):
   size = MAX_ICO_SIZE
