@@ -95,7 +95,7 @@ def process_dir(dir_path: str, override_existing: bool = False):
 
     ico_img = overlay_file_size(dir_path, ico_img)
     ico_img.save(new_ico_path, format='ICO', sizes=[(256, 256), (48, 48), (16, 16)])
-    set_folder_icon(dir_path, new_ico_name, override)
+    set_folder_icon(dir_path, new_ico_name, override_existing=override)
     subprocess.run(['attrib', '+h', new_ico_path], check=True)
 
   except Exception as ex:
@@ -156,8 +156,10 @@ def overlay_file_size(dir_path: str, ico_img: Image.Image) -> Image.Image:
   return img
 
 def format_size(size_bytes: int) -> str:
-  units = ['MB', 'GB', 'TB', 'PB']
-  size = size_bytes / (1024 * 1024)
+  units = ['GB', 'TB', 'PB']
+  size = size_bytes / (1024 * 1024 * 1024)
+  if size < 1:
+    return f'<1 {units[0]}'
   for unit in units[:-1]:
     if size < 1024:
       return f'{math.ceil(size)} {unit}'
