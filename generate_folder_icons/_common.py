@@ -56,7 +56,6 @@ def process_folder(folder_path: str, image_filenames: list[str]):
 
   if image_path:
     image_to_ico(image_path, ico_path)
-    subprocess.run(['attrib', '+h', ico_path], check=True)
     set_folder_icon(folder_path, ICO_FILENAME)
   elif skipped:
     tqdm.write(logger.formatWarn(f'No image found in "{folder_path}" is newer than the icon.'))
@@ -79,6 +78,7 @@ def image_to_ico(image_path: str, ico_path: str, icon_sizes: list[int] = DEFAULT
       offset = (int((MAX_ICO_SIZE - img.size[0]) / 2), int((MAX_ICO_SIZE - img.size[1]) / 2))
       background.paste(img, offset)
       background.save(ico_path, format = 'ICO', sizes = [(s, s) for s in icon_sizes])
+
   except Exception as ex:
     logger.error(f'Error converting "{image_path}" to ICO:\n{ex}')
 
@@ -87,7 +87,7 @@ def set_folder_icon(folder_path: str, ico_path: str, override_existing: bool = F
     desktop_ini_path = os.path.join(folder_path, DESKTOP_INI_FILENAME)
 
     if os.path.exists(desktop_ini_path):
-      subprocess.run(['attrib', '-s', folder_path], check=True)
+      show_file(desktop_ini_path)
 
     config, encoding = read_ini(desktop_ini_path)
 
@@ -97,10 +97,11 @@ def set_folder_icon(folder_path: str, ico_path: str, override_existing: bool = F
 
     set_ini_icon(config, ico_path)
     write_ini(desktop_ini_path, encoding, config)
+    hide_file(desktop_ini_path)
 
-    subprocess.run(['attrib', '+s', folder_path], check=True)
   except PermissionError:
     tqdm.write(logger.formatWarn(f'Permission denied: "{desktop_ini_path}". You may need to run the script as an administrator.'))
+
   except Exception as ex:
     tqdm.write(logger.formatError(f'Error setting folder icon to "{folder_path}":\n{ex}'))
 
@@ -111,10 +112,12 @@ def read_ini(ini_path: str, encoding: str = INI_PREFERRED_ENCODING):
   try:
     if os.path.exists(ini_path):
       config.read(ini_path, encoding=encoding)
+
   except Exception as ex:
     try:
       encoding = INI_FALLBACK_ENCODING
       config.read(ini_path, encoding=encoding)
+
     except Exception as ex:
       logger.error(f'Failed to read "{ini_path}": {ex}')
 
@@ -122,13 +125,13 @@ def read_ini(ini_path: str, encoding: str = INI_PREFERRED_ENCODING):
 
 def write_ini(ini_path: str, encoding: str, config: ConfigParser):
   if os.path.exists(ini_path):
-    subprocess.run(['attrib', '-h', '-s', ini_path], check=True)
+    remove_file_attrs(ini_path, ['h', 's'])
 
   with open(ini_path, 'w', encoding=encoding) as ini:
     config.write(ini)
     logger.success(f'Saved "{ini_path}".')
 
-  subprocess.run(['attrib', '+h', '+s', ini_path], check=True)
+  add_file_attrs(ini_path, ['h', 's'])
 
 def get_ini_icon(config: ConfigParser):
   return config.get(INI_SHELL_SECTION, INI_ICON_KEY, fallback=None)
@@ -138,3 +141,17 @@ def set_ini_icon(config: ConfigParser, ico_path: str, ico_index: int = 0):
     config[INI_SHELL_SECTION] = {}
 
   config[INI_SHELL_SECTION][INI_ICON_KEY] = f'{ico_path},{ico_index}'
+
+def add_file_attrs(file_path: str, attrs: list[str]):
+  if os.path.exists(file_path):
+    subprocess.run(['attrib'] + ['+' + attr for attr in attrs] + [file_path], check=True)
+
+def remove_file_attrs(file_path: str, attrs: list[str]):
+  if os.path.exists(file_path):
+    subprocess.run(['attrib'] + ['-' + attr for attr in attrs] + [file_path], check=True)
+
+def hide_file(file_path: str):
+  add_file_attrs(file_path, ['h'])
+
+def show_file(file_path: str):
+  remove_file_attrs(file_path, ['h'])

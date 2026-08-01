@@ -12,7 +12,7 @@ from PIL import Image, ImageDraw, ImageFont
 from mtlogger import logger
 from mtprompt import Prompt
 
-from _common import DESKTOP_INI_FILENAME, ICO_FILENAME, MAX_ICO_SIZE, get_ini_icon, read_ini, set_folder_icon
+from _common import DESKTOP_INI_FILENAME, ICO_FILENAME, MAX_ICO_SIZE, get_ini_icon, hide_file, read_ini, set_folder_icon, show_file
 
 OVERLAY_SMALLER_THAN_GB = False
 ICO_BAK_FILENAME = 'icon.bak.ico'
@@ -103,7 +103,8 @@ def process_dir(dir_path: str, override_existing: bool = False):
 
     if ico_path != os.path.basename(bak_ico_path):
       set_folder_icon(dir_path, new_ico_name, override_existing=override)
-      subprocess.run(['attrib', '+h', new_ico_path], check=True)
+
+    subprocess.run(['attrib', '+h', new_ico_path], check=True)
 
   except Exception as ex:
     logger.error(f'Could not process "{dir_path}": {ex}')
@@ -115,7 +116,7 @@ def calculate_dir_size(dir_path: str):
   total_size = None
 
   if os.path.exists(cache_path):
-    subprocess.run(['attrib', '-h', cache_path], check=True)
+    hide_file(cache_path)
 
   if os.path.exists(cache_path):
     with open(cache_path, 'r') as f:
@@ -123,7 +124,7 @@ def calculate_dir_size(dir_path: str):
       total_size = int(lines[0]) if len(lines) > 0 else None
       formatted_size = lines[1] if len(lines) > 1 else None
       if formatted_size:
-        subprocess.run(['attrib', '+h', cache_path], check=True)
+        show_file(cache_path)
         return formatted_size
 
   if total_size is None:
@@ -137,7 +138,7 @@ def calculate_dir_size(dir_path: str):
   with open(cache_path, 'w') as f:
     f.write(f'{total_size}\n{formatted_size}')
 
-  subprocess.run(['attrib', '+h', cache_path], check=True)
+  show_file(cache_path)
 
   return formatted_size
 
