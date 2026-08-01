@@ -50,8 +50,7 @@ def main():
 def process_dir(dir_path: str, override_existing: bool = False):
   try:
     ini_path = os.path.join(dir_path, DESKTOP_INI_FILENAME)
-    config, encoding = read_ini(ini_path)
-
+    config, _ = read_ini(ini_path)
     ico_config = get_ini_icon(config)
     if not ico_config:
       logger.trace(f'Skipping "{dir_path}". No folder icon is set.')
@@ -87,6 +86,10 @@ def process_dir(dir_path: str, override_existing: bool = False):
       if not any(a.getdata()):
         ico_img = Image.merge('RGBA', (r, g, b, Image.new('L', ico_img.size, 255)))
 
+    if not ico_img:
+      logger.trace(f'Skipping "{dir_path}". Could not load folder icon.')
+      return
+
     if not os.path.exists(bak_ico_path):
       ico_img.save(bak_ico_path, format='ICO', sizes=[(256, 256)])
       subprocess.run(['attrib', '+h', bak_ico_path], check=True)
@@ -96,40 +99,52 @@ def process_dir(dir_path: str, override_existing: bool = False):
 
     ico_img = overlay_file_size(dir_path, ico_img)
     ico_img.save(new_ico_path, format='ICO', sizes=[(256, 256), (48, 48), (16, 16)])
-    set_folder_icon(dir_path, new_ico_name, override_existing=override)
-    subprocess.run(['attrib', '+h', new_ico_path], check=True)
+    logger.success(f'Saved "{new_ico_path}".')
+
+    if ico_path != os.path.basename(bak_ico_path):
+      set_folder_icon(dir_path, new_ico_name, override_existing=override)
+      subprocess.run(['attrib', '+h', new_ico_path], check=True)
 
   except Exception as ex:
     logger.error(f'Could not process "{dir_path}": {ex}')
 
   subprocess.run(['attrib', '+h', '+s', ini_path], check=True)
 
-def calculate_dir_size(dir_path: str) -> int:
+def calculate_dir_size(dir_path: str):
   cache_path = os.path.join(dir_path, DIR_SIZE_FILENAME)
 
   if os.path.exists(cache_path):
-    with open(cache_path, 'r') as f:
-      return int(f.read().strip())
+    subprocess.run(['attrib', '-h', cache_path], check=True)
 
-  total_size = sum(
-    os.path.getsize(os.path.join(root, f))
-    for root, _, files in os.walk(dir_path)
-    for f in files
-  )
+  if os.path.exists(cache_path):
+    with open(cache_path, 'r') as f:
+      lines = f.read().strip().splitlines()
+      formatted_size = lines[1] if len(lines) > 1 else None
+      if formatted_size:
+        return formatted_size
+
+      total_size = int(lines[0])
+      formatted_size = format_size(total_size)
+  else:
+    total_size = sum(
+      os.path.getsize(os.path.join(root, f))
+      for root, _, files in os.walk(dir_path)
+      for f in files
+    )
+    formatted_size = format_size(total_size)
 
   with open(cache_path, 'w') as f:
-    f.write(str(total_size))
+    f.write(f'{total_size}\n{formatted_size}')
 
   subprocess.run(['attrib', '+h', cache_path], check=True)
 
-  return total_size
+  return formatted_size
 
-def overlay_file_size(dir_path: str, ico_img: Image.Image) -> Image.Image:
-  total_size = calculate_dir_size(dir_path)
+def overlay_file_size(dir_path: str, ico_img: Image.Image):
+  formatted_size = calculate_dir_size(dir_path)
 
   img = ico_img.convert('RGBA').copy()
-  label = format_size(total_size)
-  if not label:
+  if not formatted_size:
     return ico_img
   width, _ = img.size
 
@@ -139,7 +154,7 @@ def overlay_file_size(dir_path: str, ico_img: Image.Image) -> Image.Image:
     font = ImageFont.load_default()
 
   draw = ImageDraw.Draw(img)
-  bbox = draw.textbbox((0, 0), label, font=font)
+  bbox = draw.textbbox((0, 0), formatted_size, font=font)
   text_w = bbox[2] - bbox[0]
   text_h = bbox[3] - bbox[1]
 
@@ -154,7 +169,7 @@ def overlay_file_size(dir_path: str, ico_img: Image.Image) -> Image.Image:
   img.paste(box, (box_x, box_y), box)
 
   draw = ImageDraw.Draw(img)
-  draw.text((box_x + padding - bbox[0], box_y + padding - bbox[1]), label, font=font, fill=(255, 255, 255, 255))
+  draw.text((box_x + padding - bbox[0], box_y + padding - bbox[1]), formatted_size, font=font, fill=(255, 255, 255, 255))
 
   return img
 
@@ -209,4 +224,4 @@ if __name__ == '__main__':
   except Exception as ex:
     logger.unhandledError(ex)
 
-  Prompt.enter_to_exit(timeout=True)
+  Prompt.enter_to_exit()
