@@ -68,7 +68,7 @@ class Prompt:
       default_display = 'y/N'
 
     while True:
-      val = input(f'{prompt} ({default_display}):\n').strip().lower()
+      val = input(f'{prompt} ({default_display})\n: ').strip().lower()
 
       if val in ('y', 'yes'):
         boolean = True
@@ -189,4 +189,4 @@ class Prompt:
 def format_prompt(prompt: str, default: str = None):
   formatted_prompt = prompt.strip(' ')
   formatted_default = f'(default: {default})' if default else ''
-  return f'{formatted_prompt}{' ' if formatted_default and not formatted_prompt.endswith('\n') else ''}{formatted_default}{":\n" if formatted_prompt or formatted_default else ""}'
+  return f'{formatted_prompt}{' ' if formatted_default and not formatted_prompt.endswith('\n') else ''}{formatted_default}{"\n: " if formatted_prompt or formatted_default else ""}'
