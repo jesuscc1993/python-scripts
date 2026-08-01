@@ -8,15 +8,7 @@ from configparser import ConfigParser
 from mtlogger import logger
 from tqdm import tqdm
 
-MAX_ICO_SIZE = 256
-DEFAULT_ICO_SIZES = [16, 48, 256]
-ICO_FILENAME = 'icon.ico'
-
-DESKTOP_INI_FILENAME = 'desktop.ini'
-INI_PREFERRED_ENCODING = 'utf-8'
-INI_FALLBACK_ENCODING = 'cp1252'
-INI_ICON_KEY = 'IconResource'
-INI_SHELL_SECTION = '.ShellClassInfo'
+from _constants import DEFAULT_ICO_SIZES, DESKTOP_INI_FILENAME, FALLBACK_ENCODING, HIDDEN_FILE_ATTRS, HIDDEN_SYSTEM_FILE_ATTRS, ICO_FILENAME, INI_ICON_KEY, INI_SHELL_SECTION, MAX_ICO_SIZE, PREFERRED_ENCODING
 
 def process_parent_folder(parent_folder: str, depth: int, image_filenames: list[str]):
   parent_folder = os.path.abspath(parent_folder)
@@ -96,7 +88,7 @@ def set_folder_icon(folder_path: str, ico_path: str, override_existing: bool = F
       return
 
     set_ini_icon(config, ico_path)
-    write_ini(desktop_ini_path, encoding, config)
+    write_ini(desktop_ini_path, config, encoding)
     hide_file(desktop_ini_path)
 
   except PermissionError:
@@ -105,7 +97,7 @@ def set_folder_icon(folder_path: str, ico_path: str, override_existing: bool = F
   except Exception as ex:
     tqdm.write(logger.formatError(f'Error setting folder icon to "{folder_path}":\n{ex}'))
 
-def read_ini(ini_path: str, encoding: str = INI_PREFERRED_ENCODING):
+def read_ini(ini_path: str, encoding: str = PREFERRED_ENCODING):
   config = ConfigParser()
   config.optionxform = str
 
@@ -115,7 +107,7 @@ def read_ini(ini_path: str, encoding: str = INI_PREFERRED_ENCODING):
 
   except Exception as ex:
     try:
-      encoding = INI_FALLBACK_ENCODING
+      encoding = FALLBACK_ENCODING
       config.read(ini_path, encoding=encoding)
 
     except Exception as ex:
@@ -123,15 +115,26 @@ def read_ini(ini_path: str, encoding: str = INI_PREFERRED_ENCODING):
 
   return config, encoding
 
-def write_ini(ini_path: str, encoding: str, config: ConfigParser):
-  if os.path.exists(ini_path):
-    remove_file_attrs(ini_path, ['h', 's'])
+def write_file(file_path: str, content: str, attrs: list[str], encoding: str = PREFERRED_ENCODING):
+  if os.path.exists(file_path):
+    remove_file_attrs(file_path, attrs)
 
-  with open(ini_path, 'w', encoding=encoding) as ini:
+  with open(file_path, 'w', encoding=encoding) as file:
+    file.write(content)
+    logger.success(f'Saved "{file_path}".')
+
+def write_ini(file_path: str, config: ConfigParser, encoding: str):
+  if os.path.exists(file_path):
+    remove_file_attrs(file_path, HIDDEN_SYSTEM_FILE_ATTRS)
+
+  with open(file_path, 'w', encoding=encoding) as ini:
     config.write(ini)
-    logger.success(f'Saved "{ini_path}".')
+    logger.success(f'Saved "{file_path}".')
 
-  add_file_attrs(ini_path, ['h', 's'])
+  add_file_attrs(file_path, HIDDEN_SYSTEM_FILE_ATTRS)
+
+def write_hidden_file(file_path: str, content: str, encoding: str):
+  write_file(file_path, content, HIDDEN_FILE_ATTRS, encoding)
 
 def get_ini_icon(config: ConfigParser):
   return config.get(INI_SHELL_SECTION, INI_ICON_KEY, fallback=None)
@@ -151,7 +154,7 @@ def remove_file_attrs(file_path: str, attrs: list[str]):
     subprocess.run(['attrib'] + ['-' + attr for attr in attrs] + [file_path], check=True)
 
 def hide_file(file_path: str):
-  add_file_attrs(file_path, ['h'])
+  add_file_attrs(file_path, HIDDEN_FILE_ATTRS)
 
 def show_file(file_path: str):
-  remove_file_attrs(file_path, ['h'])
+  remove_file_attrs(file_path, HIDDEN_FILE_ATTRS)

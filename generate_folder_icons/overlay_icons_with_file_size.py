@@ -1,7 +1,6 @@
 import ctypes
 import math
 import os
-import subprocess
 import sys
 import win32con
 import win32gui
@@ -12,7 +11,8 @@ from PIL import Image, ImageDraw, ImageFont
 from mtlogger import logger
 from mtprompt import Prompt
 
-from _common import DESKTOP_INI_FILENAME, ICO_FILENAME, MAX_ICO_SIZE, get_ini_icon, hide_file, read_ini, set_folder_icon, show_file
+from _constants import DESKTOP_INI_FILENAME, HIDDEN_SYSTEM_FILE_ATTRS, ICO_FILENAME, MAX_ICO_SIZE
+from _common import add_file_attrs, get_ini_icon, hide_file, read_ini, set_folder_icon, show_file, write_hidden_file
 
 OVERLAY_SMALLER_THAN_GB = False
 ICO_BAK_FILENAME = 'icon.bak.ico'
@@ -92,10 +92,10 @@ def process_dir(dir_path: str, override_existing: bool = False):
 
     if not os.path.exists(bak_ico_path):
       ico_img.save(bak_ico_path, format='ICO', sizes=[(256, 256)])
-      subprocess.run(['attrib', '+h', bak_ico_path], check=True)
+      hide_file(bak_ico_path)
 
     if os.path.exists(new_ico_path):
-      subprocess.run(['attrib', '-h', new_ico_path], check=True)
+      show_file(new_ico_path)
 
     ico_img = overlay_file_size(dir_path, ico_img)
     ico_img.save(new_ico_path, format='ICO', sizes=[(256, 256), (48, 48), (16, 16)])
@@ -104,19 +104,16 @@ def process_dir(dir_path: str, override_existing: bool = False):
     if ico_path != os.path.basename(bak_ico_path):
       set_folder_icon(dir_path, new_ico_name, override_existing=override)
 
-    subprocess.run(['attrib', '+h', new_ico_path], check=True)
+    hide_file(new_ico_path)
 
   except Exception as ex:
     logger.error(f'Could not process "{dir_path}": {ex}')
 
-  subprocess.run(['attrib', '+h', '+s', ini_path], check=True)
+  add_file_attrs(ini_path, HIDDEN_SYSTEM_FILE_ATTRS)
 
 def calculate_dir_size(dir_path: str):
   cache_path = os.path.join(dir_path, DIR_SIZE_FILENAME)
   total_size = None
-
-  if os.path.exists(cache_path):
-    show_file(cache_path)
 
   if os.path.exists(cache_path):
     with open(cache_path, 'r') as f:
@@ -124,7 +121,6 @@ def calculate_dir_size(dir_path: str):
       total_size = int(lines[0]) if len(lines) > 0 else None
       formatted_size = lines[1] if len(lines) > 1 else None
       if formatted_size:
-        hide_file(cache_path)
         return formatted_size
 
   if total_size is None:
@@ -135,10 +131,8 @@ def calculate_dir_size(dir_path: str):
     )
   formatted_size = format_size(total_size)
 
-  with open(cache_path, 'w') as f:
-    f.write(f'{total_size}\n{formatted_size}')
-
-  hide_file(cache_path)
+  cache_contents = f'{total_size}\n{formatted_size}'
+  write_hidden_file(cache_path, cache_contents)
 
   return formatted_size
 
