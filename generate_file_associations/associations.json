@@ -109,6 +109,7 @@
         "3ds",
         "gba",
         "n64",
+        { "class": "n64", "ext": "z64" },
         "nca",
         "nds",
         "nsp",
