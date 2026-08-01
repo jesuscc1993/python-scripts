@@ -112,6 +112,7 @@ def process_dir(dir_path: str, override_existing: bool = False):
 
 def calculate_dir_size(dir_path: str):
   cache_path = os.path.join(dir_path, DIR_SIZE_FILENAME)
+  total_size = None
 
   if os.path.exists(cache_path):
     subprocess.run(['attrib', '-h', cache_path], check=True)
@@ -119,19 +120,19 @@ def calculate_dir_size(dir_path: str):
   if os.path.exists(cache_path):
     with open(cache_path, 'r') as f:
       lines = f.read().strip().splitlines()
+      total_size = int(lines[0]) if len(lines) > 0 else None
       formatted_size = lines[1] if len(lines) > 1 else None
       if formatted_size:
+        subprocess.run(['attrib', '+h', cache_path], check=True)
         return formatted_size
 
-      total_size = int(lines[0])
-      formatted_size = format_size(total_size)
-  else:
+  if total_size is None:
     total_size = sum(
       os.path.getsize(os.path.join(root, f))
       for root, _, files in os.walk(dir_path)
       for f in files
     )
-    formatted_size = format_size(total_size)
+  formatted_size = format_size(total_size)
 
   with open(cache_path, 'w') as f:
     f.write(f'{total_size}\n{formatted_size}')
