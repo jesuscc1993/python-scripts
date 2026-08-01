@@ -116,7 +116,7 @@ def calculate_dir_size(dir_path: str):
   total_size = None
 
   if os.path.exists(cache_path):
-    hide_file(cache_path)
+    show_file(cache_path)
 
   if os.path.exists(cache_path):
     with open(cache_path, 'r') as f:
@@ -124,7 +124,7 @@ def calculate_dir_size(dir_path: str):
       total_size = int(lines[0]) if len(lines) > 0 else None
       formatted_size = lines[1] if len(lines) > 1 else None
       if formatted_size:
-        show_file(cache_path)
+        hide_file(cache_path)
         return formatted_size
 
   if total_size is None:
@@ -138,7 +138,7 @@ def calculate_dir_size(dir_path: str):
   with open(cache_path, 'w') as f:
     f.write(f'{total_size}\n{formatted_size}')
 
-  show_file(cache_path)
+  hide_file(cache_path)
 
   return formatted_size
 
@@ -152,6 +152,7 @@ def overlay_file_size(dir_path: str, ico_img: Image.Image):
 
   try:
     font = ImageFont.truetype('segoeuib.ttf', 40)
+
   except Exception:
     font = ImageFont.load_default()
 
