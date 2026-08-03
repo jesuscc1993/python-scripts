@@ -65,7 +65,14 @@ def process_dir(dir_path: str, override_existing: bool = False):
     new_ico_name = ICO_FILENAME
     new_ico_path = os.path.join(dir_path, new_ico_name)
     bak_ico_path = os.path.join(dir_path, ICO_BAK_FILENAME)
+    dir_size_path = os.path.join(dir_path, DIR_SIZE_FILENAME)
     override = override_existing or new_ico_name not in ico_path
+
+    if not override_existing and os.path.exists(new_ico_path) and os.path.exists(dir_size_path):
+      if os.path.getmtime(new_ico_path) > os.path.getmtime(dir_size_path):
+        logger.trace(f'Skipping "{dir_path}". Icon is up to date.')
+        return
+
     if ICO_FILENAME in ico_path and os.path.exists(bak_ico_path):
       ico_path = ico_path.replace(ICO_FILENAME, ICO_BAK_FILENAME)
 
@@ -177,7 +184,7 @@ def format_size(size_bytes: int) -> str:
     return f'<1 {units[0]}' if OVERLAY_SMALLER_THAN_GB else None
   for unit in units:
     if size < 1024 or unit == units[-1]:
-      return f'{math.ceil(size)} {unit}'
+      return f'{math.ceil(int(size * 100) / 100)} {unit}'
     size /= 1024
 
 def get_exe_icon(exe_path: str, index: int):
