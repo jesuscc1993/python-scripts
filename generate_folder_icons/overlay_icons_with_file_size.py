@@ -11,7 +11,7 @@ from PIL import Image, ImageDraw, ImageFont
 from mtlogger import logger
 from mtprompt import Prompt
 
-from _constants import DESKTOP_INI_FILENAME, HIDDEN_SYSTEM_FILE_ATTRS, ICO_FILENAME, MAX_ICO_SIZE
+from _constants import DESKTOP_INI_FILENAME, HIDDEN_SYSTEM_FILE_ATTRS, ICO_FILENAME, MAX_ICO_SIZE, PREFERRED_ENCODING
 from _common import add_file_attrs, get_ini_icon, hide_file, read_ini, set_folder_icon, show_file, write_hidden_file
 
 OVERLAY_SMALLER_THAN_GB = False
@@ -116,7 +116,7 @@ def calculate_dir_size(dir_path: str):
   total_size = None
 
   if os.path.exists(cache_path):
-    with open(cache_path, 'r') as f:
+    with open(cache_path, 'r', encoding=PREFERRED_ENCODING) as f:
       lines = f.read().strip().splitlines()
       total_size = int(lines[0]) if len(lines) > 0 else None
       formatted_size = lines[1] if len(lines) > 1 else None
@@ -174,10 +174,10 @@ def format_size(size_bytes: int) -> str:
   units = ['GB', 'TB', 'PB']
   size = size_bytes / (1024 * 1024 * 1024)
   if size < 1:
-    return f'<1 {units[0]}' if OVERLAY_SMALLER_THAN_GB else None
+    return f'<1 {units[0]}' if OVERLAY_SMALLER_THAN_GB else None
   for unit in units:
     if size < 1024 or unit == units[-1]:
-      return f'{math.ceil(size)} {unit}'
+      return f'{math.ceil(size)} {unit}'
     size /= 1024
 
 def get_exe_icon(exe_path: str, index: int):
