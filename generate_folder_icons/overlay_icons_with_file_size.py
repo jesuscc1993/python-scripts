@@ -169,7 +169,13 @@ def overlay_file_size(dir_path: str, ico_img: Image.Image):
   box_x = width - margin - box_w
   box_y = margin
 
-  box = Image.new('RGBA', (box_w, box_h), (25, 25, 25, 256))
+  box = Image.new('RGBA', (box_w, box_h), (0, 0, 0, 0))
+  ImageDraw.Draw(box).rounded_rectangle(
+    [0, 0, box_w - 1, box_h - 1],
+    radius=padding,
+    fill=(25, 25, 25, 255),
+    corners=(False, False, False, True)
+  )
   img.paste(box, (box_x, box_y), box)
 
   draw = ImageDraw.Draw(img)
