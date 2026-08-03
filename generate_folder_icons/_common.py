@@ -123,6 +123,8 @@ def write_file(file_path: str, content: str, attrs: list[str], encoding: str = P
     file.write(content)
     logger.success(f'Saved "{file_path}".')
 
+  add_file_attrs(file_path, attrs)
+
 def write_ini(file_path: str, config: ConfigParser, encoding: str):
   if os.path.exists(file_path):
     remove_file_attrs(file_path, HIDDEN_SYSTEM_FILE_ATTRS)
