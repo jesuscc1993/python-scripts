@@ -18,6 +18,13 @@ OVERLAY_SMALLER_THAN_GB = False
 ICO_BAK_FILENAME = 'icon.bak.ico'
 DIR_SIZE_FILENAME = 'dir_file_size.txt'
 
+VALUE_FONT_SIZE = 40
+UNITS_FONT_SIZE = int(VALUE_FONT_SIZE * 0.775)
+
+BG_COLOR = (25, 25, 25, 255)
+VALUE_COLOR = (255, 255, 255, 255)
+UNITS_COLOR = (192, 192, 192, 255)
+
 def main():
   if len(sys.argv) > 1:
     parent_path = sys.argv[1]
@@ -147,25 +154,35 @@ def overlay_file_size(dir_path: str, ico_img: Image.Image):
   formatted_size = calculate_dir_size(dir_path)
 
   img = ico_img.convert('RGBA').copy()
-  if not formatted_size:
+  parts = formatted_size.split() if formatted_size else []
+  if not (formatted_size and len(parts) == 2):
     return ico_img
   width, _ = img.size
 
   try:
-    font = ImageFont.truetype('segoeuib.ttf', 40)
-
+    font = ImageFont.truetype('segoeuib.ttf', VALUE_FONT_SIZE)
+    font_unit = ImageFont.truetype('segoeuib.ttf', UNITS_FONT_SIZE)
   except Exception:
-    font = ImageFont.load_default()
+    font = ImageFont.load_default(VALUE_FONT_SIZE)
+    font_unit = ImageFont.load_default(UNITS_FONT_SIZE)
+
+  value_text = parts[0]
+  unit_text = parts[1]
 
   draw = ImageDraw.Draw(img)
-  bbox = draw.textbbox((0, 0), formatted_size, font=font)
-  text_w = bbox[2] - bbox[0]
-  text_h = bbox[3] - bbox[1]
+  bbox_value = draw.textbbox((0, 0), value_text, font=font)
+  value_w = bbox_value[2] - bbox_value[0]
+  value_h = bbox_value[3] - bbox_value[1]
 
+  bbox_unit = draw.textbbox((0, 0), unit_text, font=font_unit)
+  unit_w = bbox_unit[2] - bbox_unit[0]
+  unit_h = bbox_unit[3] - bbox_unit[1]
+
+  gap = 4
   margin = 0
   padding = 8
-  box_w = text_w + padding * 2
-  box_h = text_h + padding * 2
+  box_w = value_w + gap + unit_w + padding * 2
+  box_h = value_h + padding * 2
   box_x = width - margin - box_w
   box_y = margin
 
@@ -173,13 +190,27 @@ def overlay_file_size(dir_path: str, ico_img: Image.Image):
   ImageDraw.Draw(box).rounded_rectangle(
     [0, 0, box_w - 1, box_h - 1],
     radius=padding,
-    fill=(25, 25, 25, 255),
+    fill=BG_COLOR,
     corners=(False, False, False, True)
   )
   img.paste(box, (box_x, box_y), box)
 
   draw = ImageDraw.Draw(img)
-  draw.text((box_x + padding - bbox[0], box_y + padding - bbox[1]), formatted_size, font=font, fill=(255, 255, 255, 255))
+  draw.text(
+    (box_x + padding - bbox_value[0], box_y + padding - bbox_value[1]),
+    value_text,
+    font=font,
+    fill=VALUE_COLOR
+  )
+
+  unit_x = box_x + padding + value_w + gap - bbox_unit[0]
+  unit_y = box_y + padding + (value_h - unit_h) // 2 - bbox_unit[1]
+  draw.text(
+    (unit_x, unit_y),
+    unit_text,
+    font=font_unit,
+    fill=UNITS_COLOR
+  )
 
   return img
 
@@ -187,10 +218,10 @@ def format_size(size_bytes: int) -> str:
   units = ['GB', 'TB', 'PB']
   size = size_bytes / (1024 * 1024 * 1024)
   if size < 1:
-    return f'<1 {units[0]}' if OVERLAY_SMALLER_THAN_GB else None
+    return f'<1 {units[0]}' if OVERLAY_SMALLER_THAN_GB else None
   for unit in units:
     if size < 1024 or unit == units[-1]:
-      return f'{math.ceil(int(size * 100) / 100)} {unit}'
+      return f'{math.ceil(int(size * 100) / 100)}  {unit}'
     size /= 1024
 
 def get_exe_icon(exe_path: str, index: int):
