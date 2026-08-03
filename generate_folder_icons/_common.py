@@ -133,7 +133,7 @@ def write_ini(file_path: str, config: ConfigParser, encoding: str):
 
   add_file_attrs(file_path, HIDDEN_SYSTEM_FILE_ATTRS)
 
-def write_hidden_file(file_path: str, content: str, encoding: str):
+def write_hidden_file(file_path: str, content: str, encoding: str = PREFERRED_ENCODING):
   write_file(file_path, content, HIDDEN_FILE_ATTRS, encoding)
 
 def get_ini_icon(config: ConfigParser):

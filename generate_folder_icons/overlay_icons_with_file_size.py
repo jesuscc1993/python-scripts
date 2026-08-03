@@ -120,7 +120,7 @@ def calculate_dir_size(dir_path: str):
       lines = f.read().strip().splitlines()
       total_size = int(lines[0]) if len(lines) > 0 else None
       formatted_size = lines[1] if len(lines) > 1 else None
-      if formatted_size:
+      if formatted_size and formatted_size != 'None':
         return formatted_size
 
   if total_size is None:
@@ -131,7 +131,7 @@ def calculate_dir_size(dir_path: str):
     )
   formatted_size = format_size(total_size)
 
-  cache_contents = f'{total_size}\n{formatted_size}'
+  cache_contents = f'{total_size}\n{formatted_size or ""}'
   write_hidden_file(cache_path, cache_contents)
 
   return formatted_size
