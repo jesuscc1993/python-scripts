@@ -14,12 +14,21 @@ from mtprompt import Prompt
 from _constants import DESKTOP_INI_FILENAME, HIDDEN_SYSTEM_FILE_ATTRS, ICO_FILENAME, MAX_ICO_SIZE, PREFERRED_ENCODING
 from _common import add_file_attrs, get_ini_icon, hide_file, read_ini, set_folder_icon, show_file, write_hidden_file
 
+DEBUG = False
+OVERRIDE = False
 OVERLAY_SMALLER_THAN_GB = False
+
+FONT_NAME = 'segoeuib.ttf'
 ICO_BAK_FILENAME = 'icon.bak.ico'
 DIR_SIZE_FILENAME = 'dir_file_size.txt'
 
-VALUE_FONT_SIZE = 40
-UNITS_FONT_SIZE = int(VALUE_FONT_SIZE * 0.775)
+SIZE_256 = 256
+VALUE_FONT_SIZE_256 = 40
+UNITS_FONT_SIZE_256 = int(VALUE_FONT_SIZE_256 * 0.775)
+
+SIZE_48 = 48
+VALUE_FONT_SIZE_48 = 14
+UNITS_FONT_SIZE_48 = int(VALUE_FONT_SIZE_48 * 0.8)
 
 BG_COLOR = (25, 25, 25, 255)
 VALUE_COLOR = (255, 255, 255, 255)
@@ -49,7 +58,7 @@ def main():
 
     for dir_name in dirs:
       child_path = os.path.join(root, dir_name)
-      process_dir(child_path, override_existing=False)
+      process_dir(child_path, override_existing=OVERRIDE)
 
   winsound.MessageBeep()
   logger.success(f'Finished setting icons for "{parent_path}".', prefix_newline=True)
@@ -111,9 +120,26 @@ def process_dir(dir_path: str, override_existing: bool = False):
     if os.path.exists(new_ico_path):
       show_file(new_ico_path)
 
-    ico_img = overlay_file_size(dir_path, ico_img)
-    ico_img.save(new_ico_path, format='ICO', sizes=[(256, 256), (48, 48), (16, 16)])
+    formatted_size = calculate_dir_size(dir_path)
+    size_parts = formatted_size.split() if formatted_size else []
+    if not (size_parts and len(size_parts) == 2):
+      logger.trace(f'Skipping "{dir_path}". Formatted size is not in format "<value> <unit>".')
+      return
+
+    ico_img = ico_img.convert('RGBA')
+    img_256 = overlay_file_size_256(size_parts[0], size_parts[1], ico_img)
+    img_48 = overlay_file_size_48(size_parts[0], size_parts[1], ico_img)
+    img_16 = ico_img.resize((16, 16), Image.LANCZOS)
+    img_256.save(new_ico_path, format='ICO', append_images=[img_48, img_16])
     logger.success(f'Saved "{new_ico_path}".')
+
+    if DEBUG:
+      debug_dir = os.path.join(dir_path, 'icon')
+      os.makedirs(debug_dir, exist_ok=True)
+
+      img_256.save(os.path.join(debug_dir, '256.png'), format='PNG')
+      img_48.save(os.path.join(debug_dir, '48.png'), format='PNG')
+      img_16.save(os.path.join(debug_dir, '16.png'), format='PNG')
 
     if ico_path != os.path.basename(bak_ico_path):
       set_folder_icon(dir_path, new_ico_name, override_existing=override)
@@ -150,41 +176,31 @@ def calculate_dir_size(dir_path: str):
 
   return formatted_size
 
-def overlay_file_size(dir_path: str, ico_img: Image.Image):
-  formatted_size = calculate_dir_size(dir_path)
-
-  img = ico_img.convert('RGBA').copy()
-  parts = formatted_size.split() if formatted_size else []
-  if not (formatted_size and len(parts) == 2):
-    return ico_img
-  width, _ = img.size
+def overlay_file_size_256(value_text: str, unit_text: str, ico_img: Image.Image):
+  img = ico_img.resize((SIZE_256, SIZE_256), Image.LANCZOS)
 
   try:
-    font = ImageFont.truetype('segoeuib.ttf', VALUE_FONT_SIZE)
-    font_unit = ImageFont.truetype('segoeuib.ttf', UNITS_FONT_SIZE)
+    value_font = ImageFont.truetype(FONT_NAME, VALUE_FONT_SIZE_256)
+    unit_font = ImageFont.truetype(FONT_NAME, UNITS_FONT_SIZE_256)
   except Exception:
-    font = ImageFont.load_default(VALUE_FONT_SIZE)
-    font_unit = ImageFont.load_default(UNITS_FONT_SIZE)
-
-  value_text = parts[0]
-  unit_text = parts[1]
+    value_font = ImageFont.load_default(VALUE_FONT_SIZE_256)
+    unit_font = ImageFont.load_default(UNITS_FONT_SIZE_256)
 
   draw = ImageDraw.Draw(img)
-  bbox_value = draw.textbbox((0, 0), value_text, font=font)
+  bbox_value = draw.textbbox((0, 0), value_text, font=value_font)
   value_w = bbox_value[2] - bbox_value[0]
   value_h = bbox_value[3] - bbox_value[1]
 
-  bbox_unit = draw.textbbox((0, 0), unit_text, font=font_unit)
+  bbox_unit = draw.textbbox((0, 0), unit_text, font=unit_font)
   unit_w = bbox_unit[2] - bbox_unit[0]
   unit_h = bbox_unit[3] - bbox_unit[1]
 
   gap = 4
-  margin = 0
   padding = 8
   box_w = value_w + gap + unit_w + padding * 2
   box_h = value_h + padding * 2
-  box_x = width - margin - box_w
-  box_y = margin
+  box_x = SIZE_256 - box_w
+  box_y = 0
 
   box = Image.new('RGBA', (box_w, box_h), (0, 0, 0, 0))
   ImageDraw.Draw(box).rounded_rectangle(
@@ -199,16 +215,62 @@ def overlay_file_size(dir_path: str, ico_img: Image.Image):
   draw.text(
     (box_x + padding - bbox_value[0], box_y + padding - bbox_value[1]),
     value_text,
-    font=font,
+    font=value_font,
     fill=VALUE_COLOR
   )
 
   unit_x = box_x + padding + value_w + gap - bbox_unit[0]
   unit_y = box_y + padding + (value_h - unit_h) // 2 - bbox_unit[1]
+  draw.text((unit_x, unit_y), unit_text, font=unit_font, fill=UNITS_COLOR)
+
+  return img
+
+def overlay_file_size_48(value_text: str, unit_text: str, ico_img: Image.Image):
+  img = ico_img.resize((SIZE_48, SIZE_48), Image.LANCZOS)
+
+  try:
+    value_font = ImageFont.truetype(FONT_NAME, VALUE_FONT_SIZE_48)
+    unit_font = ImageFont.truetype(FONT_NAME, UNITS_FONT_SIZE_48)
+  except Exception:
+    value_font = ImageFont.load_default(VALUE_FONT_SIZE_48)
+    unit_font = ImageFont.load_default(UNITS_FONT_SIZE_48)
+
+  draw = ImageDraw.Draw(img)
+  bbox_value = draw.textbbox((0, 0), value_text, font=value_font)
+  value_w = bbox_value[2] - bbox_value[0]
+  value_h = bbox_value[3] - bbox_value[1]
+
+  bbox_unit = draw.textbbox((0, 0), unit_text, font=unit_font)
+  unit_w = bbox_unit[2] - bbox_unit[0]
+  unit_h = bbox_unit[3] - bbox_unit[1]
+
+  gap = 2
+  padding = 3
+  box_h = value_h + padding * 2
+  box_x = 0
+  box_w = SIZE_48
+  box_y = 0
+
+  box = Image.new('RGBA', (box_w, box_h), (0, 0, 0, 0))
+  ImageDraw.Draw(box).rectangle([0, 0, box_w - 1, box_h - 1], fill=BG_COLOR)
+  img.paste(box, (box_x, box_y), box)
+
+  draw = ImageDraw.Draw(img)
+  total_text_w = value_w + gap + unit_w
+  text_start_x = (SIZE_48 - total_text_w) // 2
+  draw.text(
+    (text_start_x - bbox_value[0], box_y + padding - bbox_value[1]),
+    value_text,
+    font=value_font,
+    fill=VALUE_COLOR
+  )
+
+  unit_x = text_start_x + value_w + gap - bbox_unit[0]
+  unit_y = box_y + padding + (value_h - unit_h) // 2 - bbox_unit[1]
   draw.text(
     (unit_x, unit_y),
     unit_text,
-    font=font_unit,
+    font=unit_font,
     fill=UNITS_COLOR
   )
 
