@@ -56,6 +56,8 @@ def main():
       dirs.clear()
       continue
 
+    dirs[:] = [d for d in dirs if not should_ignore_dir(os.path.join(root, d))]
+
     for dir_name in dirs:
       child_path = os.path.join(root, dir_name)
       process_dir(child_path, override_existing=OVERRIDE)
@@ -63,10 +65,16 @@ def main():
   winsound.MessageBeep()
   logger.success(f'Finished setting icons for "{parent_path}".', prefix_newline=True)
 
+def should_ignore_dir(dir_path: str) -> bool:
+  if os.path.exists(os.path.join(dir_path, '.no_file_size')):
+    return True
+  attrs = ctypes.windll.kernel32.GetFileAttributesW(dir_path)
+  return attrs != -1 and bool(attrs & 0x2)
+
 def process_dir(dir_path: str, override_existing: bool = False):
   try:
-    if os.path.exists(os.path.join(dir_path, '.no_file_size')):
-      logger.trace(f'Skipping "{dir_path}". Folder contains a .no_file_size file.')
+    if should_ignore_dir(dir_path):
+      logger.trace(f'Skipping "{dir_path}". Found .no_file_size marker.')
       return
 
     ini_path = os.path.join(dir_path, DESKTOP_INI_FILENAME)
