@@ -73,8 +73,9 @@ def find_font(name):
 def process_dir(dir, font):
   dir_name = os.path.basename(dir)
   cover_img = os.path.join(dir, COVER_NAME)
+  cover_bak_img = os.path.join(dir, COVER_BAK_NAME)
 
-  if not os.path.isfile(cover_img):
+  if not os.path.isfile(cover_img) and not os.path.isfile(os.path.join(dir, COVER_BAK_NAME)):
     tqdm_dim(f'Skipping "{dir_name}". No cover found.')
     return
 
@@ -84,10 +85,9 @@ def process_dir(dir, font):
     tqdm_dim(f'Skipping "{dir_name}". Score could not be inferred.')
     return
 
-  process_cover(dir, cover_img, score, font)
+  process_cover(dir, cover_img, cover_bak_img, score, font)
 
-def process_cover(dir, cover_img, score, font):
-  cover_bak_img = os.path.join(dir, COVER_BAK_NAME)
+def process_cover(dir, cover_img, cover_bak_img, score, font):
   if not os.path.exists(cover_bak_img):
     shutil.copy(cover_img, cover_bak_img)
 
