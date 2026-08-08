@@ -65,6 +65,10 @@ def main():
 
 def process_dir(dir_path: str, override_existing: bool = False):
   try:
+    if os.path.exists(os.path.join(dir_path, '.no_file_size')):
+      logger.trace(f'Skipping "{dir_path}". Folder contains a .no_file_size file.')
+      return
+
     ini_path = os.path.join(dir_path, DESKTOP_INI_FILENAME)
     config, _ = read_ini(ini_path)
     ico_config = get_ini_icon(config)
