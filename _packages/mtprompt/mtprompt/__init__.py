@@ -24,7 +24,7 @@ class Prompt:
         continue
 
       logger.log()
-      return val if val else default
+      return val if val != '' else default
 
   @staticmethod
   def int(
@@ -50,7 +50,7 @@ class Prompt:
           continue
 
       logger.log()
-      return val if val else default
+      return val if val != '' else default
 
   @staticmethod
   def bool(
@@ -105,7 +105,7 @@ class Prompt:
         continue
 
       logger.log()
-      return val if val else default
+      return val if val != '' else default
 
   @staticmethod
   def dir(
@@ -128,7 +128,7 @@ class Prompt:
         continue
 
       logger.log()
-      return val if val else default
+      return val if val != '' else default
 
   @staticmethod
   def file(
@@ -151,7 +151,7 @@ class Prompt:
         continue
 
       logger.log()
-      return val if val else default
+      return val if val != '' else default
 
   @staticmethod
   def enter_to_exit(timeout = False, sound = True):
