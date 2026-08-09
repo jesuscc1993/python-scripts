@@ -201,9 +201,10 @@ def calculate_dir_size(dir_path: str):
 
   if total_size is None:
     total_size = sum(
-      get_file_size_on_disk(os.path.join(root, f))
+      get_file_size_on_disk(path)
       for root, _, files in os.walk(dir_path)
       for f in files
+      if os.path.exists(path := os.path.join(root, f))
     )
   formatted_size = format_size(total_size)
 
