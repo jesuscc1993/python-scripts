@@ -1,5 +1,6 @@
 import os
 import stat
+import subprocess
 import sys
 
 from concurrent.futures import ThreadPoolExecutor
@@ -43,11 +44,11 @@ def process_folder(folder_path):
         if is_hidden:
           logger.trace(f'Skipping "{rel_path}". File already exists.')
         else:
-          os.system(f'attrib +h "{rel_path}"')
+          subprocess.run(['attrib', '+h', file_path], check=False)
           logger.success(f'Hid existing "{rel_path}" file.')
       else:
         open(file_path, 'w').close()
-        os.system(f'attrib +h "{rel_path}"')
+        subprocess.run(['attrib', '+h', file_path], check=False)
         logger.success(f'Created hidden "{rel_path}" file.')
 
     except Exception as ex:
