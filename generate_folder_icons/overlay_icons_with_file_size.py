@@ -1,6 +1,7 @@
 import ctypes
 import math
 import os
+import shutil
 import sys
 import win32con
 import win32gui
@@ -48,19 +49,23 @@ def main():
     )
 
   parent_path = os.path.abspath(parent_path)
-  parent_depth = parent_path.rstrip(os.sep).count(os.sep)
 
-  for root, dirs, _ in os.walk(parent_path):
-    current_depth = root.rstrip(os.sep).count(os.sep) - parent_depth
-    if current_depth >= depth:
-      dirs.clear()
-      continue
+  if depth == 0:
+    process_dir(parent_path, override_existing=OVERRIDE)
+  else:
+    parent_depth = parent_path.rstrip(os.sep).count(os.sep)
 
-    dirs[:] = [d for d in dirs if not should_ignore_dir(os.path.join(root, d))]
+    for root, dirs, _ in os.walk(parent_path):
+      current_depth = root.rstrip(os.sep).count(os.sep) - parent_depth
+      if current_depth >= depth:
+        dirs.clear()
+        continue
 
-    for dir_name in dirs:
-      child_path = os.path.join(root, dir_name)
-      process_dir(child_path, override_existing=OVERRIDE)
+      dirs[:] = [d for d in dirs if not should_ignore_dir(os.path.join(root, d))]
+
+      for dir_name in dirs:
+        child_path = os.path.join(root, dir_name)
+        process_dir(child_path, override_existing=OVERRIDE)
 
   winsound.MessageBeep()
   logger.success(f'Finished setting icons for "{parent_path}".', prefix_newline=True)
@@ -101,19 +106,26 @@ def process_dir(dir_path: str, override_existing: bool = False):
         logger.trace(f'Skipping "{dir_path}". Icon is up to date.')
         return
 
-    if ICO_FILENAME in ico_path and os.path.exists(bak_ico_path):
+    ico_path_lower = ico_path.lower()
+
+    if '.ico' in ico_path_lower and ICO_FILENAME not in ico_path_lower and not os.path.exists(bak_ico_path):
+      shutil.copy2(os.path.join(dir_path, ico_path), bak_ico_path)
+      hide_file(bak_ico_path)
+
+    if ICO_FILENAME in ico_path_lower and os.path.exists(bak_ico_path):
       ico_path = ico_path.replace(ICO_FILENAME, ICO_BAK_FILENAME)
+      ico_path_lower = ico_path.lower()
 
     ico_img = None
 
-    if '.dll' in ico_path.lower():
+    if '.dll' in ico_path_lower:
       logger.trace(f'Skipping "{dir_path}". Folder icon is using a DLL file.')
       return
 
-    if '.exe' in ico_path.lower():
+    if '.exe' in ico_path_lower:
       ico_img = get_exe_icon(os.path.join(dir_path, ico_path), int(ico_index))
 
-    if '.ico' in ico_path.lower():
+    if '.ico' in ico_path_lower:
       ico_img = Image.open(os.path.join(dir_path, ico_path))
 
     if ico_img and ico_img.mode == 'RGBA':
@@ -133,6 +145,10 @@ def process_dir(dir_path: str, override_existing: bool = False):
       show_file(new_ico_path)
 
     formatted_size = calculate_dir_size(dir_path)
+    if formatted_size == '<1 GB' and not OVERLAY_SMALLER_THAN_GB:
+      logger.trace(f'Skipping "{dir_path}". Overlay is disabled for sizes smaller than 1 GB.')
+      return
+
     size_parts = formatted_size.split() if formatted_size else []
     if not (size_parts and len(size_parts) == 2):
       logger.trace(f'Skipping "{dir_path}". Formatted size is not in format "<value> <unit>".')
@@ -163,6 +179,14 @@ def process_dir(dir_path: str, override_existing: bool = False):
 
   add_file_attrs(ini_path, HIDDEN_SYSTEM_FILE_ATTRS)
 
+def get_file_size_on_disk(file_path: str) -> int:
+  high = ctypes.c_ulong(0)
+  low = ctypes.windll.kernel32.GetCompressedFileSizeW(file_path, ctypes.byref(high))
+  low_unsigned = low & 0xFFFFFFFF
+  if low_unsigned == 0xFFFFFFFF and ctypes.GetLastError() != 0:
+    return os.path.getsize(file_path)
+  return (high.value << 32) + low_unsigned
+
 def calculate_dir_size(dir_path: str):
   cache_path = os.path.join(dir_path, DIR_SIZE_FILENAME)
   total_size = None
@@ -170,14 +194,14 @@ def calculate_dir_size(dir_path: str):
   if os.path.exists(cache_path):
     with open(cache_path, 'r', encoding=PREFERRED_ENCODING) as f:
       lines = f.read().strip().splitlines()
-      total_size = int(lines[0]) if len(lines) > 0 else None
+      total_size = int(lines[0].replace(',', '')) if len(lines) > 0 else None
       formatted_size = lines[1] if len(lines) > 1 else None
       if formatted_size and formatted_size != 'None':
         return formatted_size
 
   if total_size is None:
     total_size = sum(
-      os.path.getsize(os.path.join(root, f))
+      get_file_size_on_disk(os.path.join(root, f))
       for root, _, files in os.walk(dir_path)
       for f in files
     )
@@ -292,7 +316,7 @@ def format_size(size_bytes: int) -> str:
   units = ['GB', 'TB', 'PB']
   size = size_bytes / (1024 * 1024 * 1024)
   if size < 1:
-    return f'<1 {units[0]}' if OVERLAY_SMALLER_THAN_GB else None
+    return f'<1 {units[0]}'
   for unit in units:
     if size < 1024 or unit == units[-1]:
       return f'{math.ceil(int(size * 100) / 100)}  {unit}'
