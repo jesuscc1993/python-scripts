@@ -157,8 +157,18 @@ def process_dir(dir_path: str, override_existing: bool = False):
     ico_img = ico_img.convert('RGBA')
     img_256 = overlay_file_size_256(size_parts[0], size_parts[1], ico_img)
     img_48 = overlay_file_size_48(size_parts[0], size_parts[1], ico_img)
-    img_16 = ico_img.resize((16, 16), Image.LANCZOS)
-    img_256.save(new_ico_path, format='ICO', append_images=[img_48, img_16])
+
+    other_frames = []
+    with Image.open(bak_ico_path) as bak:
+      bak_sizes = bak.info.get('sizes', set())
+      for size in bak_sizes:
+        if size not in {(256, 256), (48, 48)}:
+          bak.size = size
+          other_frames.append(bak.copy())
+      if (16, 16) not in bak_sizes:
+        other_frames.append(ico_img.resize((16, 16), Image.LANCZOS))
+
+    img_256.save(new_ico_path, format='ICO', append_images=[img_48] + other_frames)
     logger.success(f'Saved "{new_ico_path}".')
 
     if DEBUG:
@@ -167,7 +177,6 @@ def process_dir(dir_path: str, override_existing: bool = False):
 
       img_256.save(os.path.join(debug_dir, '256.png'), format='PNG')
       img_48.save(os.path.join(debug_dir, '48.png'), format='PNG')
-      img_16.save(os.path.join(debug_dir, '16.png'), format='PNG')
 
     if ico_path != os.path.basename(bak_ico_path):
       set_folder_icon(dir_path, new_ico_name, override_existing=override)
