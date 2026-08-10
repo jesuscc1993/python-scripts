@@ -108,13 +108,12 @@ def process_dir(dir_path: str, override_existing: bool = False):
 
     ico_path_lower = ico_path.lower()
 
-    if '.ico' in ico_path_lower and ICO_FILENAME not in ico_path_lower and not os.path.exists(bak_ico_path):
-      shutil.copy2(os.path.join(dir_path, ico_path), bak_ico_path)
-      hide_file(bak_ico_path)
-
     if ICO_FILENAME in ico_path_lower and os.path.exists(bak_ico_path):
       ico_path = ico_path.replace(ICO_FILENAME, ICO_BAK_FILENAME)
       ico_path_lower = ico_path.lower()
+    elif '.ico' in ico_path_lower and ICO_FILENAME not in ico_path_lower:
+      shutil.copy2(os.path.join(dir_path, ico_path), bak_ico_path)
+      hide_file(bak_ico_path)
 
     ico_img = None
 
@@ -137,13 +136,6 @@ def process_dir(dir_path: str, override_existing: bool = False):
       logger.trace(f'Skipping "{dir_path}". Could not load folder icon.')
       return
 
-    if not os.path.exists(bak_ico_path):
-      ico_img.save(bak_ico_path, format='ICO', sizes=[(256, 256)])
-      hide_file(bak_ico_path)
-
-    if os.path.exists(new_ico_path):
-      show_file(new_ico_path)
-
     formatted_size = calculate_dir_size(dir_path)
     if formatted_size == '<1 GB' and not OVERLAY_SMALLER_THAN_GB:
       logger.trace(f'Skipping "{dir_path}". Overlay is disabled for sizes smaller than 1 GB.')
@@ -153,6 +145,13 @@ def process_dir(dir_path: str, override_existing: bool = False):
     if not (size_parts and len(size_parts) == 2):
       logger.trace(f'Skipping "{dir_path}". Formatted size is not in format "<value> <unit>".')
       return
+
+    if not os.path.exists(bak_ico_path):
+      ico_img.save(bak_ico_path, format='ICO', sizes=[(256, 256)])
+      hide_file(bak_ico_path)
+
+    if os.path.exists(new_ico_path):
+      show_file(new_ico_path)
 
     ico_img = ico_img.convert('RGBA')
     img_256 = overlay_file_size_256(size_parts[0], size_parts[1], ico_img)
