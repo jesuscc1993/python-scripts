@@ -14,15 +14,15 @@ INI_FILENAME = 'desktop.ini'
 SHELL_SECTION = '.ShellClassInfo'
 
 EXE_EXCLUSION_PATTERNS = [
-  r'BsSndRpt',
-  r'CrashHandler',
-  r'EOSBootstrapper',
-  r'Handler',
-  r'ModManager',
-  r'Setup',
-  r'Trainer',
-  r'Unins',
-  r'Updat'
+  r'bootstrapper',
+  r'bssndrpt',
+  r'handler',
+  r'manager',
+  r'setup',
+  r'trainer',
+  r'unins',
+  r'updat',
+  r'upload'
 ]
 
 def main():
