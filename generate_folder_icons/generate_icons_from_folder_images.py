@@ -5,7 +5,14 @@ from mtprompt import Prompt
 
 from _common import process_parent_folder
 
-IMAGE_FILENAMES = ['folder.jpg', 'cover.jpg', 'AlbumArtSmall.jpg']
+IMAGE_FILENAMES = [
+  'folder.jpg',
+  'cover.jpg',
+  'cover.png',
+  'cover.webp',
+  'albumart.jpg',
+  'AlbumArtSmall.jpg'
+]
 
 def main():
   if len(sys.argv) > 1:
