@@ -103,7 +103,7 @@ def format_size_column(b: int):
 def format_compression_column(results: list, comp_type: CompType):
   r = next((r for r in results if r['CompType'] == comp_type), None)
   if r is None:
-    return format_flex([format_dimmed(''), EMPTY_CELL])
+    return format_flex([format_dimmed(EMPTY_CELL), ''])
   gb = r['AfterBytes'] / 1024 ** 3
   pct = (1 - r['AfterBytes'] / r['BeforeBytes']) * 100
   return format_flex([format_size(gb), format_dimmed(f'↓{round(pct)}%')])
