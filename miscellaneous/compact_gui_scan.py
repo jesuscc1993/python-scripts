@@ -109,7 +109,7 @@ def format_compression_column(results: list, comp_type: CompType):
   return format_flex([format_size(gb), format_dimmed(f'↓{round(pct)}%')])
 
 def format_size(gigabytes: float):
-  return f'{round(gigabytes) or 1} GB'
+  return f'{round(gigabytes, 1) or 0.1:g} GB'
 
 def format_flex(items: list[str]):
   return f'<div class="justify-between">{"".join(items)}</div>'
