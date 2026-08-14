@@ -65,8 +65,8 @@ def process_dir(dir_path: str, db: list[DbEntry]):
     lines += [
       '### Games Found',
       '',
-      '| Game | Matched (accuracy%) | Original  | XPRESS4K | XPRESS8K | XPRESS16K | LZX |',
-      '|------|---------------------|----------:|----------|----------|-----------|-----|',
+      f'| Game | Matched {format_dimmed(f"(accuracy%)")} | Original  | XPRESS 4K | XPRESS 8K | XPRESS 16K | LZX |',
+      '|---|---|--:|---|---|---|---|',
     ]
     for dir_name, entry, score in matched:
       r = entry['CompressionResults']
