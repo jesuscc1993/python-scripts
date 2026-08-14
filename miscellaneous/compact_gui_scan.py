@@ -51,11 +51,11 @@ def process_dir(dir_path: str, db: list[DbEntry]):
         continue
     matched.append((dir_name, db_entry, score))
 
-  matched.sort(key=lambda x: get_best_savings(x[1]), reverse=True)
+  matched.sort(key=lambda x: get_best_space_saved(x[1]), reverse=True)
 
   lines = [
     '<title>CompactGUI Scan Output</title>',
-    '<style>.dim { opacity: 0.5; } .justify-between { display:flex; justify-content:space-between; }</style>',
+    '<style>.dim { opacity: 0.5; } .justify-between { display:flex; justify-content:space-between; gap: 0.25em; }</style>',
     '',
     f'# CompactGUI Scan Output for "{dir_path}"',
     '',
@@ -91,11 +91,11 @@ def process_dir(dir_path: str, db: list[DbEntry]):
   logger.success(f'Saved output to {output_path}')
   os.startfile(output_path)
 
-def get_best_savings(entry: DbEntry):
+def get_best_space_saved(entry: DbEntry):
   results = entry['CompressionResults']
   if not results:
     return 0
-  return max(1 - r['AfterBytes'] / r['BeforeBytes'] for r in results)
+  return max(r['BeforeBytes'] - r['AfterBytes'] for r in results)
 
 def format_size_column(b: int):
   return format_size(b / 1024 ** 3)
@@ -106,7 +106,7 @@ def format_compression_column(results: list, comp_type: CompType):
     return format_flex([format_dimmed(''), EMPTY_CELL])
   gb = r['AfterBytes'] / 1024 ** 3
   pct = (1 - r['AfterBytes'] / r['BeforeBytes']) * 100
-  return format_flex([format_dimmed(f'{round(pct)}%'), format_size(gb)])
+  return format_flex([format_size(gb), format_dimmed(f'↓{round(pct)}%')])
 
 def format_size(gigabytes: float):
   return f'{round(gigabytes) or 1} GB'
