@@ -11,6 +11,7 @@ from rapidfuzz import process
 from _compact_gui_types import CompType, DbEntry
 
 DATABASE_PATH = r"%LOCALAPPDATA%\IridiumIO\CompactGUI\databasev2.json"
+EMPTY_CELL = '<span style="opacity:0.33;">N/A</span>'
 
 def main():
   games_dir = sys.argv[1] if len(sys.argv) > 1 else Prompt.dir('Enter the path to the directory containing your games')
@@ -46,24 +47,7 @@ def process_dir(dir_path: str, db: list[DbEntry]):
         continue
     matched.append((dir_name, db_entry))
 
-  def best_savings(entry: DbEntry) -> float:
-    results = entry['CompressionResults']
-    if not results:
-      return 0
-    return max(1 - r['AfterBytes'] / r['BeforeBytes'] for r in results)
-
-  matched.sort(key=lambda x: best_savings(x[1]), reverse=True)
-
-  def fmt_size(b: int) -> str:
-    return f'{b / 1024 ** 3:.2f}GB'
-
-  def fmt_col(results: list, comp_type: CompType) -> str:
-    r = next((r for r in results if r['CompType'] == comp_type), None)
-    if r is None:
-      return 'N/A'
-    gb = r['AfterBytes'] / 1024 ** 3
-    pct = (1 - r['AfterBytes'] / r['BeforeBytes']) * 100
-    return f'{gb:.2f}GB ({pct:.1f}%)'
+  matched.sort(key=lambda x: get_best_savings(x[1]), reverse=True)
 
   lines = [
     '# CompactGUI Scan Output',
@@ -79,8 +63,8 @@ def process_dir(dir_path: str, db: list[DbEntry]):
     ]
     for dir_name, entry in matched:
       r = entry['CompressionResults']
-      uncompressed = fmt_size(r[0]['BeforeBytes']) if r else 'N/A'
-      lines.append(f'| {dir_name} | {uncompressed} | {fmt_col(r, CompType.XPRESS4K)} | {fmt_col(r, CompType.XPRESS8K)} | {fmt_col(r, CompType.XPRESS16K)} | {fmt_col(r, CompType.LZX)} |')
+      uncompressed = format_size_column(r[0]['BeforeBytes']) if r else EMPTY_CELL
+      lines.append(f'| {dir_name} | {uncompressed} | {format_compression_column(r, CompType.XPRESS4K)} | {format_compression_column(r, CompType.XPRESS8K)} | {format_compression_column(r, CompType.XPRESS16K)} | {format_compression_column(r, CompType.LZX)} |')
 
   if len(unmatched):
     lines += [
@@ -99,6 +83,23 @@ def process_dir(dir_path: str, db: list[DbEntry]):
 
   logger.success(f'Saved output to {output_path}')
   os.startfile(output_path)
+
+def get_best_savings(entry: DbEntry):
+  results = entry['CompressionResults']
+  if not results:
+    return 0
+  return max(1 - r['AfterBytes'] / r['BeforeBytes'] for r in results)
+
+def format_size_column(b: int):
+  return f'{b / 1024 ** 3:.2f}GB'
+
+def format_compression_column(results: list, comp_type: CompType):
+  r = next((r for r in results if r['CompType'] == comp_type), None)
+  if r is None:
+    return EMPTY_CELL
+  gb = r['AfterBytes'] / 1024 ** 3
+  pct = (1 - r['AfterBytes'] / r['BeforeBytes']) * 100
+  return f'{gb:.2f}GB ({pct:.1f}%)'
 
 def is_hidden(path: str):
   return os.stat(path).st_file_attributes & stat.FILE_ATTRIBUTE_HIDDEN
