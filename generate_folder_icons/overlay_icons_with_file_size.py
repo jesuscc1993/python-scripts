@@ -16,6 +16,7 @@ from _constants import DESKTOP_INI_FILENAME, HIDDEN_SYSTEM_FILE_ATTRS, ICO_FILEN
 from _common import add_file_attrs, get_ini_icon, hide_file, read_ini, set_folder_icon, show_file, write_hidden_file
 
 DEBUG = False
+FORCE_RECALCULATE = False
 OVERRIDE = False
 OVERLAY_SMALLER_THAN_GB = False
 
@@ -65,6 +66,7 @@ def main():
 
       for dir_name in dirs:
         child_path = os.path.join(root, dir_name)
+        logger.log()
         process_dir(child_path, override_existing=OVERRIDE)
 
   winsound.MessageBeep()
@@ -79,14 +81,14 @@ def should_ignore_dir(dir_path: str) -> bool:
 def process_dir(dir_path: str, override_existing: bool = False):
   try:
     if should_ignore_dir(dir_path):
-      logger.trace(f'Skipping "{dir_path}". Found .no_file_size marker.')
+      logger.trace(f'  Skipping "{dir_path}". Found .no_file_size marker.')
       return
 
     ini_path = os.path.join(dir_path, DESKTOP_INI_FILENAME)
     config, _ = read_ini(ini_path)
     ico_config = get_ini_icon(config)
     if not ico_config:
-      logger.trace(f'Skipping "{dir_path}". No folder icon is set.')
+      logger.trace(f'  Skipping "{dir_path}". No folder icon is set.')
       return
 
     if ',' in ico_config:
@@ -101,9 +103,9 @@ def process_dir(dir_path: str, override_existing: bool = False):
     dir_size_path = os.path.join(dir_path, DIR_SIZE_FILENAME)
     override = override_existing or new_ico_name not in ico_path
 
-    if not override_existing and os.path.exists(new_ico_path) and os.path.exists(dir_size_path):
+    if not FORCE_RECALCULATE and not override_existing and os.path.exists(new_ico_path) and os.path.exists(dir_size_path):
       if os.path.getmtime(new_ico_path) > os.path.getmtime(dir_size_path):
-        logger.trace(f'Skipping "{dir_path}". Icon is up to date.')
+        logger.trace(f'  Skipping "{dir_path}". Icon is up to date.')
         return
 
     ico_path_lower = ico_path.lower()
@@ -118,7 +120,7 @@ def process_dir(dir_path: str, override_existing: bool = False):
     ico_img = None
 
     if '.dll' in ico_path_lower:
-      logger.trace(f'Skipping "{dir_path}". Folder icon is using a DLL file.')
+      logger.trace(f'  Skipping "{dir_path}". Folder icon is using a DLL file.')
       return
 
     if '.exe' in ico_path_lower:
@@ -133,17 +135,17 @@ def process_dir(dir_path: str, override_existing: bool = False):
         ico_img = Image.merge('RGBA', (r, g, b, Image.new('L', ico_img.size, 255)))
 
     if not ico_img:
-      logger.trace(f'Skipping "{dir_path}". Could not load folder icon.')
+      logger.trace(f'  Skipping "{dir_path}". Could not load folder icon.')
       return
 
     formatted_size = calculate_dir_size(dir_path)
     if formatted_size == '<1 GB' and not OVERLAY_SMALLER_THAN_GB:
-      logger.trace(f'Skipping "{dir_path}". Overlay is disabled for sizes smaller than 1 GB.')
+      logger.trace(f'  Skipping "{dir_path}". Overlay is disabled for sizes smaller than 1 GB.')
       return
 
     size_parts = formatted_size.split() if formatted_size else []
     if not (size_parts and len(size_parts) == 2):
-      logger.trace(f'Skipping "{dir_path}". Formatted size is not in format "<value> <unit>".')
+      logger.trace(f'  Skipping "{dir_path}". Formatted size is not in format "<value> <unit>".')
       return
 
     if not os.path.exists(bak_ico_path):
@@ -199,7 +201,7 @@ def calculate_dir_size(dir_path: str):
   cache_path = os.path.join(dir_path, DIR_SIZE_FILENAME)
   total_size = None
 
-  if os.path.exists(cache_path):
+  if not FORCE_RECALCULATE and os.path.exists(cache_path):
     with open(cache_path, 'r', encoding=PREFERRED_ENCODING) as f:
       lines = f.read().strip().splitlines()
       total_size = int(lines[0].replace(',', '')) if len(lines) > 0 else None
