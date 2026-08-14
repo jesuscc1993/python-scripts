@@ -55,7 +55,7 @@ def process_dir(dir_path: str, db: list[DbEntry]):
 
   lines = [
     '<title>CompactGUI Scan Output</title>',
-    '<style>.dim { opacity: 0.5; }</style>',
+    '<style>.dim { opacity: 0.5; } .justify-between { display:flex; justify-content:space-between; }</style>',
     '',
     f'# CompactGUI Scan Output for "{dir_path}"',
     '',
@@ -112,7 +112,7 @@ def format_size(gigabytes: float):
   return f'{round(gigabytes) or 1} GB'
 
 def format_flex(items: list[str]):
-  return f'<div style="display:flex;justify-content:space-between;">{"".join(items)}</div>'
+  return f'<div class="justify-between">{"".join(items)}</div>'
 
 def format_dimmed(msg: str):
   return f'<span class="dim">{msg}</span>'
