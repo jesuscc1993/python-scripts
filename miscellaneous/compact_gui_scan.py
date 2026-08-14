@@ -11,18 +11,19 @@ from rapidfuzz import process
 from _compact_gui_types import CompType, DbEntry
 
 DATABASE_PATH = r"%LOCALAPPDATA%\IridiumIO\CompactGUI\databasev2.json"
-EMPTY_CELL = '<span style="opacity:0.33;">N/A</span>'
-MATCHING_ACCURACY = 75
+EMPTY_CELL = 'N/A'
+MATCHING_ACCURACY = 80
 
 def main():
-  games_dir = sys.argv[1] if len(sys.argv) > 1 else Prompt.dir('Enter the path to the directory containing your games')
+  games_dirs = sys.argv[1:] if len(sys.argv) > 1 else [Prompt.dir('Enter the path to the directory containing your games')]
 
   db = get_db()
   if db is None:
     logger.error("Database could not be loaded. Aborting.")
     return
 
-  process_dir(games_dir, db)
+  for games_dir in games_dirs:
+    process_dir(games_dir, db)
 
 def process_dir(dir_path: str, db: list[DbEntry]):
   dir_names = [
@@ -53,7 +54,10 @@ def process_dir(dir_path: str, db: list[DbEntry]):
   matched.sort(key=lambda x: get_best_savings(x[1]), reverse=True)
 
   lines = [
-    '# CompactGUI Scan Output',
+    '<title>CompactGUI Scan Output</title>',
+    '<style>.dim { opacity: 0.5; }</style>',
+    '',
+    f'# CompactGUI Scan Output for "{dir_path}"',
     '',
   ]
 
@@ -61,25 +65,24 @@ def process_dir(dir_path: str, db: list[DbEntry]):
     lines += [
       '### Games Found',
       '',
-      '| Game | Matched | Uncompressed | XPRESS4K | XPRESS8K | XPRESS16K | LZX |',
-      '|------|---------|--------------|----------|----------|-----------|-----|',
+      '| Game | Matched (accuracy%) | Original  | XPRESS4K | XPRESS8K | XPRESS16K | LZX |',
+      '|------|---------------------|----------:|----------|----------|-----------|-----|',
     ]
     for dir_name, entry, score in matched:
       r = entry['CompressionResults']
-      uncompressed = format_size_column(r[0]['BeforeBytes']) if r else EMPTY_CELL
-      matched_name = f'{entry["FolderName"]} ({score:.0f}%)' if entry['FolderName'] != dir_name else ''
-      lines.append(f'| {dir_name} | {matched_name} | {uncompressed} | {format_compression_column(r, CompType.XPRESS4K)} | {format_compression_column(r, CompType.XPRESS8K)} | {format_compression_column(r, CompType.XPRESS16K)} | {format_compression_column(r, CompType.LZX)} |')
+      game_cell = dir_name
+      matched_cell = format_dimmed(f'{entry["FolderName"]} ({score:.0f}%)') if score == 100 else f'{entry["FolderName"]} {format_dimmed(f"({score:.0f}%)")}'
+      original_cell = format_size_column(r[0]['BeforeBytes']) if r else EMPTY_CELL
+      lines.append(f'| {game_cell} | {matched_cell} | {original_cell} | {format_compression_column(r, CompType.XPRESS4K)} | {format_compression_column(r, CompType.XPRESS8K)} | {format_compression_column(r, CompType.XPRESS16K)} | {format_compression_column(r, CompType.LZX)} |')
 
   if len(unmatched):
     lines += [
       '',
       '### Games Not Found',
       '',
-      '| Game |',
-      '|------|',
     ]
     for dir_name in unmatched:
-      lines.append(f'| {dir_name} |')
+      lines.append(f'- {dir_name}')
 
   output_path = os.path.join(dir_path, 'compact_gui_scan_output.md')
   with open(output_path, 'w', encoding='utf-8') as f:
@@ -95,15 +98,24 @@ def get_best_savings(entry: DbEntry):
   return max(1 - r['AfterBytes'] / r['BeforeBytes'] for r in results)
 
 def format_size_column(b: int):
-  return f'{b / 1024 ** 3:.2f}GB'
+  return format_size(b / 1024 ** 3)
 
 def format_compression_column(results: list, comp_type: CompType):
   r = next((r for r in results if r['CompType'] == comp_type), None)
   if r is None:
-    return EMPTY_CELL
+    return format_flex([format_dimmed(''), EMPTY_CELL])
   gb = r['AfterBytes'] / 1024 ** 3
   pct = (1 - r['AfterBytes'] / r['BeforeBytes']) * 100
-  return f'{gb:.2f}GB ({pct:.1f}%)'
+  return format_flex([format_dimmed(f'{round(pct)}%'), format_size(gb)])
+
+def format_size(gigabytes: float):
+  return f'{round(gigabytes) or 1} GB'
+
+def format_flex(items: list[str]):
+  return f'<div style="display:flex;justify-content:space-between;">{"".join(items)}</div>'
+
+def format_dimmed(msg: str):
+  return f'<span class="dim">{msg}</span>'
 
 def is_hidden(path: str):
   return os.stat(path).st_file_attributes & stat.FILE_ATTRIBUTE_HIDDEN
