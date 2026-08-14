@@ -98,6 +98,7 @@ def process_dir(dir_path: str, db: list[DbEntry]):
     f.write('\n'.join(lines))
 
   logger.success(f'Saved output to {output_path}')
+  os.startfile(output_path)
 
 def is_hidden(path: str):
   return os.stat(path).st_file_attributes & stat.FILE_ATTRIBUTE_HIDDEN
@@ -117,4 +118,4 @@ if __name__ == '__main__':
   except Exception as ex:
     logger.unhandledError(ex)
 
-  Prompt.enter_to_exit()
+  Prompt.enter_to_exit(timeout = True)
