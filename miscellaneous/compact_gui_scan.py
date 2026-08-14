@@ -12,6 +12,7 @@ from _compact_gui_types import CompType, DbEntry
 
 DATABASE_PATH = r"%LOCALAPPDATA%\IridiumIO\CompactGUI\databasev2.json"
 EMPTY_CELL = '<span style="opacity:0.33;">N/A</span>'
+MATCHING_ACCURACY = 75
 
 def main():
   games_dir = sys.argv[1] if len(sys.argv) > 1 else Prompt.dir('Enter the path to the directory containing your games')
@@ -38,14 +39,16 @@ def process_dir(dir_path: str, db: list[DbEntry]):
 
   for dir_name in dir_names:
     db_entry = db_by_folder.get(dir_name)
+    score = 100
     if db_entry is None:
-      result = process.extractOne(dir_name, db_folder_names, score_cutoff=70)
+      result = process.extractOne(dir_name, db_folder_names, score_cutoff=MATCHING_ACCURACY)
       if result:
         db_entry = db_by_folder[result[0]]
+        score = result[1]
       else:
         unmatched.append(dir_name)
         continue
-    matched.append((dir_name, db_entry))
+    matched.append((dir_name, db_entry, score))
 
   matched.sort(key=lambda x: get_best_savings(x[1]), reverse=True)
 
@@ -58,13 +61,14 @@ def process_dir(dir_path: str, db: list[DbEntry]):
     lines += [
       '### Games Found',
       '',
-      '| Game | Uncompressed | XPRESS4K | XPRESS8K | XPRESS16K | LZX |',
-      '|------|--------------|----------|----------|-----------|-----|',
+      '| Game | Matched | Uncompressed | XPRESS4K | XPRESS8K | XPRESS16K | LZX |',
+      '|------|---------|--------------|----------|----------|-----------|-----|',
     ]
-    for dir_name, entry in matched:
+    for dir_name, entry, score in matched:
       r = entry['CompressionResults']
       uncompressed = format_size_column(r[0]['BeforeBytes']) if r else EMPTY_CELL
-      lines.append(f'| {dir_name} | {uncompressed} | {format_compression_column(r, CompType.XPRESS4K)} | {format_compression_column(r, CompType.XPRESS8K)} | {format_compression_column(r, CompType.XPRESS16K)} | {format_compression_column(r, CompType.LZX)} |')
+      matched_name = f'{entry["FolderName"]} ({score:.0f}%)' if entry['FolderName'] != dir_name else ''
+      lines.append(f'| {dir_name} | {matched_name} | {uncompressed} | {format_compression_column(r, CompType.XPRESS4K)} | {format_compression_column(r, CompType.XPRESS8K)} | {format_compression_column(r, CompType.XPRESS16K)} | {format_compression_column(r, CompType.LZX)} |')
 
   if len(unmatched):
     lines += [
