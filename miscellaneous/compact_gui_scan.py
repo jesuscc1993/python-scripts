@@ -51,7 +51,8 @@ def process_dir(dir_path: str, db: list[DbEntry]):
         continue
     matched.append((dir_name, db_entry, score))
 
-  matched.sort(key=lambda x: get_best_space_saved(x[1]), reverse=True)
+  matched = [(dir_name, entry, score, get_max_space_saved(entry)) for dir_name, entry, score in matched]
+  matched.sort(key=lambda x: x[3], reverse=True)
 
   lines = [
     '<title>CompactGUI Scan Output</title>',
@@ -65,15 +66,16 @@ def process_dir(dir_path: str, db: list[DbEntry]):
     lines += [
       '### Games Found',
       '',
-      f'| Game | Matched {format_dimmed(f"(accuracy%)")} | Original  | XPRESS 4K | XPRESS 8K | XPRESS 16K | LZX |',
-      '|---|---|--:|---|---|---|---|',
+      f'| Game | Matched {format_dimmed(f"(accuracy%)")} | Original  | XPRESS 4K | XPRESS 8K | XPRESS 16K | LZX | Max Savings |',
+      '|---|---|--:|---|---|---|---|--:|',
     ]
-    for dir_name, entry, score in matched:
+    for dir_name, entry, score, max_savings in matched:
       r = entry['CompressionResults']
       game_cell = dir_name
       matched_cell = format_dimmed(f'{entry["FolderName"]} ({score:.0f}%)') if score == 100 else f'{entry["FolderName"]} {format_dimmed(f"({score:.0f}%)")}'
       original_cell = format_size_column(r[0]['BeforeBytes']) if r else EMPTY_CELL
-      lines.append(f'| {game_cell} | {matched_cell} | {original_cell} | {format_compression_column(r, CompType.XPRESS4K)} | {format_compression_column(r, CompType.XPRESS8K)} | {format_compression_column(r, CompType.XPRESS16K)} | {format_compression_column(r, CompType.LZX)} |')
+      max_savings_cell = format_size(max_savings / 1024 ** 3) if r else EMPTY_CELL
+      lines.append(f'| {game_cell} | {matched_cell} | {original_cell} | {format_compression_column(r, CompType.XPRESS4K)} | {format_compression_column(r, CompType.XPRESS8K)} | {format_compression_column(r, CompType.XPRESS16K)} | {format_compression_column(r, CompType.LZX)} | {max_savings_cell} |')
 
   if len(unmatched):
     lines += [
@@ -91,7 +93,7 @@ def process_dir(dir_path: str, db: list[DbEntry]):
   logger.success(f'Saved output to {output_path}')
   os.startfile(output_path)
 
-def get_best_space_saved(entry: DbEntry):
+def get_max_space_saved(entry: DbEntry):
   results = entry['CompressionResults']
   if not results:
     return 0
