@@ -40,8 +40,7 @@ def process_folder(folder_path):
       rel_path = os.path.relpath(file_path, os.path.dirname(folder_path))
 
       if os.path.exists(file_path):
-        is_hidden = os.stat(file_path).st_file_attributes & stat.FILE_ATTRIBUTE_HIDDEN
-        if is_hidden:
+        if is_hidden(file_path):
           logger.trace(f'Skipping "{rel_path}". File already exists.')
         else:
           subprocess.run(['attrib', '+h', file_path], check=False)
@@ -53,6 +52,9 @@ def process_folder(folder_path):
 
     except Exception as ex:
       logger.error(f'Could not create "{filename}":\n{ex}')
+
+def is_hidden(path: str):
+  return os.stat(path).st_file_attributes & stat.FILE_ATTRIBUTE_HIDDEN
 
 if __name__ == '__main__':
   try:
