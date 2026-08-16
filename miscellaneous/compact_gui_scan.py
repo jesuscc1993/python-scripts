@@ -1,11 +1,11 @@
 import json
 import os
+import re
 import stat
 import sys
 
 from mtlogger import logger
 from mtprompt import Prompt
-
 from rapidfuzz import process
 
 from _compact_gui_types import CompType, DbEntry
@@ -40,23 +40,35 @@ def process_dir(dir_path: str, db: list[DbEntry]) -> tuple[list, list]:
     if entry.is_dir() and not is_hidden(entry.path)
   ]
 
-  db_by_folder = {entry['FolderName']: entry for entry in db}
+  db_by_folder = {entry['FolderName'].lower(): entry for entry in db}
   db_folder_names = list(db_by_folder.keys())
 
   matched = []
   unmatched = []
 
   for dir_name in dir_names:
-    db_entry = db_by_folder.get(dir_name)
+    dir_name_lower = dir_name.lower()
+    db_entry = (
+      db_by_folder.get(dir_name_lower) or
+      db_by_folder.get(dir_name_lower.replace(' -', '')) or
+      db_by_folder.get(dir_name_lower.replace(' ', ''))
+    )
     score = 100
     if db_entry is None:
-      result = process.extractOne(dir_name, db_folder_names, score_cutoff=MATCHING_ACCURACY)
-      if result:
-        db_entry = db_by_folder[result[0]]
-        score = result[1]
+      pattern = re.compile(r'\b' + re.escape(dir_name_lower) + r'\b')
+      substring_matches = [name for name in db_folder_names if pattern.search(name)]
+      if substring_matches:
+        best = min(substring_matches, key=len)
+        db_entry = db_by_folder[best]
+        score = round(len(dir_name) / len(best) * 100)
       else:
-        unmatched.append(dir_name)
-        continue
+        result = process.extractOne(dir_name_lower, db_folder_names, score_cutoff=MATCHING_ACCURACY)
+        if result and result[0] not in dir_name_lower:
+          db_entry = db_by_folder[result[0]]
+          score = result[1]
+        else:
+          unmatched.append(dir_name)
+          continue
     matched.append((dir_name, db_entry, score))
 
   matched = [(dir_name, entry, score, get_max_space_saved(entry)) for dir_name, entry, score in matched]
@@ -76,7 +88,7 @@ def write_output(matched: list, unmatched: list):
     lines += [
       '### Games Found',
       '',
-      f'| Game | Matched {format_dimmed(f"(accuracy%)")} | Original  | XPRESS 4K | XPRESS 8K | XPRESS 16K | LZX | Savings |',
+      f'| Game | Matched {format_dimmed(f"(accuracy%)")} | Original | XPRESS 4K | XPRESS 8K | XPRESS 16K | LZX | Savings |',
       '|---|---|--:|---|---|---|---|--:|',
     ]
     for dir_name, entry, score, max_savings in matched:
