@@ -31,6 +31,7 @@ def main():
     all_unmatched.extend(unmatched)
 
   all_matched.sort(key=lambda x: x[3], reverse=True)
+  all_unmatched.sort()
   write_output(all_matched, all_unmatched)
 
 def process_dir(dir_path: str, db: list[DbEntry]) -> tuple[list, list]:
