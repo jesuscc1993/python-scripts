@@ -97,7 +97,7 @@ def write_output(matched: list, unmatched: list):
     for dir_name, entry, score, max_savings in matched:
       r = entry['CompressionResults']
       game_cell = dir_name
-      matched_cell = format_dimmed(f'{entry["FolderName"]} ({score:.0f}%)') if score == 100 else f'{entry["FolderName"]} {format_dimmed(f"({score:.0f}%)")}'
+      matched_cell = format_dimmed(f'{entry["GameName"]} ({score:.0f}%)') if score == 100 else f'{entry["GameName"]} {format_dimmed(f"({score:.0f}%)")}'
       original_cell = format_size_column(r[0]['BeforeBytes']) if r else EMPTY_CELL
       max_savings_cell = format_size(max_savings / 1024 ** 3) if r else EMPTY_CELL
       lines.append(f'| {game_cell} | {matched_cell} | {original_cell} | {format_compression_column(r, CompType.XPRESS4K)} | {format_compression_column(r, CompType.XPRESS8K)} | {format_compression_column(r, CompType.XPRESS16K)} | {format_compression_column(r, CompType.LZX)} | {max_savings_cell} |')
