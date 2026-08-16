@@ -40,14 +40,17 @@ def process_dir(dir_path: str, db: list[DbEntry]) -> tuple[list, list]:
     if entry.is_dir() and not is_hidden(entry.path)
   ]
 
-  db_by_folder = {entry['FolderName'].lower(): entry for entry in db}
+  db_by_folder = {}
+  for entry in db:
+    db_by_folder[normalize_dir_name(entry['GameName'])] = entry
+    db_by_folder[normalize_dir_name(entry['FolderName'])] = entry
   db_folder_names = list(db_by_folder.keys())
 
   matched = []
   unmatched = []
 
   for dir_name in dir_names:
-    dir_name_lower = dir_name.lower()
+    dir_name_lower = normalize_dir_name(dir_name)
     db_entry = (
       db_by_folder.get(dir_name_lower) or
       db_by_folder.get(dir_name_lower.replace(' -', '')) or
@@ -144,6 +147,9 @@ def format_dimmed(msg: str):
 
 def is_hidden(path: str):
   return os.lstat(path).st_file_attributes & stat.FILE_ATTRIBUTE_HIDDEN
+
+def normalize_dir_name(name: str):
+  return re.sub(r'[:꞉’\']', '', name.lower())
 
 def get_db() -> list[DbEntry] | None:
   db_path = os.path.expandvars(DATABASE_PATH)
