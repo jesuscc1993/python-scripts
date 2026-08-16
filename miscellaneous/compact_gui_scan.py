@@ -22,10 +22,18 @@ def main():
     logger.error("Database could not be loaded. Aborting.")
     return
 
-  for games_dir in games_dirs:
-    process_dir(games_dir, db)
+  all_matched = []
+  all_unmatched = []
 
-def process_dir(dir_path: str, db: list[DbEntry]):
+  for games_dir in games_dirs:
+    matched, unmatched = process_dir(games_dir, db)
+    all_matched.extend(matched)
+    all_unmatched.extend(unmatched)
+
+  all_matched.sort(key=lambda x: x[3], reverse=True)
+  write_output(all_matched, all_unmatched)
+
+def process_dir(dir_path: str, db: list[DbEntry]) -> tuple[list, list]:
   dir_names = [
     entry.name
     for entry in os.scandir(dir_path)
@@ -52,13 +60,15 @@ def process_dir(dir_path: str, db: list[DbEntry]):
     matched.append((dir_name, db_entry, score))
 
   matched = [(dir_name, entry, score, get_max_space_saved(entry)) for dir_name, entry, score in matched]
-  matched.sort(key=lambda x: x[3], reverse=True)
 
+  return matched, unmatched
+
+def write_output(matched: list, unmatched: list):
   lines = [
     '<title>CompactGUI Scan Output</title>',
     '<style>.dim { opacity: 0.5; } .justify-between { display:flex; justify-content:space-between; gap: 0.25em; }</style>',
     '',
-    f'# CompactGUI Scan Output for "{dir_path}"',
+    f'# CompactGUI Scan Output',
     '',
   ]
 
@@ -66,7 +76,7 @@ def process_dir(dir_path: str, db: list[DbEntry]):
     lines += [
       '### Games Found',
       '',
-      f'| Game | Matched {format_dimmed(f"(accuracy%)")} | Original  | XPRESS 4K | XPRESS 8K | XPRESS 16K | LZX | Max Savings |',
+      f'| Game | Matched {format_dimmed(f"(accuracy%)")} | Original  | XPRESS 4K | XPRESS 8K | XPRESS 16K | LZX | Savings |',
       '|---|---|--:|---|---|---|---|--:|',
     ]
     for dir_name, entry, score, max_savings in matched:
@@ -86,7 +96,8 @@ def process_dir(dir_path: str, db: list[DbEntry]):
     for dir_name in unmatched:
       lines.append(f'- {dir_name}')
 
-  output_path = os.path.join(dir_path, 'compact_gui_scan_output.md')
+  tmp_dir = os.path.expandvars('%TEMP%')
+  output_path = os.path.join(tmp_dir, 'compact_gui_scan_output.md')
   with open(output_path, 'w', encoding='utf-8') as f:
     f.write('\n'.join(lines))
 
@@ -120,7 +131,7 @@ def format_dimmed(msg: str):
   return f'<span class="dim">{msg}</span>'
 
 def is_hidden(path: str):
-  return os.stat(path).st_file_attributes & stat.FILE_ATTRIBUTE_HIDDEN
+  return os.lstat(path).st_file_attributes & stat.FILE_ATTRIBUTE_HIDDEN
 
 def get_db() -> list[DbEntry] | None:
   db_path = os.path.expandvars(DATABASE_PATH)

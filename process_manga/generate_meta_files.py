@@ -54,7 +54,7 @@ def process_folder(folder_path):
       logger.error(f'Could not create "{filename}":\n{ex}')
 
 def is_hidden(path: str):
-  return os.stat(path).st_file_attributes & stat.FILE_ATTRIBUTE_HIDDEN
+  return os.lstat(path).st_file_attributes & stat.FILE_ATTRIBUTE_HIDDEN
 
 if __name__ == '__main__':
   try:
