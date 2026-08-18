@@ -2,6 +2,7 @@ import ctypes
 import math
 import os
 import shutil
+import stat
 import sys
 import win32con
 import win32gui
@@ -23,6 +24,7 @@ OVERLAY_SMALLER_THAN_GB = False
 FONT_NAME = 'segoeuib.ttf'
 ICO_BAK_FILENAME = 'icon.bak.ico'
 DIR_SIZE_FILENAME = 'dir_file_size.txt'
+EXCLUSION_FILE = '.noscan'
 
 SIZE_256 = 256
 VALUE_FONT_SIZE_256 = 40
@@ -62,7 +64,7 @@ def main():
         dirs.clear()
         continue
 
-      dirs[:] = [d for d in dirs if not should_ignore_dir(os.path.join(root, d))]
+      dirs[:] = [d for d in dirs if not should_skip_dir(os.path.join(root, d))]
 
       for dir_name in dirs:
         child_path = os.path.join(root, dir_name)
@@ -72,23 +74,29 @@ def main():
   winsound.MessageBeep()
   logger.success(f'Finished setting icons for "{parent_path}".', prefix_newline=True)
 
-def should_ignore_dir(
+def should_skip_dir(
   dir_path: str,
 ):
-  if os.path.exists(os.path.join(dir_path, '.no_file_size')):
-    return True
-  attrs = ctypes.windll.kernel32.GetFileAttributesW(dir_path)
-  return attrs != -1 and bool(attrs & 0x2)
+  should_skip = is_hidden(dir_path) or has_exclusion_file(dir_path)
+  if should_skip:
+    logger.trace(f'  Skipping "{dir_path}". Directory is hidden or contains a {EXCLUSION_FILE} file.')
+  return should_skip
+
+def is_hidden(
+  path: str,
+):
+  return os.lstat(path).st_file_attributes & stat.FILE_ATTRIBUTE_HIDDEN
+
+def has_exclusion_file(
+  path: str,
+):
+  return os.path.exists(os.path.join(path, EXCLUSION_FILE))
 
 def process_dir(
   dir_path: str,
   override_existing = False,
 ):
   try:
-    if should_ignore_dir(dir_path):
-      logger.trace(f'  Skipping "{dir_path}". Found .no_file_size marker.')
-      return
-
     ini_path = os.path.join(dir_path, DESKTOP_INI_FILENAME)
     config, _ = read_ini(ini_path)
     ico_config = get_ini_icon(config)

@@ -12,6 +12,7 @@ from _compact_gui_types import CompType, DbEntry
 
 DATABASE_PATH = r"%LOCALAPPDATA%\IridiumIO\CompactGUI\databasev2.json"
 EMPTY_CELL = 'N/A'
+EXCLUSION_FILE = '.noscan'
 MATCHING_ACCURACY = 80
 
 def main():
@@ -41,7 +42,7 @@ def process_dir(
   dir_names = [
     entry.name
     for entry in os.scandir(dir_path)
-    if entry.is_dir() and not is_hidden(entry.path)
+    if entry.is_dir() and not should_skip_dir(entry.path)
   ]
 
   db_by_folder = {}
@@ -167,10 +168,23 @@ def format_dimmed(
 ):
   return f'<span class="dim">{msg}</span>'
 
+def should_skip_dir(
+  dir_path: str,
+):
+  should_skip = is_hidden(dir_path) or has_exclusion_file(dir_path)
+  if should_skip:
+    logger.trace(f'  Skipping "{dir_path}". Directory is hidden or contains a {EXCLUSION_FILE} file.')
+  return should_skip
+
 def is_hidden(
   path: str,
 ):
   return os.lstat(path).st_file_attributes & stat.FILE_ATTRIBUTE_HIDDEN
+
+def has_exclusion_file(
+  path: str,
+):
+  return os.path.exists(os.path.join(path, EXCLUSION_FILE))
 
 def normalize_dir_name(
   name: str,
