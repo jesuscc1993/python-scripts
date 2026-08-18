@@ -106,7 +106,7 @@ def write_output(
       game_cell = dir_name
       steam_id = entry.get('SteamID')
       game_name = f'[{entry["GameName"]}](https://store.steampowered.com/app/{steam_id})' if steam_id else entry['GameName']
-      matched_cell = format_dimmed(f'{game_name} ({score:.0f}%)') if score == 100 else f'{game_name} {format_dimmed(f"({score:.0f}%)")}'
+      matched_cell = f'{game_name} {format_dimmed(f"({score:.0f}%)")}' if score == 100 else format_dimmed(f'{game_name} ({score:.0f}%)')
       original_cell = format_size_column(r[0]['BeforeBytes']) if r else EMPTY_CELL
       max_savings_cell = format_size(max_savings / 1024 ** 3) if r else EMPTY_CELL
       lines.append(f'| {game_cell} | {matched_cell} | {original_cell} | {format_compression_column(r, CompType.XPRESS4K)} | {format_compression_column(r, CompType.XPRESS8K)} | {format_compression_column(r, CompType.XPRESS16K)} | {format_compression_column(r, CompType.LZX)} | {max_savings_cell} |')
