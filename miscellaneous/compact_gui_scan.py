@@ -103,14 +103,23 @@ def write_output(
       '|---|---|--:|---|---|---|---|--:|',
     ]
     for dir_name, entry, score, max_savings in matched:
-      r = entry['CompressionResults']
-      game_cell = dir_name
+      compression_results = entry.get('CompressionResults')
       steam_id = entry.get('SteamID')
-      game_name = f'[{entry["GameName"]}](https://store.steampowered.com/app/{steam_id})' if steam_id else entry['GameName']
-      matched_cell = game_name if score == 100 else format_dimmed(f'{game_name} ({score:.0f}%)')
-      original_cell = format_size_column(r[0]['BeforeBytes']) if r else EMPTY_CELL
-      max_savings_cell = format_size(max_savings / 1024 ** 3) if r else EMPTY_CELL
-      lines.append(f'| {game_cell} | {matched_cell} | {original_cell} | {format_compression_column(r, CompType.XPRESS4K)} | {format_compression_column(r, CompType.XPRESS8K)} | {format_compression_column(r, CompType.XPRESS16K)} | {format_compression_column(r, CompType.LZX)} | {max_savings_cell} |')
+      game_name = entry.get('GameName')
+      folder_name = entry.get('FolderName')
+      if score < 100:
+        if (
+          matches_loosely(dir_name, game_name) or
+          matches_loosely(dir_name, folder_name)
+        ):
+          score = 100
+
+      game_cell = dir_name
+      game_name_content = f'[{game_name}](https://store.steampowered.com/app/{steam_id})' if steam_id else game_name
+      matched_cell = game_name_content if score == 100 else format_dimmed(f'{game_name_content} ({score:.0f}%)')
+      original_cell = format_size_column(compression_results[0].get('BeforeBytes')) if compression_results else EMPTY_CELL
+      max_savings_cell = format_size(max_savings / 1024 ** 3) if compression_results else EMPTY_CELL
+      lines.append(f'| {game_cell} | {matched_cell} | {original_cell} | {format_compression_column(compression_results, CompType.XPRESS4K)} | {format_compression_column(compression_results, CompType.XPRESS8K)} | {format_compression_column(compression_results, CompType.XPRESS16K)} | {format_compression_column(compression_results, CompType.LZX)} | {max_savings_cell} |')
 
   if len(unmatched):
     lines += [
@@ -188,8 +197,22 @@ def has_exclusion_file(
 
 def normalize_dir_name(
   name: str,
+  remove_spaces = False
 ):
-  return re.sub(r'[:꞉’\']', '', name.lower())
+  name = name.lower()
+  name = re.sub(r'[:꞉’\']', '', name)
+  if remove_spaces:
+    name = re.sub(r'\s+', '', name)
+  return name
+
+def matches_loosely(
+  a: str,
+  b: str,
+):
+  return (
+    normalize_dir_name(a, remove_spaces=True) ==
+    normalize_dir_name(b, remove_spaces=True)
+  )
 
 def get_db():
   db_path = os.path.expandvars(DATABASE_PATH)
