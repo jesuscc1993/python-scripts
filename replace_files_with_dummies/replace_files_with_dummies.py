@@ -16,22 +16,27 @@ def main():
 
   process_files(parent_folder, pattern)
 
-def process_files(parent_folder, pattern):
+def process_files(
+  parent_folder_path: str,
+  pattern: re.Pattern,
+):
   files_to_process = []
 
-  for root, _, files in os.walk(parent_folder):
+  for root, _, files in os.walk(parent_folder_path):
     for file in files:
       if pattern.search(file):
         file_path = os.path.join(root, file)
         files_to_process.append(file_path)
 
-  with ThreadPoolExecutor() as executor, tqdm(total = len(files_to_process), desc = f'Processing "{parent_folder}"') as progress:
+  with ThreadPoolExecutor() as executor, tqdm(total = len(files_to_process), desc = f'Processing "{parent_folder_path}"') as progress:
     for _ in executor.map(replace_file, files_to_process):
       progress.update(1)
 
-  logger.success(f'Finished replacing files in "{parent_folder}".\n')
+  logger.success(f'Finished replacing files in "{parent_folder_path}".\n')
 
-def replace_file(file_path):
+def replace_file(
+  file_path: str,
+):
   with open(file_path, 'w') as file:
     file.write('')
 

@@ -15,7 +15,9 @@ def main():
 
   restore_backups(src_path)
 
-def restore_backups(dir_path):
+def restore_backups(
+  dir_path: str,
+):
 	for filename in os.listdir(dir_path):
 		if '.bak.' in filename:
 			bak_path = os.path.join(dir_path, filename)

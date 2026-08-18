@@ -17,7 +17,9 @@ def main():
 
   restore_file(bak_file_path)
 
-def restore_file(bak_file_path):
+def restore_file(
+  bak_file_path: str,
+):
   bak_dir_path = os.path.dirname(bak_file_path)
   bak_file_name = os.path.basename(bak_file_path)
   bak_file_stem, src_file_ext = os.path.splitext(bak_file_name)

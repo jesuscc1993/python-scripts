@@ -54,7 +54,11 @@ def prompt_params():
 
   return parent_folder, cover_type, override_existing
 
-def generate_covers(parent_folder, cover_type, override_existing):
+def generate_covers(
+  parent_folder_path: str,
+  cover_type: str,
+  override_existing: bool,
+):
   cover_url = COVER_URL_MAP.get(cover_type)
   if not cover_url:
     logger.error(f'Invalid cover type "{cover_type}". Must be one of: {", ".join(COVER_URL_MAP)}.')
@@ -62,8 +66,8 @@ def generate_covers(parent_folder, cover_type, override_existing):
 
   logger.log('Generating cover images...')
 
-  for folder_name in natsorted(os.listdir(parent_folder)):
-    folder_path = os.path.join(parent_folder, folder_name)
+  for folder_name in natsorted(os.listdir(parent_folder_path)):
+    folder_path = os.path.join(parent_folder_path, folder_name)
 
     if os.path.isdir(folder_path) and folder_name.isdigit():
       process_folder(folder_path, folder_name, cover_url, override_existing)
@@ -71,7 +75,12 @@ def generate_covers(parent_folder, cover_type, override_existing):
   winsound.MessageBeep()
   logger.log('\nFinished generating cover images.')
 
-def process_folder(folder_path, folder_name, cover_url, override_existing):
+def process_folder(
+  folder_path: str,
+  folder_name: str,
+  cover_url: str,
+  override_existing: bool,
+):
   cover_path = os.path.join(folder_path, FOLDER_IMAGE_FILENAME)
   formatted_name = folder_name.rjust(ID_LENGTH)
 
@@ -94,14 +103,21 @@ def process_folder(folder_path, folder_name, cover_url, override_existing):
 
   logger.success(f'[{formatted_name}] Generated cover image.')
 
-def resize_image_to_fill(img, w, h):
+def resize_image_to_fill(
+  img: Image.Image,
+  w: int,
+  h: int,
+):
   new_scale = max(w / img.width, h / img.height)
   new_width = int(img.width * new_scale)
   new_height = int(img.height * new_scale)
 
   return resize_image(img, new_width, new_height)
 
-def crop_image(img, crop_size):
+def crop_image(
+  img: Image.Image,
+  crop_size: int,
+):
   new_width = img.width
   new_height = img.height
 

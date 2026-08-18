@@ -34,7 +34,10 @@ def main():
   all_unmatched.sort()
   write_output(all_matched, all_unmatched)
 
-def process_dir(dir_path: str, db: list[DbEntry]) -> tuple[list, list]:
+def process_dir(
+  dir_path: str,
+  db: list[DbEntry],
+):
   dir_names = [
     entry.name
     for entry in os.scandir(dir_path)
@@ -79,7 +82,10 @@ def process_dir(dir_path: str, db: list[DbEntry]) -> tuple[list, list]:
 
   return matched, unmatched
 
-def write_output(matched: list, unmatched: list):
+def write_output(
+  matched: list,
+  unmatched: list,
+):
   lines = [
     '<title>CompactGUI Scan Output</title>',
     '<style>.dim { opacity: 0.5; } .justify-between { display:flex; justify-content:space-between; gap: 0.25em; }</style>',
@@ -122,16 +128,23 @@ def write_output(matched: list, unmatched: list):
   logger.success(f'Saved output to {output_path}')
   os.startfile(output_path)
 
-def get_max_space_saved(entry: DbEntry):
+def get_max_space_saved(
+  entry: DbEntry,
+):
   results = entry['CompressionResults']
   if not results:
     return 0
   return max(r['BeforeBytes'] - r['AfterBytes'] for r in results)
 
-def format_size_column(b: int):
+def format_size_column(
+  b: int,
+):
   return format_size(b / 1024 ** 3)
 
-def format_compression_column(results: list, comp_type: CompType):
+def format_compression_column(
+  results: list,
+  comp_type: CompType,
+):
   r = next((r for r in results if r['CompType'] == comp_type), None)
   if r is None:
     return format_flex([format_dimmed(EMPTY_CELL), ''])
@@ -139,22 +152,32 @@ def format_compression_column(results: list, comp_type: CompType):
   pct = (1 - r['AfterBytes'] / r['BeforeBytes']) * 100
   return format_flex([format_size(gb), format_dimmed(f'↓{round(pct)}%')])
 
-def format_size(gigabytes: float):
+def format_size(
+  gigabytes: float,
+):
   return f'{round(gigabytes, 1) or 0.1:g} GB'
 
-def format_flex(items: list[str]):
+def format_flex(
+  items: list[str],
+):
   return f'<div class="justify-between">{"".join(items)}</div>'
 
-def format_dimmed(msg: str):
+def format_dimmed(
+  msg: str,
+):
   return f'<span class="dim">{msg}</span>'
 
-def is_hidden(path: str):
+def is_hidden(
+  path: str,
+):
   return os.lstat(path).st_file_attributes & stat.FILE_ATTRIBUTE_HIDDEN
 
-def normalize_dir_name(name: str):
+def normalize_dir_name(
+  name: str,
+):
   return re.sub(r'[:꞉’\']', '', name.lower())
 
-def get_db() -> list[DbEntry] | None:
+def get_db():
   db_path = os.path.expandvars(DATABASE_PATH)
   if not os.path.exists(db_path):
     logger.error(f"Database file not found at {db_path}")

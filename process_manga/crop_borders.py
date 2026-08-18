@@ -15,12 +15,16 @@ def main():
   else:
     select_parent_folder('Enter the path to the parent folder containing the folders or images you want to crop the borders of:\n', process_parent_folder)
 
-def process_parent_folder(folder_path):
+def process_parent_folder(
+  folder_path: str,
+):
   process_folder_images(folder_path, process_image)
 
   logger.success(f'Finished cropping borders in "{folder_path}".')
 
-def process_image(file_path):
+def process_image(
+  file_path: str,
+):
   try:
     with Image.open(file_path) as img:
       width, height = img.size
@@ -31,7 +35,9 @@ def process_image(file_path):
   except Exception as ex:
     logger.error(f'Could not process {file_path}:\n{ex}')
 
-def crop_blanks(img):
+def crop_blanks(
+  img: Image.Image,
+):
   np_img = numpy.array(img)
   if np_img.ndim == 2:
     mask = np_img < WHITE_THRESHOLD

@@ -10,12 +10,16 @@ from tqdm import tqdm
 
 from _constants import DEFAULT_ICO_SIZES, DESKTOP_INI_FILENAME, FALLBACK_ENCODING, HIDDEN_FILE_ATTRS, HIDDEN_SYSTEM_FILE_ATTRS, ICO_FILENAME, INI_ICON_KEY, INI_SHELL_SECTION, MAX_ICO_SIZE, PREFERRED_ENCODING
 
-def process_parent_folder(parent_folder: str, depth: int, image_filenames: list[str]):
-  parent_folder = os.path.abspath(parent_folder)
-  parent_depth = parent_folder.rstrip(os.sep).count(os.sep)
+def process_parent_folder(
+  parent_folder_path: str,
+  depth: int,
+  image_filenames: list[str],
+):
+  parent_folder_path = os.path.abspath(parent_folder_path)
+  parent_depth = parent_folder_path.rstrip(os.sep).count(os.sep)
 
-  folders_to_process = [parent_folder]
-  for root, dirs, _ in os.walk(parent_folder):
+  folders_to_process = [parent_folder_path]
+  for root, dirs, _ in os.walk(parent_folder_path):
     current_depth = root.rstrip(os.sep).count(os.sep) - parent_depth
     if current_depth >= depth:
       dirs.clear()
@@ -24,14 +28,17 @@ def process_parent_folder(parent_folder: str, depth: int, image_filenames: list[
     for dir_name in dirs:
       folders_to_process.append(os.path.join(root, dir_name))
 
-  with ThreadPoolExecutor() as executor, tqdm(total = len(folders_to_process), desc = f'Processing "{parent_folder}"') as progress:
+  with ThreadPoolExecutor() as executor, tqdm(total = len(folders_to_process), desc = f'Processing "{parent_folder_path}"') as progress:
     for _ in executor.map(lambda f: process_folder(f, image_filenames), folders_to_process):
       progress.update(1)
 
   winsound.MessageBeep()
-  logger.log(f'\nFinished setting icons for "{parent_folder}".')
+  logger.log(f'\nFinished setting icons for "{parent_folder_path}".')
 
-def process_folder(folder_path: str, image_filenames: list[str]):
+def process_folder(
+  folder_path: str,
+  image_filenames: list[str],
+):
   image_path = None
   ico_path = os.path.join(folder_path, ICO_FILENAME)
   ico_exists = os.path.exists(ico_path)
@@ -54,10 +61,17 @@ def process_folder(folder_path: str, image_filenames: list[str]):
   else:
     tqdm.write(logger.formatWarn(f'No suitable image found in "{folder_path}".'))
 
-def is_file_newer_than(file_a: str, file_b: str):
+def is_file_newer_than(
+  file_a: str,
+  file_b: str,
+):
   return os.path.getmtime(file_a) > os.path.getmtime(file_b)
 
-def image_to_ico(image_path: str, ico_path: str, icon_sizes: list[int] = DEFAULT_ICO_SIZES):
+def image_to_ico(
+  image_path: str,
+  ico_path: str,
+  icon_sizes = DEFAULT_ICO_SIZES,
+):
   try:
     if os.path.exists(ico_path):
       os.unlink(ico_path)
@@ -74,7 +88,11 @@ def image_to_ico(image_path: str, ico_path: str, icon_sizes: list[int] = DEFAULT
   except Exception as ex:
     logger.error(f'Error converting "{image_path}" to ICO:\n{ex}')
 
-def set_folder_icon(folder_path: str, ico_path: str, override_existing: bool = False):
+def set_folder_icon(
+  folder_path: str,
+  ico_path: str,
+  override_existing = False,
+):
   try:
     desktop_ini_path = os.path.join(folder_path, DESKTOP_INI_FILENAME)
 
@@ -97,7 +115,10 @@ def set_folder_icon(folder_path: str, ico_path: str, override_existing: bool = F
   except Exception as ex:
     tqdm.write(logger.formatError(f'Error setting folder icon to "{folder_path}":\n{ex}'))
 
-def read_ini(ini_path: str, encoding: str = PREFERRED_ENCODING):
+def read_ini(
+  ini_path: str,
+  encoding = PREFERRED_ENCODING,
+):
   config = ConfigParser()
   config.optionxform = str
 
@@ -115,7 +136,12 @@ def read_ini(ini_path: str, encoding: str = PREFERRED_ENCODING):
 
   return config, encoding
 
-def write_file(file_path: str, content: str, attrs: list[str], encoding: str = PREFERRED_ENCODING):
+def write_file(
+  file_path: str,
+  content: str,
+  attrs: list[str],
+  encoding = PREFERRED_ENCODING,
+):
   if os.path.exists(file_path):
     remove_file_attrs(file_path, attrs)
 
@@ -125,7 +151,11 @@ def write_file(file_path: str, content: str, attrs: list[str], encoding: str = P
 
   add_file_attrs(file_path, attrs)
 
-def write_ini(file_path: str, config: ConfigParser, encoding: str):
+def write_ini(
+  file_path: str,
+  config: ConfigParser,
+  encoding: str,
+):
   if os.path.exists(file_path):
     remove_file_attrs(file_path, HIDDEN_SYSTEM_FILE_ATTRS)
 
@@ -135,28 +165,48 @@ def write_ini(file_path: str, config: ConfigParser, encoding: str):
 
   add_file_attrs(file_path, HIDDEN_SYSTEM_FILE_ATTRS)
 
-def write_hidden_file(file_path: str, content: str, encoding: str = PREFERRED_ENCODING):
+def write_hidden_file(
+  file_path: str,
+  content: str,
+  encoding = PREFERRED_ENCODING,
+):
   write_file(file_path, content, HIDDEN_FILE_ATTRS, encoding)
 
-def get_ini_icon(config: ConfigParser):
+def get_ini_icon(
+  config: ConfigParser,
+):
   return config.get(INI_SHELL_SECTION, INI_ICON_KEY, fallback=None)
 
-def set_ini_icon(config: ConfigParser, ico_path: str, ico_index: int = 0):
+def set_ini_icon(
+  config: ConfigParser,
+  ico_path: str,
+  ico_index = 0,
+):
   if INI_SHELL_SECTION not in config:
     config[INI_SHELL_SECTION] = {}
 
   config[INI_SHELL_SECTION][INI_ICON_KEY] = f'{ico_path},{ico_index}'
 
-def add_file_attrs(file_path: str, attrs: list[str]):
+def add_file_attrs(
+  file_path: str,
+  attrs: list[str],
+):
   if os.path.exists(file_path):
     subprocess.run(['attrib'] + ['+' + attr for attr in attrs] + [file_path], check=True)
 
-def remove_file_attrs(file_path: str, attrs: list[str]):
+def remove_file_attrs(
+  file_path: str,
+  attrs: list[str],
+):
   if os.path.exists(file_path):
     subprocess.run(['attrib'] + ['-' + attr for attr in attrs] + [file_path], check=True)
 
-def hide_file(file_path: str):
+def hide_file(
+  file_path: str,
+):
   add_file_attrs(file_path, HIDDEN_FILE_ATTRS)
 
-def show_file(file_path: str):
+def show_file(
+  file_path: str,
+):
   remove_file_attrs(file_path, HIDDEN_FILE_ATTRS)

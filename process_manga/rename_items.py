@@ -6,6 +6,7 @@ from concurrent.futures import ThreadPoolExecutor
 from mtlogger import logger
 from mtprompt import Prompt
 from tqdm import tqdm
+from typing import Callable
 
 from _common import CHAPTER_NUMBER_REGEX, ENDING_REGEX, EPILOGUE_REGEX, IMAGE_EXTENSIONS, INTEGER_REGEX, SEASON_REGEX, SIDE_STORY_REGEX, SPECIAL_REGEX, VOLUME_NUMBER_REGEX, zfill_float
 
@@ -22,23 +23,30 @@ def prompt_parent_folder():
 
   process_parent_folder(parent_folder)
 
-def process_parent_folder(parent_folder):
-  for root, dirs, files in os.walk(parent_folder, topdown = False):
+def process_parent_folder(
+  parent_folder_path: str,
+):
+  for root, dirs, files in os.walk(parent_folder_path, topdown = False):
     all_items = files + dirs
 
     with ThreadPoolExecutor() as executor:
       list(tqdm(executor.map(lambda item: process_item(root, item), all_items), total = len(all_items), desc=f'Processing "{root}"'))
 
-  logger.success(f'Finished renaming items in "{parent_folder}".')
+  logger.success(f'Finished renaming items in "{parent_folder_path}".')
 
-def process_item(root, item_name):
-  item_path = os.path.join(root, item_name)
+def process_item(
+  parent_folder_path: str,
+  item_name: str,
+):
+  item_path = os.path.join(parent_folder_path, item_name)
   new_name = get_processed_name(item_path)
   if new_name != item_name:
-    new_path = os.path.join(root, new_name)
+    new_path = os.path.join(parent_folder_path, new_name)
     os.rename(item_path, new_path)
 
-def get_processed_name(item_path):
+def get_processed_name(
+  item_path: str,
+):
   is_dir = os.path.isdir(item_path)
   base_name = os.path.basename(item_path)
   new_name = base_name
@@ -95,7 +103,12 @@ def get_processed_name(item_path):
 
   return new_name + ext
 
-def replace(pattern, repl, string, flags=re.IGNORECASE):
+def replace(
+  pattern: str,
+  repl: str | Callable,
+  string: str,
+  flags=re.IGNORECASE,
+):
   return re.sub(pattern, repl, string, flags=flags)
 
 if __name__ == '__main__':

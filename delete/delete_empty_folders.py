@@ -10,10 +10,12 @@ def main():
 
   delete_empty_folders(parent_folder)
 
-def delete_empty_folders(parent_folder):
+def delete_empty_folders(
+  parent_folder_path: str,
+):
   none_deleted = True
 
-  for root, dirs, _ in os.walk(parent_folder, topdown = False):
+  for root, dirs, _ in os.walk(parent_folder_path, topdown = False):
     for dir_name in dirs:
       dir_path = os.path.join(root, dir_name)
       try:

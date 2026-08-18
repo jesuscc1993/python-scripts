@@ -35,7 +35,11 @@ COVER_URL_MAP = {
 HEADER_SIZE = COVER_URL_MAP['header']['size']
 COVER_SIZE = COVER_URL_MAP['library']['size']
 
-def download_assets_for_app_id(steam_app_id, dest_dir, filename_id = None):
+def download_assets_for_app_id(
+  steam_app_id: str,
+  dest_dir: str,
+  filename_id: str = None,
+):
   filename_id = filename_id or steam_app_id
   Path(dest_dir).mkdir(parents = True, exist_ok = True)
   for _, data in COVER_URL_MAP.items():
@@ -43,7 +47,11 @@ def download_assets_for_app_id(steam_app_id, dest_dir, filename_id = None):
     filename = data['dest'].format(filename_id)
     download_asset_for_app_id(url, Path(dest_dir) / filename, data.get('size'))
 
-def download_asset_for_app_id(url, dest, size = None):
+def download_asset_for_app_id(
+  url: str,
+  dest: Path,
+  size: list = None,
+):
   if Path(dest).exists():
     logger.trace(f'Skipping {Path(dest).name}: already exists')
     return
@@ -51,7 +59,11 @@ def download_asset_for_app_id(url, dest, size = None):
   response.raise_for_status()
   save_asset(response.content, dest, size)
 
-def save_asset(content, filepath, size = None):
+def save_asset(
+  content: bytes,
+  filepath: Path,
+  size: list = None,
+):
   try:
     img = Image.open(BytesIO(content))
     if size:

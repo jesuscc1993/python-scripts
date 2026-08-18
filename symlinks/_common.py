@@ -6,14 +6,13 @@ import sys
 
 from mtlogger import logger
 from pathlib import Path
-from typing import Optional
 
 def make_link(
   dest: str,
   src: str,
-  target_is_directory: bool,
-  make_dirs: Optional[bool] = True
-) -> bool:
+  target_is_dir: bool,
+  make_dirs = True,
+):
   dest_path = os.path.expandvars(dest)
   src_path = os.path.expandvars(src)
 
@@ -35,12 +34,14 @@ def make_link(
     return
 
   try:
-    Path(dest_path).symlink_to(src_path, target_is_directory)
+    Path(dest_path).symlink_to(src_path, target_is_dir)
     logger.success(f'Linked "{dest_path}" to "{src_path}".')
   except Exception as ex:
     logger.error(f'Failed to link "{dest_path}" to "{src_path}": {ex}')
 
-def remove_link(location: str) -> None:
+def remove_link(
+  location: str,
+):
   path = Path(location)
   if path.is_symlink():
     path.unlink(missing_ok=True)
@@ -52,11 +53,19 @@ def remove_link(location: str) -> None:
       shutil.move(location, new_location)
       logger.debug(f'  Backed up existing "{location}" as "{new_location}".')
 
-def link_dir(dest: str, src: str, make_dirs: Optional[bool] = True) -> bool:
-  return make_link(dest, src, target_is_directory=True, make_dirs=make_dirs)
+def link_dir(
+  dest: str,
+  src: str,
+  make_dirs = True,
+):
+  return make_link(dest, src, target_is_dir=True, make_dirs=make_dirs)
 
-def link_file(target: str, source: str, make_dirs: Optional[bool] = True) -> bool:
-  return make_link(target, source, target_is_directory=False, make_dirs=make_dirs)
+def link_file(
+  target: str,
+  source: str,
+  make_dirs = True,
+):
+  return make_link(target, source, target_is_dir=False, make_dirs=make_dirs)
 
 def run_as_admin():
   if os.name == 'nt' and not ctypes.windll.shell32.IsUserAnAdmin():

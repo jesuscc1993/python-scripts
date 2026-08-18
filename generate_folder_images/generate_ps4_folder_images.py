@@ -15,11 +15,16 @@ TITLE_URL = 'https://serialstation.com/titles/{game_id}'
 def main():
   process_parent_folder(process_folder)
 
-def process_folder(folder_path):
+def process_folder(
+  folder_path: str,
+):
   game_id = os.path.basename(os.path.normpath(folder_path))
   download_game_cover(game_id, folder_path)
 
-def download_game_cover(game_id, folder_path):
+def download_game_cover(
+  game_id: str,
+  folder_path: str,
+):
   try:
     url = TITLE_URL.format(game_id=re.sub(r'([A-Za-z]+)(\d+)', r'\1/\2', game_id))
     response = requests.get(url)

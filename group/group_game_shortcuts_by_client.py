@@ -16,12 +16,16 @@ def main():
 
   process_parent_folder(parent_dir, should_process_item, get_group_name)
 
-def should_process_item(item_path):
+def should_process_item(
+  item_path: str,
+):
   return os.path.isfile(item_path) and item_path.lower().endswith('.url')
 
-def get_group_name(url_file):
+def get_group_name(
+  url_file_path: str,
+):
   try:
-    with open(url_file, 'r', encoding='utf-8') as f:
+    with open(url_file_path, 'r', encoding='utf-8') as f:
       for line in f:
         if line.strip().startswith('URL='):
           match = re.match(r'URL=(.+?)://', line)
@@ -32,7 +36,7 @@ def get_group_name(url_file):
             parts = re.split(r'[-_]', protocol)
             return ' '.join(p.capitalize() for p in parts)
   except Exception as ex:
-    logger.error(f'Failed to read {url_file}: {ex}')
+    logger.error(f'Failed to read {url_file_path}: {ex}')
   return None
 
 if __name__ == '__main__':

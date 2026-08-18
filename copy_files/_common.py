@@ -9,7 +9,10 @@ BACKUP_PATH = 'backups'
 TIMESTAMP_FORMAT = '%Y-%m-%d_%H-%M-%S'
 WATCH_INTERVAL = 60
 
-def rename_with_timestamp(dir_path: str, src_file_path: str):
+def rename_with_timestamp(
+  dir_path: str,
+  src_file_path: str,
+):
   file_name = os.path.basename(src_file_path)
 
   if os.path.exists(src_file_path):
@@ -21,6 +24,9 @@ def rename_with_timestamp(dir_path: str, src_file_path: str):
     shutil.move(src_file_path, stamped_file_path)
     logger.success(f'Backed up existing "{file_name}" as "{stamped_file_name}"')
 
-def enforce_unique_path(pathA: str, pathB: str):
+def enforce_unique_path(
+  pathA: str,
+  pathB: str,
+):
   if pathA == pathB:
     raise ValueError('Source and destination paths cannot be the same.')

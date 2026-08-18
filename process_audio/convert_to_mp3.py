@@ -48,35 +48,45 @@ def main():
         worker,
         input_path,
         output_path,
-        og_filename,
-        new_filename,
+        input_filename,
+        output_filename,
         bitrate
       )
-      for input_path, output_path, og_filename, new_filename in files_to_convert
+      for input_path, output_path, input_filename, output_filename in files_to_convert
     ]
     for _ in tqdm(as_completed(futures), total = len(futures), desc = "Converting files to MP3"):
       pass
 
   tqdm.write("Finished converting files to MP3.")
 
-def worker(input_path, output_path, og_filename, new_filename, bitrate):
+def worker(
+  input_file_path: str,
+  output_file_path: str,
+  input_filename: str,
+  output_filename: str,
+  bitrate: str,
+):
   try:
-    convert_to_mp3(input_path, output_path, bitrate)
-    send2trash(input_path)
-    tqdm.write(f'Converted "{og_filename}" to "{new_filename}".')
+    convert_to_mp3(input_file_path, output_file_path, bitrate)
+    send2trash(input_file_path)
+    tqdm.write(f'Converted "{input_filename}" to "{output_filename}".')
   except Exception as ex:
-    tqdm.write(f'Failed to convert "{input_path}":\n{ex}')
+    tqdm.write(f'Failed to convert "{input_file_path}":\n{ex}')
 
-def convert_to_mp3(input_path, output_path, bitrate):
+def convert_to_mp3(
+  input_file_path: str,
+  output_file_path: str,
+  bitrate: str,
+):
   result = subprocess.run(
     [
       'ffmpeg',
-      '-i', input_path,
+      '-i', input_file_path,
       '-b:a', bitrate,
       '-codec:a', 'libmp3lame',
       '-map', 'a',
       '-y',
-      output_path
+      output_file_path
     ],
     stdout = subprocess.PIPE,
     stderr = subprocess.PIPE

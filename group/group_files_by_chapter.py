@@ -19,30 +19,34 @@ def main():
 
   process_parent_folder(parent_dir)
 
-def process_parent_folder(parent_dir):
+def process_parent_folder(
+  parent_dir_path: str,
+):
   files_to_process = []
 
-  for item in os.listdir(parent_dir):
-    item_path = os.path.join(parent_dir, item)
+  for item in os.listdir(parent_dir_path):
+    item_path = os.path.join(parent_dir_path, item)
     if should_process_item(item_path):
       chapter = get_chapter(item)
       if not chapter:
         tqdm.write(logger.formatWarn(f'Skipping "{item}". Chapter number could not be inferred.'))
         continue
 
-      output_path = os.path.join(parent_dir, f'Ch.{chapter.zfill(2)}')
+      output_path = os.path.join(parent_dir_path, f'Ch.{chapter.zfill(2)}')
       if not os.path.exists(output_path):
         os.makedirs(output_path)
 
       files_to_process.append((item_path, output_path, chapter))
 
-  with ThreadPoolExecutor() as executor, tqdm(total = len(files_to_process), desc = f'Processing "{parent_dir}"') as progress:
+  with ThreadPoolExecutor() as executor, tqdm(total = len(files_to_process), desc = f'Processing "{parent_dir_path}"') as progress:
     for _ in executor.map(process_file, files_to_process):
       progress.update(1)
 
-  logger.success(f'Finished grouping files in "{parent_dir}".\n')
+  logger.success(f'Finished grouping files in "{parent_dir_path}".\n')
 
-def should_process_item(item_path):
+def should_process_item(
+  item_path: str,
+):
   if not os.path.isfile(item_path):
     return False
 
@@ -52,7 +56,9 @@ def should_process_item(item_path):
 
   return True
 
-def process_file(params):
+def process_file(
+  params: tuple,
+):
   src, target_folder, chapter = params
   base, ext = os.path.splitext(os.path.basename(src))
   new_name = f'ch{chapter}_p{base}{ext}'
@@ -64,7 +70,9 @@ def process_file(params):
     counter += 1
   shutil.move(src, dest)
 
-def get_chapter(filename):
+def get_chapter(
+  filename: str,
+):
   ch_match = re.search(CHAPTER_NUMBER_REGEX, filename, re.IGNORECASE)
   chapter = ch_match.group(1) if ch_match else None
   return chapter

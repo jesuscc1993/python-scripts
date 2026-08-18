@@ -17,10 +17,14 @@ def main():
   else:
     select_parent_folder('Enter the path to the parent folder containing the folders or images you want to level shift:\n', process_parent_folder)
 
-def process_parent_folder(folder_path):
+def process_parent_folder(
+  folder_path: str,
+):
   process_folder_images(folder_path, process_image)
 
-def process_image(file_path):
+def process_image(
+  file_path: str,
+):
   img = Image.open(file_path)
   if not is_grayscale(img):
     return
@@ -41,7 +45,10 @@ def process_image(file_path):
   out_img = Image.fromarray(scaled)
   out_img.save(file_path, quality=80)
 
-def is_grayscale(img, tolerance = 5):
+def is_grayscale(
+  img: Image.Image,
+  tolerance = 5,
+):
   if img.mode == 'L':
     return True
   if img.mode in ['RGB', 'RGBA']:
@@ -52,7 +59,10 @@ def is_grayscale(img, tolerance = 5):
     return numpy.all(diff <= tolerance)
   return False
 
-def get_min_max(array, scan_area = 1):
+def get_min_max(
+  array: numpy.ndarray,
+  scan_area = 1,
+):
   if scan_area <= 0 or scan_area >= 1:
     return array.min(), array.max()
 

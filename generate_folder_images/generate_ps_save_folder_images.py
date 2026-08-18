@@ -11,7 +11,9 @@ IMAGE_FILENAME = 'ICON0.PNG'
 def main():
   process_parent_folder(process_folder)
 
-def process_folder(folder_path):
+def process_folder(
+  folder_path: str,
+):
   image_path = os.path.join(folder_path, IMAGE_FILENAME)
 
   if not os.path.exists(image_path):

@@ -35,7 +35,9 @@ def main():
 
   process_directory(input_path)
 
-def process_directory(dir_path):
+def process_directory(
+  dir_path: str,
+):
   mutagen_files = []
   ffmpeg_files = []
 
@@ -65,10 +67,15 @@ def process_directory(dir_path):
     shutil.rmtree(tmp_dir, ignore_errors = True)
     logger.success('Finished generating video covers.')
 
-def get_ext(file_path):
+def get_ext(
+  file_path: str,
+):
   return os.path.splitext(file_path)[1].lower()
 
-def process_file(file_path, tmp_dir):
+def process_file(
+  file_path: str,
+  tmp_dir: str,
+):
   name = os.path.basename(file_path)
   stem = os.path.splitext(name)[0]
   ext = get_ext(file_path)
@@ -105,7 +112,10 @@ def process_file(file_path, tmp_dir):
   except Exception as ex:
     tqdm.write(f'  Failed: {ex}')
 
-def embed_cover_mutagen(file_path, cover_path):
+def embed_cover_mutagen(
+  file_path: str,
+  cover_path: str,
+):
   with open(cover_path, 'rb') as f:
     data = f.read()
   ext = get_ext(file_path)
@@ -119,7 +129,12 @@ def embed_cover_mutagen(file_path, cover_path):
     tags.save()
 
 
-def embed_cover_ffmpeg(file_path, cover_path, out_path, ext):
+def embed_cover_ffmpeg(
+  file_path: str,
+  cover_path: str,
+  output_path: str,
+  ext: str,
+):
   if ext == '.mkv':
     cmd = [
       'ffmpeg', '-y',
@@ -129,7 +144,7 @@ def embed_cover_ffmpeg(file_path, cover_path, out_path, ext):
       '-metadata:s:t:0', 'mimetype=image/jpeg',
       '-metadata:s:t:0', 'filename=cover.jpg',
       '-c', 'copy',
-      out_path
+      output_path
     ]
   else:
     cmd = [
@@ -141,14 +156,16 @@ def embed_cover_ffmpeg(file_path, cover_path, out_path, ext):
       '-map', '1',
       '-c', 'copy',
       '-disposition:v:1', 'attached_pic',
-      out_path
+      output_path
     ]
 
   result = subprocess.run(cmd, capture_output = True)
   if result.returncode != 0:
     raise RuntimeError(result.stderr.decode(errors = 'replace'))
 
-def get_video_info(file_path):
+def get_video_info(
+  file_path: str,
+):
   try:
     result = subprocess.run(
       [
@@ -165,7 +182,9 @@ def get_video_info(file_path):
   except Exception:
     return None
 
-def crop_to_16_9(img):
+def crop_to_16_9(
+  img: Image.Image,
+):
   w, h = img.size
   if w / h > 16 / 9:
     new_w = int(h * 16 / 9)
@@ -173,7 +192,10 @@ def crop_to_16_9(img):
     img = img.crop((x, 0, x + new_w, h))
   return img
 
-def crop_black_borders(img, threshold=10):
+def crop_black_borders(
+  img: Image.Image,
+  threshold=10,
+):
   arr = np.array(img)
   mask = arr.max(axis=2) > threshold
   rows = np.any(mask, axis=1)
@@ -184,7 +206,11 @@ def crop_black_borders(img, threshold=10):
   x0, x1 = np.where(cols)[0][[0, -1]]
   return img.crop((x0, y0, x1 + 1, y1 + 1))
 
-def capture_frame(file_path, seek_secs, output_path):
+def capture_frame(
+  file_path: str,
+  seek_secs: float,
+  output_path: str,
+):
   subprocess.run(
     [
       'ffmpeg', '-y',
@@ -202,7 +228,9 @@ def capture_frame(file_path, seek_secs, output_path):
   if not os.path.exists(output_path):
     raise RuntimeError(f'Failed to extract frame from: {os.path.basename(file_path)}')
 
-def format_duration(secs):
+def format_duration(
+  secs: float,
+):
   secs = int(secs)
   h = secs // 3600
   m = (secs % 3600) // 60
@@ -211,12 +239,18 @@ def format_duration(secs):
     return f'{h}:{m:02d}:{s:02d}'
   return f'{m}:{s:02d}'
 
-def format_size(size_bytes):
+def format_size(
+  size_bytes: int,
+):
   if size_bytes >= 1024 ** 3:
     return f'{round(size_bytes / (1024 ** 3), 2)} GB'
   return f'{round(size_bytes / (1024 ** 2))} MB'
 
-def draw_stats_overlay(img, duration_secs, file_size):
+def draw_stats_overlay(
+  img: Image.Image,
+  duration_secs: float,
+  file_size: int,
+):
   draw = ImageDraw.Draw(img, 'RGBA')
 
   try:
@@ -232,7 +266,13 @@ def draw_stats_overlay(img, duration_secs, file_size):
   return img.convert('RGB')
 
 
-def draw_label(draw, font, text, side, img_w):
+def draw_label(
+  draw: ImageDraw.ImageDraw,
+  font: ImageFont.FreeTypeFont,
+  text: str,
+  side: str,
+  img_w: int,
+):
   bb = draw.textbbox((0, 0), text, font=font)
   tw = bb[2] - bb[0]
   th = bb[3] - bb[1]

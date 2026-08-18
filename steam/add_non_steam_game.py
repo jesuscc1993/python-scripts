@@ -82,15 +82,23 @@ def main():
     grid_path = Path(STEAM_INSTALL_PATH, 'userdata', STEAM_USER_ID3, 'config', 'grid')
     download_assets_for_app_id(app_id, grid_path, entry['appid'])
 
-def generate_app_id(exe):
-  key = exe.encode('utf-8')
+def generate_app_id(
+  exe_path: str,
+):
+  key = exe_path.encode('utf-8')
   return binascii.crc32(key) | 0x80000000
 
-def read_cstring(data, offset):
+def read_cstring(
+  data: bytes,
+  offset: int,
+):
   end = data.index(b'\x00', offset)
   return data[offset:end].decode('utf-8'), end + 1
 
-def parse_object(data, offset = 0):
+def parse_object(
+  data: bytes,
+  offset = 0,
+):
   obj = {}
 
   while True:
@@ -114,7 +122,9 @@ def parse_object(data, offset = 0):
 
     obj[key] = value
 
-def serialize_object(obj):
+def serialize_object(
+  obj: dict,
+):
   result = bytearray()
   for key, value in obj.items():
     key_bytes = key.encode('utf-8') + b'\x00'
@@ -129,30 +139,34 @@ def serialize_object(obj):
   result += bytes([TYPE_END])
   return bytes(result)
 
-def get_shortcut_info(path):
-  path = Path(path)
+def get_shortcut_info(
+  file_path: str,
+):
+  file_path = Path(file_path)
 
-  match path.suffix.lower():
+  match file_path.suffix.lower():
     case '.lnk':
-      info = get_lnk_info(path)
+      info = get_lnk_info(file_path)
     case '.url':
-      info = get_url_info(path)
+      info = get_url_info(file_path)
     case _:
-      raise ValueError(f'Unsupported shortcut type: {path.suffix}')
+      raise ValueError(f'Unsupported shortcut type: {file_path.suffix}')
 
-  logger.debug(f'Parsed shortcut "{path}":\n{stringify(info)}\n')
+  logger.debug(f'Parsed shortcut "{file_path}":\n{stringify(info)}\n')
   return info
 
-def get_lnk_info(path):
+def get_lnk_info(
+  file_path: str,
+):
   link = pythoncom.CoCreateInstance(
     shell.CLSID_ShellLink,
     None,
     pythoncom.CLSCTX_INPROC_SERVER,
     shell.IID_IShellLink
   )
-  link.QueryInterface(pythoncom.IID_IPersistFile).Load(str(path))
+  link.QueryInterface(pythoncom.IID_IPersistFile).Load(str(file_path))
 
-  name = Path(path).stem
+  name = Path(file_path).stem
   target = link.GetPath(0)[0]
   icon, _ = link.GetIconLocation()
   icon = icon or target
@@ -163,12 +177,14 @@ def get_lnk_info(path):
     'icon': icon,
   }
 
-def get_url_info(path):
+def get_url_info(
+  file_path: str,
+):
   cfg = configparser.ConfigParser(interpolation = None)
-  cfg.read(path, encoding = 'utf-8')
+  cfg.read(file_path, encoding = 'utf-8')
   shortcut = cfg['InternetShortcut']
 
-  name = Path(path).stem
+  name = Path(file_path).stem
   target = shortcut.get('URL', '')
   icon = shortcut.get('IconFile', '') or target
 
@@ -178,7 +194,9 @@ def get_url_info(path):
     'target': target,
   }
 
-def stringify(obj):
+def stringify(
+  obj: dict,
+):
   return json.dumps(obj, indent = 2)
 
 if __name__ == '__main__':

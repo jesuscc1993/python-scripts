@@ -37,13 +37,17 @@ def main():
 
   process_root(folder, img_path, img_spot)
 
-def process_root(folder: str, img_path: str, img_spot: int):
-  logger.log(f'Deleting image matches for "{folder}"...')
+def process_root(
+  folder_path: str,
+  img_path: str,
+  img_spot: int,
+):
+  logger.log(f'Deleting image matches for "{folder_path}"...')
 
   ref_hash = imagehash.phash(Image.open(img_path))
   chapter_folders = sorted([
-    os.path.join(folder, d) for d in os.listdir(folder)
-    if os.path.isdir(os.path.join(folder, d))
+    os.path.join(folder_path, d) for d in os.listdir(folder_path)
+    if os.path.isdir(os.path.join(folder_path, d))
   ])
 
   deleted = 0
@@ -56,7 +60,11 @@ def process_root(folder: str, img_path: str, img_spot: int):
   else:
     logger.success(f'Deleted {deleted} image {"match" if deleted == 1 else "matches"}.')
 
-def process_chapter(chapter_folder: str, ref_hash: imagehash.ImageHash, img_spot: int):
+def process_chapter(
+  chapter_folder: str,
+  ref_hash: imagehash.ImageHash,
+  img_spot: int,
+):
   last_img = get_image_by_spot(chapter_folder, img_spot)
   if not last_img:
     return
@@ -67,16 +75,19 @@ def process_chapter(chapter_folder: str, ref_hash: imagehash.ImageHash, img_spot
     return True
   return False
 
-def get_image_by_spot(folder, spot):
+def get_image_by_spot(
+  folder_path: str,
+  spot: int,
+):
   images = sorted([
-    f for f in os.listdir(folder)
+    f for f in os.listdir(folder_path)
     if os.path.splitext(f)[1].lstrip('.').lower() in IMAGE_EXTENSIONS
   ])
   if not images:
     return None
   if spot == -1:
-    return os.path.join(folder, images[-1])
-  return os.path.join(folder, images[spot - 1])
+    return os.path.join(folder_path, images[-1])
+  return os.path.join(folder_path, images[spot - 1])
 
 if __name__ == '__main__':
   try:

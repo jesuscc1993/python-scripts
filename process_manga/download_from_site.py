@@ -29,7 +29,11 @@ def main():
   logger.success(f'Finished downloading from "{base_url}".\n')
   main()
 
-def download_all_chapters(base_url, css_selector, chapter_count):
+def download_all_chapters(
+  base_url: str,
+  css_selector: str,
+  chapter_count: int,
+):
   files_to_process = range(1, chapter_count + 1)
 
   with ThreadPoolExecutor() as executor, tqdm(total = len(files_to_process), desc='Downloading Chapters') as progress:
@@ -39,7 +43,11 @@ def download_all_chapters(base_url, css_selector, chapter_count):
       future.result()
       progress.update(1)
 
-def download_images_from_chapter(base_url, css_selector, chapter_number):
+def download_images_from_chapter(
+  base_url: str,
+  css_selector: str,
+  chapter_number: int,
+):
   chapter_url = base_url % tuple([chapter_number] * base_url.count('%s'))
   folder = f'downloads/Ch.{pad_string(chapter_number)}'
 
@@ -67,7 +75,10 @@ def download_images_from_chapter(base_url, css_selector, chapter_number):
   except Exception as ex:
     logger.error(f'Could not download chapter {chapter_number}:\n{ex}')
 
-def pad_string(string, width = 3):
+def pad_string(
+  string: str,
+  width = 3,
+):
   return str(string).zfill(width)
 
 if __name__ == '__main__':

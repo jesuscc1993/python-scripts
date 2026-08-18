@@ -38,25 +38,37 @@ canvas.create_image(0, 0, anchor = 'nw', image = photo_image)
 
 root.lift()
 
-def start_root_drag(ev):
+def start_root_drag(
+  ev,
+):
   root.x_offset = ev.x
   root.y_offset = ev.y
 
-def drag_root(_):
+def drag_root(
+  _,
+):
   x = root.winfo_pointerx() - root.x_offset
   y = root.winfo_pointery() - root.y_offset
   root.geometry(f'+{x}+{y}')
 
-def reset_root_position(_):
+def reset_root_position(
+  _,
+):
   root.geometry(f'{width}x{height}+0+0')
 
-def hide_root(_):
+def hide_root(
+  _,
+):
   root.attributes('-alpha', 0.0)
 
-def show_root(_):
+def show_root(
+  _,
+):
   root.attributes('-alpha', 1.0)
 
-def destroy_root(_):
+def destroy_root(
+  _,
+):
   root.destroy()
 
 root.bind('<KeyPress-Control_L>', hide_root)

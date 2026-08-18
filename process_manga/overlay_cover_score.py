@@ -56,10 +56,14 @@ def main():
 
   logger.success(f'Finished overlaying scores in "{parent_dir}".')
 
-def tqdm_dim(msg):
+def tqdm_dim(
+  msg: str,
+):
   tqdm.write(logger.formatTrace(msg))
 
-def find_font(name):
+def find_font(
+  name: str,
+):
   user_fonts = os.path.join(os.environ.get('LOCALAPPDATA', ''), 'Microsoft', 'Windows', 'Fonts', name)
   if os.path.exists(user_fonts):
     return user_fonts
@@ -70,7 +74,10 @@ def find_font(name):
 
   return None
 
-def process_dir(dir, font):
+def process_dir(
+  dir: str,
+  font: ImageFont.FreeTypeFont,
+):
   dir_name = os.path.basename(dir)
   cover_img = os.path.join(dir, COVER_NAME)
   cover_bak_img = os.path.join(dir, COVER_BAK_NAME)
@@ -87,7 +94,13 @@ def process_dir(dir, font):
 
   process_cover(dir, cover_img, cover_bak_img, score, font)
 
-def process_cover(dir, cover_img, cover_bak_img, score, font):
+def process_cover(
+  dir: str,
+  cover_img: str,
+  cover_bak_img: str,
+  score: int,
+  font: ImageFont.FreeTypeFont,
+):
   if not os.path.exists(cover_bak_img):
     shutil.copy(cover_img, cover_bak_img)
 
@@ -99,14 +112,22 @@ def process_cover(dir, cover_img, cover_bak_img, score, font):
 
   tqdm.write(logger.formatDebug(f'Applied score overlay to "{os.path.basename(dir)}".'))
 
-def resize_cover(img, target_w, target_h):
+def resize_cover(
+  img: Image.Image,
+  target_w: int,
+  target_h: int,
+):
   scale = max(target_w / img.width, target_h / img.height)
   img = img.resize((round(img.width * scale), round(img.height * scale)), Image.LANCZOS)
   left = (img.width - target_w) // 2
   top = (img.height - target_h) // 2
   return img.crop((left, top, left + target_w, top + target_h))
 
-def overlay_score(img, score, font):
+def overlay_score(
+  img: Image.Image,
+  score: int,
+  font: ImageFont.FreeTypeFont,
+):
   text = format_score(score)
   bg_color = get_score_color(score)
 
@@ -129,11 +150,15 @@ def overlay_score(img, score, font):
 
   return Image.alpha_composite(img, overlay).convert('RGB')
 
-def format_score(score):
+def format_score(
+  score: int,
+):
   return f'{math.ceil(score)}%'
   # return f'{math.ceil(score) / 10:.1f}'
 
-def get_score_color(score):
+def get_score_color(
+  score: int,
+):
   if score < VALUE_LOW: return BG_LOWEST
   if score < VALUE_MEDIUM: return BG_LOW
   elif score < VALUE_HIGH: return BG_MEDIUM

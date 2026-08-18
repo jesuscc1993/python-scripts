@@ -25,8 +25,10 @@ def main():
 
   logger.success(f'Finished suffixing scores in "{parent_dir}".')
 
-def process_dir(dir):
-  dir_name = os.path.basename(dir)
+def process_dir(
+  dir_path: str,
+):
+  dir_name = os.path.basename(dir_path)
 
   if re.search(r'\{\d{1,3}\}', dir_name):
     logger.trace(f'Skipping "{dir_name}". Already has a score suffix.')
@@ -68,10 +70,10 @@ def process_dir(dir):
 
       result = results[(int(choice) - 1) if choice else 0]
 
-    new_name = f'{dir_name} {{{result.score_int}}}'
-    new_path = os.path.join(os.path.dirname(dir), new_name)
-    os.rename(dir, new_path)
-    logger.success(f'Renamed "{dir_name}" -> "{new_name}".')
+    new_dir_name = f'{dir_name} {{{result.score_int}}}'
+    new_dir_path = os.path.join(os.path.dirname(dir_path), new_dir_name)
+    os.rename(dir_path, new_dir_path)
+    logger.success(f'Renamed "{dir_name}" -> "{new_dir_name}".')
   except Exception as ex:
     logger.error(f'Error processing "{dir_name}": {ex}')
 

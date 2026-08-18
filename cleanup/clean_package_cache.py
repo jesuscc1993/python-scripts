@@ -9,7 +9,10 @@ def main():
   clear_cache_for_package_manager("yarn", ["cache", "clean"])
   clear_cache_for_package_manager("pip", ["cache", "purge"])
 
-def clear_cache_for_package_manager(cmd, args):
+def clear_cache_for_package_manager(
+  cmd: str,
+  args: list,
+):
   exe = shutil.which(cmd)
   if exe:
     try:

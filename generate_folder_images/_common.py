@@ -5,10 +5,13 @@ import winsound
 from PIL import Image
 from mtlogger import logger
 from mtprompt import Prompt
+from typing import Callable
 
 from _constants import FOLDER_IMAGE_FILENAME, FOLDER_IMAGE_SIZE
 
-def process_parent_folder(process_folder):
+def process_parent_folder(
+  process_folder: Callable,
+):
   if len(sys.argv) > 1:
     parent_folder = sys.argv[1]
   else:
@@ -38,10 +41,17 @@ def process_parent_folder(process_folder):
   winsound.MessageBeep()
   logger.log(f'Finished generating cover images.')
 
-def resize_image(img, w, h):
+def resize_image(
+  img: Image.Image,
+  w: int,
+  h: int,
+):
   return img.resize((w, h), Image.LANCZOS)
 
-def save_resized_image(img, folder_path):
+def save_resized_image(
+  img: Image.Image,
+  folder_path: str,
+):
   original_width, original_height = img.size
 
   if original_width > FOLDER_IMAGE_SIZE and original_height > FOLDER_IMAGE_SIZE:

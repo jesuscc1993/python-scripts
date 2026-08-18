@@ -15,7 +15,9 @@ SEARCH_URL = 'https://cdromance.org/?s={game_id}'
 def main():
   process_parent_folder(process_folder)
 
-def process_folder(folder_path):
+def process_folder(
+  folder_path: str,
+):
   match = re.match(r'([A-Za-z]+\d+)', os.path.basename(os.path.normpath(folder_path)))
 
   if match:
@@ -27,7 +29,10 @@ def process_folder(folder_path):
 
   download_game_cover(game_id, folder_path)
 
-def download_game_cover(game_id, folder_path):
+def download_game_cover(
+  game_id: str,
+  folder_path: str,
+):
   try:
     search_url = SEARCH_URL.format(game_id = game_id)
     response = requests.get(search_url)

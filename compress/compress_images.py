@@ -22,32 +22,40 @@ def main():
   compress_child_images(parent_dir, lossless, quality)
   logger.success(f'Compressed images in "{parent_dir}".')
 
-def compress_child_images(parent_dir, lossless, quality):
+def compress_child_images(
+  parent_dir_path: str,
+  lossless: bool,
+  quality: int,
+):
   files_to_process = []
 
-  for root, _, files in os.walk(parent_dir):
+  for root, _, files in os.walk(parent_dir_path):
     for file in files:
       ext = os.path.splitext(file)[1].lower()
       if is_image_file(file) and ext != output_ext:
         file_path = os.path.join(root, file)
         files_to_process.append(file_path)
 
-  with ThreadPoolExecutor() as executor, tqdm(total = len(files_to_process), desc = f'Processing "{parent_dir}"') as progress:
-    for _ in executor.map(lambda file_path: compress_image(file_path, lossless, quality), files_to_process):
+  with ThreadPoolExecutor() as executor, tqdm(total = len(files_to_process), desc = f'Processing "{parent_dir_path}"') as progress:
+    for _ in executor.map(lambda img_path: compress_image(img_path, lossless, quality), files_to_process):
       progress.update(1)
 
-def compress_image(file_path, lossless, quality):
+def compress_image(
+  img_path: str,
+  lossless: bool,
+  quality: int,
+):
   try:
-    name, ext = os.path.splitext(file_path)
+    name, ext = os.path.splitext(img_path)
     backup_path = f'{name}{BAK_EXTENSION}{ext.lower()}'
     output_path = f'{name}{output_ext}'
 
-    os.rename(file_path, backup_path)
+    os.rename(img_path, backup_path)
 
     with Image.open(backup_path) as img:
       if output_ext == WEBP_EXTENSION:
         if img.width > WEBP_DIMENSION_LIMIT or img.height > WEBP_DIMENSION_LIMIT:
-          logger.warn(f'Skipping "{file_path}" as the image\'s dimensions ({img.width}px x {img.height}px) exceed WebP\'s limit of {WEBP_DIMENSION_LIMIT}px.')
+          logger.warn(f'Skipping "{img_path}" as the image\'s dimensions ({img.width}px x {img.height}px) exceed WebP\'s limit of {WEBP_DIMENSION_LIMIT}px.')
           return
 
       img.save(
@@ -61,10 +69,10 @@ def compress_image(file_path, lossless, quality):
       os.remove(backup_path)
     else:
       os.remove(output_path)
-      os.rename(backup_path, file_path)
+      os.rename(backup_path, img_path)
 
   except Exception as ex:
-    logger.error(f'Failed to compress "{file_path}":\n{ex}')
+    logger.error(f'Failed to compress "{img_path}":\n{ex}')
 
 if __name__ == '__main__':
   try:

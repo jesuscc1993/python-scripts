@@ -25,10 +25,13 @@ def main():
   except ValueError as ex:
     logger.error(ex)
 
-def backup_updated_files(src_path, dest_path):
-  for src_dir, _, files in os.walk(src_path):
-    relative_path = os.path.relpath(src_dir, src_path)
-    dest_dir = os.path.join(dest_path, relative_path)
+def backup_updated_files(
+  src_dir_path: str,
+  dest_dir_path: str,
+):
+  for src_dir, _, files in os.walk(src_dir_path):
+    relative_path = os.path.relpath(src_dir, src_dir_path)
+    dest_dir = os.path.join(dest_dir_path, relative_path)
     os.makedirs(dest_dir, exist_ok = True)
 
     for file in files:

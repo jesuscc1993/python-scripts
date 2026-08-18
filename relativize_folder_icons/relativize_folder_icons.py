@@ -15,10 +15,14 @@ def main():
   )
   process_subfolders(parent_folder, recursive, is_root = True)
 
-def process_subfolders(base_path, recursive, is_root = False):
-  logger.log(f'Processing "{base_path}"...')
+def process_subfolders(
+  base_folder_path: str,
+  recursive: bool,
+  is_root = False,
+):
+  logger.log(f'Processing "{base_folder_path}"...')
 
-  for root, dirs, files in os.walk(base_path):
+  for root, dirs, files in os.walk(base_folder_path):
     if is_root and 'desktop.ini' in files:
       process_folder(root)
 
@@ -27,9 +31,11 @@ def process_subfolders(base_path, recursive, is_root = False):
         subfolder_path = os.path.join(root, dir)
         process_subfolders(subfolder_path, recursive)
 
-  logger.success(f'Finished processing "{base_path}".')
+  logger.success(f'Finished processing "{base_folder_path}".')
 
-def process_folder(folder_path):
+def process_folder(
+  folder_path: str,
+):
   desktop_ini_path = os.path.join(folder_path, 'desktop.ini')
   if not os.path.isfile(desktop_ini_path):
     return

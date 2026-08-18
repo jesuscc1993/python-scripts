@@ -17,7 +17,9 @@ def main():
 
   generate_shortcuts(binaries, roms_by_platform, out_dir)
 
-def find_binaries(binaries_dir):
+def find_binaries(
+  binaries_dir: str,
+):
   binaries = {}
   if not os.path.isdir(binaries_dir):
     logger.warn(f'Binaries directory does not exist: {binaries_dir}')
@@ -40,7 +42,9 @@ def find_binaries(binaries_dir):
 
   return binaries
 
-def find_roms(roms_dir):
+def find_roms(
+  roms_dir: str,
+):
   roms_by_platform = {}
   if not os.path.isdir(roms_dir):
     logger.warn(f'ROMs directory does not exist: {roms_dir}')
@@ -68,7 +72,11 @@ def find_roms(roms_dir):
 
   return roms_by_platform
 
-def generate_shortcuts(binaries, roms_by_platform, out_dir):
+def generate_shortcuts(
+  binaries: dict,
+  roms_by_platform: dict,
+  out_dir: str,
+):
   for platform, roms in roms_by_platform.items():
     binary = find_binary_for_platform(platform, binaries)
     if not binary:
@@ -79,7 +87,10 @@ def generate_shortcuts(binaries, roms_by_platform, out_dir):
     os.makedirs(platform_out_dir, exist_ok=True)
     generate_shortcuts_for_platform(binary, roms, platform_out_dir)
 
-def find_binary_for_platform(platform, binaries):
+def find_binary_for_platform(
+  platform: str,
+  binaries: dict,
+):
   platform_key = platform.lower()
 
   binary_names_for_platform = BINARY_BY_PLATFORM.get(platform_key)
@@ -97,11 +108,19 @@ def find_binary_for_platform(platform, binaries):
 
   return None
 
-def generate_shortcuts_for_platform(binary, roms, out_dir):
+def generate_shortcuts_for_platform(
+  binary: str,
+  roms: list,
+  out_dir: str,
+):
   for rom in roms:
     generate_rom_shortcut(binary, rom, out_dir)
 
-def generate_rom_shortcut(binary, rom, out_dir):
+def generate_rom_shortcut(
+  binary: str,
+  rom: str,
+  out_dir: str,
+):
   try:
     rom_name = os.path.splitext(os.path.basename(rom))[0]
     # rom_name = re.sub(r'\[.*?\]', '', rom_name)

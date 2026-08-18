@@ -49,7 +49,9 @@ def main():
       download_assets_for_app_id(selected.get('id'), os.path.join(os.getcwd(), OUTPUT_FOLDER))
       break
 
-def search_game(name):
+def search_game(
+  name: str,
+):
   params = SEARCH_PARAMS.copy()
   params['term'] = name
 

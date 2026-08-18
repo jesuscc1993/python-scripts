@@ -13,25 +13,29 @@ def main():
   else:
     select_parent_folder('Enter the path to the parent folder containing the folders or images you want to resize:\n', process_parent_folder)
 
-def process_parent_folder(folder_path):
+def process_parent_folder(
+  folder_path: str,
+):
   process_folder_images(folder_path, process_image)
 
   logger.success(f'Finished resizing images in "{folder_path}".')
 
-def process_image(original_path):
+def process_image(
+  img_path: str,
+):
   try:
-    with Image.open(original_path) as img:
+    with Image.open(img_path) as img:
       needs_resizing = image_needs_resizing(img)
-      needs_compression = not is_image_optimally_compressed(original_path)
+      needs_compression = not is_image_optimally_compressed(img_path)
 
       if needs_resizing:
         img = resize_image(img)
 
       if needs_resizing or needs_compression:
-        save_image_to_path(img, original_path)
+        save_image_to_path(img, img_path)
 
   except Exception as ex:
-    logger.error(f'Error processing "{original_path}":\n{ex}')
+    logger.error(f'Error processing "{img_path}":\n{ex}')
 
 if __name__ == '__main__':
   try:

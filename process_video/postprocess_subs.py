@@ -21,7 +21,9 @@ def main():
   else:
     process_directory(input_path)
 
-def process_file(file_path):
+def process_file(
+  file_path: str,
+):
   file_name = os.path.basename(file_path)
   ext = os.path.splitext(file_name)[1].lower()
   if ext != SUBTITLE_EXT:
@@ -32,7 +34,9 @@ def process_file(file_path):
   add_missing_spaces(dest_file_path)
   logger.log(f'Fixed subtitles for "{file_name}".')
 
-def process_directory(dir_path):
+def process_directory(
+  dir_path: str,
+):
   for file_name in os.listdir(dir_path):
     process_file(os.path.join(dir_path, file_name))
 

@@ -80,11 +80,16 @@ def main():
       f.write(content)
       logger.log(f'Created manifest for "{game}" -> {filepath}')
 
-def get_owned_games(api_key, steam_id):
+def get_owned_games(
+  api_key: str,
+  steam_id: str,
+):
   url = f'https://api.steampowered.com/IPlayerService/GetOwnedGames/v1/?key={api_key}&steamid={steam_id}&include_appinfo=true'
   return requests.get(url).json().get('response', {}).get('games', [])
 
-def sanitize_name(name):
+def sanitize_name(
+  name: str,
+):
   return re.sub(r'[^a-zA-Z0-9 _\-]', '', name).strip().lower()
 
 if __name__ == '__main__':

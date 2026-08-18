@@ -19,16 +19,22 @@ def main():
 
   process_parent_folder(parent_folder)
 
-def process_parent_folder(parent_folder):
-  pdf_files = list(Path(parent_folder).glob('*.pdf'))
+def process_parent_folder(
+  parent_folder_path: str,
+):
+  pdf_files = list(Path(parent_folder_path).glob('*.pdf'))
   if not pdf_files:
-    logger.warn(f'No PDF files found in "{parent_folder}".')
+    logger.warn(f'No PDF files found in "{parent_folder_path}".')
     return
 
   for pdf_file in pdf_files:
-    pdf_to_webp(parent_folder, str(pdf_file))
+    pdf_to_webp(parent_folder_path, str(pdf_file))
 
-def process_page(pdf_document, page_number, output_path):
+def process_page(
+  pdf_document: pymupdf.Document,
+  page_number: int,
+  output_path: str,
+):
   page = pdf_document.load_page(page_number)
   matrix = pymupdf.Matrix(RESOLUTION_SCALE, RESOLUTION_SCALE)
   pixmap = page.get_pixmap(matrix = matrix)
@@ -38,9 +44,12 @@ def process_page(pdf_document, page_number, output_path):
   img.save(img_path, OUTPUT_FORMAT, quality = OUTPUT_QUALITY)
   logger.log(f'Saved: "{img_path}".')
 
-def pdf_to_webp(parent_folder, pdf_path):
+def pdf_to_webp(
+  parent_folder_path: str,
+  pdf_path: str,
+):
   pdf_name = Path(pdf_path).stem
-  output_path = os.path.join(parent_folder, pdf_name)
+  output_path = os.path.join(parent_folder_path, pdf_name)
   os.makedirs(output_path, exist_ok = True)
 
   pdf_document = pymupdf.open(pdf_path)

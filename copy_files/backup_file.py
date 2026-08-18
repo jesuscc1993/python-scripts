@@ -26,7 +26,9 @@ def main():
   else:
     backup_file(og_file_path)
 
-def backup_file(og_file_path):
+def backup_file(
+  og_file_path: str,
+):
   og_dir_path = os.path.dirname(og_file_path)
   og_file_name = os.path.basename(og_file_path)
   og_file_stem, src_file_ext = os.path.splitext(og_file_name)

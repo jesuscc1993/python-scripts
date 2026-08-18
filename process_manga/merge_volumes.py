@@ -15,18 +15,20 @@ def main():
   else:
     select_parent_folder('Enter the path to the parent folder containing the volume folders you want to merge:\n', process_parent_folder)
 
-def process_parent_folder(parent_dir):
+def process_parent_folder(
+  parent_folder_path: str,
+):
   files_to_process = []
 
-  for folder in os.listdir(parent_dir):
-    folder_path = os.path.join(parent_dir, folder)
+  for folder in os.listdir(parent_folder_path):
+    folder_path = os.path.join(parent_folder_path, folder)
     if os.path.isdir(folder_path):
       volume, chapter = get_volume_and_chapter(folder)
       if volume is None or chapter is None:
         tqdm.write(logger.formatWarn(f'Skipping "{folder}". Volume or chapter numbers could not be inferred.'))
         continue
 
-      output_path = os.path.join(parent_dir, f'Vol.{zfill_float(volume, 2)}')
+      output_path = os.path.join(parent_folder_path, f'Vol.{zfill_float(volume, 2)}')
       if not os.path.exists(output_path):
         os.makedirs(output_path)
 
@@ -35,21 +37,25 @@ def process_parent_folder(parent_dir):
         if os.path.isfile(src):
           files_to_process.append((src, output_path, get_sanitized_chapter(chapter)))
 
-  with ThreadPoolExecutor() as executor, tqdm(total = len(files_to_process), desc = f'Processing "{parent_dir}"') as progress:
+  with ThreadPoolExecutor() as executor, tqdm(total = len(files_to_process), desc = f'Processing "{parent_folder_path}"') as progress:
     for _ in executor.map(process_file, files_to_process):
       progress.update(1)
 
-  delete_empty_folders(parent_dir)
+  delete_empty_folders(parent_folder_path)
 
-  logger.success(f'Finished merging volumes in "{parent_dir}".')
+  logger.success(f'Finished merging volumes in "{parent_folder_path}".')
 
-def get_sanitized_chapter(chapter):
+def get_sanitized_chapter(
+  chapter: str,
+):
   parts = zfill_float(chapter, 3).split('.')
   name = parts[0]
   if len(parts) > 1: name += chr(ord('a') + int(parts[1]) - 1)
   return name
 
-def process_file(params):
+def process_file(
+  params: tuple,
+):
   src, target_folder, chapter = params
   base, ext = os.path.splitext(os.path.basename(src))
   new_name = f'ch{chapter}_p{base}{ext}'

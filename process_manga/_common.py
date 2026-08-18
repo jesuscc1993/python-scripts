@@ -7,6 +7,7 @@ from concurrent.futures import ThreadPoolExecutor
 from mtlogger import logger
 from mtprompt import Prompt
 from tqdm import tqdm
+from typing import Callable
 
 from _image_utils import is_image_file
 
@@ -27,7 +28,11 @@ CHAPTER_NUMBER_REGEX  = rf'{CHAPTER_REGEX}{NUMBER_REGEX}'
 ITEM_EXTENSIONS = ['cbz', 'zip']
 IMAGE_EXTENSIONS = ['webp', 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'tif']
 
-def select_parent_folder(prompt, callback, options = {}):
+def select_parent_folder(
+  prompt: str,
+  callback: Callable,
+  options: dict = {},
+):
   prompt = prompt or 'Enter the path to the parent folder you want to process:\n'
   log_success = options.get('log_success', False)
   loop = options.get('loop', True)
@@ -50,7 +55,10 @@ def select_parent_folder(prompt, callback, options = {}):
   else:
     Prompt.enter_to_exit()
 
-def process_folder_images(folder_path, callback):
+def process_folder_images(
+  folder_path: str,
+  callback: Callable,
+):
   files_to_process = []
 
   for root, _, files in os.walk(folder_path):
@@ -63,7 +71,9 @@ def process_folder_images(folder_path, callback):
     for _ in executor.map(callback, files_to_process):
       progress.update(1)
 
-def delete_empty_folders(folder_path):
+def delete_empty_folders(
+  folder_path: str,
+):
   for root, dirs, _ in os.walk(folder_path, topdown = False):
     for dir_name in dirs:
       dir_path = os.path.join(root, dir_name)
@@ -72,19 +82,26 @@ def delete_empty_folders(folder_path):
       except OSError:
         pass
 
-def get_volume_and_chapter(filename):
+def get_volume_and_chapter(
+  filename: str,
+):
   vol_match = re.search(VOLUME_NUMBER_REGEX, filename, re.IGNORECASE)
   ch_match = re.search(CHAPTER_NUMBER_REGEX, filename, re.IGNORECASE)
   volume = float(vol_match.group(1)) if vol_match else None
   chapter = float(ch_match.group(1)) if ch_match else None
   return (volume, chapter)
 
-def get_chapter(filename):
+def get_chapter(
+  filename: str,
+):
   ch_match = re.search(CHAPTER_NUMBER_REGEX, filename, re.IGNORECASE)
   chapter = ch_match.group(1) if ch_match else None
   return chapter
 
-def run_scripts_in_sequence(script_names, parent_folder):
+def run_scripts_in_sequence(
+  script_names: list,
+  parent_folder_path: str,
+):
   env = os.environ.copy()
   env['NO_ENTER_TO_EXIT'] = '1'
 
@@ -92,13 +109,16 @@ def run_scripts_in_sequence(script_names, parent_folder):
     abs_path = os.path.abspath(os.path.join(os.path.dirname(__file__), script + '.py'))
 
     logger.trace(f'\nRunning {script}:')
-    subprocess.run(['python', abs_path, parent_folder], env=env)
+    subprocess.run(['python', abs_path, parent_folder_path], env=env)
 
   logger.info(
-    f'Finished batch running scripts on "{parent_folder}".\n',
+    f'Finished batch running scripts on "{parent_folder_path}".\n',
     prefix_newline=True
   )
 
-def zfill_float(value, width):
+def zfill_float(
+  value: float |str,
+  width: int,
+):
   parts = f'{float(value):g}'.split('.')
   return parts[0].zfill(width) + ('.' + parts[1] if len(parts) > 1 else '')

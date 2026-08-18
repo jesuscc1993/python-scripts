@@ -39,13 +39,16 @@ def prompt_params():
 
   return parent_folder, override_existing
 
-def generate_covers(parent_folder, override_existing):
+def generate_covers(
+  parent_folder_path: str,
+  override_existing: bool,
+):
   logger.log('Generating cover images...')
 
   mapping = load_switch_mapping()
 
-  for folder_name in natsorted(os.listdir(parent_folder)):
-    folder_path = os.path.join(parent_folder, folder_name)
+  for folder_name in natsorted(os.listdir(parent_folder_path)):
+    folder_path = os.path.join(parent_folder_path, folder_name)
 
     if os.path.isdir(folder_path):
       process_folder(folder_path, folder_name, mapping.get(folder_name), override_existing)
@@ -53,7 +56,12 @@ def generate_covers(parent_folder, override_existing):
   winsound.MessageBeep()
   logger.log('\nFinished generating cover images.')
 
-def process_folder(folder_path, folder_name, entry, override_existing):
+def process_folder(
+  folder_path: str,
+  folder_name: str,
+  entry: dict,
+  override_existing: bool,
+):
   formatted_name = folder_name.rjust(ID_LENGTH)
   cover_path = os.path.join(folder_path, FOLDER_IMAGE_FILENAME)
 
@@ -79,20 +87,22 @@ def process_folder(folder_path, folder_name, entry, override_existing):
 
   logger.success(f'[{formatted_name}] Generated cover image.')
 
-def read_cached_mapping(path):
-  if not os.path.exists(path) or time.time() - os.path.getmtime(path) >= CACHE_TTL:
+def read_cached_mapping(
+  file_path: str,
+):
+  if not os.path.exists(file_path) or time.time() - os.path.getmtime(file_path) >= CACHE_TTL:
     return None
 
-  with open(path, 'r', encoding='utf-8') as fh:
+  with open(file_path, 'r', encoding='utf-8') as fh:
     return json.load(fh)
 
 def load_switch_mapping():
   path = os.path.join(os.path.dirname(__file__), 'cache', CACHE_FILENAME)
 
   try:
-    cached = read_cached_mapping(path)
-    if cached is not None:
-      return cached
+    cached_mapping = read_cached_mapping(path)
+    if cached_mapping is not None:
+      return cached_mapping
   except Exception:
     pass
 

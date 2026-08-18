@@ -24,7 +24,9 @@ def main():
   else:
     process_directory(input_path)
 
-def process_file(file_path):
+def process_file(
+  file_path: str,
+):
   file_name = os.path.basename(file_path)
   name, ext = os.path.splitext(file_name)
   if ext.lower() not in VIDEO_EXTS:
@@ -37,11 +39,17 @@ def process_file(file_path):
   dest_file_path = os.path.join(output_path, name + SUBTITLE_EXT)
   extract_subtitles(file_path, dest_file_path, file_name)
 
-def process_directory(dir_path):
+def process_directory(
+  dir_path: str,
+):
   for file_name in os.listdir(dir_path):
     process_file(os.path.join(dir_path, file_name))
 
-def extract_subtitles(src_file_path, dest_file_path, file_name):
+def extract_subtitles(
+  src_file_path: str,
+  dest_file_path: str,
+  file_name: str,
+):
   cmd = [
     'ffmpeg',
     '-i', src_file_path,

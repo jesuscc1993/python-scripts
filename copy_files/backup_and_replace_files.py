@@ -30,20 +30,26 @@ def main():
   except ValueError as ex:
     logger.error(ex)
 
-def rename_and_copy_files(src_path, dest_path, matches_only):
-  files = os.listdir(src_path)
+def rename_and_copy_files(
+  src_dir_path: str,
+  dest_dir_path: str,
+  matches_only: bool,
+):
+  files = os.listdir(src_dir_path)
   if files:
-    os.makedirs(dest_path, exist_ok=True)
+    os.makedirs(dest_dir_path, exist_ok=True)
 
     for filename in files:
-      src_file = os.path.join(src_path, filename)
-      dest_file = os.path.join(dest_path, filename)
+      src_file = os.path.join(src_dir_path, filename)
+      dest_file = os.path.join(dest_dir_path, filename)
       if os.path.isfile(src_file) and (os.path.exists(dest_file) or not matches_only):
         backup_file(dest_file)
         shutil.copy(src_file, dest_file)
-    logger.success(f'Finished copying files from "{src_path}" to "{dest_path}".')
+    logger.success(f'Finished copying files from "{src_dir_path}" to "{dest_dir_path}".')
 
-def backup_file(file_path):
+def backup_file(
+  file_path: str,
+):
   if os.path.isfile(file_path):
     name, ext = os.path.splitext(file_path)
     new_filename = f'{name}.bak{ext}'

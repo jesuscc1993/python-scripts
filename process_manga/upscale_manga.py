@@ -15,10 +15,14 @@ def main():
   else:
     select_parent_folder('Enter the path to the parent folder containing the folders or images you want to upscale:\n', process_parent_folder)
 
-def process_parent_folder(folder_path):
+def process_parent_folder(
+  folder_path: str,
+):
   process_folder_images(folder_path, process_image)
 
-def process_image(file_path):
+def process_image(
+  file_path: str,
+):
   try:
     subprocess.run(
       [

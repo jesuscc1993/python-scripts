@@ -41,15 +41,18 @@ def prompt_params():
 
   return parent_folder, override_existing
 
-def generate_covers(parent_folder, override_existing):
-  if not os.path.isdir(parent_folder):
-    logger.error(f'The specified path "{parent_folder}" is not a directory.')
+def generate_covers(
+  parent_folder_path: str,
+  override_existing: bool,
+):
+  if not os.path.isdir(parent_folder_path):
+    logger.error(f'The specified path "{parent_folder_path}" is not a directory.')
     return
 
   logger.log('Generating cover images...')
 
-  for folder_name in natsorted(os.listdir(parent_folder)):
-    folder_path = os.path.join(parent_folder, folder_name)
+  for folder_name in natsorted(os.listdir(parent_folder_path)):
+    folder_path = os.path.join(parent_folder_path, folder_name)
 
     if os.path.isdir(folder_path):
       process_folder(folder_path, folder_name, override_existing)
@@ -84,10 +87,14 @@ def get_access_token():
 
   return None
 
-def split_camel_case(name):
+def split_camel_case(
+  name: str,
+):
   return re.sub(r'([a-z])([A-Z])', r'\1 \2', name)
 
-def get_cover_image(query):
+def get_cover_image(
+  query: str,
+):
   query = split_camel_case(query)
   access_token = get_access_token()
   body = f'fields name,cover.url; search "{query}"; limit 1;'
@@ -114,7 +121,9 @@ def get_cover_image(query):
 
   return None
 
-def download_image(image_url):
+def download_image(
+  image_url: str,
+):
   try:
     response = requests.get(image_url, timeout=REQ_TIMEOUT)
     response.raise_for_status()
@@ -124,7 +133,10 @@ def download_image(image_url):
 
   return None
 
-def save_image(img, save_path):
+def save_image(
+  img: Image.Image,
+  save_path: str,
+):
   try:
     if img.mode != 'RGB':
       img = img.convert('RGB')
@@ -133,7 +145,11 @@ def save_image(img, save_path):
   except Exception as ex:
     logger.error(f'Could not save "{save_path}":\n{ex}')
 
-def process_folder(folder_path, folder_name, override_existing):
+def process_folder(
+  folder_path: str,
+  folder_name: str,
+  override_existing: bool,
+):
   cover_path = os.path.join(folder_path, FOLDER_IMAGE_FILENAME)
 
   if os.path.exists(cover_path) and not override_existing:

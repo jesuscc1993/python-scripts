@@ -22,10 +22,12 @@ def prompt_parent_folder():
 
   process_parent_folder(parent_folder)
 
-def process_parent_folder(parent_folder):
-  folders_to_process = [parent_folder]
+def process_parent_folder(
+  parent_folder_path: str,
+):
+  folders_to_process = [parent_folder_path]
 
-  with os.scandir(parent_folder) as entries:
+  with os.scandir(parent_folder_path) as entries:
     for entry in entries:
       if entry.is_dir():
         folders_to_process.append(entry.path)
@@ -33,7 +35,9 @@ def process_parent_folder(parent_folder):
   with ThreadPoolExecutor(max_workers=1) as executor:
     executor.map(process_folder, folders_to_process)
 
-def process_folder(folder_path):
+def process_folder(
+  folder_path: str,
+):
   for filename in META_FILES:
     try:
       file_path = os.path.join(folder_path, filename)
@@ -53,7 +57,9 @@ def process_folder(folder_path):
     except Exception as ex:
       logger.error(f'Could not create "{filename}":\n{ex}')
 
-def is_hidden(path: str):
+def is_hidden(
+  path: str,
+):
   return os.lstat(path).st_file_attributes & stat.FILE_ATTRIBUTE_HIDDEN
 
 if __name__ == '__main__':

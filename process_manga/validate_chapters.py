@@ -17,12 +17,14 @@ def main():
       { 'log_success': False }
     )
 
-def process_parent_folder(directory):
-  directory_name = os.path.basename(directory)
+def process_parent_folder(
+  dir_path: str,
+):
+  dir_name = os.path.basename(dir_path)
   found_chapters = set()
   incomplete_chapters = []
 
-  for entry in sorted(os.scandir(directory), key = get_sort_key):
+  for entry in sorted(os.scandir(dir_path), key = get_sort_key):
     chapter = get_chapter(entry.name)
     if chapter:
       found_chapters.add(float(chapter))
@@ -32,19 +34,19 @@ def process_parent_folder(directory):
         incomplete_chapters.append(float(chapter))
 
   if not found_chapters:
-    logger.trace(f'No chapters found in "{directory_name}".')
+    logger.trace(f'No chapters found in "{dir_name}".')
     return
 
   expected_chapters = set(range(1, int(max(found_chapters)) + 1))
   missing_chapters = expected_chapters - found_chapters
   if missing_chapters:
     logger.warn(
-      f'\nChapters missing in "{directory_name}": '
+      f'\nChapters missing in "{dir_name}": '
       f'{" ".join(format_chapter(ch) for ch in sorted(missing_chapters))}'
     )
   else:
     logger.success(
-      f'No chapters found missing in "{directory_name}".',
+      f'No chapters found missing in "{dir_name}".',
       prefix_newline=True
     )
 
@@ -53,11 +55,14 @@ def process_parent_folder(directory):
       f'\nIncomplete chapters ({len(incomplete_chapters)}): [{', '.join(format_chapter(ch) for ch in sorted(incomplete_chapters))}]'
     )
 
-def is_chapter_folder_missing_pages(directory, chapter):
+def is_chapter_folder_missing_pages(
+  dir_path: str,
+  chapter: str,
+):
   pattern = re.compile(r'(\d+)', re.IGNORECASE)
   found_pages = set()
 
-  for entry in os.scandir(directory):
+  for entry in os.scandir(dir_path):
     if entry.is_file():
       match = pattern.search(entry.name)
       if match:
@@ -76,11 +81,15 @@ def is_chapter_folder_missing_pages(directory, chapter):
     )
     return True
 
-def get_sort_key(entry):
+def get_sort_key(
+  entry: os.DirEntry,
+):
   chapter = get_chapter(entry.name)
   return (0, float(chapter)) if chapter is not None else (1, entry.name.lower())
 
-def format_chapter(chapter):
+def format_chapter(
+  chapter: str,
+):
   integer, dot, decimal = f'{float(chapter):g}'.partition('.')
   return f'{int(integer):03d}{dot}{decimal}'
 

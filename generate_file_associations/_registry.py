@@ -10,7 +10,12 @@ HKEY_NAMES = {
   winreg.HKEY_USERS: 'HKEY_USERS',
 }
 
-def add_registry_entry(root, path, name, value):
+def add_registry_entry(
+  root: int,
+  path: str,
+  name: str,
+  value: str,
+):
   try:
     with winreg.CreateKey(root, path) as key:
       winreg.SetValueEx(key, name, 0, winreg.REG_SZ, value)
@@ -18,7 +23,11 @@ def add_registry_entry(root, path, name, value):
   except Exception as ex:
     logger.error(f'Could not add registry entry for "{get_registry_key(root, path)}":\n{ex}')
 
-def delete_registry_entry(root, path, name = None):
+def delete_registry_entry(
+  root: int,
+  path: str,
+  name: str = None,
+):
   try:
     if not name:
       winreg.DeleteKey(root, path)
@@ -32,7 +41,11 @@ def delete_registry_entry(root, path, name = None):
   except Exception as ex:
     logger.error(f'Could not delete registry entry "{get_registry_key(root, path)}":\n{ex}')
 
-def get_registry_value(root, path, name):
+def get_registry_value(
+  root: int,
+  path: str,
+  name: str,
+):
   try:
     with winreg.OpenKey(root, path) as key:
       return winreg.QueryValueEx(key, name)[0]
@@ -42,6 +55,10 @@ def get_registry_value(root, path, name):
     logger.error(f'Could not get value for registry entry "{get_registry_key(root, path, name)}":\n{ex}')
     return None
 
-def get_registry_key(root, path, name = None):
+def get_registry_key(
+  root: int,
+  path: str,
+  name: str = None,
+):
   root_name = HKEY_NAMES.get(root, str(root))
   return f'{root_name}\\{path}' + (f'\\{name}' if name else '')

@@ -56,7 +56,9 @@ def main():
   winsound.MessageBeep()
   logger.success(f'Finished setting icons for "{parent_path}".', prefix_newline=True)
 
-def process_dir(dir_path):
+def process_dir(
+  dir_path: str,
+):
   try:
     abs_exe_path = find_exe(dir_path)
     if not abs_exe_path:
@@ -68,7 +70,9 @@ def process_dir(dir_path):
   except Exception as ex:
     logger.error(f'Could not process "{dir_path}": {ex}')
 
-def find_exe(dir_path):
+def find_exe(
+  dir_path: str,
+):
   pattern = re.compile('|'.join(EXE_EXCLUSION_PATTERNS), re.IGNORECASE)
 
   for dirpath, _, filenames in os.walk(dir_path):

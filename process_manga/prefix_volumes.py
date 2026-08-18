@@ -26,7 +26,9 @@ def main():
   if folder and ranges:
     process_parent_folder(folder, ranges)
 
-def prompt_chapter_ranges(folder):
+def prompt_chapter_ranges(
+  folder_path: str,
+):
   ranges_input = Prompt.str(f'Enter the volume ranges. Supported formats:\n{logger.colorize(Fore.CYAN, " n1, n2, n3, ..., n99")}\n{logger.colorize(Fore.LIGHTBLACK_EX, "  Last chapter for each volume, separated by commas (e.g. 12,24,36)")}\n{logger.colorize(Fore.CYAN, " [n]")}\n{logger.colorize(Fore.LIGHTBLACK_EX, "  fixed chapter count per volume (e.g. [12])")}\n')
 
   match = re.fullmatch(r'\[(\d+)\]', ranges_input.strip())
@@ -34,8 +36,8 @@ def prompt_chapter_ranges(folder):
     step = int(match.group(1))
     items = sorted([
       item
-      for item in os.listdir(folder)
-      if os.path.isdir(os.path.join(folder, item))
+      for item in os.listdir(folder_path)
+      if os.path.isdir(os.path.join(folder_path, item))
       or os.path.splitext(item)[1].lower().endswith(tuple(ITEM_EXTENSIONS))
     ])
     lastChapter = int(get_chapter(items[-1]))
@@ -64,10 +66,13 @@ def prompt_chapter_ranges(folder):
     prev = b
   return ranges
 
-def process_parent_folder(parent_folder, chapter_ranges):
-  folders = [f for f in os.listdir(parent_folder) if os.path.isdir(os.path.join(parent_folder, f))]
+def process_parent_folder(
+  parent_folder_path: str,
+  chapter_ranges: list,
+):
+  folders = [f for f in os.listdir(parent_folder_path) if os.path.isdir(os.path.join(parent_folder_path, f))]
 
-  for folder in tqdm(folders, desc=f'Processing "{parent_folder}"'):
+  for folder in tqdm(folders, desc=f'Processing "{parent_folder_path}"'):
     chapter = get_chapter(folder)
     if not chapter:
       tqdm.write(logger.formatWarn(f'Skipping "{folder}". Chapter number could not be inferred.'))
@@ -82,18 +87,18 @@ def process_parent_folder(parent_folder, chapter_ranges):
         prefix = f'Vol.{str(vol_index).zfill(2)}'
         if folder.startswith(prefix):
           break
-        old_path = os.path.join(parent_folder, folder)
-        new_path = os.path.join(parent_folder, prefix + ' ' + folder)
-        os.rename(old_path, new_path)
+        old_folder_path = os.path.join(parent_folder_path, folder)
+        new_folder_path = os.path.join(parent_folder_path, prefix + ' ' + folder)
+        os.rename(old_folder_path, new_folder_path)
         break
 
   winsound.MessageBeep()
-  logger.success(f'Finished prefixing volumes in "{parent_folder}".\n')
+  logger.success(f'Finished prefixing volumes in "{parent_folder_path}".\n')
 
   merge_input = Prompt.bool('Merge volumes?', default=True)
   if merge_input:
     merge_script = os.path.join(os.path.dirname(__file__), 'merge_volumes.py')
-    subprocess.run([sys.executable, merge_script, parent_folder], check = True)
+    subprocess.run([sys.executable, merge_script, parent_folder_path], check = True)
 
 if __name__ == '__main__':
   try:

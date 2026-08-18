@@ -8,13 +8,16 @@ from spotdl.utils.search import parse_query
 
 def main():
   spotify_url = sys.argv[1] if len(sys.argv) > 1 else Prompt.str('Enter a Spotify track/album/playlist URL')
-  output_path = sys.argv[2] if len(sys.argv) > 2 else os.path.join(os.getcwd(), 'output')
+  output_dir_path = sys.argv[2] if len(sys.argv) > 2 else os.path.join(os.getcwd(), 'output')
 
-  download_from_spotify(output_path, spotify_url)
+  download_from_spotify(output_dir_path, spotify_url)
 
-def download_from_spotify(output_path, spotify_url):
+def download_from_spotify(
+  output_dir_path: str,
+  spotify_url: str,
+):
   try:
-    spotdl = init_spotify_client(output_path)
+    spotdl = init_spotify_client(output_dir_path)
     queries = parse_query(spotify_url)
     for query in queries:
       spotdl.download(query)
@@ -22,7 +25,9 @@ def download_from_spotify(output_path, spotify_url):
   except Exception as ex:
     logger.error(f'Download failed: {ex}')
 
-def init_spotify_client(output_path):
+def init_spotify_client(
+  output_dir_path: str,
+):
   client_id = os.environ.get('SPOTIPY_CLIENT_ID')
   client_secret = os.environ.get('SPOTIPY_CLIENT_SECRET')
   if not client_id or not client_secret:
@@ -31,7 +36,7 @@ def init_spotify_client(output_path):
   return Spotdl(
     client_id = client_id,
     client_secret = client_secret,
-    downloader_settings = { "output": output_path }
+    downloader_settings = { "output": output_dir_path }
   )
 
 if __name__ == '__main__':

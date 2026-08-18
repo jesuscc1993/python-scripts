@@ -78,7 +78,10 @@ def get_associations():
   with open(ASSOCIATIONS_JSON, 'r') as associations:
     return json.load(associations)
 
-def get_icon_path(icons_path, name):
+def get_icon_path(
+  icons_path: str,
+  name: str,
+):
   if name == None:
     return None
 

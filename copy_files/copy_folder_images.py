@@ -32,11 +32,14 @@ def main():
   except ValueError as ex:
     logger.error(ex)
 
-def copy_folder_assets(src_path, dest_path):
-  for item in os.listdir(src_path):
-    item_path = os.path.join(src_path, item)
+def copy_folder_assets(
+  src_dir_path: str,
+  dest_dir_path: str,
+):
+  for item in os.listdir(src_dir_path):
+    item_path = os.path.join(src_dir_path, item)
     if os.path.isdir(item_path):
-      dest_folder = os.path.join(dest_path, item)
+      dest_folder = os.path.join(dest_dir_path, item)
       os.makedirs(dest_folder, exist_ok=True)
 
       for file in os.listdir(item_path):
@@ -46,7 +49,7 @@ def copy_folder_assets(src_path, dest_path):
           shutil.copy2(src_file, dest_file)
           logger.debug(f'Copied "{src_file}" as "{dest_file}".')
 
-  logger.success(f'Finished copying "{src_path}" to "{dest_path}".')
+  logger.success(f'Finished copying "{src_dir_path}" to "{dest_dir_path}".')
 
 if __name__ == '__main__':
   try:

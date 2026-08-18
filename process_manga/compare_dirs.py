@@ -61,28 +61,36 @@ def main():
   if mismatches:
     logger.failure(f'Mismatching ranges ({len(mismatches)}): {stringify(mismatches)}\n')
 
-def stringify(obj):
+def stringify(
+  obj: dict,
+):
   return json.dumps(obj, indent = 2)
 
-def get_subfolders(parent_dir):
+def get_subfolders(
+  parent_folder_path: str,
+):
   results = {}
-  for root, dirs, _ in os.walk(parent_dir):
-    if root == parent_dir:
+  for root, dirs, _ in os.walk(parent_folder_path):
+    if root == parent_folder_path:
       continue
     dirs[:] = [d for d in dirs if not re.fullmatch(r'[\(\[\{].*[\)\]\}]', d)]
     if not dirs:
-      rel = os.path.relpath(root, parent_dir)
+      rel = os.path.relpath(root, parent_folder_path)
       results[normalize_name(os.path.basename(rel))] = rel
   return results
 
-def normalize_name(name):
+def normalize_name(
+  name: str,
+):
   return re.sub(r'\s*(\{.*?\}|\(.*?\))\s*', '', name).strip()
 
-def get_subfolder_ranges(folder):
+def get_subfolder_ranges(
+  folder_path: str,
+):
   items = sorted([
     item
-    for item in os.listdir(folder)
-    if os.path.isdir(os.path.join(folder, item))
+    for item in os.listdir(folder_path)
+    if os.path.isdir(os.path.join(folder_path, item))
     or os.path.splitext(item)[1].lower().endswith(tuple(ITEM_EXTENSIONS))
   ])
 
@@ -109,7 +117,9 @@ def get_subfolder_ranges(folder):
   else:
     return None
 
-def print_range(range):
+def print_range(
+  range: tuple,
+):
   if range:
     vol_range = range[0]
     ch_range = range[1]

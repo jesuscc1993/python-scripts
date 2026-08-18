@@ -25,11 +25,16 @@ def main():
   with open(OUTPUT_FILE, 'w') as f:
     json.dump(filtered_app_ids, f, indent = 2)
 
-def get_owned_games(api_key, steam_id):
+def get_owned_games(
+  api_key: str,
+  steam_id: str,
+):
   url = f'https://api.steampowered.com/IPlayerService/GetOwnedGames/v1/?key={api_key}&steamid={steam_id}&include_appinfo=true'
   return requests.get(url).json().get('response', {}).get('games', [])
 
-def filter_game(game):
+def filter_game(
+  game: dict,
+):
   if PLAYED is not None:
     played = game.get('playtime_forever', 0) > 0
     if played != PLAYED:

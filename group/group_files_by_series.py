@@ -12,7 +12,9 @@ def main():
 
   process_parent_folder(parent_dir, should_process_item, get_group_name)
 
-def should_process_item(item_path):
+def should_process_item(
+  item_path: str,
+):
   if not os.path.isfile(item_path):
     return False
 
@@ -22,7 +24,9 @@ def should_process_item(item_path):
 
   return True
 
-def get_group_name(file_path):
+def get_group_name(
+  file_path: str,
+):
   file_name = re.sub(r'[\(\[\{].*?[\)\]\}]', '', os.path.basename(file_path))
   parts = re.split(r'(?:\s+-\s+|S\d+)', file_name)
   group_name = parts[0] if len(parts) > 1 else file_name

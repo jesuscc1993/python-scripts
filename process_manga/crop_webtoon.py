@@ -18,12 +18,16 @@ def main():
   else:
     select_parent_folder('Enter the path to the parent folder containing the folders or images you want to crop the blanks of:\n', process_parent_folder)
 
-def process_parent_folder(folder_path):
+def process_parent_folder(
+  folder_path: str,
+):
   process_folder_images(folder_path, process_image)
 
   logger.success(f'Finished cropping webtoons in "{folder_path}".')
 
-def process_image(file_path):
+def process_image(
+  file_path: str,
+):
   try:
     with Image.open(file_path) as img:
       blank_free_image = crop_blanks(img)
@@ -31,17 +35,24 @@ def process_image(file_path):
   except Exception as ex:
     logger.error(f'Could not process {file_path}:\n{ex}')
 
-def is_blank_strip(image_strip):
+def is_blank_strip(
+  image_strip: Image.Image,
+):
   gray_strip = image_strip.convert('L')
   min_pixel, max_pixel = gray_strip.getextrema()
   return min_pixel >= WHITE_THRESHOLD or max_pixel <= BLACK_THRESHOLD
 
-def process_strip(strip, height):
+def process_strip(
+  strip: Image.Image,
+  height: int,
+):
   if height > HEIGHT_THRESHOLD:
     return strip.resize((strip.width, HEIGHT_THRESHOLD))
   return strip
 
-def crop_blanks(img):
+def crop_blanks(
+  img: Image.Image,
+):
   width, height = img.size
   blank_start = None
   result_parts = []
@@ -74,33 +85,36 @@ def crop_blanks(img):
 
   return stitched_image
 
-def save_image_splits(img, original_path):
+def save_image_splits(
+  img: Image.Image,
+  original_img_path: str,
+):
   width, height = img.size
   aspect_ratio = width / height
   if aspect_ratio < MAX_PAGE_ASPECT_RATIO:
     split_height = int(width / MAX_PAGE_ASPECT_RATIO)
     num_splits = (height + split_height - 1) // split_height
     split_height = height // num_splits
-    base_name, ext = os.path.splitext(original_path)
+    base_name, ext = os.path.splitext(original_img_path)
     try:
       for i in range(num_splits):
         top = i * split_height
         bottom = (i + 1) * split_height if i < num_splits - 1 else height
         split_image = img.crop((0, top, width, bottom))
         split_file_path = f"{base_name}.{i + 1}{ext}"
-        save_image_to_path(split_image, split_file_path, True)
-      os.remove(original_path)
+        save_image_to_path(split_image, split_file_path, keep=True)
+      os.remove(original_img_path)
     except Exception as ex:
-      logger.error(f'Could not save split images for {original_path}:\n{ex}')
+      logger.error(f'Could not save split images for {original_img_path}:\n{ex}')
       for i in range(num_splits):
         split_file_path = f"{base_name}.{i + 1}{ext}"
         if os.path.exists(split_file_path):
           os.remove(split_file_path)
   else:
     try:
-      save_image_to_path(img, original_path)
+      save_image_to_path(img, original_img_path)
     except Exception as ex:
-      logger.error(f'Could not save image {original_path}:\n{ex}')
+      logger.error(f'Could not save image {original_img_path}:\n{ex}')
 
 if __name__ == '__main__':
   try:

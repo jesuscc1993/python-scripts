@@ -14,7 +14,9 @@ def main():
   while src_path := Prompt.path('Enter the path you want to create a hidden symlink for', optional=True):
     process_dir(src_path)
 
-def process_dir(src_path: str):
+def process_dir(
+  src_path: str,
+):
   new_name = os.path.basename(Prompt.str('Enter the new name for the item'))
 
   parent_dir = os.path.dirname(src_path)
@@ -24,12 +26,14 @@ def process_dir(src_path: str):
   logger.success(f'Renamed "{src_path}" to "{dest_path}".')
 
   is_dir = os.path.isdir(dest_path)
-  make_link(src_path, dest_path, target_is_directory=is_dir, make_dirs=False)
+  make_link(src_path, dest_path, is_dir, make_dirs=False)
   hide_path(src_path)
 
   logger.hr()
 
-def hide_path(path: str):
+def hide_path(
+  path: str,
+):
   ctypes.windll.kernel32.SetFileAttributesW(path, FILE_ATTRIBUTE_HIDDEN)
 
 if __name__ == '__main__':

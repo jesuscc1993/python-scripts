@@ -9,8 +9,10 @@ SCRIPT_NAMES = [
   'rename_items'
 ]
 
-def process_parent_folder(parent_folder):
-  run_scripts_in_sequence(SCRIPT_NAMES, parent_folder)
+def process_parent_folder(
+  parent_folder_path: str,
+):
+  run_scripts_in_sequence(SCRIPT_NAMES, parent_folder_path)
 
 if __name__ == '__main__':
   try:

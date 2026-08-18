@@ -72,13 +72,18 @@ def main():
   winsound.MessageBeep()
   logger.success(f'Finished setting icons for "{parent_path}".', prefix_newline=True)
 
-def should_ignore_dir(dir_path: str) -> bool:
+def should_ignore_dir(
+  dir_path: str,
+):
   if os.path.exists(os.path.join(dir_path, '.no_file_size')):
     return True
   attrs = ctypes.windll.kernel32.GetFileAttributesW(dir_path)
   return attrs != -1 and bool(attrs & 0x2)
 
-def process_dir(dir_path: str, override_existing: bool = False):
+def process_dir(
+  dir_path: str,
+  override_existing = False,
+):
   try:
     if should_ignore_dir(dir_path):
       logger.trace(f'  Skipping "{dir_path}". Found .no_file_size marker.')
@@ -189,7 +194,9 @@ def process_dir(dir_path: str, override_existing: bool = False):
 
   add_file_attrs(ini_path, HIDDEN_SYSTEM_FILE_ATTRS)
 
-def get_file_size_on_disk(file_path: str) -> int:
+def get_file_size_on_disk(
+  file_path: str,
+):
   high = ctypes.c_ulong(0)
   low = ctypes.windll.kernel32.GetCompressedFileSizeW(file_path, ctypes.byref(high))
   low_unsigned = low & 0xFFFFFFFF
@@ -197,7 +204,9 @@ def get_file_size_on_disk(file_path: str) -> int:
     return os.path.getsize(file_path)
   return (high.value << 32) + low_unsigned
 
-def calculate_dir_size(dir_path: str):
+def calculate_dir_size(
+  dir_path: str,
+):
   cache_path = os.path.join(dir_path, DIR_SIZE_FILENAME)
   total_size = None
 
@@ -223,7 +232,11 @@ def calculate_dir_size(dir_path: str):
 
   return formatted_size
 
-def overlay_file_size_256(value_text: str, unit_text: str, ico_img: Image.Image):
+def overlay_file_size_256(
+  value_text: str,
+  unit_text: str,
+  ico_img: Image.Image,
+):
   img = ico_img.resize((SIZE_256, SIZE_256), Image.LANCZOS)
 
   try:
@@ -272,7 +285,11 @@ def overlay_file_size_256(value_text: str, unit_text: str, ico_img: Image.Image)
 
   return img
 
-def overlay_file_size_48(value_text: str, unit_text: str, ico_img: Image.Image):
+def overlay_file_size_48(
+  value_text: str,
+  unit_text: str,
+  ico_img: Image.Image,
+):
   img = ico_img.resize((SIZE_48, SIZE_48), Image.LANCZOS)
 
   try:
@@ -323,7 +340,9 @@ def overlay_file_size_48(value_text: str, unit_text: str, ico_img: Image.Image):
 
   return img
 
-def format_size(size_bytes: int) -> str:
+def format_size(
+  size_bytes: int,
+):
   units = ['GB', 'TB', 'PB']
   size = size_bytes / (1024 * 1024 * 1024)
   if size < 1:
@@ -333,7 +352,10 @@ def format_size(size_bytes: int) -> str:
       return f'{math.ceil(int(size * 100) / 100)}  {unit}'
     size /= 1024
 
-def get_exe_icon(exe_path: str, index: int):
+def get_exe_icon(
+  exe_path: str,
+  index: int,
+):
   size = MAX_ICO_SIZE
   hicon_large = ctypes.c_void_p()
 

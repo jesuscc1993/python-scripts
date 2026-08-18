@@ -14,10 +14,12 @@ def main():
 
   rename_zip_to_cbz(parent_dir)
 
-def rename_zip_to_cbz(parent_dir: str):
-  logger.log(f'Renaming ZIP files to CBZ in "{parent_dir}"...')
+def rename_zip_to_cbz(
+  parent_dir_path: str,
+):
+  logger.log(f'Renaming ZIP files to CBZ in "{parent_dir_path}"...')
 
-  for root, _, files in os.walk(parent_dir):
+  for root, _, files in os.walk(parent_dir_path):
     for name in files:
       old_path = os.path.join(root, name)
       new_path = os.path.splitext(old_path)[0] + '.cbz'
@@ -28,7 +30,7 @@ def rename_zip_to_cbz(parent_dir: str):
       os.rename(old_path, new_path)
       logger.debug(f'Renamed "{old_path}" to "{new_path}".')
 
-  logger.success(f'Renamed ZIP files to CBZ in "{parent_dir}".')
+  logger.success(f'Renamed ZIP files to CBZ in "{parent_dir_path}".')
 
 if __name__ == '__main__':
   try:

@@ -20,13 +20,16 @@ def main():
   compare_paths_and_delete_files(src_path, dest_path)
   delete_empty_folders(dest_path)
 
-def compare_paths_and_delete_files(src_path, dest_path):
+def compare_paths_and_delete_files(
+  src_dir_path: str,
+  dest_dir_path: str,
+):
   none_deleted = True
 
-  for root, _, files in os.walk(src_path):
+  for root, _, files in os.walk(src_dir_path):
     for f in files:
       path_a = os.path.join(root, f)
-      path_b = path_a.replace(src_path, dest_path, 1)
+      path_b = path_a.replace(src_dir_path, dest_dir_path, 1)
       if os.path.exists(path_b):
         send2trash(path_b)
         none_deleted = False
@@ -35,10 +38,12 @@ def compare_paths_and_delete_files(src_path, dest_path):
   if none_deleted:
     logger.log('No file matches were found.')
   else:
-    logger.success(f'Finished deleting from "{dest_path}" files that already existed in "{src_path}".\n')
+    logger.success(f'Finished deleting from "{dest_dir_path}" files that already existed in "{src_dir_path}".\n')
 
-def delete_empty_folders(parent_folder):
-  for root, dirs, _ in os.walk(parent_folder, topdown = False):
+def delete_empty_folders(
+  parent_folder_path: str,
+):
+  for root, dirs, _ in os.walk(parent_folder_path, topdown = False):
     for dir_name in dirs:
       try:
         os.rmdir(os.path.join(root, dir_name))
