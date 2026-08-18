@@ -3,6 +3,8 @@ import os
 import sys
 import subprocess
 
+from send2trash import send2trash
+
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from mtlogger import logger
 from mtprompt import Prompt
@@ -60,7 +62,7 @@ def main():
 def worker(input_path, output_path, og_filename, new_filename, bitrate):
   try:
     convert_to_mp3(input_path, output_path, bitrate)
-    os.remove(input_path)
+    send2trash(input_path)
     tqdm.write(f'Converted "{og_filename}" to "{new_filename}".')
   except Exception as ex:
     tqdm.write(f'Failed to convert "{input_path}":\n{ex}')

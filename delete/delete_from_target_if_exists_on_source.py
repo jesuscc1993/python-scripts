@@ -1,6 +1,7 @@
 import os
 import sys
 
+from send2trash import send2trash
 from mtlogger import logger
 from mtprompt import Prompt
 
@@ -27,7 +28,7 @@ def compare_paths_and_delete_files(src_path, dest_path):
       path_a = os.path.join(root, f)
       path_b = path_a.replace(src_path, dest_path, 1)
       if os.path.exists(path_b):
-        os.remove(path_b)
+        send2trash(path_b)
         none_deleted = False
         logger.debug(f'Deleted "{path_b}".')
 

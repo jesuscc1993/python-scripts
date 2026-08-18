@@ -12,7 +12,7 @@ ZIP_TYPES = ['ZIP', 'CBZ']
 
 BAK_EXTENSION = f'.{BAK_TYPE.lower()}'
 
-def compress_child_folders(parent_folder, output_type = ZIP_TYPES[0], min_depth = 1, max_depth = 1):
+def compress_child_folders(parent_folder, output_type = ZIP_TYPES[0], min_depth = 1, max_depth = 1, remove_original = True):
   logger.log(f'Compressing folders in "{parent_folder}"...')
 
   if max_depth < 1:
@@ -40,7 +40,7 @@ def compress_child_folders(parent_folder, output_type = ZIP_TYPES[0], min_depth 
     try:
       with ThreadPoolExecutor() as executor:
         list(tqdm(
-          executor.map(lambda folder: compress_folder(folder, output_type, tmp_dir), folders),
+          executor.map(lambda folder: compress_folder(folder, output_type, tmp_dir, remove_original), folders),
           total = len(folders),
           desc = f'Processing "{parent_folder}"'
         ))
@@ -51,7 +51,7 @@ def compress_child_folders(parent_folder, output_type = ZIP_TYPES[0], min_depth 
   else:
     logger.warn(f'No folders found in "{parent_folder}".')
 
-def compress_folder(folder_path, output_type, tmp_dir):
+def compress_folder(folder_path, output_type, tmp_dir, remove_original = True):
   folder_name = os.path.basename(folder_path)
   parent_dir = os.path.dirname(folder_path)
 
@@ -75,12 +75,14 @@ def compress_folder(folder_path, output_type, tmp_dir):
           compressed_file.write(file_path, os.path.relpath(file_path, folder_path))
 
       shutil.move(tmp_zip_path, final_zip_path)
-      shutil.rmtree(folder_path)
+
+      if remove_original:
+        shutil.rmtree(folder_path)
 
   except Exception as ex:
     logger.error(f'An error occurred while processing "{folder_name}":\n{ex}')
 
-def extract_child_archives(parent_folder):
+def extract_child_archives(parent_folder, remove_archives = True):
   archives = []
   for root, _, files in os.walk(parent_folder, topdown = False):
     for file_name in files:
@@ -88,9 +90,9 @@ def extract_child_archives(parent_folder):
         archives.append(os.path.join(root, file_name))
 
   for archive_path in tqdm(archives, desc=f'Processing "{parent_folder}"'):
-    extract_archive(archive_path)
+    extract_archive(archive_path, remove_archives)
 
-def extract_archive(archive_path):
+def extract_archive(archive_path, remove_archive = True):
   folder_name = os.path.splitext(os.path.basename(archive_path))[0]
   target_dir = os.path.join(os.path.dirname(archive_path), folder_name)
 
@@ -101,4 +103,5 @@ def extract_archive(archive_path):
   with zipfile.ZipFile(archive_path, 'r') as compressed_file:
     compressed_file.extractall(target_dir)
 
-  os.remove(archive_path)
+  if remove_archive:
+    os.remove(archive_path)
