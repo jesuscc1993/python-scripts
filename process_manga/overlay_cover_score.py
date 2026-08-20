@@ -11,8 +11,12 @@ from mtlogger import logger
 from mtprompt import Prompt
 from tqdm import tqdm
 
-COVER_NAME = 'cover.jpg'
-COVER_BAK_NAME = '.bak'.join(list(os.path.splitext(COVER_NAME)))
+COVER_NAMES = [
+  'cover.jpg',
+  'cover.png',
+  'cover.webp',
+]
+COVER_BAK_EXT = '.bak'
 COVER_W = 212
 COVER_H = 318
 
@@ -74,17 +78,39 @@ def find_font(
 
   return None
 
+def find_cover(
+  dir: str,
+  is_backup = False,
+):
+  for cover_name in COVER_NAMES:
+    path = get_cover_path(dir, cover_name, is_backup)
+    if os.path.isfile(path):
+      return path
+  return None
+
+def get_cover_path(
+  dir: str,
+  cover_name: str,
+  is_backup = False,
+):
+  name, ext = os.path.splitext(cover_name)
+  path = os.path.join(dir, name + (COVER_BAK_EXT if is_backup else '') + ext)
+  return path
+
 def process_dir(
   dir: str,
   font: ImageFont.FreeTypeFont,
 ):
   dir_name = os.path.basename(dir)
-  cover_img = os.path.join(dir, COVER_NAME)
-  cover_bak_img = os.path.join(dir, COVER_BAK_NAME)
+  cover_img_path = find_cover(dir)
+  cover_img_bak_path = find_cover(dir, is_backup=True)
 
-  if not os.path.isfile(cover_img) and not os.path.isfile(os.path.join(dir, COVER_BAK_NAME)):
+  if cover_img_path is None and cover_img_bak_path is None:
     tqdm_dim(f'Skipping "{dir_name}". No cover found.')
     return
+
+  if cover_img_bak_path is None:
+    cover_img_bak_path = get_cover_path(dir, os.path.basename(cover_img_path), is_backup=True)
 
   score_match = re.search(r'\{(\d{1,3})?\}', os.path.basename(dir))
   score = int(score_match.group(1)) if score_match else None
@@ -92,23 +118,24 @@ def process_dir(
     tqdm_dim(f'Skipping "{dir_name}". Score could not be inferred.')
     return
 
-  process_cover(dir, cover_img, cover_bak_img, score, font)
+  process_cover(dir, cover_img_path, cover_img_bak_path, score, font)
 
 def process_cover(
   dir: str,
-  cover_img: str,
-  cover_bak_img: str,
+  cover_img_path: str,
+  cover_img_bak_path: str,
   score: int,
   font: ImageFont.FreeTypeFont,
 ):
-  if not os.path.exists(cover_bak_img):
-    shutil.copy(cover_img, cover_bak_img)
+  if not os.path.exists(cover_img_bak_path):
+    shutil.copy(cover_img_path, cover_img_bak_path)
+    os.remove(cover_img_path)
 
-  shutil.copy(cover_bak_img, cover_img)
-  img = Image.open(cover_img).convert('RGBA')
+  processed_cover_img_path = os.path.join(dir, COVER_NAMES[0])
+  img = Image.open(cover_img_bak_path).convert('RGBA')
   img = resize_cover(img, COVER_W, COVER_H)
   img = overlay_score(img, score, font)
-  img.save(cover_img, quality=100)
+  img.save(processed_cover_img_path, quality=100)
 
   tqdm.write(logger.formatDebug(f'Applied score overlay to "{os.path.basename(dir)}".'))
 
