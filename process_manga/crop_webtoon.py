@@ -6,7 +6,7 @@ from mtlogger import logger
 from mtprompt import Prompt
 
 from _common import process_folder_images, select_parent_folder
-from _image_utils import save_image_to_path
+from _image_utils import is_image_uncompressed, save_image_to_path
 from _settings import BLACK_THRESHOLD, WHITE_THRESHOLD, MAX_PAGE_ASPECT_RATIO
 
 # settings
@@ -31,7 +31,15 @@ def process_image(
   try:
     with Image.open(file_path) as img:
       blank_free_image = crop_blanks(img)
-      save_image_splits(blank_free_image, file_path)
+
+      if (image_needs_splitting(blank_free_image)):
+        save_image_splits(blank_free_image, file_path)
+      elif (
+        blank_free_image.height != img.height or
+        is_image_uncompressed(file_path)
+      ):
+        save_image_to_path(blank_free_image, file_path)
+
   except Exception as ex:
     logger.error(f'Could not process {file_path}:\n{ex}')
 
@@ -85,36 +93,39 @@ def crop_blanks(
 
   return stitched_image
 
+def image_needs_splitting(
+  img: Image.Image,
+):
+  width, height = img.size
+  aspect_ratio = width / height
+  return aspect_ratio < MAX_PAGE_ASPECT_RATIO
+
 def save_image_splits(
   img: Image.Image,
   original_img_path: str,
 ):
   width, height = img.size
-  aspect_ratio = width / height
-  if aspect_ratio < MAX_PAGE_ASPECT_RATIO:
-    split_height = int(width / MAX_PAGE_ASPECT_RATIO)
-    num_splits = (height + split_height - 1) // split_height
-    split_height = height // num_splits
-    base_name, ext = os.path.splitext(original_img_path)
-    try:
-      for i in range(num_splits):
-        top = i * split_height
-        bottom = (i + 1) * split_height if i < num_splits - 1 else height
-        split_image = img.crop((0, top, width, bottom))
-        split_file_path = f"{base_name}.{i + 1}{ext}"
-        save_image_to_path(split_image, split_file_path, keep=True)
-      os.remove(original_img_path)
-    except Exception as ex:
-      logger.error(f'Could not save split images for {original_img_path}:\n{ex}')
-      for i in range(num_splits):
-        split_file_path = f"{base_name}.{i + 1}{ext}"
-        if os.path.exists(split_file_path):
-          os.remove(split_file_path)
-  else:
-    try:
-      save_image_to_path(img, original_img_path)
-    except Exception as ex:
-      logger.error(f'Could not save image {original_img_path}:\n{ex}')
+  split_height = int(width / MAX_PAGE_ASPECT_RATIO)
+  num_splits = (height + split_height - 1) // split_height
+  split_height = height // num_splits
+  base_name, ext = os.path.splitext(original_img_path)
+
+  try:
+    for i in range(num_splits):
+      top = i * split_height
+      bottom = (i + 1) * split_height if i < num_splits - 1 else height
+      split_image = img.crop((0, top, width, bottom))
+      split_file_path = f"{base_name}.{i + 1}{ext}"
+      save_image_to_path(split_image, split_file_path, keep=True)
+    os.remove(original_img_path)
+
+  except Exception as ex:
+    logger.error(f'Could not save split images for {original_img_path}:\n{ex}')
+
+    for i in range(num_splits):
+      split_file_path = f"{base_name}.{i + 1}{ext}"
+      if os.path.exists(split_file_path):
+        os.remove(split_file_path)
 
 if __name__ == '__main__':
   try:
