@@ -29,9 +29,10 @@ def process_image(
     with Image.open(file_path) as img:
       width, height = img.size
       if width > MAX_WIDTH or height > MAX_HEIGHT:
-        img = crop_blanks(img)
-        img = resize_image(img)
-        save_image_to_path(img, file_path)
+        cropped_img = crop_blanks(img)
+        resized_img = resize_image(cropped_img)
+        if resized_img.size != img.size:
+          save_image_to_path(resized_img, file_path)
   except Exception as ex:
     logger.error(f'Could not process {file_path}:\n{ex}')
 
