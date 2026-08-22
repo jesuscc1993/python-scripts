@@ -97,14 +97,25 @@ def extract_child_archives(
   parent_folder_path: str,
   remove_archives = True,
 ):
+  logger.log(f'Extracting archives in "{parent_folder_path}"...')
+
   archives = []
   for root, _, files in os.walk(parent_folder_path, topdown = False):
     for file_name in files:
       if any(file_name.upper().endswith(f'.{ext}') for ext in ZIP_TYPES):
         archives.append(os.path.join(root, file_name))
 
-  for archive_path in tqdm(archives, desc=f'Processing "{parent_folder_path}"'):
-    extract_archive(archive_path, remove_archives)
+  if len(archives) > 0:
+    with ThreadPoolExecutor() as executor:
+      list(tqdm(
+        executor.map(lambda archive_path: extract_archive(archive_path, remove_archives), archives),
+        total = len(archives),
+        desc = f'Processing "{parent_folder_path}"'
+      ))
+
+    logger.success(f'Finished extracting archives in "{parent_folder_path}".')
+  else:
+    logger.warn(f'No archives found in "{parent_folder_path}".')
 
 def extract_archive(
   archive_path: str,
@@ -117,8 +128,12 @@ def extract_archive(
     logger.trace(f'Skipping "{archive_path}". Folder exists.')
     return
 
-  with zipfile.ZipFile(archive_path, 'r') as compressed_file:
-    compressed_file.extractall(target_dir)
+  try:
+    with zipfile.ZipFile(archive_path, 'r') as compressed_file:
+      compressed_file.extractall(target_dir)
 
-  if remove_archive:
-    os.remove(archive_path)
+    if remove_archive:
+      os.remove(archive_path)
+
+  except Exception as ex:
+    logger.error(f'An error occurred while processing "{folder_name}":\n{ex}')
