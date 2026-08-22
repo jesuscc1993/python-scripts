@@ -19,23 +19,29 @@ def main():
 
 def process_parent_folder(
   dir_path: str,
+  recursive = True,
 ):
   dir_name = os.path.basename(dir_path)
+  entries = sorted(os.scandir(dir_path), key = get_sort_key)
   found_chapters = set()
-  incomplete_chapters = []
 
-  for entry in sorted(os.scandir(dir_path), key = get_sort_key):
+  for entry in entries:
     chapter = get_chapter(entry.name)
     if chapter:
       found_chapters.add(float(chapter))
 
-    if entry.is_dir():
-      if is_chapter_folder_missing_pages(entry.path, chapter):
-        incomplete_chapters.append(float(chapter))
-
   if not found_chapters:
-    logger.trace(f'No chapters found in "{dir_name}".')
-    return
+    found_subfolder_chapters = False
+
+    if recursive:
+      for entry in os.scandir(dir_path):
+        if entry.is_dir():
+          subfolder_result = process_parent_folder(entry.path, recursive=False)
+          found_subfolder_chapters = found_subfolder_chapters or subfolder_result
+      if not found_subfolder_chapters:
+        logger.trace(f'No chapters found in "{dir_name}", trying subfolders instead.')
+
+    return found_subfolder_chapters
 
   expected_chapters = set(range(1, int(max(found_chapters)) + 1))
   missing_chapters = expected_chapters - found_chapters
@@ -50,10 +56,19 @@ def process_parent_folder(
       prefix_newline=True
     )
 
+  incomplete_chapters = []
+  for entry in entries:
+    chapter = get_chapter(entry.name)
+    if chapter and entry.is_dir():
+      if is_chapter_folder_missing_pages(entry.path, chapter):
+        incomplete_chapters.append(float(chapter))
+
   if incomplete_chapters:
     logger.warn(
-      f'\nIncomplete chapters ({len(incomplete_chapters)}): [{', '.join(format_chapter(ch) for ch in sorted(incomplete_chapters))}]'
+      f'\n  Incomplete chapters ({len(incomplete_chapters)}): [{', '.join(format_chapter(ch) for ch in sorted(incomplete_chapters))}]'
     )
+
+  return True
 
 def is_chapter_folder_missing_pages(
   dir_path: str,
