@@ -2,7 +2,6 @@ import ctypes
 import math
 import os
 import shutil
-import stat
 import sys
 import win32con
 import win32gui
@@ -10,11 +9,12 @@ import win32ui
 import winsound
 
 from PIL import Image, ImageDraw, ImageFont
+from mtattr import Attr
 from mtlogger import logger
 from mtprompt import Prompt
 
 from _constants import DESKTOP_INI_FILENAME, HIDDEN_SYSTEM_FILE_ATTRS, ICO_FILENAME, MAX_ICO_SIZE, PREFERRED_ENCODING
-from _common import add_file_attrs, get_ini_icon, hide_file, read_ini, set_folder_icon, show_file, write_hidden_file
+from _common import get_ini_icon, read_ini, set_folder_icon, write_hidden_file
 
 DEBUG = False
 FORCE_RECALCULATE = False
@@ -77,15 +77,10 @@ def main():
 def should_skip_dir(
   dir_path: str,
 ):
-  should_skip = is_hidden(dir_path) or has_exclusion_file(dir_path)
+  should_skip = Attr.is_hidden(dir_path) or has_exclusion_file(dir_path)
   if should_skip:
     logger.trace(f'  Skipping "{dir_path}". Directory is hidden or contains a {EXCLUSION_FILE} file.')
   return should_skip
-
-def is_hidden(
-  path: str,
-):
-  return os.lstat(path).st_file_attributes & stat.FILE_ATTRIBUTE_HIDDEN
 
 def has_exclusion_file(
   path: str,
@@ -128,7 +123,7 @@ def process_dir(
       ico_path_lower = ico_path.lower()
     elif '.ico' in ico_path_lower and ICO_FILENAME not in ico_path_lower:
       shutil.copy2(os.path.join(dir_path, ico_path), bak_ico_path)
-      hide_file(bak_ico_path)
+      Attr.hide(bak_ico_path)
 
     ico_img = None
 
@@ -163,10 +158,10 @@ def process_dir(
 
     if not os.path.exists(bak_ico_path):
       ico_img.save(bak_ico_path, format='ICO', sizes=[(256, 256)])
-      hide_file(bak_ico_path)
+      Attr.hide(bak_ico_path)
 
     if os.path.exists(new_ico_path):
-      show_file(new_ico_path)
+      Attr.show(new_ico_path)
 
     ico_img = ico_img.convert('RGBA')
     img_256 = overlay_file_size_256(size_parts[0], size_parts[1], ico_img)
@@ -195,12 +190,12 @@ def process_dir(
     if ico_path != os.path.basename(bak_ico_path):
       set_folder_icon(dir_path, new_ico_name, override_existing=override)
 
-    hide_file(new_ico_path)
+    Attr.hide(new_ico_path)
 
   except Exception as ex:
     logger.error(f'Could not process "{dir_path}": {ex}')
 
-  add_file_attrs(ini_path, HIDDEN_SYSTEM_FILE_ATTRS)
+  Attr.add(ini_path, HIDDEN_SYSTEM_FILE_ATTRS)
 
 def get_file_size_on_disk(
   file_path: str,

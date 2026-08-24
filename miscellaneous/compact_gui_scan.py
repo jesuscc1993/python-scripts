@@ -1,9 +1,9 @@
 import json
 import os
 import re
-import stat
 import sys
 
+from mtattr import Attr
 from mtlogger import logger
 from mtprompt import Prompt
 from rapidfuzz import process
@@ -180,15 +180,10 @@ def format_dimmed(
 def should_skip_dir(
   dir_path: str,
 ):
-  should_skip = is_hidden(dir_path) or has_exclusion_file(dir_path)
+  should_skip = Attr.is_hidden(dir_path) or has_exclusion_file(dir_path)
   if should_skip:
     logger.trace(f'  Skipping "{dir_path}". Directory is hidden or contains a {EXCLUSION_FILE} file.')
   return should_skip
-
-def is_hidden(
-  path: str,
-):
-  return os.lstat(path).st_file_attributes & stat.FILE_ATTRIBUTE_HIDDEN
 
 def has_exclusion_file(
   path: str,

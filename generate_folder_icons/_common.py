@@ -1,10 +1,10 @@
 import os
-import subprocess
 import winsound
 
 from PIL import Image
 from concurrent.futures import ThreadPoolExecutor
 from configparser import ConfigParser
+from mtattr import Attr
 from mtlogger import logger
 from tqdm import tqdm
 
@@ -97,7 +97,7 @@ def set_folder_icon(
     desktop_ini_path = os.path.join(folder_path, DESKTOP_INI_FILENAME)
 
     if os.path.exists(desktop_ini_path):
-      show_file(desktop_ini_path)
+      Attr.show(desktop_ini_path)
 
     config, encoding = read_ini(desktop_ini_path)
 
@@ -107,7 +107,7 @@ def set_folder_icon(
 
     set_ini_icon(config, ico_path)
     write_ini(desktop_ini_path, config, encoding)
-    hide_file(desktop_ini_path)
+    Attr.hide(desktop_ini_path)
 
   except PermissionError:
     tqdm.write(logger.formatWarn(f'Permission denied: "{desktop_ini_path}". You may need to run the script as an administrator.'))
@@ -143,13 +143,13 @@ def write_file(
   encoding = PREFERRED_ENCODING,
 ):
   if os.path.exists(file_path):
-    remove_file_attrs(file_path, attrs)
+    Attr.remove(file_path, attrs)
 
   with open(file_path, 'w', encoding=encoding) as file:
     file.write(content)
     logger.success(f'Saved "{file_path}".')
 
-  add_file_attrs(file_path, attrs)
+  Attr.add(file_path, attrs)
 
 def write_ini(
   file_path: str,
@@ -157,13 +157,13 @@ def write_ini(
   encoding: str,
 ):
   if os.path.exists(file_path):
-    remove_file_attrs(file_path, HIDDEN_SYSTEM_FILE_ATTRS)
+    Attr.remove(file_path, HIDDEN_SYSTEM_FILE_ATTRS)
 
   with open(file_path, 'w', encoding=encoding) as ini:
     config.write(ini)
     logger.success(f'Saved "{file_path}".')
 
-  add_file_attrs(file_path, HIDDEN_SYSTEM_FILE_ATTRS)
+  Attr.add(file_path, HIDDEN_SYSTEM_FILE_ATTRS)
 
 def write_hidden_file(
   file_path: str,
@@ -186,27 +186,3 @@ def set_ini_icon(
     config[INI_SHELL_SECTION] = {}
 
   config[INI_SHELL_SECTION][INI_ICON_KEY] = f'{ico_path},{ico_index}'
-
-def add_file_attrs(
-  file_path: str,
-  attrs: list[str],
-):
-  if os.path.exists(file_path):
-    subprocess.run(['attrib'] + ['+' + attr for attr in attrs] + [file_path], check=True)
-
-def remove_file_attrs(
-  file_path: str,
-  attrs: list[str],
-):
-  if os.path.exists(file_path):
-    subprocess.run(['attrib'] + ['-' + attr for attr in attrs] + [file_path], check=True)
-
-def hide_file(
-  file_path: str,
-):
-  add_file_attrs(file_path, HIDDEN_FILE_ATTRS)
-
-def show_file(
-  file_path: str,
-):
-  remove_file_attrs(file_path, HIDDEN_FILE_ATTRS)

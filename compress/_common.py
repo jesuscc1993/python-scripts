@@ -32,8 +32,8 @@ def compress_child_folders(
         continue
 
       folder_path = os.path.join(root, dir_name)
-      rel_path = os.path.relpath(folder_path, parent_folder_path)
-      current_depth = rel_path.count(os.sep) + 1
+      rel_folder_path = os.path.relpath(folder_path, parent_folder_path)
+      current_depth = rel_folder_path.count(os.sep) + 1
 
       if min_depth <= current_depth <= max_depth:
         folders.append(folder_path)
