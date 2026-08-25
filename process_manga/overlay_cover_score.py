@@ -10,7 +10,9 @@ from concurrent.futures import ThreadPoolExecutor
 from mtlogger import logger
 from mtprompt import Prompt
 from tqdm import tqdm
+from xml.etree import ElementTree
 
+COMIC_INFO_FILENAME = 'ComicInfo.xml'
 COVER_NAMES = [
   'cover.jpg',
   'cover.png',
@@ -115,10 +117,25 @@ def process_dir(
   score_match = re.search(r'\{(\d{1,3})?\}', os.path.basename(dir))
   score = int(score_match.group(1)) if score_match else None
   if score is None:
+    score = read_score_from_comic_info(dir)
+  if score is None:
     tqdm_dim(f'Skipping "{dir_name}". Score could not be inferred.')
     return
 
   process_cover(dir, cover_img_path, cover_img_bak_path, score, font)
+
+def read_score_from_comic_info(
+  dir: str,
+):
+  comic_info_path = os.path.join(dir, COMIC_INFO_FILENAME)
+  if not os.path.isfile(comic_info_path):
+    return None
+
+  try:
+    rating = ElementTree.parse(comic_info_path).getroot().findtext('CommunityRating')
+    return round(float(rating) * 20) if rating else None
+  except Exception:
+    return None
 
 def process_cover(
   dir: str,
