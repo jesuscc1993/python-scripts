@@ -17,7 +17,10 @@ STEAM_USER_ID3 = os.environ.get('STEAM_USER_ID3')
 UBISOFT_USER_ID = os.environ.get('UBISOFT_USER_ID')
 GAME_CLIENTS_SAVES_PATH = os.environ.get('GAME_CLIENTS_SAVES_PATH')
 
-DRIVES = ['D:\\', 'E:\\', 'Z:\\']
+D_DRIVE = 'D:/'
+E_DRIVE = 'E:/'
+Z_DRIVE = 'Z:/'
+DRIVES = [D_DRIVE, E_DRIVE, Z_DRIVE]
 
 CLIENTS = os.path.join('Games', 'Clients')
 GAMES = os.path.join('Games', 'PC')
@@ -42,12 +45,12 @@ def main():
 def link_steam():
   if STEAM_USER_ID3:
     link_dir(
-      os.path.join('D:\\', CLIENTS, 'Steam', 'steamapps'),
-      os.path.join('D:\\', STEAM_APPS)
+      os.path.join(D_DRIVE, CLIENTS, 'Steam', 'steamapps'),
+      os.path.join(D_DRIVE, STEAM_APPS)
     )
     link_dir(
-      os.path.join('D:\\', CLIENTS, 'Steam', 'userdata', STEAM_USER_ID3, 'config', 'grid'),
-      os.path.join('Z:\\', 'Images', 'Covers', 'Steam', '_output')
+      os.path.join(D_DRIVE, CLIENTS, 'Steam', 'userdata', STEAM_USER_ID3, 'config', 'grid'),
+      os.path.join(Z_DRIVE, 'Images', 'Covers', 'Steam', '_output')
     )
     for drive in DRIVES:
       link_dir(
@@ -69,11 +72,11 @@ def link_steam():
 def link_amazon():
   link_dir(
     os.path.join(LOCAL_DATA, AMAZON_GAMES),
-    os.path.join('D:\\', CLIENTS, AMAZON_GAMES)
+    os.path.join(D_DRIVE, CLIENTS, AMAZON_GAMES)
   )
   link_dir(
     os.path.join(LOCAL_DATA, AMAZON_LIBRARY),
-    os.path.join('D:\\', GAMES)
+    os.path.join(D_DRIVE, GAMES)
   )
   for drive in DRIVES:
     link_dir(
@@ -95,11 +98,11 @@ def link_epic():
 def link_ubisoft():
   if UBISOFT_USER_ID:
     link_dir(
-      os.path.join('D:\\', CLIENTS, 'Uplay', 'games'),
-      os.path.join('D:\\', GAMES)
+      os.path.join(D_DRIVE, CLIENTS, 'Uplay', 'games'),
+      os.path.join(D_DRIVE, GAMES)
     )
     link_dir(
-      os.path.join('E:\\', CLIENTS, 'Uplay', 'savegames', UBISOFT_USER_ID),
+      os.path.join(E_DRIVE, CLIENTS, 'Uplay', 'savegames', UBISOFT_USER_ID),
       os.path.join(GAME_CLIENTS_SAVES_PATH, 'Ubisoft')
     )
   else:
@@ -109,13 +112,13 @@ def link_ubisoft():
 def link_electronic_arts():
   link_dir(
     os.path.join(PROGRAM_FILES, 'Electronic Arts', 'EA Desktop', 'EA Desktop'),
-    os.path.join('D:\\', CLIENTS, 'EA Desktop')
+    os.path.join(D_DRIVE, CLIENTS, 'EA Desktop')
   )
   print()
 
 def reverse_link_electronic_arts():
   link_dir(
-    os.path.join('D:\\', CLIENTS, 'EA Desktop'),
+    os.path.join(D_DRIVE, CLIENTS, 'EA Desktop'),
     os.path.join(PROGRAM_FILES, 'Electronic Arts', 'EA Desktop', 'EA Desktop'),
   )
   print()

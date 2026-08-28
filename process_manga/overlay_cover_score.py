@@ -70,11 +70,11 @@ def tqdm_dim(
 def find_font(
   name: str,
 ):
-  user_fonts = os.path.join(os.environ.get('LOCALAPPDATA', ''), 'Microsoft', 'Windows', 'Fonts', name)
+  user_fonts = os.path.join(os.environ.get('LOCALAPPDATA'), 'Microsoft', 'Windows', 'Fonts', name)
   if os.path.exists(user_fonts):
     return user_fonts
 
-  system_fonts = os.path.join(os.environ.get('WINDIR', 'C:\\Windows'), 'Fonts', name)
+  system_fonts = os.path.join(os.environ.get('WINDIR'), 'Fonts', name)
   if os.path.exists(system_fonts):
     return system_fonts
 
