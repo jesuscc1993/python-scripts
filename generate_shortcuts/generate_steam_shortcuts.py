@@ -13,7 +13,10 @@ STEAM_PROTOCOL = 'steam://rungameid/{app_id}'
 CHARS_TO_REPLACE = re.compile(r'\s*:\s*|[<>"/\\|?*]')
 CHARS_TO_REMOVE = re.compile(r'[™]')
 
-VDF_LIBRARY_PATH = os.path.join(LIBRARY_DIR, 'libraryfolder.vdf')
+ID_BLACKLIST = {
+  228980,
+}
+
 VDF_TOKEN_REGEXP = re.compile(r'\{|\}|"((?:\\.|[^"\\])*)"')
 
 def main():
@@ -36,10 +39,11 @@ def main():
 
 def find_library_paths():
   library_paths = []
+
   for drive in DRIVES:
-    vdf_path = os.path.join(drive, VDF_LIBRARY_PATH)
-    if os.path.isfile(vdf_path):
-      library_paths.append(os.path.join(drive, LIBRARY_DIR))
+    library_path = os.path.join(drive, LIBRARY_DIR)
+    if os.path.isdir(library_path):
+      library_paths.append(library_path)
 
   return library_paths
 
@@ -47,6 +51,7 @@ def find_games(
   library_paths: list,
 ):
   games = []
+
   for library_path in library_paths:
     steam_apps_path = os.path.join(library_path, 'steamapps')
     for manifest_path in glob.glob(os.path.join(steam_apps_path, 'appmanifest_*.acf')):
@@ -64,6 +69,10 @@ def parse_manifest(
   name = state.get('name')
   if not app_id or not name:
     logger.warn(f'Skipping incomplete manifest: "{manifest_path}"')
+    return None
+
+  if app_id in ID_BLACKLIST:
+    logger.trace(f'Skipping blacklisted app: "{app_id}"')
     return None
 
   return {'app_id': app_id, 'name': name}
