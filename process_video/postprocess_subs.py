@@ -37,8 +37,9 @@ def process_file(
 def process_directory(
   dir_path: str,
 ):
-  for file_name in os.listdir(dir_path):
-    process_file(os.path.join(dir_path, file_name))
+  for root, _, file_names in os.walk(dir_path):
+    for file_name in file_names:
+      process_file(os.path.join(root, file_name))
 
 if __name__ == '__main__':
   try:
