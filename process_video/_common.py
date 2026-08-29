@@ -16,6 +16,7 @@ def add_missing_spaces(
   with open(file_path, 'r', encoding = ENCODING, errors = 'replace') as f:
     content = f.read()
   content = re.sub(r'(?<=[a-záéíóúüñ])([.,;:!?]+)([A-ZÁÉÍÓÚÜÑ])', r'\1 \2', content)
+  content = re.sub(r'(?<=\S)(\.\.\.)(?=[A-ZÁÉÍÓÚÜÑ])', r'\1 ', content)
   with open(file_path, 'w', encoding = ENCODING) as f:
     f.write(content)
 
