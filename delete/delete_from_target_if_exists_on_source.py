@@ -1,9 +1,11 @@
+from concurrent.futures import ThreadPoolExecutor
 import os
 import sys
 
 from send2trash import send2trash
 from mtlogger import logger
 from mtprompt import Prompt
+from tqdm import tqdm
 
 def main():
   if len(sys.argv) > 2:
@@ -25,20 +27,30 @@ def compare_paths_and_delete_files(
   dest_dir_path: str,
 ):
   none_deleted = True
+  paths_to_delete = []
 
   for root, _, files in os.walk(src_dir_path):
     for f in files:
       path_a = os.path.join(root, f)
       path_b = path_a.replace(src_dir_path, dest_dir_path, 1)
+
       if os.path.exists(path_b):
-        send2trash(path_b)
-        none_deleted = False
-        logger.debug(f'Deleted "{path_b}".')
+        paths_to_delete.append(path_b)
+
+  with ThreadPoolExecutor() as executor, tqdm(total = len(paths_to_delete), desc = f'Deleting from "{dest_dir_path}"') as progress:
+    for _ in executor.map(delete_path, paths_to_delete):
+      progress.update(1)
+
+    none_deleted = False
 
   if none_deleted:
     logger.log('No file matches were found.')
   else:
-    logger.success(f'Finished deleting from "{dest_dir_path}" files that already existed in "{src_dir_path}".\n')
+    logger.success(f'Finished deleting from "{dest_dir_path}" files that already existed in "{src_dir_path}".')
+
+def delete_path(path: str):
+  send2trash(path)
+  tqdm.write(logger.format_debug(f'Deleted "{path}".'))
 
 def delete_empty_folders(
   parent_folder_path: str,
