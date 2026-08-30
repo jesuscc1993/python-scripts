@@ -37,11 +37,12 @@ def compare_paths_and_delete_files(
       if os.path.exists(path_b):
         paths_to_delete.append(path_b)
 
-  with ThreadPoolExecutor() as executor, tqdm(total = len(paths_to_delete), desc = f'Deleting from "{dest_dir_path}"') as progress:
-    for _ in executor.map(delete_path, paths_to_delete):
-      progress.update(1)
+  if (len(paths_to_delete) > 0):
+    with ThreadPoolExecutor() as executor, tqdm(total = len(paths_to_delete), desc = f'Deleting from "{dest_dir_path}"') as progress:
+      for _ in executor.map(delete_path, paths_to_delete):
+        progress.update(1)
 
-    none_deleted = False
+      none_deleted = False
 
   if none_deleted:
     logger.log('No file matches were found.')
