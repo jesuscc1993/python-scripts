@@ -1,7 +1,18 @@
 import os
 
 from PIL import ImageFont
+from enum import Enum
 from mtlogger import LogLevel, Logger
+
+class SegoeFontName(Enum):
+  BLACK = 'seguibl.ttf'
+  BOLD = 'segoeuib.ttf'
+  LIGHT = 'segoeuil.ttf'
+  REGULAR = 'segoeui.ttf'
+  SEMIBOLD = 'seguisb.ttf'
+  SEMILIGHT = 'segoeuisl.ttf'
+
+FontName = SegoeFontName
 
 class Font:
 
@@ -9,8 +20,10 @@ class Font:
 
   @staticmethod
   def find_by_name(
-    name: str,
+    name: str | FontName,
   ):
+    name = name.value if isinstance(name, Enum) else name
+
     user_fonts = os.path.join(os.environ.get('LOCALAPPDATA', ''), 'Microsoft', 'Windows', 'Fonts', name)
     if os.path.exists(user_fonts):
       Font.logger.trace(f'Found font "{name}" in user fonts.')
@@ -25,7 +38,7 @@ class Font:
 
   @staticmethod
   def load_by_name(
-    name: str,
+    name: str | FontName,
     size: int,
   ):
     return Font.load_by_path(Font.find_by_name(name), size)

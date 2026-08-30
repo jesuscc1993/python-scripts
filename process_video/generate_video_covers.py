@@ -6,7 +6,7 @@ import subprocess
 import sys
 
 from PIL import Image, ImageDraw, ImageFont
-from mtfont import Font
+from mtfont import Font, SegoeFontName
 from mtlogger import logger
 from mtprompt import Prompt
 from mutagen.asf import ASF, ASFByteArrayAttribute
@@ -19,7 +19,7 @@ COMBINED_VIDEO_EXTS = MUTAGEN_EXTS | OTHER_VIDEO_EXTS
 
 SCREENSHOT_SECS = 3 * 60
 
-FONT_PATH = Font.find_by_name('segoeuib.ttf')
+FONT_PATH = Font.find_by_name(SegoeFontName.BOLD)
 FONT_SIZE = 24
 
 OVERLAY_PADDING = 4

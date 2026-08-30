@@ -10,7 +10,7 @@ import winsound
 
 from PIL import Image, ImageDraw
 from mtattr import Attr
-from mtfont import Font
+from mtfont import Font, SegoeFontName
 from mtlogger import logger
 from mtprompt import Prompt
 
@@ -22,7 +22,7 @@ FORCE_RECALCULATE = False
 OVERRIDE = False
 OVERLAY_SMALLER_THAN_GB = False
 
-FONT_PATH = Font.find_by_name('segoeuib.ttf')
+FONT_PATH = Font.find_by_name(SegoeFontName.BOLD)
 ICO_BAK_FILENAME = 'icon.bak.ico'
 DIR_SIZE_FILENAME = 'dir_file_size.txt'
 EXCLUSION_FILE = '.noscan'
