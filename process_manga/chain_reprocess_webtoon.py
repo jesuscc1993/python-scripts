@@ -19,5 +19,5 @@ if __name__ == '__main__':
   try:
     select_parent_folder(None, process_parent_folder)
   except Exception as ex:
-    logger.unhandledError(ex)
+    logger.unhandled_error(ex)
     Prompt.enter_to_exit()

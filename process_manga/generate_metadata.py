@@ -50,7 +50,7 @@ def process_dir(
   fetch_manga_info(dir_path, sanitized_name)
 
 def format_result_title(result: MangaSearchResult):
-  return f'{result.title} {logger.formatTrace("(" + result.type + ")")}'
+  return f'{result.title} {logger.format_trace("(" + result.type + ")")}'
 
 def write_comic_info(
   dir_path: str,
@@ -185,6 +185,6 @@ if __name__ == '__main__':
   try:
     main()
   except Exception as ex:
-    logger.unhandledError(ex)
+    logger.unhandled_error(ex)
 
   Prompt.enter_to_exit(timeout=True)

@@ -75,7 +75,7 @@ def process_parent_folder(
   for folder in tqdm(folders, desc=f'Processing "{parent_folder_path}"'):
     chapter = get_chapter(folder)
     if not chapter:
-      tqdm.write(logger.formatWarn(f'Skipping "{folder}". Chapter number could not be inferred.'))
+      tqdm.write(logger.format_warn(f'Skipping "{folder}". Chapter number could not be inferred.'))
       continue
     try:
       ch_num = float(chapter)
@@ -104,5 +104,5 @@ if __name__ == '__main__':
   try:
     main()
   except Exception as ex:
-    logger.unhandledError(ex)
+    logger.unhandled_error(ex)
     Prompt.enter_to_exit()

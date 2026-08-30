@@ -71,7 +71,7 @@ def process_chapter(
   img_hash = imagehash.phash(Image.open(last_img))
   if ref_hash - img_hash <= HASH_THRESHOLD:
     send2trash(last_img)
-    tqdm.write(logger.formatInfo(f'Deleted "{last_img}"'))
+    tqdm.write(logger.format_info(f'Deleted "{last_img}"'))
     return True
   return False
 
@@ -93,6 +93,6 @@ if __name__ == '__main__':
   try:
     main()
   except Exception as ex:
-    logger.unhandledError(ex)
+    logger.unhandled_error(ex)
 
   Prompt.enter_to_exit()

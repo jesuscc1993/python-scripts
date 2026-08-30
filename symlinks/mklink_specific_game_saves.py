@@ -57,6 +57,6 @@ if __name__ == '__main__':
     run_as_admin()
     main()
   except Exception as ex:
-    logger.unhandledError(ex)
+    logger.unhandled_error(ex)
 
   Prompt.enter_to_exit()

@@ -14,6 +14,15 @@ class LogLevel(Enum):
   LOG = 'LOG'
   WARN = 'WARN'
 
+LOG_LEVEL_SEVERITY = {
+  LogLevel.TRACE: 0,
+  LogLevel.DEBUG: 1,
+  LogLevel.LOG: 2,
+  LogLevel.INFO: 2,
+  LogLevel.WARN: 3,
+  LogLevel.ERROR: 4,
+}
+
 class LevelColor(Enum):
   TRACE = Fore.LIGHTBLACK_EX
   DEBUG = Fore.CYAN
@@ -26,76 +35,85 @@ class LogOptions(TypedDict, total=False):
   prefix_newline: bool
 
 class Logger:
+  def __init__(self, level: LogLevel = LogLevel.TRACE):
+    self.level = level
+
   # core functions
   def colorize(_, color: str, msg = ''):
     return f"{color}{msg.replace(Fore.RESET, color)}{Fore.RESET}"
 
-  def formatLevel(self, level: LogLevel, msg = ''):
+  def format_level(self, level: LogLevel, msg = ''):
     return self.colorize(LevelColor[level.name].value, msg)
 
-  def print(_, msg = '', options: Optional[LogOptions] = None):
+  def is_enabled(self, level: LogLevel):
+    return LOG_LEVEL_SEVERITY[level] >= LOG_LEVEL_SEVERITY[self.level]
+
+  def print(self, level: LogLevel, msg = '', options: Optional[LogOptions] = None):
+    if not self.is_enabled(level):
+      return
+
     prefix_newline = options.get('prefix_newline', False) if options else False
     print(f'{'\n' if prefix_newline else ''}{msg}')
   #
 
   # formatting functions
-  def formatTrace(self, msg = ''):
-    return self.formatLevel(LogLevel.TRACE, msg)
+  def format_trace(self, msg = ''):
+    return self.format_level(LogLevel.TRACE, msg)
 
-  def formatDebug(self, msg = ''):
-    return self.formatLevel(LogLevel.DEBUG, msg)
+  def format_debug(self, msg = ''):
+    return self.format_level(LogLevel.DEBUG, msg)
 
-  def formatError(self, msg = ''):
-    return self.formatLevel(LogLevel.ERROR, msg)
+  def format_error(self, msg = ''):
+    return self.format_level(LogLevel.ERROR, msg)
 
-  def formatInfo(self, msg = ''):
-    return self.formatLevel(LogLevel.INFO, msg)
+  def format_info(self, msg = ''):
+    return self.format_level(LogLevel.INFO, msg)
 
-  def formatLog(self, msg = ''):
-    return self.formatLevel(LogLevel.LOG, msg)
+  def format_log(self, msg = ''):
+    return self.format_level(LogLevel.LOG, msg)
 
-  def formatWarn(self, msg = ''):
-    return self.formatLevel(LogLevel.WARN, msg)
+  def format_warn(self, msg = ''):
+    return self.format_level(LogLevel.WARN, msg)
 
-  def formatSuccess(self, msg = ''):
+  def format_success(self, msg = ''):
     return f'{self.colorize(Fore.GREEN, "✓")} {msg}'
 
-  def formatFailure(self, msg = ''):
+  def format_failure(self, msg = ''):
     return f'{self.colorize(Fore.RED, "✗")} {msg}'
   #
 
   # print functions
   def trace(self, msg = '', **kwargs: Unpack[LogOptions]):
-    self.print(self.formatTrace(msg), LogOptions(**kwargs))
+    self.print(LogLevel.TRACE, self.format_trace(msg), LogOptions(**kwargs))
 
   def debug(self, msg = '', **kwargs: Unpack[LogOptions]):
-    self.print(self.formatDebug(msg), LogOptions(**kwargs))
+    self.print(LogLevel.DEBUG, self.format_debug(msg), LogOptions(**kwargs))
 
   def error(self, msg = '', **kwargs: Unpack[LogOptions]):
-    self.print(self.formatError(msg), LogOptions(**kwargs))
+    self.print(LogLevel.ERROR, self.format_error(msg), LogOptions(**kwargs))
 
   def info(self, msg = '', **kwargs: Unpack[LogOptions]):
-    self.print(self.formatInfo(msg), LogOptions(**kwargs))
+    self.print(LogLevel.INFO, self.format_info(msg), LogOptions(**kwargs))
 
   def log(self, msg = '', **kwargs: Unpack[LogOptions]):
-    self.print(self.formatLog(msg), LogOptions(**kwargs))
+    self.print(LogLevel.LOG, self.format_log(msg), LogOptions(**kwargs))
 
   def warn(self, msg = '', **kwargs: Unpack[LogOptions]):
-    self.print(self.formatWarn(msg), LogOptions(**kwargs))
+    self.print(LogLevel.WARN, self.format_warn(msg), LogOptions(**kwargs))
 
   def success(self, msg = '', **kwargs: Unpack[LogOptions]):
-    self.print(self.formatSuccess(msg), LogOptions(**kwargs))
+    self.print(LogLevel.LOG, self.format_success(msg), LogOptions(**kwargs))
 
   def failure(self, msg = '', **kwargs: Unpack[LogOptions]):
-    self.print(self.formatFailure(msg), LogOptions(**kwargs))
+    self.print(LogLevel.ERROR, self.format_failure(msg), LogOptions(**kwargs))
   #
 
   # other functions
-  def unhandledError(self, msg = '', **kwargs: Unpack[LogOptions]):
-    self.print(self.formatError(f'Unhandled error: {msg}'), LogOptions(**kwargs))
+  def unhandled_error(self, msg = '', **kwargs: Unpack[LogOptions]):
+    self.print(LogLevel.ERROR, self.format_error(f'Unhandled error: {msg}'), LogOptions(**kwargs))
 
   def hr(self):
-    self.print(self.colorize(Fore.LIGHTBLACK_EX, '─' * os.get_terminal_size().columns))
+    self.print(LogLevel.LOG, self.colorize(Fore.LIGHTBLACK_EX, '─' * os.get_terminal_size().columns))
   #
 
 logger = Logger()

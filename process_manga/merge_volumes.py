@@ -25,7 +25,7 @@ def process_parent_folder(
     if os.path.isdir(folder_path):
       volume, chapter = get_volume_and_chapter(folder)
       if volume is None or chapter is None:
-        tqdm.write(logger.formatWarn(f'Skipping "{folder}". Volume or chapter numbers could not be inferred.'))
+        tqdm.write(logger.format_warn(f'Skipping "{folder}". Volume or chapter numbers could not be inferred.'))
         continue
 
       output_path = os.path.join(parent_folder_path, f'Vol.{zfill_float(volume, 2)}')
@@ -71,5 +71,5 @@ if __name__ == '__main__':
   try:
     main()
   except Exception as ex:
-    logger.unhandledError(ex)
+    logger.unhandled_error(ex)
     Prompt.enter_to_exit()

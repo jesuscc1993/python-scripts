@@ -29,7 +29,7 @@ def process_parent_folder(
     if should_process_item(item_path):
       chapter = get_chapter(item)
       if not chapter:
-        tqdm.write(logger.formatWarn(f'Skipping "{item}". Chapter number could not be inferred.'))
+        tqdm.write(logger.format_warn(f'Skipping "{item}". Chapter number could not be inferred.'))
         continue
 
       output_path = os.path.join(parent_dir_path, f'Ch.{chapter.zfill(2)}')
@@ -81,6 +81,6 @@ if __name__ == '__main__':
   try:
     main()
   except Exception as ex:
-    logger.unhandledError(ex)
+    logger.unhandled_error(ex)
 
   Prompt.enter_to_exit()

@@ -65,7 +65,7 @@ def main():
 def tqdm_dim(
   msg: str,
 ):
-  tqdm.write(logger.formatTrace(msg))
+  tqdm.write(logger.format_trace(msg))
 
 def find_font(
   name: str,
@@ -154,7 +154,7 @@ def process_cover(
   img = overlay_score(img, score, font)
   img.save(processed_cover_img_path, quality=100)
 
-  tqdm.write(logger.formatDebug(f'Applied score overlay to "{os.path.basename(dir)}".'))
+  tqdm.write(logger.format_debug(f'Applied score overlay to "{os.path.basename(dir)}".'))
 
 def resize_cover(
   img: Image.Image,
@@ -213,6 +213,6 @@ if __name__ == '__main__':
   try:
     main()
   except Exception as ex:
-    logger.unhandledError(ex)
+    logger.unhandled_error(ex)
 
   Prompt.enter_to_exit(timeout=True)

@@ -40,7 +40,7 @@ def main():
         else:
           mismatches.append(item_name)
           logger.log(f'  "{item_name}" has different volumes or chapters in the folders.')
-          logger.failure(f'{logger.formatTrace(f"\"{folder_a}\"")} {print_range(range_a)} | {print_range(range_b)} {logger.formatTrace(f"\"{folder_b}\"")}')
+          logger.failure(f'{logger.format_trace(f"\"{folder_a}\"")} {print_range(range_a)} | {print_range(range_b)} {logger.format_trace(f"\"{folder_b}\"")}')
       else:
         logger.trace(f'Failed to determine ranges for "{item_name}".')
     elif path_a:
@@ -139,6 +139,6 @@ if __name__ == '__main__':
   try:
     main()
   except Exception as ex:
-    logger.unhandledError(ex)
+    logger.unhandled_error(ex)
 
   Prompt.enter_to_exit()

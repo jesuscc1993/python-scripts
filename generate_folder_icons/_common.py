@@ -57,9 +57,9 @@ def process_folder(
     image_to_ico(image_path, ico_path)
     set_folder_icon(folder_path, ICO_FILENAME)
   elif skipped:
-    tqdm.write(logger.formatWarn(f'No image found in "{folder_path}" is newer than the icon.'))
+    tqdm.write(logger.format_warn(f'No image found in "{folder_path}" is newer than the icon.'))
   else:
-    tqdm.write(logger.formatWarn(f'No suitable image found in "{folder_path}".'))
+    tqdm.write(logger.format_warn(f'No suitable image found in "{folder_path}".'))
 
 def is_file_newer_than(
   file_a: str,
@@ -110,10 +110,10 @@ def set_folder_icon(
     Attr.hide(desktop_ini_path)
 
   except PermissionError:
-    tqdm.write(logger.formatWarn(f'Permission denied: "{desktop_ini_path}". You may need to run the script as an administrator.'))
+    tqdm.write(logger.format_warn(f'Permission denied: "{desktop_ini_path}". You may need to run the script as an administrator.'))
 
   except Exception as ex:
-    tqdm.write(logger.formatError(f'Error setting folder icon to "{folder_path}":\n{ex}'))
+    tqdm.write(logger.format_error(f'Error setting folder icon to "{folder_path}":\n{ex}'))
 
 def read_ini(
   ini_path: str,
