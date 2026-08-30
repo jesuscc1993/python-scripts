@@ -7,6 +7,7 @@ import sys
 
 from PIL import Image, ImageDraw, ImageFont
 from concurrent.futures import ThreadPoolExecutor
+from mtfont import Font
 from mtlogger import logger
 from mtprompt import Prompt
 from tqdm import tqdm
@@ -26,7 +27,7 @@ OVERLAY_PADDING = 8
 OVERLAY_MARGIN = 8
 OVERLAY_RADIUS = 8
 
-FONT_NAME = 'Roboto-Regular.ttf'
+FONT_PATH = Font.find_by_name('Roboto-Regular.ttf')
 FONT_SIZE = 31
 
 FG_GRAY = '#333333'
@@ -49,7 +50,7 @@ def main():
       'Enter the path to the directory containing your manga'
     )
 
-  font = ImageFont.truetype(find_font(FONT_NAME), FONT_SIZE)
+  font = Font.load_by_path(FONT_PATH, FONT_SIZE)
 
   dirs_to_process = []
   for entry in os.scandir(parent_dir):
@@ -66,19 +67,6 @@ def tqdm_dim(
   msg: str,
 ):
   tqdm.write(logger.format_trace(msg))
-
-def find_font(
-  name: str,
-):
-  user_fonts = os.path.join(os.environ.get('LOCALAPPDATA'), 'Microsoft', 'Windows', 'Fonts', name)
-  if os.path.exists(user_fonts):
-    return user_fonts
-
-  system_fonts = os.path.join(os.environ.get('WINDIR'), 'Fonts', name)
-  if os.path.exists(system_fonts):
-    return system_fonts
-
-  return None
 
 def find_cover(
   dir: str,

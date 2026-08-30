@@ -6,10 +6,11 @@ import subprocess
 import sys
 
 from PIL import Image, ImageDraw, ImageFont
-from mutagen.asf import ASF, ASFByteArrayAttribute
-from mutagen.mp4 import MP4, MP4Cover
+from mtfont import Font
 from mtlogger import logger
 from mtprompt import Prompt
+from mutagen.asf import ASF, ASFByteArrayAttribute
+from mutagen.mp4 import MP4, MP4Cover
 from tqdm import tqdm
 
 MUTAGEN_EXTS = {'.mp4', '.m4v', '.mov', '.wmv'}
@@ -18,7 +19,7 @@ COMBINED_VIDEO_EXTS = MUTAGEN_EXTS | OTHER_VIDEO_EXTS
 
 SCREENSHOT_SECS = 3 * 60
 
-FONT_NAME = 'segoeuib.ttf'
+FONT_PATH = Font.find_by_name('segoeuib.ttf')
 FONT_SIZE = 24
 
 OVERLAY_PADDING = 4
@@ -252,13 +253,8 @@ def draw_stats_overlay(
   file_size: int,
 ):
   draw = ImageDraw.Draw(img, 'RGBA')
-
-  try:
-    font = ImageFont.truetype(FONT_NAME, FONT_SIZE)
-  except Exception:
-    font = ImageFont.load_default()
-
-  img_w, img_h = img.size
+  font = Font.load_by_path(FONT_PATH, FONT_SIZE)
+  img_w, _ = img.size
 
   draw_label(draw, font, format_duration(duration_secs), side = 'left', img_w = img_w)
   draw_label(draw, font, format_size(file_size), side = 'right', img_w = img_w)

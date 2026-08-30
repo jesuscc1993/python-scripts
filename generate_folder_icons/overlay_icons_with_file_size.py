@@ -8,8 +8,9 @@ import win32gui
 import win32ui
 import winsound
 
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw
 from mtattr import Attr
+from mtfont import Font
 from mtlogger import logger
 from mtprompt import Prompt
 
@@ -21,7 +22,7 @@ FORCE_RECALCULATE = False
 OVERRIDE = False
 OVERLAY_SMALLER_THAN_GB = False
 
-FONT_NAME = 'segoeuib.ttf'
+FONT_PATH = Font.find_by_name('segoeuib.ttf')
 ICO_BAK_FILENAME = 'icon.bak.ico'
 DIR_SIZE_FILENAME = 'dir_file_size.txt'
 EXCLUSION_FILE = '.noscan'
@@ -242,12 +243,8 @@ def overlay_file_size_256(
 ):
   img = ico_img.resize((SIZE_256, SIZE_256), Image.LANCZOS)
 
-  try:
-    value_font = ImageFont.truetype(FONT_NAME, VALUE_FONT_SIZE_256)
-    unit_font = ImageFont.truetype(FONT_NAME, UNITS_FONT_SIZE_256)
-  except Exception:
-    value_font = ImageFont.load_default(VALUE_FONT_SIZE_256)
-    unit_font = ImageFont.load_default(UNITS_FONT_SIZE_256)
+  value_font = Font.load_by_path(FONT_PATH, VALUE_FONT_SIZE_256)
+  unit_font = Font.load_by_path(FONT_PATH, UNITS_FONT_SIZE_256)
 
   draw = ImageDraw.Draw(img)
   bbox_value = draw.textbbox((0, 0), value_text, font=value_font)
@@ -295,12 +292,8 @@ def overlay_file_size_48(
 ):
   img = ico_img.resize((SIZE_48, SIZE_48), Image.LANCZOS)
 
-  try:
-    value_font = ImageFont.truetype(FONT_NAME, VALUE_FONT_SIZE_48)
-    unit_font = ImageFont.truetype(FONT_NAME, UNITS_FONT_SIZE_48)
-  except Exception:
-    value_font = ImageFont.load_default(VALUE_FONT_SIZE_48)
-    unit_font = ImageFont.load_default(UNITS_FONT_SIZE_48)
+  value_font = Font.load_by_path(FONT_PATH, VALUE_FONT_SIZE_48)
+  unit_font = Font.load_by_path(FONT_PATH, UNITS_FONT_SIZE_48)
 
   draw = ImageDraw.Draw(img)
   bbox_value = draw.textbbox((0, 0), value_text, font=value_font)
