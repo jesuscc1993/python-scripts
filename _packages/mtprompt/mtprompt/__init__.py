@@ -5,6 +5,48 @@ import winsound
 
 from mtlogger import logger
 
+def to_bool(val: str):
+  val = val.strip().lower()
+
+  if val in ('y', 'yes'):
+    return True
+  if val in ('n', 'no'):
+    return False
+
+  raise ValueError(f'Value "{val}" is not a valid boolean (y/n).')
+
+def to_int(val: str):
+  val = val.strip()
+
+  try:
+    return int(val)
+  except ValueError:
+    raise ValueError(f'Input "{val}" is not an integer.')
+
+def to_path(val: str):
+  val = val.strip(' "')
+
+  if not os.path.exists(val):
+    raise ValueError(f'Path "{val}" does not exist.')
+
+  return val
+
+def to_dir(val: str):
+  val = val.strip(' "')
+
+  if not os.path.isdir(val):
+    raise ValueError(f'Path "{val}" is not a directory.')
+
+  return val
+
+def to_file(val: str):
+  val = val.strip(' "')
+
+  if not os.path.isfile(val):
+    raise ValueError(f'Path "{val}" is not a file.')
+
+  return val
+
 class Prompt:
 
   @staticmethod
@@ -44,9 +86,9 @@ class Prompt:
 
       if val != '':
         try:
-          val = int(val)
-        except ValueError:
-          logger.error(f'Input "{val}" is not an integer.\n')
+          val = to_int(val)
+        except ValueError as ex:
+          logger.error(f'{ex}\n')
           continue
 
       logger.log()
@@ -68,14 +110,15 @@ class Prompt:
       default_display = 'y/N'
 
     while True:
-      val = input(f'{prompt} ({default_display})\n: ').strip().lower()
+      val = input(f'{prompt} ({default_display})\n: ').strip()
 
-      if val in ('y', 'yes'):
-        boolean = True
-      elif val in ('n', 'no'):
-        boolean = False
-      else:
+      if not val:
         boolean = default
+      else:
+        try:
+          boolean = to_bool(val)
+        except ValueError:
+          boolean = default
 
       if boolean is None and default is None and not optional:
         logger.error('A value is required.\n')
@@ -100,9 +143,12 @@ class Prompt:
         logger.error('A path is required.\n')
         continue
 
-      if val and not os.path.exists(val):
-        logger.error(f'Path "{val}" does not exist.\n')
-        continue
+      if val:
+        try:
+          val = to_path(val)
+        except ValueError as ex:
+          logger.error(f'{ex}\n')
+          continue
 
       logger.log()
       return val if val != '' else default
@@ -123,9 +169,12 @@ class Prompt:
         logger.error('A directory path is required.\n')
         continue
 
-      if val and not os.path.isdir(val):
-        logger.error(f'Path "{val}" is not a directory.\n')
-        continue
+      if val:
+        try:
+          val = to_dir(val)
+        except ValueError as ex:
+          logger.error(f'{ex}\n')
+          continue
 
       logger.log()
       return val if val != '' else default
@@ -146,9 +195,12 @@ class Prompt:
         logger.error('A file path is required.\n')
         continue
 
-      if val and not os.path.isfile(val):
-        logger.error(f'Path "{val}" is not a file.\n')
-        continue
+      if val:
+        try:
+          val = to_file(val)
+        except ValueError as ex:
+          logger.error(f'{ex}\n')
+          continue
 
       logger.log()
       return val if val != '' else default
