@@ -8,8 +8,9 @@ from mtprompt import Prompt
 from tqdm import tqdm
 
 from _common import scan_dir_names, seconds_to_hours, format_dimmed, simplify_game_name, matches_loosely
-from _constants import EMPTY_CELL, STYLE
+from _constants import EMPTY_CELL, GENERIC_EXCLUSION_FILE, STYLE
 
+HLTB_EXCLUSION_FILE = '.nohltbscan'
 DB_PATH = os.path.join(os.path.dirname(__file__), '..', '_data', 'hltb_database.json')
 
 def main():
@@ -18,7 +19,7 @@ def main():
   game_dirs = sys.argv[1:] if len(sys.argv) > 1 else [Prompt.dir('Enter the path to the directory containing your games')]
 
   db = get_db()
-  dir_names = scan_dir_names(game_dirs)
+  dir_names = scan_dir_names(game_dirs, [GENERIC_EXCLUSION_FILE, HLTB_EXCLUSION_FILE])
 
   matched = []
   unmatched = []
