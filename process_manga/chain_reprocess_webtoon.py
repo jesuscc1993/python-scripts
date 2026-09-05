@@ -4,10 +4,10 @@ from mtprompt import Prompt
 from _common import select_parent_folder, run_scripts_in_sequence
 
 SCRIPT_NAMES = [
-  '../compress/extract_archives',
-  'crop_webtoon',
-  '../compress/compress_folders',
-  'rename_items'
+  '../compress/extract_archives $dir',
+  'crop_webtoon $dir',
+  '../compress/compress_folders $dir ZIP Y',
+  'rename_items $dir'
 ]
 
 def process_parent_folder(

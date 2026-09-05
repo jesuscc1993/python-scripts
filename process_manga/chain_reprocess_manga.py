@@ -4,11 +4,11 @@ from mtprompt import Prompt
 from _common import select_parent_folder, run_scripts_in_sequence
 
 SCRIPT_NAMES = [
-  '../compress/extract_archives',
-  'resize_manga',
-  '../compress/compress_folders',
-  'rename_items',
-  '../rename/rename_zip_to_cbz'
+  '../compress/extract_archives $dir',
+  'resize_manga $dir',
+  '../compress/compress_folders $dir ZIP Y',
+  'rename_items $dir',
+  '../rename/rename_zip_to_cbz $dir'
 ]
 
 def process_parent_folder(

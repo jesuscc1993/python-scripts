@@ -1,6 +1,7 @@
 import os
+import re
 import shutil
-import subprocess
+import tempfile
 import zipfile
 
 from concurrent.futures import ThreadPoolExecutor
@@ -28,9 +29,6 @@ def compress_child_folders(
   folders = []
   for root, dirs, _ in os.walk(parent_folder_path, topdown = False):
     for dir_name in dirs:
-      if dir_name == '.tmp':
-        continue
-
       folder_path = os.path.join(root, dir_name)
       rel_folder_path = os.path.relpath(folder_path, parent_folder_path)
       current_depth = rel_folder_path.count(os.sep) + 1
@@ -39,19 +37,12 @@ def compress_child_folders(
         folders.append(folder_path)
 
   if len(folders) > 0:
-    tmp_dir = os.path.join(parent_folder_path, '.tmp')
-    os.makedirs(tmp_dir, exist_ok = True)
-    subprocess.call(['attrib', '+H', str(tmp_dir)])
-
-    try:
-      with ThreadPoolExecutor() as executor:
-        list(tqdm(
-          executor.map(lambda folder: compress_folder(folder, output_type, tmp_dir, remove_original), folders),
-          total = len(folders),
-          desc = f'Processing "{parent_folder_path}"'
-        ))
-    finally:
-      shutil.rmtree(tmp_dir, ignore_errors = True)
+    with ThreadPoolExecutor() as executor:
+      list(tqdm(
+        executor.map(lambda folder: compress_folder(folder, output_type, remove_original), folders),
+        total = len(folders),
+        desc = f'Processing "{parent_folder_path}"'
+      ))
 
     logger.success(f'Finished compressing folders in "{parent_folder_path}".')
   else:
@@ -60,14 +51,14 @@ def compress_child_folders(
 def compress_folder(
   folder_path: str,
   output_type: str,
-  tmp_dir: str,
   remove_original = True,
 ):
   folder_name = os.path.basename(folder_path)
   parent_dir = os.path.dirname(folder_path)
 
   zip_filename = f'{folder_name}.{output_type.lower()}'
-  tmp_zip_path = os.path.join(tmp_dir, zip_filename)
+  tmp_name = re.sub(r'[<>:"/\\|?*]', '_', folder_path)
+  tmp_zip_path = os.path.join(tempfile.gettempdir(), f'{tmp_name}.tmp')
   final_zip_path = os.path.join(parent_dir, zip_filename)
 
   if os.path.exists(final_zip_path):
@@ -92,6 +83,9 @@ def compress_folder(
 
   except Exception as ex:
     logger.error(f'An error occurred while processing "{folder_name}":\n{ex}')
+  finally:
+    if os.path.exists(tmp_zip_path):
+      os.remove(tmp_zip_path)
 
 def extract_child_archives(
   parent_folder_path: str,

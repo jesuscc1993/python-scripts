@@ -99,17 +99,19 @@ def get_chapter(
   return chapter
 
 def run_scripts_in_sequence(
-  script_names: list,
+  script_commands: list,
   parent_folder_path: str,
 ):
   env = os.environ.copy()
   env['NO_ENTER_TO_EXIT'] = '1'
 
-  for script in script_names:
+  for script_command in script_commands:
+    script, *arg_tokens = script_command.split(' ')
+    args = [parent_folder_path if token == '$dir' else token for token in arg_tokens]
     abs_path = os.path.abspath(os.path.join(os.path.dirname(__file__), script + '.py'))
 
     logger.trace(f'\nRunning {script}:')
-    subprocess.run(['python', abs_path, parent_folder_path], env=env)
+    subprocess.run(['python', abs_path, *args], env=env)
 
   logger.info(
     f'Finished batch running scripts on "{parent_folder_path}".\n',
