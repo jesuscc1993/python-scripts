@@ -3,20 +3,21 @@ import os
 import re
 import sys
 
-from mtattr import Attr
 from mtlogger import logger
 from mtprompt import Prompt
 from rapidfuzz import process
+from tqdm import tqdm
 
+from _common import scan_dir_names
 from _compact_gui_types import CompType, DbEntry
+from _constants import EMPTY_CELL, STYLE
 
 DATABASE_PATH = r"%LOCALAPPDATA%\IridiumIO\CompactGUI\databasev2.json"
-DIR_BLACKLIST = ['__InstallData__']
-EMPTY_CELL = 'N/A'
-EXCLUSION_FILE = '.noscan'
 MATCHING_ACCURACY = 75
 
 def main():
+  logger.log('Running CompactGUI scan...')
+
   game_dirs = sys.argv[1:] if len(sys.argv) > 1 else [Prompt.dir('Enter the path to the directory containing your games')]
 
   db = get_db()
@@ -24,71 +25,63 @@ def main():
     logger.error("Database could not be loaded. Aborting.")
     return
 
-  all_matched = []
-  all_unmatched = []
-
-  for games_dir in game_dirs:
-    matched, unmatched = process_dir(games_dir, db)
-    all_matched.extend(matched)
-    all_unmatched.extend(unmatched)
-
-  all_matched.sort(key=lambda x: get_savings(x[3]), reverse=True)
-  all_unmatched.sort()
-  write_output(all_matched, all_unmatched)
-
-def process_dir(
-  dir_path: str,
-  db: list[DbEntry],
-):
-  dir_names = [
-    entry.name
-    for entry in os.scandir(dir_path)
-    if entry.is_dir() and not should_skip_dir(entry.path)
-  ]
-
-  db_by_folder = {}
-  for entry in db:
-    db_by_folder[normalize_dir_name(entry['GameName'])] = entry
-    db_by_folder[normalize_dir_name(entry['FolderName'])] = entry
+  db_by_folder = build_db_by_folder(db)
   db_folder_names = list(db_by_folder.keys())
+  dir_names = scan_dir_names(game_dirs)
 
   matched = []
   unmatched = []
 
-  for dir_name in dir_names:
-    dir_name_lower = normalize_dir_name(dir_name)
-    db_entry = (
-      db_by_folder.get(dir_name_lower) or
-      db_by_folder.get(dir_name_lower.replace(' -', '')) or
-      db_by_folder.get(dir_name_lower.replace(' ', ''))
-    )
-    score = 100
+  for dir_name in tqdm(dir_names, desc = 'Scanning games'):
+    db_entry, score = match_dir_name(dir_name, db_by_folder, db_folder_names)
     if db_entry is None:
-      pattern = re.compile(r'\b' + re.escape(dir_name_lower) + r'\b')
-      substring_matches = [name for name in db_folder_names if pattern.search(name)]
-      if substring_matches:
-        best = min(substring_matches, key=len)
-        score = round(len(dir_name) / len(best) * 100)
-        if score < MATCHING_ACCURACY:
-          unmatched.append(dir_name)
-          continue
-        db_entry = db_by_folder[best]
-      else:
-        result = process.extractOne(dir_name_lower, db_folder_names, score_cutoff=MATCHING_ACCURACY)
-        if result and result[0] not in dir_name_lower:
-          db_entry = db_by_folder[result[0]]
-          score = result[1]
-        else:
-          unmatched.append(dir_name)
-          continue
-    matched.append((dir_name, db_entry, score))
+      unmatched.append(dir_name)
+      continue
 
-  matched = [
-    (dir_name, entry, score, get_best_compression_result(entry.get('CompressionResults')))
-    for dir_name, entry, score in matched
-  ]
+    best_result = get_best_compression_result(db_entry.get('CompressionResults'))
+    matched.append((dir_name, db_entry, score, best_result))
 
-  return matched, unmatched
+  matched.sort(key = lambda x: get_savings(x[3]), reverse = True)
+  unmatched.sort()
+  write_output(matched, unmatched)
+
+def build_db_by_folder(
+  db: list[DbEntry],
+):
+  db_by_folder = {}
+  for entry in db:
+    db_by_folder[normalize_dir_name(entry['GameName'])] = entry
+    db_by_folder[normalize_dir_name(entry['FolderName'])] = entry
+  return db_by_folder
+
+def match_dir_name(
+  dir_name: str,
+  db_by_folder: dict,
+  db_folder_names: list,
+):
+  dir_name_lower = normalize_dir_name(dir_name)
+  db_entry = (
+    db_by_folder.get(dir_name_lower) or
+    db_by_folder.get(dir_name_lower.replace(' -', '')) or
+    db_by_folder.get(dir_name_lower.replace(' ', ''))
+  )
+  if db_entry is not None:
+    return db_entry, 100
+
+  pattern = re.compile(r'\b' + re.escape(dir_name_lower) + r'\b')
+  substring_matches = [name for name in db_folder_names if pattern.search(name)]
+  if substring_matches:
+    best = min(substring_matches, key = len)
+    score = round(len(dir_name) / len(best) * 100)
+    if score < MATCHING_ACCURACY:
+      return None, None
+    return db_by_folder[best], score
+
+  result = process.extractOne(dir_name_lower, db_folder_names, score_cutoff = MATCHING_ACCURACY)
+  if result and result[0] not in dir_name_lower:
+    return db_by_folder[result[0]], result[1]
+
+  return None, None
 
 def write_output(
   matched: list,
@@ -96,7 +89,7 @@ def write_output(
 ):
   lines = [
     '<title>CompactGUI Scan Output</title>',
-    '<style>th { text-align: center !important; } .dim { filter: brightness(0.5); } .justify-between { display:flex; justify-content:space-between; gap: 0.25em; }</style>',
+    f'<style>{STYLE}</style>',
     '',
     f'# CompactGUI Scan Output',
     '',
@@ -230,19 +223,6 @@ def format_dimmed(
   msg: str,
 ):
   return f'<span class="dim">{msg}</span>'
-
-def should_skip_dir(
-  dir_path: str,
-):
-  should_skip = Attr.is_hidden(dir_path) or has_exclusion_file(dir_path) or os.path.basename(dir_path) in DIR_BLACKLIST
-  if should_skip:
-    logger.trace(f'  Skipping "{dir_path}". Directory is hidden, contains a {EXCLUSION_FILE} file, or is blacklisted.')
-  return should_skip
-
-def has_exclusion_file(
-  path: str,
-):
-  return os.path.exists(os.path.join(path, EXCLUSION_FILE))
 
 def normalize_dir_name(
   name: str,
