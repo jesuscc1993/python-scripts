@@ -1,3 +1,5 @@
+import csv
+import io
 import os
 import sys
 import threading
@@ -8,9 +10,9 @@ from mtlogger import logger
 def to_bool(val: str):
   val = val.strip().lower()
 
-  if val in ('y', 'yes'):
+  if val in ('y', 'yes', 'true'):
     return True
-  if val in ('n', 'no'):
+  if val in ('n', 'no', 'false'):
     return False
 
   raise ValueError(f'Value "{val}" is not a valid boolean (y/n).')
@@ -47,6 +49,21 @@ def to_file(val: str):
 
   return val
 
+def to_list(val: str):
+  try:
+    values = next(csv.reader(io.StringIO(val), skipinitialspace=True, strict=True))
+  except csv.Error:
+    raise ValueError(f'Input "{val}" is not a valid comma-separated list.')
+
+  parsed_values = []
+  for item in values:
+    item = item.strip()
+    if len(item) >= 2 and item[0] == item[-1] and item[0] in ('"', "'"):
+      item = item[1:-1]
+    parsed_values.append(item)
+
+  return parsed_values
+
 class Prompt:
 
   @staticmethod
@@ -67,6 +84,32 @@ class Prompt:
 
       logger.log()
       return val if val != '' else default
+
+  @staticmethod
+  def list(
+    prompt = '',
+    *,
+    optional = False,
+    default: list = None
+  ):
+    prompt = prompt.strip(' "\'')
+
+    while True:
+      val = input(format_prompt(prompt, default))
+
+      if not val and default is None and not optional:
+        logger.error('A list is required.\n')
+        continue
+
+      if val:
+        try:
+          val = to_list(val)
+        except ValueError as ex:
+          logger.error(f'{ex}\n')
+          continue
+
+      logger.log()
+      return val if val else default
 
   @staticmethod
   def int(

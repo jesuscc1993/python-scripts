@@ -18,6 +18,7 @@ def compress_child_folders(
   parent_folder_path: str,
   output_type: str,
   remove_original = False,
+  exclusion_patterns: list = None,
   min_depth = 1,
   max_depth = 1,
 ):
@@ -40,7 +41,7 @@ def compress_child_folders(
   if folders:
     with ThreadPoolExecutor() as executor:
       list(tqdm(
-        executor.map(lambda folder: compress_folder(folder, output_type, remove_original), folders),
+        executor.map(lambda folder: compress_folder(folder, output_type, remove_original, exclusion_patterns), folders),
         total = len(folders),
         desc = f'Processing "{parent_folder_path}"'
       ))
@@ -82,13 +83,15 @@ def compress_folder(
 
     if files_to_compress:
       with zipfile.ZipFile(tmp_zip_path, 'w', zipfile.ZIP_DEFLATED) as compressed_file:
-        for file_path in files_to_compress:
+        for file_path in tqdm(files_to_compress, unit='file'):
           compressed_file.write(file_path, os.path.relpath(file_path, folder_path))
 
       shutil.move(tmp_zip_path, final_zip_path)
 
       if remove_original:
         shutil.rmtree(folder_path)
+
+      logger.success(f'Compressed folder "{folder_path}".')
 
   except Exception as ex:
     logger.error(f'An error occurred while processing "{folder_name}":\n{ex}')

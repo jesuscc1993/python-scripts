@@ -9,7 +9,7 @@ from unittest.mock import patch
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
-from mtprompt import Prompt, to_bool, to_int, to_path, to_dir, to_file
+from mtprompt import Prompt, to_bool, to_int, to_list, to_path, to_dir, to_file
 
 class ToBoolTests(unittest.TestCase):
 
@@ -18,6 +18,8 @@ class ToBoolTests(unittest.TestCase):
     self.assertTrue(to_bool('Y'))
     self.assertTrue(to_bool('yes'))
     self.assertTrue(to_bool('YES'))
+    self.assertTrue(to_bool('true'))
+    self.assertTrue(to_bool('TRUE'))
     self.assertTrue(to_bool('  yes  '))
 
   def test_no_variants(self):
@@ -25,6 +27,8 @@ class ToBoolTests(unittest.TestCase):
     self.assertFalse(to_bool('N'))
     self.assertFalse(to_bool('no'))
     self.assertFalse(to_bool('NO'))
+    self.assertFalse(to_bool('false'))
+    self.assertFalse(to_bool('FALSE'))
 
   def test_invalid_raises(self):
     with self.assertRaises(ValueError):
@@ -66,6 +70,24 @@ class ToPathTests(unittest.TestCase):
     with self.assertRaises(ValueError):
       to_file(self.tmp_dir)
 
+class ToListTests(unittest.TestCase):
+
+  def test_splits_unquoted_items(self):
+    self.assertEqual(to_list('foo,bar'), ['foo', 'bar'])
+
+  def test_parses_double_quoted_item(self):
+    self.assertEqual(to_list('"foo",bar'), ['foo', 'bar'])
+
+  def test_parses_single_quoted_item(self):
+    self.assertEqual(to_list("'foo',bar"), ['foo', 'bar'])
+
+  def test_preserves_commas_inside_quotes(self):
+    self.assertEqual(to_list('foo,"bar,baz"'), ['foo', 'bar,baz'])
+
+  def test_invalid_raises(self):
+    with self.assertRaises(ValueError):
+      to_list('"foo,bar')
+
 class PromptIntTests(unittest.TestCase):
 
   def call(self, inputs, **kwargs):
@@ -84,6 +106,34 @@ class PromptIntTests(unittest.TestCase):
 
   def test_default_on_empty(self):
     self.assertEqual(self.call([''], default = 9), 9)
+
+class PromptListTests(unittest.TestCase):
+
+  def call(self, inputs, **kwargs):
+    input_iter = iter(inputs)
+    with patch('builtins.input', side_effect = lambda _ = '': next(input_iter)), redirect_stdout(io.StringIO()):
+      return Prompt.list('p', **kwargs)
+
+  def test_splits_unquoted_items(self):
+    self.assertEqual(self.call(['foo,bar']), ['foo', 'bar'])
+
+  def test_removes_quotes_from_items(self):
+    self.assertEqual(self.call(['"foo",bar']), ['foo', 'bar'])
+
+  def test_preserves_commas_inside_quotes(self):
+    self.assertEqual(self.call(['foo,"bar,baz"']), ['foo', 'bar,baz'])
+
+  def test_strips_item_whitespace(self):
+    self.assertEqual(self.call([' foo, bar ']), ['foo', 'bar'])
+
+  def test_retries_on_malformed_input(self):
+    self.assertEqual(self.call(['"foo,bar', 'foo,bar']), ['foo', 'bar'])
+
+  def test_optional_empty(self):
+    self.assertIsNone(self.call([''], optional = True))
+
+  def test_default_on_empty(self):
+    self.assertEqual(self.call([''], default = ['foo']), ['foo'])
 
 class PromptBoolTests(unittest.TestCase):
 
