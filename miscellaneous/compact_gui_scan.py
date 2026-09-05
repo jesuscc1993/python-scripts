@@ -11,12 +11,13 @@ from rapidfuzz import process
 from _compact_gui_types import CompType, DbEntry
 
 DATABASE_PATH = r"%LOCALAPPDATA%\IridiumIO\CompactGUI\databasev2.json"
+DIR_BLACKLIST = ['__InstallData__']
 EMPTY_CELL = 'N/A'
 EXCLUSION_FILE = '.noscan'
 MATCHING_ACCURACY = 75
 
 def main():
-  games_dirs = sys.argv[1:] if len(sys.argv) > 1 else [Prompt.dir('Enter the path to the directory containing your games')]
+  game_dirs = sys.argv[1:] if len(sys.argv) > 1 else [Prompt.dir('Enter the path to the directory containing your games')]
 
   db = get_db()
   if db is None:
@@ -26,7 +27,7 @@ def main():
   all_matched = []
   all_unmatched = []
 
-  for games_dir in games_dirs:
+  for games_dir in game_dirs:
     matched, unmatched = process_dir(games_dir, db)
     all_matched.extend(matched)
     all_unmatched.extend(unmatched)
@@ -152,7 +153,8 @@ def format_matched_column(
     ):
       score = 100
 
-  game_name_content = f'[{game_name}](https://store.steampowered.com/app/{steam_id})' if steam_id else game_name
+  formatted_game_name = format_game_name(game_name)
+  game_name_content = f'[{formatted_game_name}](https://store.steampowered.com/app/{steam_id})' if steam_id else formatted_game_name
   return game_name_content if score == 100 else format_dimmed(f'{game_name_content} ({score:.0f}%)')
 
 def format_comp_type_column(
@@ -198,6 +200,16 @@ def get_savings(
 ):
   return result['BeforeBytes'] - result['AfterBytes'] if result else 0
 
+def format_game_name(
+  name: str,
+):
+  formatted_name = name
+  formatted_name = re.sub(r'[™®]\s?', '', formatted_name)
+  formatted_name = re.sub(r'([:-]\s?)?(GOTY|Game of The Year|Director\'s Cut)(\sEdition)?', '', formatted_name, flags = re.IGNORECASE)
+  formatted_name = re.sub(r'([:-]\s?)?(Definitive|Deluxe|Gold|Premium|Ultimate)\sEdition', '', formatted_name, flags = re.IGNORECASE)
+  formatted_name = re.sub(r'[:-]\s?(\w+)\sEdition', '', formatted_name, flags = re.IGNORECASE)
+  return formatted_name.strip()
+
 def format_comp_name(
   comp_type: CompType,
 ):
@@ -222,9 +234,9 @@ def format_dimmed(
 def should_skip_dir(
   dir_path: str,
 ):
-  should_skip = Attr.is_hidden(dir_path) or has_exclusion_file(dir_path)
+  should_skip = Attr.is_hidden(dir_path) or has_exclusion_file(dir_path) or os.path.basename(dir_path) in DIR_BLACKLIST
   if should_skip:
-    logger.trace(f'  Skipping "{dir_path}". Directory is hidden or contains a {EXCLUSION_FILE} file.')
+    logger.trace(f'  Skipping "{dir_path}". Directory is hidden, contains a {EXCLUSION_FILE} file, or is blacklisted.')
   return should_skip
 
 def has_exclusion_file(
