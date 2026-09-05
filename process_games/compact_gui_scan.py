@@ -8,7 +8,7 @@ from mtprompt import Prompt
 from rapidfuzz import process
 from tqdm import tqdm
 
-from _common import scan_dir_names
+from _common import scan_dir_names, format_dimmed, simplify_game_name, matches_loosely, normalize_dir_name
 from _compact_gui_types import CompType, DbEntry
 from _constants import EMPTY_CELL, STYLE
 
@@ -146,7 +146,7 @@ def format_matched_column(
     ):
       score = 100
 
-  formatted_game_name = format_game_name(game_name)
+  formatted_game_name = simplify_game_name(game_name)
   game_name_content = f'[{formatted_game_name}](https://store.steampowered.com/app/{steam_id})' if steam_id else formatted_game_name
   return game_name_content if score == 100 else format_dimmed(f'{game_name_content} ({score:.0f}%)')
 
@@ -193,16 +193,6 @@ def get_savings(
 ):
   return result['BeforeBytes'] - result['AfterBytes'] if result else 0
 
-def format_game_name(
-  name: str,
-):
-  formatted_name = name
-  formatted_name = re.sub(r'[™®]\s?', '', formatted_name)
-  formatted_name = re.sub(r'([:-]\s?)?(GOTY|Game of The Year|Director\'s Cut)(\sEdition)?', '', formatted_name, flags = re.IGNORECASE)
-  formatted_name = re.sub(r'([:-]\s?)?(Definitive|Deluxe|Gold|Premium|Ultimate)\sEdition', '', formatted_name, flags = re.IGNORECASE)
-  formatted_name = re.sub(r'[:-]\s?(\w+)\sEdition', '', formatted_name, flags = re.IGNORECASE)
-  return formatted_name.strip()
-
 def format_comp_name(
   comp_type: CompType,
 ):
@@ -218,30 +208,6 @@ def format_flex(
   items: list[str],
 ):
   return f'<span class="justify-between">{"".join(items)}</span>'
-
-def format_dimmed(
-  msg: str,
-):
-  return f'<span class="dim">{msg}</span>'
-
-def normalize_dir_name(
-  name: str,
-  remove_spaces = False
-):
-  name = name.lower()
-  name = re.sub(r'[:꞉’\']', '', name)
-  if remove_spaces:
-    name = re.sub(r'\s+', '', name)
-  return name
-
-def matches_loosely(
-  a: str,
-  b: str,
-):
-  return (
-    normalize_dir_name(a, remove_spaces=True) ==
-    normalize_dir_name(b, remove_spaces=True)
-  )
 
 def get_db():
   db_path = os.path.expandvars(DATABASE_PATH)

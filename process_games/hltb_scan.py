@@ -1,6 +1,5 @@
 import json
 import os
-import re
 import sys
 
 from mtlogger import logger
@@ -8,7 +7,7 @@ from mthltb import Hltb, HltbResult
 from mtprompt import Prompt
 from tqdm import tqdm
 
-from _common import scan_dir_names, seconds_to_hours
+from _common import scan_dir_names, seconds_to_hours, format_dimmed, simplify_game_name, matches_loosely
 from _constants import EMPTY_CELL, STYLE
 
 DB_PATH = os.path.join(os.path.dirname(__file__), '..', '_data', 'hltb_database.json')
@@ -114,7 +113,7 @@ def format_matched_column(
   result: HltbResult,
 ):
   game_name = result['game_name']
-  formatted_game_name = format_game_name(game_name)
+  formatted_game_name = simplify_game_name(game_name)
   game_name_content = f'[{formatted_game_name}]({result["url"]})'
   return game_name_content if matches_loosely(dir_name, game_name) else format_dimmed(game_name_content)
 
@@ -123,37 +122,6 @@ def format_hours_column(
 ):
   hours = seconds_to_hours(seconds)
   return f'{hours:g}h' if hours else EMPTY_CELL
-
-def format_game_name(
-  name: str,
-):
-  formatted_name = name
-  formatted_name = re.sub(r'[™®]\s?', '', formatted_name)
-  formatted_name = re.sub(r'([:-]\s?)?(GOTY|Game of The Year|Director\'s Cut)(\sEdition)?', '', formatted_name, flags = re.IGNORECASE)
-  formatted_name = re.sub(r'([:-]\s?)?(Definitive|Deluxe|Gold|Premium|Ultimate)\sEdition', '', formatted_name, flags = re.IGNORECASE)
-  formatted_name = re.sub(r'[:-]\s?(\w+)\sEdition', '', formatted_name, flags = re.IGNORECASE)
-  return formatted_name.strip()
-
-def format_dimmed(
-  msg: str,
-):
-  return f'<span class="dim">{msg}</span>'
-
-def normalize_dir_name(
-  name: str,
-):
-  name = name.lower()
-  name = re.sub(r'[:꞉’\']', '', name)
-  return name
-
-def matches_loosely(
-  a: str,
-  b: str,
-):
-  return (
-    re.sub(r'\s+', '', normalize_dir_name(a)) ==
-    re.sub(r'\s+', '', normalize_dir_name(b))
-  )
 
 if __name__ == '__main__':
   try:

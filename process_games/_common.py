@@ -1,4 +1,5 @@
 import os
+import re
 
 from mtattr import Attr
 from mtlogger import logger
@@ -41,4 +42,38 @@ def has_exclusion_file(
 def seconds_to_hours(
   seconds: int,
 ):
-  return round(seconds / 1800) / 2 if seconds is not None else None
+  return round(seconds / 3600) if seconds is not None else None
+
+def format_dimmed(
+  msg: str,
+):
+  return f'<span class="dim">{msg}</span>'
+
+def simplify_game_name(
+  name: str,
+):
+  formatted_name = name
+  formatted_name = re.sub(r'[™®]\s?', '', formatted_name)
+  formatted_name = re.sub(r'([:-]\s?)?(GOTY|Game of The Year|Director\'s Cut)(\sEdition)?', '', formatted_name, flags = re.IGNORECASE)
+  formatted_name = re.sub(r'([:-]\s?)?(Definitive|Deluxe|Gold|Premium|Ultimate)\sEdition', '', formatted_name, flags = re.IGNORECASE)
+  formatted_name = re.sub(r'[:-]\s?(\w+)\sEdition', '', formatted_name, flags = re.IGNORECASE)
+  return formatted_name.strip()
+
+def normalize_dir_name(
+  name: str,
+  remove_spaces = False,
+):
+  name = name.lower()
+  name = re.sub(r'[:꞉’\']', '', name)
+  if remove_spaces:
+    name = re.sub(r'\s+', '', name)
+  return name
+
+def matches_loosely(
+  a: str,
+  b: str,
+):
+  return (
+    normalize_dir_name(a, remove_spaces = True) ==
+    normalize_dir_name(b, remove_spaces = True)
+  )
