@@ -122,7 +122,7 @@ def format_hours_column(
   seconds: int,
 ):
   hours = seconds_to_hours(seconds)
-  return f'{hours:g}h' if hours is not None else EMPTY_CELL
+  return f'{hours:g}h' if hours else EMPTY_CELL
 
 def format_game_name(
   name: str,
