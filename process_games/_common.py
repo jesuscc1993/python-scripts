@@ -1,5 +1,6 @@
 import os
 import re
+import unicodedata
 
 from mtattr import Attr
 from mtlogger import logger
@@ -53,7 +54,7 @@ def simplify_game_name(
   name: str,
 ):
   formatted_name = name
-  formatted_name = re.sub(r'[™®]\s?', '', formatted_name)
+  formatted_name = re.sub(r'[™®]', '', formatted_name)
   formatted_name = re.sub(r'([:-]\s?)?(GOTY|Game of The Year|Director\'s Cut)(\sEdition)?', '', formatted_name, flags = re.IGNORECASE)
   formatted_name = re.sub(r'([:-]\s?)?(Definitive|Deluxe|Gold|Premium|Ultimate)\sEdition', '', formatted_name, flags = re.IGNORECASE)
   formatted_name = re.sub(r'[:-]\s?(\w+)\sEdition', '', formatted_name, flags = re.IGNORECASE)
@@ -61,19 +62,22 @@ def simplify_game_name(
 
 def normalize_dir_name(
   name: str,
-  remove_spaces = False,
 ):
   name = name.lower()
   name = re.sub(r'[:꞉’\']', '', name)
-  if remove_spaces:
-    name = re.sub(r'\s+', '', name)
+  name = ''.join(char for char in unicodedata.normalize('NFKD', name) if not unicodedata.combining(char))
   return name
+
+def get_comparable_dir_name(
+  name: str,
+):
+  comparable_name = re.sub(r'(\s+|-)', '', name)
+  comparable_name = simplify_game_name(comparable_name)
+  comparable_name = normalize_dir_name(comparable_name)
+  return comparable_name
 
 def matches_loosely(
   a: str,
   b: str,
 ):
-  return (
-    normalize_dir_name(a, remove_spaces = True) ==
-    normalize_dir_name(b, remove_spaces = True)
-  )
+  return get_comparable_dir_name(a) == get_comparable_dir_name(b)
