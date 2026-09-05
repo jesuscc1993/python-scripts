@@ -31,7 +31,7 @@ def main():
     all_matched.extend(matched)
     all_unmatched.extend(unmatched)
 
-  all_matched.sort(key=lambda x: x[3], reverse=True)
+  all_matched.sort(key=lambda x: get_savings(x[3]), reverse=True)
   all_unmatched.sort()
   write_output(all_matched, all_unmatched)
 
@@ -83,7 +83,7 @@ def process_dir(
     matched.append((dir_name, db_entry, score))
 
   matched = [
-    (dir_name, entry, score, get_max_space_saved(entry), get_best_compression_result(entry.get('CompressionResults')))
+    (dir_name, entry, score, get_best_compression_result(entry.get('CompressionResults')))
     for dir_name, entry, score in matched
   ]
 
@@ -108,14 +108,12 @@ def write_output(
       f'| Game | Matched {format_dimmed(f"(accuracy%)")} | Type | Before | After | Savings |',
       '|---|---|:-:|--:|--:|:-:|',
     ]
-    for dir_name, entry, score, max_savings, best_result in matched:
-      compression_results = entry.get('CompressionResults')
-
+    for dir_name, entry, score, best_result in matched:
       game_cell = format_game_column(dir_name)
       matched_cell = format_matched_column(dir_name, entry, score)
-      full_size_cell = format_before_column(compression_results)
-      savings_cell = format_savings_column(compression_results, max_savings)
-      lines.append(f'| {game_cell} | {matched_cell} | {format_comp_type_column(best_result)} | {full_size_cell} | {format_after_column(best_result)} | {savings_cell} |')
+      before_cell = format_before_column(best_result)
+      savings_cell = format_savings_column(best_result)
+      lines.append(f'| {game_cell} | {matched_cell} | {format_comp_type_column(best_result)} | {before_cell} | {format_after_column(best_result)} | {savings_cell} |')
 
   if len(unmatched):
     lines += [
@@ -165,9 +163,9 @@ def format_comp_type_column(
   return format_comp_name(CompType(result['CompType']))
 
 def format_before_column(
-  compression_results: list,
+  result: dict,
 ):
-  return format_size(compression_results[0].get('BeforeBytes')) if compression_results else EMPTY_CELL
+  return format_size(result['BeforeBytes']) if result else EMPTY_CELL
 
 def format_after_column(
   result: dict,
@@ -175,13 +173,13 @@ def format_after_column(
   return format_size(result['AfterBytes']) if result else EMPTY_CELL
 
 def format_savings_column(
-  compression_results: list,
-  max_savings: int,
+  result: dict,
 ):
-  if not compression_results:
+  if result is None:
     return EMPTY_CELL
-  pct = (max_savings / compression_results[0]['BeforeBytes']) * 100
-  return format_flex([format_dimmed(f'↓{round(pct)}%'), format_size(max_savings)])
+  savings = result['BeforeBytes'] - result['AfterBytes']
+  pct = (savings / result['BeforeBytes']) * 100
+  return format_flex([format_dimmed(f'↓{round(pct)}%'), format_size(savings)])
 
 def get_best_compression_result(
   results: list,
@@ -195,13 +193,10 @@ def get_best_compression_result(
     next((r for r in results if r['CompType'] == CompType.XPRESS4K), None)
   )
 
-def get_max_space_saved(
-  entry: DbEntry,
+def get_savings(
+  result: dict,
 ):
-  results = entry['CompressionResults']
-  if not results:
-    return 0
-  return max(r['BeforeBytes'] - r['AfterBytes'] for r in results)
+  return result['BeforeBytes'] - result['AfterBytes'] if result else 0
 
 def format_comp_name(
   comp_type: CompType,
