@@ -13,7 +13,7 @@ from _compact_gui_types import CompType, DbEntry
 DATABASE_PATH = r"%LOCALAPPDATA%\IridiumIO\CompactGUI\databasev2.json"
 EMPTY_CELL = 'N/A'
 EXCLUSION_FILE = '.noscan'
-MATCHING_ACCURACY = 80
+MATCHING_ACCURACY = 75
 
 def main():
   games_dirs = sys.argv[1:] if len(sys.argv) > 1 else [Prompt.dir('Enter the path to the directory containing your games')]
@@ -67,8 +67,11 @@ def process_dir(
       substring_matches = [name for name in db_folder_names if pattern.search(name)]
       if substring_matches:
         best = min(substring_matches, key=len)
-        db_entry = db_by_folder[best]
         score = round(len(dir_name) / len(best) * 100)
+        if score < MATCHING_ACCURACY:
+          unmatched.append(dir_name)
+          continue
+        db_entry = db_by_folder[best]
       else:
         result = process.extractOne(dir_name_lower, db_folder_names, score_cutoff=MATCHING_ACCURACY)
         if result and result[0] not in dir_name_lower:
@@ -79,7 +82,10 @@ def process_dir(
           continue
     matched.append((dir_name, db_entry, score))
 
-  matched = [(dir_name, entry, score, get_max_space_saved(entry)) for dir_name, entry, score in matched]
+  matched = [
+    (dir_name, entry, score, get_max_space_saved(entry), get_best_compression_result(entry.get('CompressionResults')))
+    for dir_name, entry, score in matched
+  ]
 
   return matched, unmatched
 
@@ -89,7 +95,7 @@ def write_output(
 ):
   lines = [
     '<title>CompactGUI Scan Output</title>',
-    '<style>.dim { opacity: 0.5; } .justify-between { display:flex; justify-content:space-between; gap: 0.25em; }</style>',
+    '<style>th { text-align: center !important; } .dim { filter: brightness(0.5); } .justify-between { display:flex; justify-content:space-between; gap: 0.25em; }</style>',
     '',
     f'# CompactGUI Scan Output',
     '',
@@ -97,29 +103,19 @@ def write_output(
 
   if len(matched):
     lines += [
-      '### Games Found',
+      f'### Games Found {format_dimmed(f"(source: [{os.path.basename(DATABASE_PATH)}]({os.path.expandvars(DATABASE_PATH).replace(chr(92), "/")}))")}',
       '',
-      f'| Game | Matched {format_dimmed(f"(accuracy%)")} | Original | XPRESS 4K | XPRESS 8K | XPRESS 16K | LZX | Savings |',
-      '|---|---|--:|---|---|---|---|--:|',
+      f'| Game | Matched {format_dimmed(f"(accuracy%)")} | Type | Before | After | Savings |',
+      '|---|---|:-:|--:|--:|:-:|',
     ]
-    for dir_name, entry, score, max_savings in matched:
+    for dir_name, entry, score, max_savings, best_result in matched:
       compression_results = entry.get('CompressionResults')
-      steam_id = entry.get('SteamID')
-      game_name = entry.get('GameName')
-      folder_name = entry.get('FolderName')
-      if score < 100:
-        if (
-          matches_loosely(dir_name, game_name) or
-          matches_loosely(dir_name, folder_name)
-        ):
-          score = 100
 
-      game_cell = dir_name
-      game_name_content = f'[{game_name}](https://store.steampowered.com/app/{steam_id})' if steam_id else game_name
-      matched_cell = game_name_content if score == 100 else format_dimmed(f'{game_name_content} ({score:.0f}%)')
-      original_cell = format_size_column(compression_results[0].get('BeforeBytes')) if compression_results else EMPTY_CELL
-      max_savings_cell = format_size(max_savings / 1024 ** 3) if compression_results else EMPTY_CELL
-      lines.append(f'| {game_cell} | {matched_cell} | {original_cell} | {format_compression_column(compression_results, CompType.XPRESS4K)} | {format_compression_column(compression_results, CompType.XPRESS8K)} | {format_compression_column(compression_results, CompType.XPRESS16K)} | {format_compression_column(compression_results, CompType.LZX)} | {max_savings_cell} |')
+      game_cell = format_game_column(dir_name)
+      matched_cell = format_matched_column(dir_name, entry, score)
+      full_size_cell = format_before_column(compression_results)
+      savings_cell = format_savings_column(compression_results, max_savings)
+      lines.append(f'| {game_cell} | {matched_cell} | {format_comp_type_column(best_result)} | {full_size_cell} | {format_after_column(best_result)} | {savings_cell} |')
 
   if len(unmatched):
     lines += [
@@ -138,6 +134,67 @@ def write_output(
   logger.success(f'Saved output to {output_path}')
   os.startfile(output_path)
 
+def format_game_column(
+  dir_name: str,
+):
+  return dir_name
+
+def format_matched_column(
+  dir_name: str,
+  entry: DbEntry,
+  score: int,
+):
+  steam_id = entry.get('SteamID')
+  game_name = entry.get('GameName')
+  folder_name = entry.get('FolderName')
+  if score < 100:
+    if (
+      matches_loosely(dir_name, game_name) or
+      matches_loosely(dir_name, folder_name)
+    ):
+      score = 100
+
+  game_name_content = f'[{game_name}](https://store.steampowered.com/app/{steam_id})' if steam_id else game_name
+  return game_name_content if score == 100 else format_dimmed(f'{game_name_content} ({score:.0f}%)')
+
+def format_comp_type_column(
+  result: dict,
+):
+  if result is None:
+    return format_dimmed(EMPTY_CELL)
+  return format_comp_name(CompType(result['CompType']))
+
+def format_before_column(
+  compression_results: list,
+):
+  return format_size(compression_results[0].get('BeforeBytes')) if compression_results else EMPTY_CELL
+
+def format_after_column(
+  result: dict,
+):
+  return format_size(result['AfterBytes']) if result else EMPTY_CELL
+
+def format_savings_column(
+  compression_results: list,
+  max_savings: int,
+):
+  if not compression_results:
+    return EMPTY_CELL
+  pct = (max_savings / compression_results[0]['BeforeBytes']) * 100
+  return format_flex([format_dimmed(f'↓{round(pct)}%'), format_size(max_savings)])
+
+def get_best_compression_result(
+  results: list,
+):
+  if not results:
+    return None
+  return (
+    next((r for r in results if r['CompType'] == CompType.LZX), None) or
+    next((r for r in results if r['CompType'] == CompType.XPRESS16K), None) or
+    next((r for r in results if r['CompType'] == CompType.XPRESS8K), None) or
+    next((r for r in results if r['CompType'] == CompType.XPRESS4K), None)
+  )
+
 def get_max_space_saved(
   entry: DbEntry,
 ):
@@ -146,31 +203,21 @@ def get_max_space_saved(
     return 0
   return max(r['BeforeBytes'] - r['AfterBytes'] for r in results)
 
-def format_size_column(
-  b: int,
-):
-  return format_size(b / 1024 ** 3)
-
-def format_compression_column(
-  results: list,
+def format_comp_name(
   comp_type: CompType,
 ):
-  r = next((r for r in results if r['CompType'] == comp_type), None)
-  if r is None:
-    return format_flex([format_dimmed(EMPTY_CELL), ''])
-  gb = r['AfterBytes'] / 1024 ** 3
-  pct = (1 - r['AfterBytes'] / r['BeforeBytes']) * 100
-  return format_flex([format_size(gb), format_dimmed(f'↓{round(pct)}%')])
+  return comp_type.name.replace('XPRESS', 'X')
 
 def format_size(
-  gigabytes: float,
+  b: int,
 ):
+  gigabytes = b / 1024 ** 3
   return f'{round(gigabytes, 1) or 0.1:g} GB'
 
 def format_flex(
   items: list[str],
 ):
-  return f'<div class="justify-between">{"".join(items)}</div>'
+  return f'<span class="justify-between">{"".join(items)}</span>'
 
 def format_dimmed(
   msg: str,
