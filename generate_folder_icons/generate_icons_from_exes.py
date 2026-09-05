@@ -4,7 +4,7 @@ import sys
 import winsound
 
 from mtlogger import logger
-from mtprompt import Prompt
+from mtprompt import Prompt, to_dir, to_int
 
 from _common import set_folder_icon
 
@@ -27,8 +27,8 @@ EXE_EXCLUSION_PATTERNS = [
 
 def main():
   if len(sys.argv) > 1:
-    parent_path = sys.argv[1]
-    depth = int(sys.argv[2]) if len(sys.argv) > 2 else 1
+    parent_path = to_dir(sys.argv[1])
+    depth = to_int(sys.argv[2]) if len(sys.argv) > 2 else 1
   else:
     parent_path = Prompt.dir(
       'Enter the path to the directory containing the exes you want to process'

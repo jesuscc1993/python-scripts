@@ -8,14 +8,14 @@ from mtlogger import logger
 from tqdm import tqdm
 
 from _common import FILE_BLACKLIST
-from mtprompt import Prompt
+from mtprompt import Prompt, to_dir
 
 NUMBER_REGEX = r'\.?\s*(\d+(?:\.\d+)?)'
 CHAPTER_REGEX = r'Ch(?:ap(?:ter)?)?|Ep(?:isode)?|Ep(?:ilogue)?|Sp(?:ecial)?'
 CHAPTER_NUMBER_REGEX  = rf'(?:{CHAPTER_REGEX}){NUMBER_REGEX}'
 
 def main():
-  parent_dir = sys.argv[1] if len(sys.argv) > 1 else Prompt.dir('Enter the path to the directory containing the files you want to group')
+  parent_dir = to_dir(sys.argv[1]) if len(sys.argv) > 1 else Prompt.dir('Enter the path to the directory containing the files you want to group')
 
   process_parent_folder(parent_dir)
 

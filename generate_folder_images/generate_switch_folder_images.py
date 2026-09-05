@@ -8,7 +8,7 @@ import winsound
 from PIL import Image
 from io import BytesIO
 from mtlogger import logger
-from mtprompt import Prompt
+from mtprompt import Prompt, to_bool, to_dir
 from natsort import natsorted
 
 from _common import resize_image
@@ -21,8 +21,8 @@ CACHE_TTL = 24 * 60 * 60
 
 def main():
   if len(sys.argv) > 1:
-    parent_folder = sys.argv[1]
-    override_existing = sys.argv[2].lower() == 'y' if len(sys.argv) > 2 else False
+    parent_folder = to_dir(sys.argv[1])
+    override_existing = to_bool(sys.argv[2]) if len(sys.argv) > 2 else False
   else:
     parent_folder, override_existing = prompt_params()
 

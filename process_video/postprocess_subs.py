@@ -2,7 +2,7 @@ import os
 import sys
 
 from mtlogger import logger
-from mtprompt import Prompt
+from mtprompt import Prompt, to_path
 
 from _common import add_missing_spaces, strip_tags_from_subs_file
 
@@ -10,7 +10,7 @@ SUBTITLE_EXT = '.srt'
 
 def main():
   if len(sys.argv) > 1:
-    input_path = sys.argv[1]
+    input_path = to_path(sys.argv[1])
   else:
     input_path = Prompt.path(
       'Enter the path to an SRT file or directory'

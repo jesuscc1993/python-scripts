@@ -5,6 +5,7 @@ import tempfile
 import zipfile
 
 from concurrent.futures import ThreadPoolExecutor
+from fnmatch import fnmatch
 from mtlogger import logger
 from tqdm import tqdm
 
@@ -15,10 +16,10 @@ BAK_EXTENSION = f'.{BAK_TYPE.lower()}'
 
 def compress_child_folders(
   parent_folder_path: str,
-  output_type = ZIP_TYPES[0],
+  output_type: str,
+  remove_original = False,
   min_depth = 1,
   max_depth = 1,
-  remove_original = True,
 ):
   logger.log(f'Compressing folders in "{parent_folder_path}"...')
 
@@ -36,7 +37,7 @@ def compress_child_folders(
       if min_depth <= current_depth <= max_depth:
         folders.append(folder_path)
 
-  if len(folders) > 0:
+  if folders:
     with ThreadPoolExecutor() as executor:
       list(tqdm(
         executor.map(lambda folder: compress_folder(folder, output_type, remove_original), folders),
@@ -50,8 +51,9 @@ def compress_child_folders(
 
 def compress_folder(
   folder_path: str,
-  output_type: str,
-  remove_original = True,
+  output_type: str = ZIP_TYPES[0],
+  remove_original = False,
+  exclusion_patterns: list = None,
 ):
   folder_name = os.path.basename(folder_path)
   parent_dir = os.path.dirname(folder_path)
@@ -66,14 +68,21 @@ def compress_folder(
     return
 
   try:
-    files = []
-    for root, _, filenames in os.walk(folder_path, topdown = False):
-      for file in filenames:
-        files.append(os.path.join(root, file))
+    files_to_compress = []
+    for root, dir_names, file_names in os.walk(folder_path):
+      if exclusion_patterns:
+        for dir_name in dir_names[:]:
+          if any(fnmatch(dir_name, pattern.rstrip('/')) for pattern in exclusion_patterns):
+            dir_names.remove(dir_name)
 
-    if len(files) > 0:
+      for file_name in file_names:
+        if exclusion_patterns and any(fnmatch(file_name, pattern) for pattern in exclusion_patterns):
+          continue
+        files_to_compress.append(os.path.join(root, file_name))
+
+    if files_to_compress:
       with zipfile.ZipFile(tmp_zip_path, 'w', zipfile.ZIP_DEFLATED) as compressed_file:
-        for file_path in files:
+        for file_path in files_to_compress:
           compressed_file.write(file_path, os.path.relpath(file_path, folder_path))
 
       shutil.move(tmp_zip_path, final_zip_path)
@@ -99,7 +108,7 @@ def extract_child_archives(
       if any(file_name.upper().endswith(f'.{ext}') for ext in ZIP_TYPES):
         archives.append(os.path.join(root, file_name))
 
-  if len(archives) > 0:
+  if archives:
     with ThreadPoolExecutor() as executor:
       list(tqdm(
         executor.map(lambda archive_path: extract_archive(archive_path, remove_archives), archives),

@@ -1,12 +1,12 @@
 import sys
 
 from mtlogger import logger
-from mtprompt import Prompt
+from mtprompt import Prompt, to_dir
 
 from _common import extract_child_archives
 
 def main():
-  parent_dir = sys.argv[1] if len(sys.argv) > 1 else Prompt.dir('Enter the path to the directory containing the folders you want to extract')
+  parent_dir = to_dir(sys.argv[1]) if len(sys.argv) > 1 else Prompt.dir('Enter the path to the directory containing the folders you want to extract')
 
   logger.log(f'Extracting archives in "{parent_dir}"...')
   extract_child_archives(parent_dir)

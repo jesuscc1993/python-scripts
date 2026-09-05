@@ -4,7 +4,7 @@ import sys
 from PIL import Image
 from concurrent.futures import ThreadPoolExecutor
 from mtlogger import logger
-from mtprompt import Prompt
+from mtprompt import Prompt, to_dir, to_int
 from tqdm import tqdm
 
 from _image_utils import LOSSLESS, WEBP_DIMENSION_LIMIT, WEBP_EXTENSION, is_image_file
@@ -14,9 +14,9 @@ from _common import BAK_EXTENSION
 output_ext = f'.{IMAGE_OUTPUT_FORMAT.lower()}'
 
 def main():
-  parent_dir = sys.argv[1] if len(sys.argv) > 1 else Prompt.dir('Enter the path to the directory containing the images you want to compress')
+  parent_dir = to_dir(sys.argv[1]) if len(sys.argv) > 1 else Prompt.dir('Enter the path to the directory containing the images you want to compress')
   lossless = sys.argv[2].lower() == LOSSLESS if len(sys.argv) > 2 else IMAGE_OUTPUT_LOSSLESS_COMPRESSION
-  quality = int(sys.argv[2]) if len(sys.argv) > 2 and not lossless else IMAGE_OUTPUT_QUALITY
+  quality = to_int(sys.argv[2]) if len(sys.argv) > 2 and not lossless else IMAGE_OUTPUT_QUALITY
 
   logger.log(f'Compressing images in "{parent_dir}"...')
   compress_child_images(parent_dir, lossless, quality)

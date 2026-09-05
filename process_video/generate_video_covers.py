@@ -8,7 +8,7 @@ import sys
 from PIL import Image, ImageDraw, ImageFont
 from mtfont import Font, SegoeFontName
 from mtlogger import logger
-from mtprompt import Prompt
+from mtprompt import Prompt, to_dir
 from mutagen.asf import ASF, ASFByteArrayAttribute
 from mutagen.mp4 import MP4, MP4Cover
 from tqdm import tqdm
@@ -28,7 +28,7 @@ OVERLAY_BG_ALPHA = 192
 
 def main():
   if len(sys.argv) > 1:
-    input_path = sys.argv[1]
+    input_path = to_dir(sys.argv[1])
   else:
     input_path = Prompt.dir(
       'Enter the path to the directory containing the videos you want to process'

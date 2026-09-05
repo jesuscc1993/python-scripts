@@ -6,7 +6,7 @@ import winsound
 from PIL import Image
 from io import BytesIO
 from mtlogger import logger
-from mtprompt import Prompt
+from mtprompt import Prompt, to_bool, to_dir
 from natsort import natsorted
 
 from _common import resize_image
@@ -31,9 +31,9 @@ COVER_URL_MAP = {
 
 def main():
   if len(sys.argv) > 1:
-    parent_folder = sys.argv[1]
+    parent_folder = to_dir(sys.argv[1])
     cover_type = sys.argv[2] if len(sys.argv) > 2 else 'capsule'
-    override_existing = sys.argv[3].lower() == 'y' if len(sys.argv) > 3 else False
+    override_existing = to_bool(sys.argv[3]) if len(sys.argv) > 3 else False
   else:
     parent_folder, cover_type, override_existing = prompt_params()
 

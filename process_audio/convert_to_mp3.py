@@ -7,7 +7,7 @@ from send2trash import send2trash
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from mtlogger import logger
-from mtprompt import Prompt
+from mtprompt import Prompt, to_dir
 from tqdm import tqdm
 
 AUDIO_EXTS = [
@@ -25,7 +25,7 @@ MP3_BITRATE = '320k'
 MP3_EXT = '.mp3'
 
 def main():
-  parent_path = sys.argv[1] if len(sys.argv) > 1 else Prompt.dir('Enter the folder path to process')
+  parent_path = to_dir(sys.argv[1]) if len(sys.argv) > 1 else Prompt.dir('Enter the folder path to process')
   bitrate = sys.argv[2] if len(sys.argv) > 2 else MP3_BITRATE
 
   files_to_convert = []

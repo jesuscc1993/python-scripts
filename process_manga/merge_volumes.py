@@ -4,14 +4,14 @@ import sys
 
 from concurrent.futures import ThreadPoolExecutor
 from mtlogger import logger
-from mtprompt import Prompt
+from mtprompt import Prompt, to_dir
 from tqdm import tqdm
 
 from _common import delete_empty_folders, get_volume_and_chapter, select_parent_folder, zfill_float
 
 def main():
   if len(sys.argv) > 1:
-    process_parent_folder(sys.argv[1])
+    process_parent_folder(to_dir(sys.argv[1]))
   else:
     select_parent_folder('Enter the path to the parent folder containing the volume folders you want to merge:\n', process_parent_folder)
 

@@ -4,7 +4,7 @@ import sys
 
 from _common import strip_tags_from_subs_file
 from mtlogger import logger
-from mtprompt import Prompt
+from mtprompt import Prompt, to_path
 
 LANGUAGE = 'eng'
 SUBTITLES_PATH = 'subtitles'
@@ -13,7 +13,7 @@ VIDEO_EXTS = ['.mp4', '.mkv']
 
 def main():
   if len(sys.argv) > 1:
-    input_path = sys.argv[1]
+    input_path = to_path(sys.argv[1])
   else:
     input_path = Prompt.path(
       'Enter the path to a video file or directory'

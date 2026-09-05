@@ -3,13 +3,13 @@ import re
 import sys
 
 from mtlogger import logger
-from mtprompt import Prompt
+from mtprompt import Prompt, to_dir
 
 from _common import get_chapter, select_parent_folder
 
 def main():
   if len(sys.argv) > 1:
-    process_parent_folder(sys.argv[1])
+    process_parent_folder(to_dir(sys.argv[1]))
   else:
     select_parent_folder(
       'Enter the path to the parent folder containing the chapter folders:\n',

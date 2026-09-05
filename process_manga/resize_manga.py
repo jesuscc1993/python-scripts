@@ -2,14 +2,14 @@ import sys
 
 from PIL import Image
 from mtlogger import logger
-from mtprompt import Prompt
+from mtprompt import Prompt, to_dir
 
 from _common import process_folder_images, select_parent_folder
 from _image_utils import image_needs_resizing, is_image_optimally_compressed, resize_image, save_image_to_path
 
 def main():
   if len(sys.argv) > 1:
-    process_parent_folder(sys.argv[1])
+    process_parent_folder(to_dir(sys.argv[1]))
   else:
     select_parent_folder('Enter the path to the parent folder containing the folders or images you want to resize:\n', process_parent_folder)
 

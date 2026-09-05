@@ -12,7 +12,7 @@ from PIL import Image, ImageDraw
 from mtattr import Attr
 from mtfont import Font, SegoeFontName
 from mtlogger import logger
-from mtprompt import Prompt
+from mtprompt import Prompt, to_dir, to_int
 
 from _constants import DESKTOP_INI_FILENAME, HIDDEN_SYSTEM_FILE_ATTRS, ICO_FILENAME, MAX_ICO_SIZE, PREFERRED_ENCODING
 from _common import get_ini_icon, read_ini, set_folder_icon, write_hidden_file
@@ -41,8 +41,8 @@ UNITS_COLOR = (192, 192, 192, 255)
 
 def main():
   if len(sys.argv) > 1:
-    parent_path = sys.argv[1]
-    depth = int(sys.argv[2]) if len(sys.argv) > 2 else 1
+    parent_path = to_dir(sys.argv[1])
+    depth = to_int(sys.argv[2]) if len(sys.argv) > 2 else 1
   else:
     parent_path = Prompt.dir(
       'Enter the path to the directory containing the exes you want to process'
@@ -217,7 +217,7 @@ def calculate_dir_size(
   if not FORCE_RECALCULATE and os.path.exists(cache_path):
     with open(cache_path, 'r', encoding=PREFERRED_ENCODING) as f:
       lines = f.read().strip().splitlines()
-      total_size = int(lines[0].replace(',', '')) if len(lines) > 0 else None
+      total_size = int(lines[0].replace(',', '')) if lines else None
       formatted_size = lines[1] if len(lines) > 1 else None
       if formatted_size and formatted_size != 'None':
         return formatted_size

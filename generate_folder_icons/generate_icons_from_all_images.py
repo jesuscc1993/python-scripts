@@ -2,7 +2,7 @@ import os
 import sys
 
 from mtlogger import logger
-from mtprompt import Prompt
+from mtprompt import Prompt, to_dir
 
 from _common import image_to_ico
 
@@ -20,7 +20,7 @@ ICON_SIZES = [16, 32, 48, 256]
 
 def main():
   if len(sys.argv) > 1:
-    parent_path = sys.argv[1]
+    parent_path = to_dir(sys.argv[1])
   else:
     parent_path = Prompt.dir(
       'Enter the path to the directory containing the images you want to process'

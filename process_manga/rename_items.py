@@ -4,7 +4,7 @@ import sys
 
 from concurrent.futures import ThreadPoolExecutor
 from mtlogger import logger
-from mtprompt import Prompt
+from mtprompt import Prompt, to_dir
 from tqdm import tqdm
 from typing import Callable
 
@@ -12,7 +12,7 @@ from _common import CHAPTER_NUMBER_REGEX, ENDING_REGEX, EPILOGUE_REGEX, IMAGE_EX
 
 def main():
   if len(sys.argv) > 1:
-    process_parent_folder(sys.argv[1])
+    process_parent_folder(to_dir(sys.argv[1]))
   else:
     prompt_parent_folder()
 
