@@ -8,17 +8,16 @@ from mtprompt import Prompt
 from tqdm import tqdm
 
 from _common import scan_dir_names, seconds_to_hours, format_dimmed, simplify_game_name, matches_loosely
-from _constants import EMPTY_CELL, GENERIC_EXCLUSION_FILE, STYLE
+from _constants import EMPTY_CELL, GENERIC_EXCLUSION_FILE, HLTB_DB_PATH, STYLE
 
 HLTB_EXCLUSION_FILE = '.nohltbscan'
-DB_PATH = os.path.join(os.path.dirname(__file__), '..', '_data', 'hltb_database.json')
 
 def main():
   logger.log('Running HowLongToBeat scan...')
 
   game_dirs = sys.argv[1:] if len(sys.argv) > 1 else [Prompt.dir('Enter the path to the directory containing your games')]
 
-  db = read_json_file(DB_PATH) or {}
+  db = read_json_file(HLTB_DB_PATH) or {}
   dir_names = scan_dir_names(game_dirs, [GENERIC_EXCLUSION_FILE, HLTB_EXCLUSION_FILE])
 
   matched = []
@@ -46,7 +45,7 @@ def get_cached_result(
 
   result = Hltb.search(dir_name)
   db[dir_name] = result
-  write_json_file(DB_PATH, db)
+  write_json_file(HLTB_DB_PATH, db)
   return result
 
 def is_result_complete(
@@ -68,7 +67,7 @@ def write_output(
 
   if len(matched):
     lines += [
-      f'### Games Found {format_dimmed(f"(cache: [{os.path.basename(DB_PATH)}]({os.path.abspath(DB_PATH).replace(chr(92), "/")}))")}',
+      f'### Games Found {format_dimmed(f"(cache: [{os.path.basename(HLTB_DB_PATH)}]({os.path.abspath(HLTB_DB_PATH).replace(chr(92), "/")}))")}',
       '',
       '| Game | Matched | Main Story | Main + Extra | Completionist |',
       '|---|---|--:|--:|--:|',
