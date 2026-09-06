@@ -1,26 +1,33 @@
+import argparse
 import os
 import re
-import sys
 
 from mtlogger import logger
 from mtfs import read_json_file, write_text_file
-from mtprompt import Prompt
+from mtprompt import Prompt, to_list
 from rapidfuzz import process
 from tqdm import tqdm
 
-from _common import scan_dir_names, format_dimmed, simplify_game_name, matches_loosely, normalize_dir_name
-from _constants import EMPTY_CELL, OUTPUT_DIR_PATH, STYLE
+from _common import scan_dir_names, format_dimmed, simplify_game_name, matches_loosely, normalize_dir_name, read_steam_wishlist_game_names, validate_dir_paths
+from _constants import EMPTY_CELL, GAME_DIRS_SCAN_TYPE, OUTPUT_DIR_PATH, STYLE, WISHLIST_FILE_SCAN_TYPE
 from _types_compact_gui import CompType, DbEntry
 
 DATABASE_PATH = r"%LOCALAPPDATA%\IridiumIO\CompactGUI\databasev2.json"
 OUTPUT_DIRNAME = 'compact_gui'
-OUTPUT_FILENAME = 'compact_gui_report.md'
+INSTALLED_GAMES_REPORT_FILENAME = 'compact_gui_report_for_installed_games.md'
+STEAM_WISHLIST_REPORT_FILENAME = 'compact_gui_report_for_steam_wishlist.md'
 MATCHING_ACCURACY = 75
 
 def main():
   logger.log('Running CompactGUI scan...')
 
-  game_dirs = sys.argv[1:] if len(sys.argv) > 1 else [Prompt.dir('Enter the path to the directory containing your games')]
+  args = create_parser().parse_args()
+  if args.game_dirs:
+    dir_names, output_filename = scan_game_dirs(to_list(args.game_dirs))
+  elif args.wishlist_file:
+    dir_names, output_filename = scan_wishlist_file(args.wishlist_file)
+  else:
+    dir_names, output_filename = prompt_for_scan_type()
 
   db = get_db()
   if db is None:
@@ -29,7 +36,6 @@ def main():
 
   db_by_folder = build_db_by_folder(db)
   db_folder_names = list(db_by_folder.keys())
-  dir_names = scan_dir_names(game_dirs)
 
   matched = []
   unmatched = []
@@ -45,7 +51,32 @@ def main():
 
   matched.sort(key = lambda x: get_savings(x[3]), reverse = True)
   unmatched.sort()
-  write_output(matched, unmatched)
+  write_output(matched, unmatched, output_filename)
+
+def prompt_for_scan_type():
+  scan_type = Prompt.str('Enter scan type (game_dirs | wishlist_file)')
+
+  if scan_type == GAME_DIRS_SCAN_TYPE:
+    return scan_game_dirs(Prompt.list('Enter the game directories (path1, path2, ...)'))
+
+  if scan_type == WISHLIST_FILE_SCAN_TYPE:
+    return scan_wishlist_file(Prompt.file('Enter the Steam wishlist JSON file'))
+
+  raise ValueError(f'Unknown scan type "{scan_type}". Use game_dirs or wishlist_file.')
+
+def create_parser():
+  parser = argparse.ArgumentParser()
+  source_group = parser.add_mutually_exclusive_group()
+  source_group.add_argument(f'--{GAME_DIRS_SCAN_TYPE}')
+  source_group.add_argument(f'--{WISHLIST_FILE_SCAN_TYPE}')
+  return parser
+
+def scan_game_dirs(game_dirs: list[str]):
+  validate_dir_paths(game_dirs)
+  return scan_dir_names(game_dirs), INSTALLED_GAMES_REPORT_FILENAME
+
+def scan_wishlist_file(wishlist_file: str):
+  return read_steam_wishlist_game_names(wishlist_file), STEAM_WISHLIST_REPORT_FILENAME
 
 def build_db_by_folder(
   db: list[DbEntry],
@@ -88,6 +119,7 @@ def match_dir_name(
 def write_output(
   matched: list,
   unmatched: list,
+  output_filename: str,
 ):
   lines = [
     '<title>CompactGUI Report</title>',
@@ -120,7 +152,7 @@ def write_output(
     for dir_name in unmatched:
       lines.append(f'- {dir_name}')
 
-  output_path = os.path.join(OUTPUT_DIR_PATH, OUTPUT_DIRNAME, OUTPUT_FILENAME)
+  output_path = os.path.join(OUTPUT_DIR_PATH, OUTPUT_DIRNAME, output_filename)
   write_text_file(output_path, '\n'.join(lines))
 
   logger.success(f'Saved output to {output_path}')

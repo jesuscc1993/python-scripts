@@ -3,9 +3,41 @@ import re
 import unicodedata
 
 from mtattr import Attr
+from mtfs import read_json_file
 from mtlogger import logger
 
 from _constants import DIR_BLACKLIST, GENERIC_EXCLUSION_FILE
+
+def validate_dir_paths(
+  dir_paths: list[str],
+):
+  for dir_path in dir_paths:
+    if not os.path.isdir(dir_path):
+      raise ValueError(f'Path "{dir_path}" is not a directory.')
+
+def read_steam_wishlist_game_names(
+  wishlist_file: str,
+):
+  wishlist_content = read_json_file(wishlist_file)
+  if wishlist_content is None:
+    raise ValueError(f'Could not read wishlist file "{wishlist_file}".')
+
+  return [
+    app_name
+    for app in wishlist_content
+    if (app_name := get_app_name_from_steam_wishlist_item(app))
+  ]
+
+def get_app_name_from_steam_wishlist_item(app: dict):
+  store_item = (app or {}).get('store_item')
+  if not store_item:
+    return None
+
+  app_name = store_item.get('name')
+  if not app_name:
+    return None
+
+  return app_name
 
 def scan_dir_names(
   dir_paths: list[str],
