@@ -9,11 +9,12 @@ from rapidfuzz import process
 from tqdm import tqdm
 
 from _common import scan_dir_names, format_dimmed, simplify_game_name, matches_loosely, normalize_dir_name
-from _compact_gui_types import CompType, DbEntry
 from _constants import EMPTY_CELL, OUTPUT_DIR_PATH, STYLE
+from _types_compact_gui import CompType, DbEntry
 
 DATABASE_PATH = r"%LOCALAPPDATA%\IridiumIO\CompactGUI\databasev2.json"
-OUTPUT_FILENAME = 'compact_gui_scan_output.md'
+OUTPUT_DIRNAME = 'compact_gui'
+OUTPUT_FILENAME = 'compact_gui_report.md'
 MATCHING_ACCURACY = 75
 
 def main():
@@ -89,10 +90,10 @@ def write_output(
   unmatched: list,
 ):
   lines = [
-    '<title>CompactGUI Scan Output</title>',
+    '<title>CompactGUI Report</title>',
     f'<style>{STYLE}</style>',
     '',
-    f'# CompactGUI Scan Output',
+    f'# CompactGUI Report',
     '',
   ]
 
@@ -119,7 +120,7 @@ def write_output(
     for dir_name in unmatched:
       lines.append(f'- {dir_name}')
 
-  output_path = os.path.join(OUTPUT_DIR_PATH, OUTPUT_FILENAME)
+  output_path = os.path.join(OUTPUT_DIR_PATH, OUTPUT_DIRNAME, OUTPUT_FILENAME)
   write_text_file(output_path, '\n'.join(lines))
 
   logger.success(f'Saved output to {output_path}')
