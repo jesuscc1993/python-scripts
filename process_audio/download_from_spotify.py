@@ -6,9 +6,11 @@ from mtprompt import Prompt
 from spotdl import Spotdl
 from spotdl.utils.search import parse_query
 
+from _constants import OUTPUT_DIR_PATH
+
 def main():
   spotify_url = sys.argv[1] if len(sys.argv) > 1 else Prompt.str('Enter a Spotify track/album/playlist URL')
-  output_dir_path = sys.argv[2] if len(sys.argv) > 2 else os.path.join(os.getcwd(), 'output')
+  output_dir_path = sys.argv[2] if len(sys.argv) > 2 else os.path.join(OUTPUT_DIR_PATH, 'spotify')
 
   download_from_spotify(output_dir_path, spotify_url)
 

@@ -5,10 +5,11 @@ from mtlogger import logger
 from mtprompt import Prompt
 
 from _common import download_assets_for_app_id
+from _constants import OUTPUT_DIR_PATH
 
 # settings
 TERMS_BLACKLIST = ['soundtrack', 'artbook']
-OUTPUT_FOLDER = os.path.join('output', 'assets')
+OUTPUT_ASSETS_DIR_PATH = os.path.join(OUTPUT_DIR_PATH, 'assets')
 
 SEARCH_URL = 'https://store.steampowered.com/api/storesearch/'
 SEARCH_PARAMS = {'term': '', 'l': 'english', 'cc': 'US'}
@@ -46,7 +47,7 @@ def main():
         continue
 
       selected = items[choice - 1]
-      download_assets_for_app_id(selected.get('id'), os.path.join(os.getcwd(), OUTPUT_FOLDER))
+      download_assets_for_app_id(selected.get('id'), os.path.join(os.getcwd(), OUTPUT_ASSETS_DIR_PATH))
       break
 
 def search_game(

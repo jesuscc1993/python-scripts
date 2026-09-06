@@ -8,7 +8,7 @@ from mtprompt import Prompt
 from tqdm import tqdm
 
 from _common import scan_dir_names, seconds_to_hours, format_dimmed, simplify_game_name, matches_loosely
-from _constants import DATA_DIR_PATH, EMPTY_CELL, GENERIC_EXCLUSION_FILE, HLTB_DB_PATH, STYLE
+from _constants import EMPTY_CELL, GENERIC_EXCLUSION_FILE, HLTB_DB_PATH, OUTPUT_DIR_PATH, STYLE
 
 HLTB_EXCLUSION_FILE = '.nohltbscan'
 OUTPUT_FILENAME = 'hltb_scan_output.md'
@@ -87,7 +87,7 @@ def write_output(
     for dir_name in unmatched:
       lines.append(f'- {dir_name}')
 
-  output_path = os.path.join(DATA_DIR_PATH, OUTPUT_FILENAME)
+  output_path = os.path.join(OUTPUT_DIR_PATH, OUTPUT_FILENAME)
   write_text_file(output_path, '\n'.join(lines))
 
   logger.success(f'Saved output to {output_path}')

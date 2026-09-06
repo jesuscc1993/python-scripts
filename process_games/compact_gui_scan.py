@@ -10,7 +10,7 @@ from tqdm import tqdm
 
 from _common import scan_dir_names, format_dimmed, simplify_game_name, matches_loosely, normalize_dir_name
 from _compact_gui_types import CompType, DbEntry
-from _constants import DATA_DIR_PATH, EMPTY_CELL, STYLE
+from _constants import EMPTY_CELL, OUTPUT_DIR_PATH, STYLE
 
 DATABASE_PATH = r"%LOCALAPPDATA%\IridiumIO\CompactGUI\databasev2.json"
 OUTPUT_FILENAME = 'compact_gui_scan_output.md'
@@ -119,7 +119,7 @@ def write_output(
     for dir_name in unmatched:
       lines.append(f'- {dir_name}')
 
-  output_path = os.path.join(DATA_DIR_PATH, OUTPUT_FILENAME)
+  output_path = os.path.join(OUTPUT_DIR_PATH, OUTPUT_FILENAME)
   write_text_file(output_path, '\n'.join(lines))
 
   logger.success(f'Saved output to {output_path}')

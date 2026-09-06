@@ -7,4 +7,5 @@ HLTB_DB_NAME = 'hltb_database.json'
 STYLE = 'th { text-align: center !important; } .dim { filter: brightness(0.5); } .justify-between { display:flex; justify-content:space-between; gap: 0.25em; }'
 
 DATA_DIR_PATH = os.path.join(os.path.dirname(__file__), '..', '_data')
+OUTPUT_DIR_PATH = os.path.join(os.path.dirname(__file__), '..', '_output')
 HLTB_DB_PATH = os.path.join(DATA_DIR_PATH, HLTB_DB_NAME)

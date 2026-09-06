@@ -5,6 +5,8 @@ from mtlogger import logger
 from mtprompt import Prompt
 from yt_dlp import YoutubeDL
 
+from _constants import OUTPUT_DIR_PATH
+
 YTDL_OPTIONS = {
   'format': 'bestaudio/best',
   'postprocessors': [{
@@ -15,7 +17,7 @@ YTDL_OPTIONS = {
 
 def main():
   youtube_url = sys.argv[1] if len(sys.argv) > 1 else Prompt.str('Enter a YouTube video/playlist URL/ID')
-  output_dir_path = sys.argv[2] if len(sys.argv) > 2 else os.path.join(os.getcwd(), 'output')
+  output_dir_path = sys.argv[2] if len(sys.argv) > 2 else os.path.join(OUTPUT_DIR_PATH, 'youtube')
 
   download_from_yt(output_dir_path, youtube_url)
 
