@@ -1,17 +1,13 @@
 import os
 import re
-import requests
 
-from dotenv import load_dotenv
 from mtlogger import logger
 from mtfs import write_text_file
 from mtprompt import Prompt
 from pathlib import Path
 
-load_dotenv(os.path.join(os.path.dirname(__file__), '.env'))
-
-STEAM_API_KEY = os.environ.get('STEAM_API_KEY')
-STEAM_USER_ID3 = os.environ.get('STEAM_USER_ID3')
+from _common import get_owned_games
+from _constants import STEAM_API_KEY, STEAM_USER_ID3, STEAM_USER_ID64
 
 APP_MANIFEST_TEMPLATE = '''"AppState"
 {{
@@ -50,7 +46,7 @@ def main():
     logger.log('No game folders found.')
     return
 
-  owned_games = {sanitize_name(g['name']): g['appid'] for g in get_owned_games(STEAM_API_KEY, STEAM_USER_ID3)}
+  owned_games = {sanitize_name(g['name']): g['appid'] for g in get_owned_games(STEAM_API_KEY, STEAM_USER_ID64)}
 
   drive = Path(folder).drive
   steam_apps_path = os.path.join(drive, 'SteamLibrary', 'steamapps')
@@ -79,13 +75,6 @@ def main():
 
     write_text_file(filepath, content)
     logger.log(f'Created manifest for "{game}" -> {filepath}')
-
-def get_owned_games(
-  api_key: str,
-  steam_id: str,
-):
-  url = f'https://api.steampowered.com/IPlayerService/GetOwnedGames/v1/?key={api_key}&steamid={steam_id}&include_appinfo=true'
-  return requests.get(url).json().get('response', {}).get('games', [])
 
 def sanitize_name(
   name: str,

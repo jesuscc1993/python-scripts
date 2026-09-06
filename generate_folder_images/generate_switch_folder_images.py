@@ -12,7 +12,7 @@ from mtprompt import Prompt, to_bool, to_dir
 from natsort import natsorted
 
 from _common import resize_image
-from _constants import JPEG_FORMAT, JPEG_QUALITY, FOLDER_IMAGE_FILENAME, FOLDER_IMAGE_W, REQ_TIMEOUT
+from _constants import JPEG_FORMAT, JPEG_QUALITY, FOLDER_IMAGE_FILENAME, FOLDER_IMAGE_W, REQUEST_TIMEOUT
 
 ID_LENGTH = 16
 SWITCH_MAPPING_URL = 'https://www.eliboa.com/switch/nsw_titles.php?export=json'
@@ -106,7 +106,7 @@ def load_switch_mapping():
     pass
 
   try:
-    resp = requests.get(SWITCH_MAPPING_URL, timeout=REQ_TIMEOUT)
+    resp = requests.get(SWITCH_MAPPING_URL, timeout=REQUEST_TIMEOUT)
     resp.raise_for_status()
     mapping = resp.json().get('game_titles', {})
 

@@ -5,7 +5,29 @@ from io import BytesIO
 from mtlogger import logger
 from pathlib import Path
 
-from _constants import COVER_URL_MAP
+from _constants import COVER_URL_MAP, REQUEST_TIMEOUT, GET_OWNED_GAMES_ENDPOINT_URL
+
+def send_request(endpoint_url: str, params: dict):
+  response = requests.get(
+    endpoint_url,
+    params=params,
+    timeout=REQUEST_TIMEOUT,
+  )
+  response.raise_for_status()
+  return response.json().get('response', {})
+
+def get_owned_games(
+  api_key: str,
+  steam_id: str,
+):
+  return send_request(
+    GET_OWNED_GAMES_ENDPOINT_URL,
+    {
+      'key': api_key,
+      'steamid': steam_id,
+      'include_appinfo': 'true',
+    },
+  ).get('games', [])
 
 def download_assets_for_app_id(
   steam_app_id: str,

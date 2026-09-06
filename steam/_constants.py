@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 load_dotenv(os.path.join(os.path.dirname(__file__), '.env'))
 
 OUTPUT_DIR_PATH = os.path.join(os.path.dirname(__file__), '..', '_output', 'steam')
-STEAM_REQUEST_TIMEOUT = 30
+REQUEST_TIMEOUT = 30
 
 STEAM_API_KEY = os.environ.get('STEAM_API_KEY')
 STEAM_INSTALL_PATH = os.environ.get('STEAM_INSTALL_PATH')
@@ -21,6 +21,10 @@ COVER_H = int(COVER_H) if COVER_H else None
 COVER_W = int(COVER_W) if COVER_W else None
 HEADER_H = int(HEADER_H) if HEADER_H else None
 HEADER_W = int(HEADER_W) if HEADER_W else None
+
+GET_OWNED_GAMES_ENDPOINT_URL = 'https://api.steampowered.com/IPlayerService/GetOwnedGames/v1/'
+GET_WISHLIST_ENDPOINT_URL = 'https://api.steampowered.com/IWishlistService/GetWishlist/v1/'
+GET_WISHLIST_SORTED_FILTERED_ENDPOINT_URL = 'https://api.steampowered.com/IWishlistService/GetWishlistSortedFiltered/v1/'
 
 COVER_URL_MAP = {
 	'header': {

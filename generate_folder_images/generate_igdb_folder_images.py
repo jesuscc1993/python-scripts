@@ -11,7 +11,7 @@ from mtprompt import Prompt, to_bool, to_dir
 from natsort import natsorted
 
 from _common import resize_image
-from _constants import JPEG_FORMAT, JPEG_QUALITY, FOLDER_IMAGE_FILENAME, FOLDER_IMAGE_W, REQ_TIMEOUT
+from _constants import JPEG_FORMAT, JPEG_QUALITY, FOLDER_IMAGE_FILENAME, FOLDER_IMAGE_W, REQUEST_TIMEOUT
 
 CLIENT_ID = os.getenv('TWITCH_CLIENT_ID')
 CLIENT_SECRET = os.getenv('TWITCH_CLIENT_SECRET')
@@ -77,7 +77,7 @@ def get_access_token():
         'client_secret': CLIENT_SECRET,
         'grant_type': 'client_credentials'
       },
-      timeout=REQ_TIMEOUT
+      timeout=REQUEST_TIMEOUT
     )
     response.raise_for_status()
     ACCESS_TOKEN = response.json().get('access_token')
@@ -108,7 +108,7 @@ def get_cover_image(
         'Content-Type': 'application/json'
       },
       data=body,
-      timeout=REQ_TIMEOUT
+      timeout=REQUEST_TIMEOUT
     )
     response.raise_for_status()
 
@@ -125,7 +125,7 @@ def download_image(
   image_url: str,
 ):
   try:
-    response = requests.get(image_url, timeout=REQ_TIMEOUT)
+    response = requests.get(image_url, timeout=REQUEST_TIMEOUT)
     response.raise_for_status()
     return Image.open(BytesIO(response.content))
   except Exception as ex:

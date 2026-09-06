@@ -6,4 +6,4 @@ FOLDER_IMAGE_W = 256
 FOLDER_IMAGE_H = 168 # 256 in most Windows versions; 168 starting with Windows 11
 FOLDER_IMAGE_SIZE = FOLDER_IMAGE_W
 
-REQ_TIMEOUT = 30
+REQUEST_TIMEOUT = 30
