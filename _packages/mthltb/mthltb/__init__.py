@@ -118,5 +118,5 @@ def normalize_game_name(
   normalized = unicodedata.normalize('NFD', name)
   normalized = re.sub(r'[\u0300-\u036f]', '', normalized)
   normalized = normalized.replace('’', "'")
-  normalized = re.sub(r"[^a-z _0-9`~!@#$%^&*()_=+|\\\]}[{;:',<.>/?]", '', normalized, flags = re.IGNORECASE)
+  normalized = re.sub(r"[^-a-z _0-9`~!@#$%^&*()_=+|\\\]}[{;:',<.>/?]", '', normalized, flags = re.IGNORECASE)
   return normalized
