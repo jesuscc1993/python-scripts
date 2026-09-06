@@ -3,6 +3,7 @@ import re
 
 from concurrent.futures import ThreadPoolExecutor
 from mtlogger import logger
+from mtfs import write_file
 from mtprompt import Prompt
 from tqdm import tqdm
 
@@ -37,8 +38,7 @@ def process_files(
 def replace_file(
   file_path: str,
 ):
-  with open(file_path, 'w') as file:
-    file.write('')
+  write_file(file_path, b'')
 
 if __name__ == '__main__':
   try:

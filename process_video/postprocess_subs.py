@@ -4,7 +4,7 @@ import sys
 from mtlogger import logger
 from mtprompt import Prompt, to_path
 
-from _common import add_missing_spaces, strip_tags_from_subs_file
+from _common import add_missing_spaces_to_subs_file, fix_invalid_chars_in_subs_file, strip_tags_from_subs_file
 
 SUBTITLE_EXT = '.srt'
 
@@ -31,7 +31,8 @@ def process_file(
 
   dest_file_path = file_path
   strip_tags_from_subs_file(dest_file_path)
-  add_missing_spaces(dest_file_path)
+  add_missing_spaces_to_subs_file(dest_file_path)
+  fix_invalid_chars_in_subs_file(dest_file_path)
   logger.log(f'Fixed subtitles for "{file_name}".')
 
 def process_directory(

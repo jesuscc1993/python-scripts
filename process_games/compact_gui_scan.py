@@ -1,9 +1,9 @@
-import json
 import os
 import re
 import sys
 
 from mtlogger import logger
+from mtfs import read_json_file, write_text_file
 from mtprompt import Prompt
 from rapidfuzz import process
 from tqdm import tqdm
@@ -120,8 +120,7 @@ def write_output(
 
   tmp_dir = os.path.expandvars('%TEMP%')
   output_path = os.path.join(tmp_dir, 'compact_gui_scan_output.md')
-  with open(output_path, 'w', encoding='utf-8') as f:
-    f.write('\n'.join(lines))
+  write_text_file(output_path, '\n'.join(lines))
 
   logger.success(f'Saved output to {output_path}')
   os.startfile(output_path)
@@ -211,12 +210,11 @@ def format_flex(
 
 def get_db():
   db_path = os.path.expandvars(DATABASE_PATH)
-  if not os.path.exists(db_path):
+  db = read_json_file(db_path)
+  if db is None:
     logger.error(f"Database file not found at {db_path}")
-    return None
 
-  with open(db_path, 'r', encoding='utf-8') as f:
-    return json.load(f)
+  return db
 
 if __name__ == '__main__':
   try:

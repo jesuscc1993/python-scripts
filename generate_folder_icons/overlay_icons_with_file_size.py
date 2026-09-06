@@ -12,6 +12,7 @@ from PIL import Image, ImageDraw
 from mtattr import Attr
 from mtfont import Font, SegoeFontName
 from mtlogger import logger
+from mtfs import read_text_file
 from mtprompt import Prompt, to_dir, to_int
 
 from _constants import DESKTOP_INI_FILENAME, HIDDEN_SYSTEM_FILE_ATTRS, ICO_FILENAME, MAX_ICO_SIZE, PREFERRED_ENCODING
@@ -215,12 +216,11 @@ def calculate_dir_size(
   total_size = None
 
   if not FORCE_RECALCULATE and os.path.exists(cache_path):
-    with open(cache_path, 'r', encoding=PREFERRED_ENCODING) as f:
-      lines = f.read().strip().splitlines()
-      total_size = int(lines[0].replace(',', '')) if lines else None
-      formatted_size = lines[1] if len(lines) > 1 else None
-      if formatted_size and formatted_size != 'None':
-        return formatted_size
+    lines = read_text_file(cache_path, PREFERRED_ENCODING).strip().splitlines()
+    total_size = int(lines[0].replace(',', '')) if lines else None
+    formatted_size = lines[1] if len(lines) > 1 else None
+    if formatted_size and formatted_size != 'None':
+      return formatted_size
 
   if total_size is None:
     total_size = sum(

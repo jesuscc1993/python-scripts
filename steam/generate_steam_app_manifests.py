@@ -4,6 +4,7 @@ import requests
 
 from dotenv import load_dotenv
 from mtlogger import logger
+from mtfs import write_text_file
 from mtprompt import Prompt
 from pathlib import Path
 
@@ -76,9 +77,8 @@ def main():
       steam_user_id = STEAM_USER_ID3
     )
 
-    with open(filepath, 'w', encoding = 'utf-8') as f:
-      f.write(content)
-      logger.log(f'Created manifest for "{game}" -> {filepath}')
+    write_text_file(filepath, content)
+    logger.log(f'Created manifest for "{game}" -> {filepath}')
 
 def get_owned_games(
   api_key: str,

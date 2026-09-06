@@ -63,7 +63,6 @@ def search_game(
     logger.error(f'Error searching for game "{name}":\n{ex}')
     return []
 
-
 if __name__ == '__main__':
   try:
     main()

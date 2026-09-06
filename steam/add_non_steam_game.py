@@ -180,9 +180,9 @@ def get_lnk_info(
 def get_url_info(
   file_path: str,
 ):
-  cfg = configparser.ConfigParser(interpolation = None)
-  cfg.read(file_path, encoding = 'utf-8')
-  shortcut = cfg['InternetShortcut']
+  config = configparser.ConfigParser(interpolation = None)
+  config.read(file_path, encoding = 'utf-8')
+  shortcut = config['InternetShortcut']
 
   name = Path(file_path).stem
   target = shortcut.get('URL', '')

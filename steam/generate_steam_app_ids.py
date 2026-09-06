@@ -1,8 +1,8 @@
-import json
 import os
 import requests
 
 from dotenv import load_dotenv
+from mtfs import write_json_file
 from natsort import natsorted
 
 load_dotenv(os.path.join(os.path.dirname(__file__), '.env'))
@@ -20,10 +20,7 @@ WITH_STATS = None
 def main():
   games = get_owned_games(STEAM_API_KEY, STEAM_USER_ID3)
   filtered_app_ids = natsorted(game['appid'] for game in games if filter_game(game))
-
-  os.makedirs(OUTPUT_PATH, exist_ok = True)
-  with open(OUTPUT_FILE, 'w') as f:
-    json.dump(filtered_app_ids, f, indent = 2)
+  write_json_file(OUTPUT_FILE, filtered_app_ids)
 
 def get_owned_games(
   api_key: str,

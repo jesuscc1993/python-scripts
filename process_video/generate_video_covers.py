@@ -7,6 +7,7 @@ import sys
 
 from PIL import Image, ImageDraw, ImageFont
 from mtfont import Font, SegoeFontName
+from mtfs import read_file
 from mtlogger import logger
 from mtprompt import Prompt, to_dir
 from mutagen.asf import ASF, ASFByteArrayAttribute
@@ -117,8 +118,7 @@ def embed_cover_mutagen(
   file_path: str,
   cover_path: str,
 ):
-  with open(cover_path, 'rb') as f:
-    data = f.read()
+  data = read_file(cover_path)
   ext = get_ext(file_path)
   if ext == '.wmv':
     tags = ASF(file_path)
@@ -128,7 +128,6 @@ def embed_cover_mutagen(
     tags = MP4(file_path)
     tags['covr'] = [MP4Cover(data, MP4Cover.FORMAT_JPEG)]
     tags.save()
-
 
 def embed_cover_ffmpeg(
   file_path: str,
@@ -260,7 +259,6 @@ def draw_stats_overlay(
   draw_label(draw, font, format_size(file_size), side = 'right', img_w = img_w)
 
   return img.convert('RGB')
-
 
 def draw_label(
   draw: ImageDraw.ImageDraw,

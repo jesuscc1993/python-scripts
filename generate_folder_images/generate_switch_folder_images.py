@@ -2,12 +2,12 @@ import os
 import requests
 import sys
 import time
-import json
 import winsound
 
 from PIL import Image
 from io import BytesIO
 from mtlogger import logger
+from mtfs import read_json_file, write_json_file
 from mtprompt import Prompt, to_bool, to_dir
 from natsort import natsorted
 
@@ -93,8 +93,7 @@ def read_cached_mapping(
   if not os.path.exists(file_path) or time.time() - os.path.getmtime(file_path) >= CACHE_TTL:
     return None
 
-  with open(file_path, 'r', encoding='utf-8') as fh:
-    return json.load(fh)
+  return read_json_file(file_path)
 
 def load_switch_mapping():
   path = os.path.join(os.path.dirname(__file__), 'cache', CACHE_FILENAME)
@@ -111,18 +110,14 @@ def load_switch_mapping():
     resp.raise_for_status()
     mapping = resp.json().get('game_titles', {})
 
-    os.makedirs(os.path.dirname(path), exist_ok=True)
-    with open(path, 'w', encoding='utf-8') as fh:
-      json.dump(mapping, fh)
+    write_json_file(path, mapping)
 
     return mapping
   except Exception as ex:
     logger.error(f'Failed to load switch mapping:\n{ex}')
 
     try:
-      if os.path.exists(path):
-        with open(path, 'r', encoding='utf-8') as fh:
-          return json.load(fh)
+      return read_json_file(path)
     except Exception:
       pass
 

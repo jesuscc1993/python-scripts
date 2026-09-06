@@ -4,6 +4,7 @@ import re
 import sys
 
 from mtlogger import logger
+from mtfs import read_text_file, write_text_file
 from mtprompt import Prompt
 
 DRIVES = ['D:/', 'E:/', 'Z:/']
@@ -95,11 +96,10 @@ def generate_game_shortcut(
     name = CHARS_TO_REMOVE.sub('', name)
     shortcut_path = os.path.join(out_dir, name + '.url')
 
-    with open(shortcut_path, 'w', encoding = 'utf-8') as f:
-      f.write('\n'.join([
-        '[InternetShortcut]',
-        f'URL={STEAM_PROTOCOL.format(app_id = game["app_id"])}',
-      ]))
+    write_text_file(shortcut_path, '\n'.join([
+      '[InternetShortcut]',
+      f'URL={STEAM_PROTOCOL.format(app_id = game["app_id"])}',
+    ]))
 
     logger.success(f'Created shortcut for "{shortcut_path}"')
 
@@ -109,11 +109,9 @@ def generate_game_shortcut(
 def parse_vdf(
   vdf_path: str,
 ):
-  with open(vdf_path, encoding = 'utf-8', errors = 'ignore') as f:
-    tokens = tokenize_vdf(f.read())
-
-  root, _ = parse_object(tokens)
-  return root
+  vdf_content = read_text_file(vdf_path)
+  tokens = tokenize_vdf(vdf_content)
+  return parse_object(tokens)[0]
 
 def tokenize_vdf(
   text: str,

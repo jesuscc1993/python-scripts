@@ -6,6 +6,7 @@ from concurrent.futures import ThreadPoolExecutor
 from configparser import ConfigParser
 from mtattr import Attr
 from mtlogger import logger
+from mtfs import write_text_file
 from tqdm import tqdm
 
 from _constants import DEFAULT_ICO_SIZES, DESKTOP_INI_FILENAME, FALLBACK_ENCODING, HIDDEN_FILE_ATTRS, HIDDEN_SYSTEM_FILE_ATTRS, ICO_FILENAME, INI_ICON_KEY, INI_SHELL_SECTION, MAX_ICO_SIZE, PREFERRED_ENCODING
@@ -145,9 +146,8 @@ def write_file(
   if os.path.exists(file_path):
     Attr.remove(file_path, attrs)
 
-  with open(file_path, 'w', encoding=encoding) as file:
-    file.write(content)
-    logger.success(f'Saved "{file_path}".')
+  write_text_file(file_path, content, encoding)
+  logger.success(f'Saved "{file_path}".')
 
   Attr.add(file_path, attrs)
 

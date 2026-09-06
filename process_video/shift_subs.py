@@ -2,6 +2,7 @@ import re
 
 from functools import partial
 from mtlogger import logger
+from mtfs import read_text_file, write_text_file
 from mtprompt import Prompt
 
 def main():
@@ -45,15 +46,10 @@ def shift_subtitles(
   srt_path: str,
   ms_to_shift: int,
 ):
-  with open(srt_path, 'r', encoding='utf-8') as f:
-    content = f.read()
-
+  content = read_text_file(srt_path)
   time_pattern = r'(\d{2}:\d{2}:\d{2},\d{3})\s*-->\s*(\d{2}:\d{2}:\d{2},\d{3})'
-
   new_content = re.sub(time_pattern, partial(replace_time, ms_to_shift=ms_to_shift), content)
-
-  with open(srt_path, 'w', encoding='utf-8') as f:
-    f.write(new_content)
+  write_text_file(srt_path, new_content)
 
   logger.success(
     f'Subtitles shifted by {ms_to_shift}ms',

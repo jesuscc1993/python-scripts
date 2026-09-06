@@ -1,9 +1,9 @@
-import json
 import os
 import sys
 
 from mtlogger import logger
 from mthltb import Hltb, HltbResult
+from mtfs import read_json_file, write_json_file, write_text_file
 from mtprompt import Prompt
 from tqdm import tqdm
 
@@ -18,7 +18,7 @@ def main():
 
   game_dirs = sys.argv[1:] if len(sys.argv) > 1 else [Prompt.dir('Enter the path to the directory containing your games')]
 
-  db = get_db()
+  db = read_json_file(DB_PATH) or {}
   dir_names = scan_dir_names(game_dirs, [GENERIC_EXCLUSION_FILE, HLTB_EXCLUSION_FILE])
 
   matched = []
@@ -40,28 +40,19 @@ def get_cached_result(
   dir_name: str,
   db: dict,
 ):
-  if dir_name in db:
-    return db[dir_name]
+  cached_result = db.get(dir_name)
+  if is_result_complete(cached_result):
+    return cached_result
 
   result = Hltb.search(dir_name)
   db[dir_name] = result
-  save_db(db)
+  write_json_file(DB_PATH, db)
   return result
 
-def get_db():
-  if not os.path.exists(DB_PATH):
-    return {}
-
-  with open(DB_PATH, 'r', encoding='utf-8') as f:
-    return json.load(f)
-
-def save_db(
-  db: dict,
+def is_result_complete(
+  result: HltbResult | None,
 ):
-  os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
-
-  with open(DB_PATH, 'w', encoding='utf-8') as f:
-    json.dump(db, f, indent=2)
+  return result and all(result.get(key) for key in ('comp_main', 'comp_plus', 'comp_100'))
 
 def write_output(
   matched: list,
@@ -98,8 +89,7 @@ def write_output(
 
   tmp_dir = os.path.expandvars('%TEMP%')
   output_path = os.path.join(tmp_dir, 'hltb_scan_output.md')
-  with open(output_path, 'w', encoding='utf-8') as f:
-    f.write('\n'.join(lines))
+  write_text_file(output_path, '\n'.join(lines))
 
   logger.success(f'Saved output to {output_path}')
   os.startfile(output_path)

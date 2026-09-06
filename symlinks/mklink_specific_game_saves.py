@@ -1,8 +1,8 @@
-import json
 import os
 
 from dotenv import load_dotenv
 from mtlogger import logger
+from mtfs import read_json_file
 from mtprompt import Prompt
 
 from _common import link_dir, link_file, run_as_admin
@@ -20,10 +20,8 @@ def main():
   if not os.path.exists(mappings_path):
     logger.error(f'File not found: "{mappings_path}". Check readme for instructions.')
     return
-  with open(mappings_path, 'r', encoding='utf-8') as file:
-    groups = json.load(file)
 
-  for group in groups:
+  for group in read_json_file(mappings_path):
     path_prefix = group.get('path_prefix')
     items = group.get('items')
     logger.log(f'\nProcessing group: {path_prefix} with {len(items)} mappings.')

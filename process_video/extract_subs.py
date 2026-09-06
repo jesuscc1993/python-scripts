@@ -54,7 +54,7 @@ def extract_subtitles(
   cmd = [
     'ffmpeg',
     '-i', src_file_path,
-    '-map', f'0:s:m:language:{LANGUAGE}:0?',
+    '-map', f'0:s:m:language:{LANGUAGE}',
     '-c:s', 'srt',
     dest_file_path
   ]

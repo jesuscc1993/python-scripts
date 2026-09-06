@@ -2,6 +2,7 @@ import os
 import shutil
 import tempfile
 import zipfile
+from mtfs import read_file, write_file
 
 from bs4 import BeautifulSoup
 from mtlogger import logger
@@ -91,9 +92,7 @@ def process_html_file(html_path):
   file_name = os.path.basename(html_path)
 
   try:
-    with open(html_path, 'rb') as html_file:
-      content = html_file.read()
-
+    content = read_file(html_path)
     soup = BeautifulSoup(content, 'html.parser')
     was_changed = clean_soup(soup)
 
@@ -101,9 +100,7 @@ def process_html_file(html_path):
       logger.trace(f'Skipping "{file_name}". Nothing to clean.')
       return
 
-    with open(html_path, 'wb') as html_file:
-      html_file.write(str(soup).encode('utf-8'))
-
+    write_file(html_path, str(soup).encode('utf-8'))
     logger.success(f'Cleaned "{file_name}".')
 
   except Exception as ex:
