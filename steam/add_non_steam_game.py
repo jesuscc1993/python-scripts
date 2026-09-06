@@ -9,13 +9,10 @@ import time
 from mtlogger import logger
 from mtprompt import Prompt
 from pathlib import Path
-from pathlib import Path
 from win32com.shell import shell # type: ignore
 
 from _common import download_assets_for_app_id
-
-STEAM_USER_ID3 = os.environ.get('STEAM_USER_ID3')
-STEAM_INSTALL_PATH = os.environ.get('STEAM_INSTALL_PATH')
+from _constants import STEAM_USER_ID3, STEAM_INSTALL_PATH
 
 TEMPLATE_PATH = os.path.join(os.path.dirname(__file__), 'vdf_game_template.json')
 

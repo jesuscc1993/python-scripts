@@ -5,6 +5,12 @@ from dotenv import load_dotenv
 load_dotenv(os.path.join(os.path.dirname(__file__), '.env'))
 
 OUTPUT_DIR_PATH = os.path.join(os.path.dirname(__file__), '..', '_output', 'steam')
+STEAM_REQUEST_TIMEOUT = 30
+
+STEAM_API_KEY = os.environ.get('STEAM_API_KEY')
+STEAM_INSTALL_PATH = os.environ.get('STEAM_INSTALL_PATH')
+STEAM_USER_ID3 = os.environ.get('STEAM_USER_ID3')
+STEAM_USER_ID64 = os.environ.get('STEAM_USER_ID64')
 
 COVER_H = os.environ.get('COVER_H')
 COVER_W = os.environ.get('COVER_W')
