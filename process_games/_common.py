@@ -25,6 +25,7 @@ def read_steam_wishlist_game_names(
   return [
     app_name
     for app in wishlist_content
+    if not app.get('store_item', {}).get('is_coming_soon')
     if (app_name := get_app_name_from_steam_wishlist_item(app))
   ]
 
