@@ -9,7 +9,7 @@ from rapidfuzz import process
 from tqdm import tqdm
 
 from _common import scan_dir_names, format_dimmed, simplify_game_name, matches_loosely, normalize_dir_name, read_steam_wishlist_game_names, validate_dir_paths
-from _constants import EMPTY_CELL, GAME_DIRS_SCAN_TYPE, OUTPUT_DIR_PATH, STYLE, WISHLIST_FILE_SCAN_TYPE
+from _constants import COMPACT_GUI_EXCLUSION_FILE, EMPTY_CELL, GAME_DIRS_SCAN_TYPE, GENERIC_EXCLUSION_FILE, OUTPUT_DIR_PATH, STYLE, WISHLIST_FILE_SCAN_TYPE
 from _types_compact_gui import CompType, DbEntry
 
 DATABASE_PATH = r"%LOCALAPPDATA%\IridiumIO\CompactGUI\databasev2.json"
@@ -73,7 +73,7 @@ def create_parser():
 
 def scan_game_dirs(game_dirs: list[str]):
   validate_dir_paths(game_dirs)
-  return scan_dir_names(game_dirs), INSTALLED_GAMES_REPORT_FILENAME
+  return scan_dir_names(game_dirs, [GENERIC_EXCLUSION_FILE, COMPACT_GUI_EXCLUSION_FILE]), INSTALLED_GAMES_REPORT_FILENAME
 
 def scan_wishlist_file(wishlist_file: str):
   return read_steam_wishlist_game_names(wishlist_file), STEAM_WISHLIST_REPORT_FILENAME
