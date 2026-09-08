@@ -186,7 +186,7 @@ def format_comp_type_column(
   result: dict,
 ):
   if result is None:
-    return format_dimmed(EMPTY_CELL)
+    return EMPTY_CELL
   return format_comp_name(CompType(result['CompType']))
 
 def format_before_column(
