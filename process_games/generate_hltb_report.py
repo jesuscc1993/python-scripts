@@ -172,7 +172,8 @@ def format_matched_column(
   matched_game_name = result['game_name']
   formatted_game_name = simplify_game_name(matched_game_name)
   game_name_content = f'[{formatted_game_name}]({result["url"]})'
-  return game_name_content if matches_loosely(game_name, matched_game_name) else format_dimmed(game_name_content)
+  loosely_match = matches_loosely(game_name, matched_game_name)
+  return game_name_content if loosely_match else format_dimmed(game_name_content)
 
 def format_hours_column(
   seconds: int,

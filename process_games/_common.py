@@ -88,31 +88,40 @@ def format_dimmed(
 def simplify_game_name(
   name: str,
 ):
-  formatted_name = name
-  formatted_name = re.sub(r'[™®]', '', formatted_name)
-  formatted_name = re.sub(r'([:-]\s?)?(GOTY|Game of The Year|Director\'s Cut)(\sEdition)?', '', formatted_name, flags = re.IGNORECASE)
-  formatted_name = re.sub(r'([:-]\s?)?(Definitive|Deluxe|Gold|Premium|Ultimate)\sEdition', '', formatted_name, flags = re.IGNORECASE)
-  formatted_name = re.sub(r'[:-]\s?(\w+)\sEdition', '', formatted_name, flags = re.IGNORECASE)
-  return formatted_name.strip()
+  parsed_name = name
+  parsed_name = re.sub(r'[™®]', '', parsed_name)
+  parsed_name = re.sub(r'([:-]\s?)?(GOTY|Game of The Year|Director.s Cut)(\sEdition)?', '', parsed_name, flags = re.IGNORECASE)
+  parsed_name = re.sub(r'([:-]\s?)?(Definitive|Deluxe|Gold|Premium|Ultimate)\sEdition', '', parsed_name, flags = re.IGNORECASE)
+  parsed_name = re.sub(r'[:-]\s?(\w+)\sEdition', '', parsed_name, flags = re.IGNORECASE)
+  return parsed_name.strip()
 
 def normalize_dir_name(
   name: str,
 ):
-  name = name.lower()
-  name = re.sub(r'[:꞉’\']', '', name)
-  name = ''.join(char for char in unicodedata.normalize('NFKD', name) if not unicodedata.combining(char))
-  return name
+  parsed_name = name.lower()
+  parsed_name = re.sub(r'[\'’:꞉—-]', '', parsed_name)
+  parsed_name = ''.join(char for char in unicodedata.normalize('NFKD', parsed_name) if not unicodedata.combining(char))
+  return parsed_name
+
+def flatten_game_name(
+  name: str,
+):
+  parsed_name = name
+  parsed_name = re.sub(r'\b(HD|Remake|Remaster(?:ed)?)\b', '', parsed_name, flags = re.IGNORECASE)
+  parsed_name = re.sub(r'(\s+)', '', parsed_name)
+  return parsed_name
 
 def get_comparable_dir_name(
   name: str,
 ):
-  comparable_name = re.sub(r'(\s+|-)', '', name)
-  comparable_name = simplify_game_name(comparable_name)
-  comparable_name = normalize_dir_name(comparable_name)
-  return comparable_name
+  parsed_name = name
+  parsed_name = simplify_game_name(parsed_name)
+  parsed_name = normalize_dir_name(parsed_name)
+  parsed_name = flatten_game_name(parsed_name)
+  return parsed_name
 
 def matches_loosely(
-  a: str,
-  b: str,
+  name_a: str,
+  name_b: str,
 ):
-  return get_comparable_dir_name(a) == get_comparable_dir_name(b)
+  return get_comparable_dir_name(name_a) == get_comparable_dir_name(name_b)
