@@ -14,12 +14,20 @@ def main():
   max_depth = to_int(sys.argv[6]) if len(sys.argv) > 6 else min_depth
 
   logger.log(f'Compressing subfolders in "{parent_dir}"...')
-  compress_child_folders(parent_dir, output_type, delete_original, exclusion_patterns, min_depth, max_depth)
+  success = compress_child_folders(parent_dir, output_type, delete_original, exclusion_patterns, min_depth, max_depth)
+
+  if success:
+    logger.success(f'Finished compressing subfolders in "{parent_dir}".')
+  else:
+    logger.error(f'Failed to compress some subfolders in "{parent_dir}".')
+
+  return success
 
 if __name__ == '__main__':
   try:
-    main()
+    success = main()
   except Exception as ex:
     logger.unhandled_error(ex)
+    success = False
 
-  Prompt.enter_to_exit()
+  Prompt.enter_to_exit(timeout=success)

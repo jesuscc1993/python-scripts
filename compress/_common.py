@@ -26,7 +26,7 @@ def compress_child_folders(
 
   if max_depth < 1:
     logger.error('Depth must be 1 or greater.')
-    return
+    return False
 
   folders = []
   for root, dirs, _ in os.walk(parent_folder_path, topdown = False):
@@ -40,15 +40,20 @@ def compress_child_folders(
 
   if folders:
     with ThreadPoolExecutor() as executor:
-      list(tqdm(
+      results = list(tqdm(
         executor.map(lambda folder: compress_folder(folder, output_type, remove_original, exclusion_patterns), folders),
         total = len(folders),
         desc = f'Processing "{parent_folder_path}"'
       ))
 
-    logger.success(f'Finished compressing folders in "{parent_folder_path}".')
+    if all(results):
+      return True
+
+    logger.error(f'Failed to compress one or more folders in "{parent_folder_path}".')
+    return False
   else:
     logger.warn(f'No folders found in "{parent_folder_path}".')
+    return True
 
 def compress_folder(
   folder_path: str,
@@ -64,11 +69,11 @@ def compress_folder(
   tmp_zip_path = os.path.join(tempfile.gettempdir(), f'{tmp_name}.tmp')
   final_zip_path = os.path.join(parent_dir, zip_filename)
 
-  if os.path.exists(final_zip_path):
-    logger.trace(f'Skipping "{folder_path}". A compressed file with the same name already exists.')
-    return
-
   try:
+    if os.path.exists(final_zip_path):
+      logger.trace(f'Skipping "{folder_path}". A compressed file with the same name already exists.')
+      return True
+
     files_to_compress = []
     for root, dir_names, file_names in os.walk(folder_path):
       if exclusion_patterns:
@@ -91,13 +96,23 @@ def compress_folder(
       if remove_original:
         shutil.rmtree(folder_path)
 
-      logger.success(f'Compressed folder "{folder_path}".')
+      return True
+
+    logger.warn(f'No files found in "{folder_path}".')
+    return True
 
   except Exception as ex:
     logger.error(f'An error occurred while processing "{folder_name}":\n{ex}')
+    return False
+
   finally:
-    if os.path.exists(tmp_zip_path):
-      os.remove(tmp_zip_path)
+    try:
+      if os.path.exists(tmp_zip_path):
+        os.remove(tmp_zip_path)
+
+    except Exception as cleanup_ex:
+      logger.error(f'Unable to remove temporary archive "{tmp_zip_path}":\n{cleanup_ex}')
+      return False
 
 def extract_child_archives(
   parent_folder_path: str,
@@ -113,15 +128,20 @@ def extract_child_archives(
 
   if archives:
     with ThreadPoolExecutor() as executor:
-      list(tqdm(
+      results = list(tqdm(
         executor.map(lambda archive_path: extract_archive(archive_path, remove_archives), archives),
         total = len(archives),
         desc = f'Processing "{parent_folder_path}"'
       ))
 
-    logger.success(f'Finished extracting archives in "{parent_folder_path}".')
+    if all(results):
+      return True
+
+    logger.error(f'Failed to extract one or more archives in "{parent_folder_path}".')
+    return False
   else:
     logger.warn(f'No archives found in "{parent_folder_path}".')
+    return True
 
 def extract_archive(
   archive_path: str,
@@ -130,16 +150,19 @@ def extract_archive(
   folder_name = os.path.splitext(os.path.basename(archive_path))[0]
   target_dir = os.path.join(os.path.dirname(archive_path), folder_name)
 
-  if os.path.exists(target_dir):
-    logger.trace(f'Skipping "{archive_path}". Folder exists.')
-    return
-
   try:
+    if os.path.exists(target_dir):
+      logger.trace(f'Skipping "{archive_path}". Folder exists.')
+      return True
+
     with zipfile.ZipFile(archive_path, 'r') as compressed_file:
       compressed_file.extractall(target_dir)
 
     if remove_archive:
       os.remove(archive_path)
 
+    return True
+
   except Exception as ex:
     logger.error(f'An error occurred while processing "{folder_name}":\n{ex}')
+    return False

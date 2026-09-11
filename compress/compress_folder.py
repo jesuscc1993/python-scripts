@@ -12,12 +12,20 @@ def main():
   exclusion_patterns = to_list(sys.argv[4]) if len(sys.argv) > 4 else None
 
   logger.log(f'Compressing folder "{folder_path}"...')
-  compress_folder(folder_path, output_type, delete_original, exclusion_patterns)
+  success = compress_folder(folder_path, output_type, delete_original, exclusion_patterns)
+
+  if success:
+    logger.success(f'Compressed folder "{folder_path}".')
+  else:
+    logger.error(f'Failed to compress folder "{folder_path}".')
+
+  return success
 
 if __name__ == '__main__':
   try:
-    main()
+    success = main()
   except Exception as ex:
     logger.unhandled_error(ex)
+    success = False
 
-  Prompt.enter_to_exit()
+  Prompt.enter_to_exit(timeout=success)
