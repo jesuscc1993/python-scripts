@@ -124,6 +124,8 @@ def process_dir(
       ico_path = ico_path.replace(ICO_FILENAME, ICO_BAK_FILENAME)
       ico_path_lower = ico_path.lower()
     elif '.ico' in ico_path_lower and ICO_FILENAME not in ico_path_lower:
+      if os.path.exists(bak_ico_path):
+        Attr.show(bak_ico_path)
       shutil.copy2(os.path.join(dir_path, ico_path), bak_ico_path)
       Attr.hide(bak_ico_path)
 
