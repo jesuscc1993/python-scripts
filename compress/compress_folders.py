@@ -3,7 +3,8 @@ import sys
 from mtlogger import logger
 from mtprompt import Prompt, to_bool, to_dir, to_int, to_list
 
-from _common import compress_child_folders, ZIP_TYPES
+from _common import compress_child_folders
+from _constants import FAILED, INCOMPLETE, SUCCEEDED, ZIP_TYPES
 
 def main():
   parent_dir = to_dir(sys.argv[1]) if len(sys.argv) > 1 else Prompt.dir('Enter the path to the directory containing the folders you want to compress')
@@ -14,20 +15,24 @@ def main():
   max_depth = to_int(sys.argv[6]) if len(sys.argv) > 6 else min_depth
 
   logger.log(f'Compressing folders in "{parent_dir}"...')
-  success = compress_child_folders(parent_dir, output_type, delete_original, exclusion_patterns, min_depth, max_depth)
+  status = compress_child_folders(parent_dir, output_type, delete_original, exclusion_patterns, min_depth, max_depth)
 
-  if success:
+  if status == SUCCEEDED:
     logger.success(f'Finished compressing folders in "{parent_dir}".')
-  else:
+
+  elif status == INCOMPLETE:
+    logger.warn(f'Compression did not complete for folders in "{parent_dir}".')
+
+  elif status == FAILED:
     logger.error(f'Failed to compress some folders in "{parent_dir}".')
 
-  return success
+  return status
 
 if __name__ == '__main__':
   try:
-    success = main()
+    status = main()
   except Exception as ex:
     logger.unhandled_error(ex)
-    success = False
+    status = FAILED
 
-  Prompt.enter_to_exit(timeout=success)
+  Prompt.enter_to_exit(timeout=status == SUCCEEDED)

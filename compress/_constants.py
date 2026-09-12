@@ -1,0 +1,8 @@
+BAK_TYPE = 'BAK'
+ZIP_TYPES = ['ZIP', 'CBZ']
+
+BAK_EXTENSION = f'.{BAK_TYPE.lower()}'
+
+FAILED = -1
+INCOMPLETE = 0
+SUCCEEDED = 1

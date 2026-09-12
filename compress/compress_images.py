@@ -9,7 +9,7 @@ from tqdm import tqdm
 
 from _image_utils import LOSSLESS, WEBP_DIMENSION_LIMIT, WEBP_EXTENSION, is_image_file
 from _settings import IMAGE_OUTPUT_FORMAT, IMAGE_OUTPUT_LOSSLESS_COMPRESSION, IMAGE_OUTPUT_QUALITY
-from _common import BAK_EXTENSION
+from _constants import BAK_EXTENSION
 
 output_ext = f'.{IMAGE_OUTPUT_FORMAT.lower()}'
 

@@ -3,7 +3,8 @@ import sys
 from mtlogger import logger
 from mtprompt import Prompt, to_bool, to_dir, to_list
 
-from _common import compress_folder, ZIP_TYPES
+from _common import compress_folder
+from _constants import FAILED, INCOMPLETE, SUCCEEDED, ZIP_TYPES
 
 def main():
   folder_path = to_dir(sys.argv[1]) if len(sys.argv) > 1 else Prompt.dir('Enter the path to the folder you want to compress')
@@ -12,20 +13,24 @@ def main():
   exclusion_patterns = to_list(sys.argv[4]) if len(sys.argv) > 4 else None
 
   logger.log(f'Compressing folder "{folder_path}"...')
-  success = compress_folder(folder_path, output_type, delete_original, exclusion_patterns)
+  status = compress_folder(folder_path, output_type, delete_original, exclusion_patterns)
 
-  if success:
+  if status == SUCCEEDED:
     logger.success(f'Compressed folder "{folder_path}".')
-  else:
+
+  elif status == INCOMPLETE:
+    logger.warn(f'Compression did not complete for folder "{folder_path}".')
+
+  elif status == FAILED:
     logger.error(f'Failed to compress folder "{folder_path}".')
 
-  return success
+  return status
 
 if __name__ == '__main__':
   try:
-    success = main()
+    status = main()
   except Exception as ex:
     logger.unhandled_error(ex)
-    success = False
+    status = FAILED
 
-  Prompt.enter_to_exit(timeout=success)
+  Prompt.enter_to_exit(timeout=status == SUCCEEDED)
