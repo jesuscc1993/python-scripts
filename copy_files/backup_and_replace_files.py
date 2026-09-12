@@ -59,7 +59,7 @@ def backup_file(
       os.rename(file_path, bak_path)
       logger.debug(f'Backed up "{file_path}" as "{bak_path}".')
     else:
-      logger.trace(f'Backup file "{bak_path}" already exists and will be reused.')
+      logger.trace(f'Backup file "{bak_path}" already exists. It will be reused.')
 
 if __name__ == '__main__':
   try:

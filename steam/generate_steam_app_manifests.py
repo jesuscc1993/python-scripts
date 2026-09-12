@@ -61,7 +61,7 @@ def main():
 
     filepath = os.path.join(steam_apps_path, f'appmanifest_{app_id}.acf')
     if os.path.exists(filepath):
-      logger.trace(f'Skipping "{game}": Manifest already exists ({filepath}).')
+      logger.trace(f'Skipping "{game}": "({filepath})" already exists.')
       continue
 
     name = game

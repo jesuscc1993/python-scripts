@@ -152,7 +152,7 @@ def extract_archive(
 
   try:
     if os.path.exists(target_dir):
-      logger.trace(f'Skipping "{archive_path}". Folder exists.')
+      logger.trace(f'Skipping "{archive_path}". Folder already exists.')
       return True
 
     with zipfile.ZipFile(archive_path, 'r') as compressed_file:

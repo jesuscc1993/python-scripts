@@ -47,7 +47,7 @@ def download_asset_for_app_id(
   size: list = None,
 ):
   if Path(dest).exists():
-    logger.trace(f'Skipping {Path(dest).name}: already exists')
+    logger.trace(f'Skipping {Path(dest).name}: already exists.')
     return
   response = requests.get(url)
   response.raise_for_status()
