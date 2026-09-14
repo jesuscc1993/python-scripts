@@ -4,10 +4,15 @@ import subprocess
 from mtlogger import logger
 from mtprompt import Prompt
 
+from _common import run_as_admin
+
 def main():
-  clear_cache_for_package_manager("npm", ["cache", "clean", "--force"])
-  clear_cache_for_package_manager("yarn", ["cache", "clean"])
-  clear_cache_for_package_manager("pip", ["cache", "purge"])
+  run_as_admin()
+
+  clear_cache_for_package_manager('npm', ['cache', 'clean', '--force'])
+  clear_cache_for_package_manager('yarn', ['cache', 'clean'])
+  clear_cache_for_package_manager('pip', ['cache', 'purge'])
+  clear_cache_for_package_manager('DISM', ['/Online', '/Cleanup-Image', '/StartComponentCleanup'])
 
 def clear_cache_for_package_manager(
   cmd: str,
@@ -16,14 +21,16 @@ def clear_cache_for_package_manager(
   exe = shutil.which(cmd)
   if exe:
     try:
-      formatted_command = f"{cmd} {' '.join(args)}"
-      logger.trace(f"Running: {formatted_command}")
+      formatted_command = f'{cmd} {' '.join(args)}'
+      logger.trace(f'Running: {formatted_command}')
       subprocess.run([exe] + args, check=True)
+
     except subprocess.CalledProcessError as e:
-      logger.error(f"Error running {formatted_command}: {e}")
+      logger.error(f'Error running {formatted_command}: {e}')
+
     print()
   else:
-    logger.warning(f"{cmd} not found, skipping.")
+    logger.warning(f'{cmd} not found, skipping.')
 
 if __name__ == '__main__':
   try:
