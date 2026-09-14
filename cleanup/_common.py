@@ -21,24 +21,39 @@ def delete_children_by_dir_pattern(dir_pattern):
 
   dir_path = os.path.expandvars(dir_pattern)
   matching_dirs = [path for path in glob.glob(dir_path) if os.path.isdir(path)]
+  failed = False
 
   if not matching_dirs:
     logger.warn(f'{dir_pattern} directory not found. Skipping...\n')
-    return
+    return False
 
   for matching_dir in matching_dirs:
-    for item in os.listdir(matching_dir):
+    try:
+      items = os.listdir(matching_dir)
+
+    except Exception as ex:
+      logger.error(f'Could not list "{matching_dir}": {ex}')
+      failed = True
+      continue
+
+    for item in items:
+      item_path = os.path.join(matching_dir, item)
       try:
-        item_path = os.path.join(matching_dir, item)
         if os.path.isfile(item_path):
           os.remove(item_path)
         elif os.path.isdir(item_path):
-          shutil.rmtree(item_path, ignore_errors=True)
+          shutil.rmtree(item_path)
 
         logger.debug(f'Deleted "{item_path}"')
 
       except Exception as ex:
         logger.error(f'Could not delete "{item_path}": {ex}')
+        failed = True
         continue
 
-  logger.success(f'Finished cleaning "{dir_pattern}".\n')
+  if failed:
+    logger.warn(f'  Finished cleaning "{dir_pattern}" with errors.\n')
+  else:
+    logger.success(f'Finished cleaning "{dir_pattern}".\n')
+
+  return not failed

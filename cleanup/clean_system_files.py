@@ -22,6 +22,7 @@ def cleanup_temp():
 
 def cleanup_crash_dumps():
   logger.log('Deleting crash dump files...')
+  failed = False
 
   directories = [
     os.path.expandvars(r'%SystemRoot%\Minidump'),
@@ -43,8 +44,12 @@ def cleanup_crash_dumps():
 
         except Exception as ex:
           logger.error(f'Could not delete crash dump file: {ex}')
+          failed = True
 
-  logger.success('Finished deleting crash dump files.\n')
+  if failed:
+    logger.warn('  Finished deleting crash dump files with errors.\n')
+  else:
+    logger.success('Finished deleting crash dump files.\n')
 
 if __name__ == '__main__':
   try:
