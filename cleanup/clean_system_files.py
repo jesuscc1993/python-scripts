@@ -1,10 +1,16 @@
 import os
-import glob
 
 from mtlogger import logger
 from mtprompt import Prompt
 
-from _common import delete_children_by_dir_pattern
+from _common import delete_children_for_dir, delete_children_for_dirs
+
+CRASH_DUMP_DIRS = [
+  os.path.expandvars(r'%SystemRoot%\Minidump'),
+  os.path.expandvars(r'%SystemRoot%'),
+  os.path.expandvars(r'%LocalAppData%\CrashDumps'),
+]
+CRASH_DUMP_FILE_PATTERNS = ['*.dmp', '*.mdmp']
 
 def main():
   cleanup_temp()
@@ -18,38 +24,10 @@ def cleanup_temp():
     logger.warn('Temporary directory not found. Skipping...')
     return
 
-  delete_children_by_dir_pattern(temp_dir)
+  delete_children_for_dir(temp_dir)
 
 def cleanup_crash_dumps():
-  logger.log('Deleting crash dump files...')
-  failed = False
-
-  directories = [
-    os.path.expandvars(r'%SystemRoot%\Minidump'),
-    os.path.expandvars(r'%SystemRoot%'),
-    os.path.expandvars(r'%LocalAppData%\CrashDumps'),
-  ]
-
-  for directory in directories:
-    if not os.path.exists(directory):
-      logger.warn(f'Directory "{directory}" not found. Skipping...')
-      continue
-
-    for ext in ['.dmp', '.mdmp']:
-      pattern = os.path.join(directory, f'*{ext}')
-      for file_path in glob.glob(pattern):
-        try:
-          os.remove(file_path)
-          logger.debug(f'Deleted "{file_path}"')
-
-        except Exception as ex:
-          logger.error(f'Could not delete crash dump file: {ex}')
-          failed = True
-
-  if failed:
-    logger.warn('  Finished deleting crash dump files with errors.\n')
-  else:
-    logger.success('Finished deleting crash dump files.\n')
+  delete_children_for_dirs(CRASH_DUMP_DIRS, CRASH_DUMP_FILE_PATTERNS)
 
 if __name__ == '__main__':
   try:

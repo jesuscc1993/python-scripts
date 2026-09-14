@@ -3,7 +3,7 @@ import os
 from mtlogger import logger
 from mtprompt import Prompt
 
-from _common import delete_children_by_dir_patterns
+from _common import delete_children_for_dirs
 
 CHROME_PATH = r'%LOCALAPPDATA%\Google\Chrome\User Data\Default'
 FIREFOX_PATH = r'%LOCALAPPDATA%\Mozilla\Firefox\Profiles\*'
@@ -16,7 +16,7 @@ DIR_PATTERNS = [
 ]
 
 def main():
-  delete_children_by_dir_patterns(DIR_PATTERNS)
+  delete_children_for_dirs(DIR_PATTERNS)
 
 if __name__ == '__main__':
   try:
