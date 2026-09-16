@@ -44,7 +44,7 @@ def link_yuzu():
     SWITCH_USER
   )
   link_dir(
-    os.path.join(EMULATORS_PATH, 'Switch', 'yuzu', 'user', 'nand', 'user', 'Contents', 'registered'),
+    os.path.join(SWITCH_USER, 'nand', 'user', 'Contents', 'registered'),
     os.path.join(ROMS_PATH, 'Switch', 'nca')
   )
   print()
@@ -124,7 +124,11 @@ def link_saves():
   )
   link_dir(
     os.path.join(EMULATORS_PATH, 'Switch', '_user_', 'nand', 'user', 'save', '0000000000000000'),
-    os.path.join(EMULATORS_SAVE_PATH, 'Switch')
+    os.path.join(EMULATORS_SAVE_PATH, 'Switch', 'Yuzu')
+  )
+  link_dir(
+    os.path.join(EMULATORS_PATH, 'Switch', 'Ryujinx', 'bis', 'user', 'save'),
+    os.path.join(EMULATORS_SAVE_PATH, 'Switch', 'Ryujinx')
   )
   link_dir(
     os.path.join(EMULATORS_PATH, 'Wii - GCN', '_user_', 'GC', 'EUR', 'Card A'),
