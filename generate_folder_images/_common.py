@@ -1,6 +1,6 @@
+import mtsound
 import os
 import sys
-import winsound
 
 from PIL import Image
 from mtlogger import logger
@@ -38,7 +38,7 @@ def process_parent_folder(
         continue
       process_folder(item_path)
 
-  winsound.MessageBeep()
+  mtsound.notify()
   logger.log(f'Finished generating cover images.')
 
 def resize_image(

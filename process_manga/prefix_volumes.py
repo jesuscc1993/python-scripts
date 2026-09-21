@@ -1,8 +1,8 @@
+import mtsound
 import os
 import re
 import subprocess
 import sys
-import winsound
 
 from mtlogger import Fore, logger
 from mtprompt import Prompt
@@ -92,7 +92,7 @@ def process_parent_folder(
         os.rename(old_folder_path, new_folder_path)
         break
 
-  winsound.MessageBeep()
+  mtsound.notify()
   logger.success(f'Finished prefixing volumes in "{parent_folder_path}".\n')
 
   merge_input = Prompt.bool('Merge volumes?', default=True)

@@ -1,5 +1,5 @@
+import mtsound
 import os
-import winsound
 
 from PIL import Image
 from concurrent.futures import ThreadPoolExecutor
@@ -33,7 +33,7 @@ def process_parent_folder(
     for _ in executor.map(lambda f: process_folder(f, image_filenames), folders_to_process):
       progress.update(1)
 
-  winsound.MessageBeep()
+  mtsound.notify()
   logger.log(f'\nFinished setting icons for "{parent_folder_path}".')
 
 def process_folder(

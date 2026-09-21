@@ -1,7 +1,7 @@
+import mtsound
 import os
 import re
 import subprocess
-import winsound
 
 from concurrent.futures import ThreadPoolExecutor
 from mtlogger import logger
@@ -44,7 +44,7 @@ def select_parent_folder(
     logger.error(f'The specified path "{parent_folder}" is not a directory.')
   else:
     callback(parent_folder)
-    winsound.MessageBeep()
+    mtsound.notify()
 
   if log_success:
     logger.success(f'Finished processing "{parent_folder}".\n')

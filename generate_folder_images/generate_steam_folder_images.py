@@ -1,7 +1,7 @@
+import mtsound
 import os
 import requests
 import sys
-import winsound
 
 from PIL import Image
 from io import BytesIO
@@ -72,7 +72,7 @@ def generate_covers(
     if os.path.isdir(folder_path) and folder_name.isdigit():
       process_folder(folder_path, folder_name, cover_url, override_existing)
 
-  winsound.MessageBeep()
+  mtsound.notify()
   logger.log('\nFinished generating cover images.')
 
 def process_folder(

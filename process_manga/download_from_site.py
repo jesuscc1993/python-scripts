@@ -1,5 +1,5 @@
+import mtsound
 import os
-import winsound
 import requests
 import urllib
 
@@ -25,7 +25,7 @@ def main():
   download_all_chapters(base_url, css_selector, chapter_count)
   logger.log()
 
-  winsound.MessageBeep()
+  mtsound.notify()
   logger.success(f'Finished downloading from "{base_url}".\n')
   main()
 

@@ -1,8 +1,8 @@
+import mtsound
 import os
 import re
 import requests
 import sys
-import winsound
 
 from PIL import Image
 from io import BytesIO
@@ -57,7 +57,7 @@ def generate_covers(
     if os.path.isdir(folder_path):
       process_folder(folder_path, folder_name, override_existing)
 
-  winsound.MessageBeep()
+  mtsound.notify()
   logger.log('\nFinished generating cover images.')
 
 def get_access_token():

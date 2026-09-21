@@ -1,7 +1,7 @@
+import mtsound
 import os
 import re
 import shutil
-import winsound
 
 from mtattr import Attr
 from mtprompt import Prompt, logger
@@ -51,7 +51,7 @@ def main():
   except Exception as e:
     tqdm.write(f'Error: {e}')
 
-  winsound.MessageBeep()
+  mtsound.notify()
   Prompt.enter_to_exit()
 
 def sanitize_name(name: str) -> str:

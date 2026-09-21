@@ -1,12 +1,12 @@
 import ctypes
 import math
+import mtsound
 import os
 import shutil
 import sys
 import win32con
 import win32gui
 import win32ui
-import winsound
 
 from PIL import Image, ImageDraw
 from mtattr import Attr
@@ -73,7 +73,7 @@ def main():
         logger.log()
         process_dir(child_path, override_existing=OVERRIDE)
 
-  winsound.MessageBeep()
+  mtsound.notify()
   logger.success(f'Finished setting icons for "{parent_path}".', prefix_newline=True)
 
 def should_skip_dir(

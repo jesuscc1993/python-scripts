@@ -1,13 +1,9 @@
 import csv
 import io
+import mtsound
 import os
 import sys
 import threading
-
-try:
-  import winsound
-except ImportError:
-  winsound = None
 
 from mtlogger import logger
 
@@ -254,8 +250,8 @@ class Prompt:
 
   @staticmethod
   def enter_to_exit(timeout = False, sound = True):
-    if sound and winsound:
-      winsound.MessageBeep()
+    if sound:
+      mtsound.notify()
 
     if os.getenv('NO_ENTER_TO_EXIT'):
       return

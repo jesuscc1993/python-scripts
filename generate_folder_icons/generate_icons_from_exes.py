@@ -1,7 +1,7 @@
+import mtsound
 import os
 import re
 import sys
-import winsound
 
 from mtlogger import logger
 from mtprompt import Prompt, to_dir, to_int
@@ -53,7 +53,7 @@ def main():
       child_path = os.path.join(root, dir_name)
       process_dir(child_path)
 
-  winsound.MessageBeep()
+  mtsound.notify()
   logger.success(f'Finished setting icons for "{parent_path}".', prefix_newline=True)
 
 def process_dir(
