@@ -38,7 +38,7 @@ def main():
         ext = type_mapping.get('ext')
         class_name = type_mapping.get('class')
 
-      ext_icon_path = get_icon_path(icons_path, ext) or get_icon_path(icons_path, class_name)
+      ext_icon_path = get_icon_path(icons_path, ext.upper()) or get_icon_path(icons_path, class_name)
       fallback_icon_path = get_icon_path(icons_path, fallback_icon)
       file_type = get_registry_value(winreg.HKEY_CLASSES_ROOT, f'.{ext}', '') or f'{class_name.lower()}file'
 
@@ -85,7 +85,7 @@ def get_icon_path(
   if name == None:
     return None
 
-  path = os.path.join(icons_path, f'{name.upper()}.ico')
+  path = os.path.join(icons_path, f'{name}.ico')
   return path if os.path.exists(path) else None
 
 if __name__ == '__main__':
