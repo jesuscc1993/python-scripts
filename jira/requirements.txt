@@ -1,0 +1,4 @@
+dotenv
+jira
+openpyxl
+tqdm
