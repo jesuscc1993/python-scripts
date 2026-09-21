@@ -1,10 +1,11 @@
 import os
+import sys
 
-from colorama import init, Fore, Style
+from colorama import init, Fore
 from enum import Enum
 from typing import Optional, TypedDict, Unpack
 
-init(autoreset = True, wrap = True, convert = True)
+init(autoreset=True, wrap=True, convert=(sys.platform == 'win32'))
 
 class LogLevel(Enum):
   TRACE = 'TRACE'

@@ -3,7 +3,11 @@ import io
 import os
 import sys
 import threading
-import winsound
+
+try:
+  import winsound
+except ImportError:
+  winsound = None
 
 from mtlogger import logger
 
@@ -250,7 +254,7 @@ class Prompt:
 
   @staticmethod
   def enter_to_exit(timeout = False, sound = True):
-    if sound:
+    if sound and winsound:
       winsound.MessageBeep()
 
     if os.getenv('NO_ENTER_TO_EXIT'):
