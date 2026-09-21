@@ -1,8 +1,6 @@
 import os
 import subprocess
 
-from mtprompt import Prompt
-
 SETUP_FILE = 'setup.py'
 
 def main():
@@ -16,4 +14,4 @@ if __name__ == '__main__':
   except Exception as ex:
     print(f'Unhandled error:  {ex}')
 
-  Prompt.enter_to_exit()
+  input('\nPress Enter to exit...')
