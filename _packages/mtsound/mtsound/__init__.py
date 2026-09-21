@@ -6,9 +6,9 @@ from shutil import which
 def notify():
   try:
     if sys.platform == 'win32':
-      _notify_win32()
+      _notify_windows()
     elif sys.platform == 'darwin':
-      _notify_darwin()
+      _notify_macos()
     else:
       _notify_linux()
   except Exception:
@@ -17,12 +17,12 @@ def notify():
     except Exception:
       pass
 
-def _notify_win32():
-  command = 'powershell' if which('powershell') else None
-  if command:
-    subprocess.run([command, '-c', '[console]::Beep()'])
+def _notify_windows():
+  import ctypes
 
-def _notify_darwin():
+  ctypes.windll.user32.MessageBeep(0)
+
+def _notify_macos():
   command = 'afplay' if which('afplay') else None
   if command:
     subprocess.run([command, '/System/Library/Sounds/Glass.aiff'])
