@@ -40,7 +40,16 @@ def compress_child_folders(
   if folders:
     with ThreadPoolExecutor() as executor:
       results = list(tqdm(
-        executor.map(lambda folder: compress_folder(folder, output_type, remove_original, exclusion_patterns), folders),
+        executor.map(
+          lambda folder: compress_folder(
+            folder,
+            output_type,
+            remove_original,
+            exclusion_patterns,
+            show_progress=False,
+          ),
+          folders
+        ),
         total = len(folders),
         desc = f'Processing "{parent_folder_path}"'
       ))
@@ -63,6 +72,7 @@ def compress_folder(
   output_type: str = ZIP_TYPES[0],
   remove_original = False,
   exclusion_patterns: list = None,
+  show_progress = True,
 ):
   folder_name = os.path.basename(folder_path)
   parent_dir = os.path.dirname(folder_path)
@@ -95,7 +105,11 @@ def compress_folder(
 
     if files_to_compress:
       with zipfile.ZipFile(tmp_zip_path, 'w', zipfile.ZIP_DEFLATED) as compressed_file:
-        for file_path in tqdm(files_to_compress, unit='file'):
+        for file_path in (
+          tqdm(files_to_compress, unit='file')
+          if show_progress
+          else files_to_compress
+        ):
           compressed_file.write(file_path, os.path.relpath(file_path, folder_path))
 
       os.replace(tmp_zip_path, final_zip_path)
