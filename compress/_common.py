@@ -21,8 +21,6 @@ def compress_child_folders(
   min_depth = 1,
   max_depth = 1,
 ):
-  logger.log(f'Compressing folders in "{parent_folder_path}"...')
-
   if max_depth < 1:
     logger.error('Depth must be 1 or greater.')
     return FAILED
