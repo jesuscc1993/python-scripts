@@ -3,13 +3,16 @@ import re
 import sys
 
 from mtlogger import logger
-from mtprompt import Prompt, to_dir
+from mtprompt import Prompt, to_bool, to_dir
 
 from _common import get_chapter, select_parent_folder
 
 def main():
   if len(sys.argv) > 1:
-    process_parent_folder(to_dir(sys.argv[1]))
+    params = [to_dir(sys.argv[1])]
+    if len(sys.argv) > 2: params.append(to_bool(sys.argv[2]))
+    if len(sys.argv) > 3: params.append(to_bool(sys.argv[3]))
+    process_parent_folder(*params)
   else:
     select_parent_folder(
       'Enter the path to the parent folder containing the chapter folders:\n',
@@ -19,6 +22,7 @@ def main():
 
 def process_parent_folder(
   dir_path: str,
+  prompt_for_deletion = True,
   recursive = True,
 ):
   dir_name = os.path.basename(dir_path)
@@ -57,16 +61,28 @@ def process_parent_folder(
     )
 
   incomplete_chapters = []
+  empty_chapters = []
   for entry in entries:
     chapter = get_chapter(entry.name)
     if chapter and entry.is_dir():
       if is_chapter_folder_missing_pages(entry.path, chapter):
         incomplete_chapters.append(float(chapter))
+      if not os.listdir(entry.path):
+        empty_chapters.append(entry)
 
   if incomplete_chapters:
     logger.warn(
       f'\n  Incomplete chapters ({len(incomplete_chapters)}): [{', '.join(format_chapter(ch) for ch in sorted(incomplete_chapters))}]'
     )
+
+  if (
+    empty_chapters and
+    prompt_for_deletion is not False and
+    Prompt.bool('Delete empty chapters?')
+  ):
+    for entry in empty_chapters:
+      os.rmdir(entry.path)
+      logger.success(f'Deleted empty chapter folder: "{entry.name}"')
 
   return True
 
