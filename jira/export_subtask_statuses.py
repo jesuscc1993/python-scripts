@@ -2,7 +2,6 @@ import os
 import sys
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from jira import JIRA
 from jira.resources import Issue
 from mtlogger import logger
 from mtprompt import Prompt, to_list, to_bool
@@ -17,14 +16,12 @@ OUTPUT_FILE_PATH = os.path.join(OUTPUT_DIR_PATH, 'ticket_export.xlsx')
 MAX_RESULTS = 255
 
 def main():
-  jira_client = get_jira_client()
-
   if len(sys.argv) > 1:
     ticket_ids = to_list(sys.argv[1])
     skip_completed = to_bool(sys.argv[2]) if len(sys.argv) > 2 else False
   else:
     ticket_ids = Prompt.list('Enter parent ticket IDs (comma-separated)')
-    skip_completed = Prompt.bool('Skip completed tasks (Done/Closed)?')
+    skip_completed = Prompt.bool('Skip completed tasks (Done/Closed)?', default=False)
 
   if not ticket_ids:
     logger.error('No ticket IDs provided.')
@@ -33,7 +30,7 @@ def main():
   os.makedirs(OUTPUT_DIR_PATH, exist_ok=True)
   logger.debug(f'Processing {len(ticket_ids)} parent ticket(s)')
   export_to_excel(
-    process_tickets(jira_client, ticket_ids, skip_completed)
+    process_tickets(ticket_ids, skip_completed)
   )
   logger.success(f'Saved "{OUTPUT_FILE_PATH}".')
 
@@ -56,14 +53,14 @@ def process_child(child: Issue, parent_id: str, parent_name: str, skip_completed
     'Child Labels': child_labels,
   }
 
-def process_tickets(jira_client: JIRA, ticket_ids: list[str], skip_completed: bool):
+def process_tickets(ticket_ids: list[str], skip_completed: bool):
   data = []
 
   for ticket_id in tqdm(ticket_ids, desc='Processing tickets', unit='ticket'):
     ticket_id = ticket_id.strip()
 
     try:
-      parent_issue = jira_client.issue(ticket_id)
+      parent_issue = get_jira_client().issue(ticket_id)
 
       all_issues = []
 
@@ -73,7 +70,7 @@ def process_tickets(jira_client: JIRA, ticket_ids: list[str], skip_completed: bo
 
       try:
         jql_query = f'"Epic Link" = {ticket_id}'
-        epic_tasks = jira_client.search_issues(jql_query, maxResults=MAX_RESULTS)
+        epic_tasks = get_jira_client().search_issues(jql_query, maxResults=MAX_RESULTS)
         if epic_tasks:
           existing_keys = {issue.key for issue in all_issues}
           new_epic_tasks = [issue for issue in epic_tasks if issue.key not in existing_keys]
@@ -88,7 +85,7 @@ def process_tickets(jira_client: JIRA, ticket_ids: list[str], skip_completed: bo
 
       parent_name = parent_issue.fields.summary
 
-      with ThreadPoolExecutor(max_workers=5) as executor:
+      with ThreadPoolExecutor() as executor:
         futures = {executor.submit(process_child, child, ticket_id, parent_name, skip_completed): child.key for child in all_issues}
 
         for future in tqdm(as_completed(futures), total=len(all_issues), desc=ticket_id, leave=False, unit='child'):
