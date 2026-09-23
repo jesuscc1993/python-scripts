@@ -113,8 +113,8 @@ class Logger:
   def unhandled_error(self, msg = '', **kwargs: Unpack[LogOptions]):
     self.print(LogLevel.ERROR, self.format_error(f'Unhandled error: {msg}'), LogOptions(**kwargs))
 
-  def hr(self):
-    self.print(LogLevel.LOG, self.colorize(Fore.LIGHTBLACK_EX, '─' * os.get_terminal_size().columns))
+  def hr(self, char = '─'):
+    self.print(LogLevel.LOG, self.colorize(Fore.LIGHTBLACK_EX, char * os.get_terminal_size().columns))
   #
 
 logger = Logger()

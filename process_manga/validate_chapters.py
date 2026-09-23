@@ -1,3 +1,4 @@
+import itertools
 import os
 import re
 import sys
@@ -29,12 +30,19 @@ def process_parent_folder(
   entries = sorted(os.scandir(dir_path), key = get_sort_key)
   found_chapters = set()
 
+  missing_chapters: list[float] = []
+  incomplete_chapters: list[float] = []
+  empty_chapters: list[float] = []
+
   for entry in entries:
     chapter = get_chapter(entry.name)
     if chapter:
       found_chapters.add(float(chapter))
 
-  if not found_chapters:
+  if found_chapters:
+    logger.hr('·')
+    logger.log(f'Processing "{dir_path}"...')
+  else:
     found_subfolder_chapters = False
 
     if recursive:
@@ -47,32 +55,54 @@ def process_parent_folder(
 
     return found_subfolder_chapters
 
-  expected_chapters = set(range(1, int(max(found_chapters)) + 1))
-  missing_chapters = expected_chapters - found_chapters
-  if missing_chapters:
-    logger.warn(
-      f'\nChapters missing in "{dir_name}": '
-      f'{" ".join(format_chapter(ch) for ch in sorted(missing_chapters))}'
-    )
-  else:
-    logger.success(
-      f'No chapters found missing in "{dir_name}".',
-      prefix_newline=True
-    )
+  missing_chapters = find_missing(found_chapters)
+  missing_chapter_pages_dict: dict[float, list[float]] = {}
 
-  incomplete_chapters = []
-  empty_chapters = []
   for entry in entries:
     chapter = get_chapter(entry.name)
     if chapter and entry.is_dir():
-      if is_chapter_folder_missing_pages(entry.path, chapter):
+      missing_chapter_pages = get_missing_chapter_pages(entry.path, chapter)
+      if missing_chapter_pages:
         incomplete_chapters.append(float(chapter))
+        missing_chapter_pages_dict[float(chapter)] = missing_chapter_pages
       if not os.listdir(entry.path):
         empty_chapters.append(entry)
 
+  logger.log()
+
+  is_problematic = bool(missing_chapters or incomplete_chapters or empty_chapters)
+  if not is_problematic:
+    logger.success(f'No chapters nor pages detected missing in "{dir_name}".')
+    return True
+
+  logger.warn(
+    f'Found issues for "{dir_name}".\n'
+    f'* Detected chapter range: {format_chapter(1)}-{format_chapter(max(found_chapters))}'
+  )
+
+  if missing_chapters:
+    logger.warn(
+      f'* Missing chapters: '
+      f'{" ".join(format_number_ranges(missing_chapters))}'
+    )
+
   if incomplete_chapters:
     logger.warn(
-      f'\n  Incomplete chapters ({len(incomplete_chapters)}): [{', '.join(format_chapter(ch) for ch in sorted(incomplete_chapters))}]'
+      f'* Incomplete chapters: '
+      f'{" ".join(format_number_ranges(incomplete_chapters))}'
+    )
+  if missing_chapter_pages_dict:
+    for chapter, missing_pages in missing_chapter_pages_dict.items():
+      logger.warn(
+        f'  * [{format_chapter(chapter)}] '
+        f'Is missing {len(missing_pages)} page{"s" if len(missing_pages) != 1 else ""}: '
+        f'{" ".join(f"{p:02d}" for p in missing_pages)}'
+      )
+
+  if empty_chapters:
+    logger.warn(
+      f'* Empty chapters: '
+      f'{" ".join(format_number_ranges(empty_chapters))}'
     )
 
   if (
@@ -86,7 +116,7 @@ def process_parent_folder(
 
   return True
 
-def is_chapter_folder_missing_pages(
+def get_missing_chapter_pages(
   dir_path: str,
   chapter: str,
 ):
@@ -103,14 +133,7 @@ def is_chapter_folder_missing_pages(
     logger.warn(f'- [Ch.{format_chapter(chapter)}] All pages missing.')
     return True
 
-  expected_pages = set(range(1, int(max(found_pages)) + 1))
-  missing_pages = expected_pages - found_pages
-  if missing_pages:
-    logger.warn(
-      f'- [Ch.{format_chapter(chapter)}] {len(missing_pages):02d} page(s) missing: '
-      f'{" ".join(f"{p:02d}" for p in sorted(missing_pages))}'
-    )
-    return True
+  return find_missing(found_pages)
 
 def get_sort_key(
   entry: os.DirEntry,
@@ -118,11 +141,28 @@ def get_sort_key(
   chapter = get_chapter(entry.name)
   return (0, float(chapter)) if chapter is not None else (1, entry.name.lower())
 
+def find_missing(
+  found: set[float],
+):
+  expected = range(1, int(max(found)) + 1)
+  return [n for n in expected if n not in found]
+
 def format_chapter(
   chapter: str,
 ):
   integer, dot, decimal = f'{float(chapter):g}'.partition('.')
   return f'{int(integer):03d}{dot}{decimal}'
+
+def format_number_ranges(
+  numbers: list[float],
+):
+  groups = itertools.groupby(enumerate(numbers), lambda pair: pair[1] - pair[0])
+  ranges = [[number for _, number in group] for _, group in groups]
+
+  return [
+    format_chapter(group[0]) if len(group) == 1 else f'{format_chapter(group[0])}-{format_chapter(group[-1])}'
+    for group in ranges
+  ]
 
 if __name__ == '__main__':
   try:
