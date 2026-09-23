@@ -18,7 +18,7 @@ def main():
 
 def prompt_parent_folder():
   parent_folder = Prompt.dir(
-    'Enter the path to the parent folder containing the chapter folders you want to rename'
+    'Enter the path to the parent folder containing the items you want to rename'
   )
 
   process_parent_folder(parent_folder)
@@ -27,7 +27,8 @@ def process_parent_folder(
   parent_folder_path: str,
 ):
   for root, dirs, files in os.walk(parent_folder_path, topdown = False):
-    all_items = files + dirs
+    filtered_files = [f for f in files if os.path.splitext(f)[1].lower() in IMAGE_EXTENSIONS]
+    all_items = filtered_files + dirs
 
     with ThreadPoolExecutor() as executor:
       list(tqdm(executor.map(lambda item: process_item(root, item), all_items), total = len(all_items), desc=f'Processing "{root}"'))
@@ -54,10 +55,6 @@ def get_processed_name(
   if not is_dir:
     new_name, ext = os.path.splitext(new_name)
     ext = ext.lower()
-
-    # skip images
-    if ext.lstrip('.') in IMAGE_EXTENSIONS:
-      return base_name
 
   else:
     ext = ''
