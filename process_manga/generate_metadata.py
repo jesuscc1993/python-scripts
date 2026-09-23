@@ -16,6 +16,7 @@ COMIC_INFO_FILENAME = 'ComicInfo.xml'
 COVER_FILENAME = 'cover.jpg'
 NO_META_FILES = ['.noxml', '.nomedia']
 ALL_FILES = [COMIC_INFO_FILENAME, COVER_FILENAME] + NO_META_FILES
+NO_RESULTS_FOUND_ERROR = 'No results found'
 
 def main():
   if len(sys.argv) > 1:
@@ -116,10 +117,17 @@ def fetch_manga_info(dir_path: str, name: str):
     logger.log()
 
     try:
-      results = [r for r in MangaSearch(name).results if r.type not in TYPE_BLACKLIST][:MAX_RESULTS]
-      if not results:
-        logger.warn(f'Skipping "{dir_name}". No results found.')
-        return
+      try:
+        results = [r for r in MangaSearch(name).results if r.type not in TYPE_BLACKLIST][:MAX_RESULTS]
+        if not results:
+          # manually raise NO_RESULTS_FOUND_ERROR after filtering blacklist,
+          # to route into the same handling as no results found by the library
+          raise ValueError(NO_RESULTS_FOUND_ERROR)
+      except ValueError as ex:
+        if str(ex) == NO_RESULTS_FOUND_ERROR:
+          logger.warn(f'  Skipping "{dir_name}". No results found for name "{name}".')
+          return
+        raise
 
       exact_match = next((r for r in results if r.title.lower() == name.lower()), None)
       if exact_match:
