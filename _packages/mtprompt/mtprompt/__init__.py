@@ -25,6 +25,14 @@ def to_int(val: str):
   except ValueError:
     raise ValueError(f'Input "{val}" is not an integer.')
 
+def to_float(val: str):
+  val = val.strip()
+
+  try:
+    return float(val)
+  except ValueError:
+    raise ValueError(f'Input "{val}" is not a valid number.')
+
 def to_path(val: str):
   val = val.strip(' "')
 
@@ -130,6 +138,32 @@ class Prompt:
       if val != '':
         try:
           val = to_int(val)
+        except ValueError as ex:
+          logger.error(f'{ex}\n')
+          continue
+
+      logger.log()
+      return val if val != '' else default
+
+  @staticmethod
+  def float(
+    prompt = '',
+    *,
+    optional = False,
+    default: float = None
+  ):
+    prompt = prompt.strip(' "\'')
+
+    while True:
+      val = input(format_prompt(prompt, default))
+
+      if not val and default is None and not optional:
+        logger.error('A number is required.\n')
+        continue
+
+      if val != '':
+        try:
+          val = to_float(val)
         except ValueError as ex:
           logger.error(f'{ex}\n')
           continue

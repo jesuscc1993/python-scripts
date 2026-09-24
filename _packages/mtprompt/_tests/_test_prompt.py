@@ -9,7 +9,7 @@ from unittest.mock import patch
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
-from mtprompt import Prompt, to_bool, to_int, to_list, to_path, to_dir, to_file
+from mtprompt import Prompt, to_bool, to_float, to_int, to_list, to_path, to_dir, to_file
 
 class ToBoolTests(unittest.TestCase):
 
@@ -43,6 +43,16 @@ class ToIntTests(unittest.TestCase):
   def test_invalid_raises(self):
     with self.assertRaises(ValueError):
       to_int('foo')
+
+class ToFloatTests(unittest.TestCase):
+
+  def test_valid(self):
+    self.assertEqual(to_float('4.2'), 4.2)
+    self.assertEqual(to_float('  15  '), 15.0)
+
+  def test_invalid_raises(self):
+    with self.assertRaises(ValueError):
+      to_float('foo')
 
 class ToPathTests(unittest.TestCase):
 
@@ -154,6 +164,25 @@ class PromptBoolTests(unittest.TestCase):
 
   def test_retries_when_required(self):
     self.assertTrue(self.call(['', 'y']))
+
+class PromptFloatTests(unittest.TestCase):
+
+  def call(self, inputs, **kwargs):
+    input_iter = iter(inputs)
+    with patch('builtins.input', side_effect = lambda _ = '': next(input_iter)), redirect_stdout(io.StringIO()):
+      return Prompt.float('p', **kwargs)
+
+  def test_valid(self):
+    self.assertEqual(self.call(['4.2']), 4.2)
+
+  def test_retries_on_invalid(self):
+    self.assertEqual(self.call(['foo', '0.7']), 0.7)
+
+  def test_optional_empty(self):
+    self.assertIsNone(self.call([''], optional = True))
+
+  def test_default_on_empty(self):
+    self.assertEqual(self.call([''], default = 0.9), 0.9)
 
 if __name__ == '__main__':
   unittest.main()
