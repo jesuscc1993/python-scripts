@@ -2,42 +2,113 @@ import os
 import stat
 import subprocess
 
-DEFAULT_ATTRS = ['h']
+from typing import Literal
+
+AttrKey = Literal['h', 's', 'r']
+
+DEFAULT_ATTRS: list[AttrKey] = ['h']
+
+STATS_BY_ATTR: dict[AttrKey, int] = {
+  'h': stat.FILE_ATTRIBUTE_HIDDEN,
+  's': stat.FILE_ATTRIBUTE_SYSTEM,
+  'r': stat.FILE_ATTRIBUTE_READONLY,
+}
+
+def _get_stat_for_attr(attr: AttrKey):
+  return STATS_BY_ATTR.get(attr, 0)
 
 class Attr:
 
+  # generic
+
   @staticmethod
   def add(
-    file_path: str,
-    attrs: list[str] = DEFAULT_ATTRS,
+    path: str,
+    attrs: list[AttrKey],
   ):
-    if os.path.exists(file_path):
-      subprocess.run(['attrib'] + ['+' + attr for attr in attrs] + [file_path], check=True)
+    if os.path.exists(path):
+      subprocess.run(['attrib'] + ['+' + attr for attr in attrs] + [path], check=True)
 
   @staticmethod
   def remove(
-    file_path: str,
-    attrs: list[str] = DEFAULT_ATTRS,
+    path: str,
+    attrs: list[AttrKey],
   ):
-    if os.path.exists(file_path):
-      subprocess.run(['attrib'] + ['-' + attr for attr in attrs] + [file_path], check=True)
+    if os.path.exists(path):
+      subprocess.run(['attrib'] + ['-' + attr for attr in attrs] + [path], check=True)
 
   @staticmethod
-  def hide(
-    file_path: str,
-    attrs: list[str] = DEFAULT_ATTRS,
+  def has(
+    path: str,
+    attr: AttrKey,
   ):
-    Attr.add(file_path, attrs)
+    return (
+      os.path.exists(path) and
+      bool(
+        os.lstat(path).st_file_attributes &
+        _get_stat_for_attr(attr)
+      )
+    )
 
   @staticmethod
-  def show(
-    file_path: str,
-    attrs: list[str] = DEFAULT_ATTRS,
+  def toggle(
+    path: str,
+    attr: AttrKey,
   ):
-    Attr.remove(file_path, attrs)
+    if os.path.exists(path):
+      if Attr.has(path, attr):
+        Attr.remove(path, [attr])
+      else:
+        Attr.add(path, [attr])
+
+  # specific
 
   @staticmethod
   def is_hidden(
-    file_path: str,
+    path: str,
   ):
-    return bool(os.lstat(file_path).st_file_attributes & stat.FILE_ATTRIBUTE_HIDDEN)
+    return Attr.has(path, 'h')
+
+  @staticmethod
+  def is_system(
+    path: str,
+  ):
+    return Attr.has(path, 's')
+
+  @staticmethod
+  def is_readonly(
+    path: str,
+  ):
+    return Attr.has(path, 'r')
+
+  @staticmethod
+  def toggle_hidden(
+    path: str,
+  ):
+    Attr.toggle(path, 'h')
+
+  @staticmethod
+  def toggle_system(
+    path: str,
+  ):
+    Attr.toggle(path, 's')
+
+  @staticmethod
+  def toggle_readonly(
+    path: str,
+  ):
+    Attr.toggle(path, 'r')
+
+  @staticmethod
+  def hide(
+    path: str,
+    attrs: list[AttrKey] = DEFAULT_ATTRS,
+  ):
+    Attr.add(path, attrs)
+
+  @staticmethod
+  def show(
+    path: str,
+    attrs: list[AttrKey] = DEFAULT_ATTRS,
+  ):
+    Attr.remove(path, attrs)

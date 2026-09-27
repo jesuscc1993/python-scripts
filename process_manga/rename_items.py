@@ -55,7 +55,8 @@ def get_processed_name(
   if not is_dir:
     new_name, ext = os.path.splitext(new_name)
     ext = ext.lower()
-
+    if ext.lstrip('.') in IMAGE_EXTENSIONS:
+      return base_name
   else:
     ext = ''
 
