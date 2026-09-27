@@ -109,6 +109,7 @@ def set_folder_icon(
     set_ini_icon(config, ico_path)
     write_ini(desktop_ini_path, config, encoding)
     Attr.hide(desktop_ini_path)
+    Attr.add(folder_path, ['s'])
 
   except PermissionError:
     tqdm.write(logger.format_warn(f'Permission denied: "{desktop_ini_path}". You may need to run the script as an administrator.'))
