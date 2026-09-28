@@ -1,3 +1,4 @@
+import json
 import os
 import subprocess
 import sys
@@ -51,11 +52,17 @@ def extract_subtitles(
   dest_file_path: str,
   file_name: str,
 ):
+  stream_idx = find_subtitle_stream(src_file_path, LANGUAGE.lower())
+  if stream_idx is None:
+    logger.warn(f'No {LANGUAGE} subtitles found for "{file_name}".')
+    return
+
   cmd = [
     'ffmpeg',
     '-i', src_file_path,
-    '-map', f'0:s:m:language:{LANGUAGE}',
+    '-map', f'0:{stream_idx}',
     '-c:s', 'srt',
+    '-y',
     dest_file_path
   ]
   subprocess.run(cmd, stdout = subprocess.DEVNULL, stderr = subprocess.DEVNULL)
@@ -67,6 +74,31 @@ def extract_subtitles(
     else:
       strip_tags_from_subs_file(dest_file_path)
       logger.log(f'Extracted {LANGUAGE} subtitles for "{file_name}".')
+
+def find_subtitle_stream(src_file_path: str, target_language: str) -> str | None:
+  try:
+    result = subprocess.run(
+      [
+        'ffprobe',
+        '-v', 'quiet',
+        '-print_format', 'json',
+        '-show_streams',
+        src_file_path
+      ],
+      capture_output = True,
+      text = True,
+      timeout = 5
+    )
+    for stream in json.loads(result.stdout).get('streams', []):
+      if stream.get('codec_type') == 'subtitle':
+        tags = stream.get('tags', {})
+        language = tags.get('language', '').lower()
+        if language.startswith(target_language):
+          return stream['index']
+
+  except Exception:
+    logger.fail(f'Failed to find subtitle stream for "{src_file_path}".')
+  return None
 
 if __name__ == '__main__':
   try:
