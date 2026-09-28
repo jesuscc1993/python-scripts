@@ -101,7 +101,7 @@ def find_subtitle_stream(src_file_path: str, target_language: str) -> str | None
           return stream['index']
 
   except Exception:
-    logger.fail(f'Failed to find subtitle stream for "{src_file_path}".')
+    logger.failure(f'Failed to find subtitle stream for "{src_file_path}".')
   return None
 
 if __name__ == '__main__':
