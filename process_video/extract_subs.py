@@ -52,6 +52,10 @@ def extract_subtitles(
   dest_file_path: str,
   file_name: str,
 ):
+  if os.path.exists(dest_file_path):
+    logger.warn(f'Skipping "{file_name}". For "{file_name}" already exist.')
+    return
+
   stream_idx = find_subtitle_stream(src_file_path, LANGUAGE.lower())
   if stream_idx is None:
     logger.warn(f'No {LANGUAGE} subtitles found for "{file_name}".')
