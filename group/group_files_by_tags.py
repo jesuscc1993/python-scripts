@@ -5,12 +5,13 @@ import sys
 from mtlogger import logger
 from mtprompt import Prompt, to_dir
 
-from _common import FILE_BLACKLIST, process_parent_folder
+from _common import FILE_BLACKLIST, find_files_to_process, group_files
 
 def main():
   parent_dir = to_dir(sys.argv[1]) if len(sys.argv) > 1 else Prompt.dir('Enter the path to the directory containing the files you want to group')
 
-  process_parent_folder(parent_dir, should_process_item, get_group_name)
+  files_to_process = find_files_to_process(parent_dir, should_process_item)
+  group_files(parent_dir, files_to_process, get_group_name)
 
 def should_process_item(
   item_path: str,
