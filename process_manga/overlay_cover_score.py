@@ -15,6 +15,7 @@ from xml.etree import ElementTree
 
 COMIC_INFO_FILENAME = 'ComicInfo.xml'
 COVER_NAMES = [
+  'cover.jpeg',
   'cover.jpg',
   'cover.png',
   'cover.webp',
