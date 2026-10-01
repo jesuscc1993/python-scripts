@@ -38,7 +38,10 @@ def get_group_name(
 def get_normalized_name(
   filename: str,
 ):
-  return re.sub(r'\[[^\]]*\]|\{[^\}]*\}', '', filename)
+  name, ext = os.path.splitext(filename)
+  name = re.sub(r'\[[^\]]*\]|\{[^\}]*\}', '', name)
+  name = re.sub(r'\s+', ' ', name).strip()
+  return f'{name}{ext}'
 
 if __name__ == '__main__':
   try:
