@@ -7,6 +7,8 @@ from _common import strip_tags_from_subs_file
 from mtlogger import logger
 from mtprompt import Prompt, to_path
 
+EXTRACT_TO_FOLDER = True
+
 LANGUAGE = 'eng'
 SUBTITLES_PATH = 'subtitles'
 SUBTITLE_EXT = '.srt'
@@ -34,8 +36,11 @@ def process_file(
     return
 
   dir_path = os.path.dirname(file_path)
-  output_path = os.path.join(dir_path, SUBTITLES_PATH)
-  os.makedirs(output_path, exist_ok = True)
+  if EXTRACT_TO_FOLDER:
+    output_path = os.path.join(dir_path, SUBTITLES_PATH)
+    os.makedirs(output_path, exist_ok = True)
+  else:
+    output_path = dir_path
 
   dest_file_path = os.path.join(output_path, name + SUBTITLE_EXT)
   extract_subtitles(file_path, dest_file_path, file_name)
