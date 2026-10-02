@@ -32,17 +32,25 @@ def process_file(
 ):
   file_name = os.path.basename(file_path)
   name, ext = os.path.splitext(file_name)
+  subtitles_file_name = name + SUBTITLE_EXT
   if ext.lower() not in VIDEO_EXTS:
     return
 
   dir_path = os.path.dirname(file_path)
+  in_place_output_path = dir_path
+  in_folder_output_path = os.path.join(dir_path, SUBTITLES_PATH)
+
+  if any(os.path.exists(os.path.join(path, subtitles_file_name)) for path in [in_place_output_path, in_folder_output_path]):
+    logger.trace(f'Skipping "{file_name}". Subtitles file already exists.')
+    return
+
   if EXTRACT_TO_FOLDER:
-    output_path = os.path.join(dir_path, SUBTITLES_PATH)
+    output_path = in_folder_output_path
     os.makedirs(output_path, exist_ok = True)
   else:
-    output_path = dir_path
+    output_path = in_place_output_path
 
-  dest_file_path = os.path.join(output_path, name + SUBTITLE_EXT)
+  dest_file_path = os.path.join(output_path, subtitles_file_name)
   extract_subtitles(file_path, dest_file_path, file_name)
 
 def process_directory(
@@ -57,13 +65,11 @@ def extract_subtitles(
   dest_file_path: str,
   file_name: str,
 ):
-  if os.path.exists(dest_file_path):
-    logger.warn(f'Skipping "{file_name}". For "{file_name}" already exist.')
-    return
+  no_subs_found_message = f'Skipping "{file_name}". No {LANGUAGE} subtitles found.'
 
   stream_idx = find_subtitle_stream(src_file_path, LANGUAGE.lower())
   if stream_idx is None:
-    logger.warn(f'No {LANGUAGE} subtitles found for "{file_name}".')
+    logger.warn(no_subs_found_message)
     return
 
   cmd = [
@@ -79,10 +85,12 @@ def extract_subtitles(
   if os.path.exists(dest_file_path):
     if os.path.getsize(dest_file_path) == 0:
       os.remove(dest_file_path)
-      logger.warn(f'No {LANGUAGE} subtitles found for "{file_name}". Removed empty subtitle file.')
+      logger.warn(no_subs_found_message)
     else:
       strip_tags_from_subs_file(dest_file_path)
       logger.log(f'Extracted {LANGUAGE} subtitles for "{file_name}".')
+  else:
+    logger.warn(no_subs_found_message)
 
 def find_subtitle_stream(src_file_path: str, target_language: str) -> str | None:
   try:
