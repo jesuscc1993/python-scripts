@@ -8,7 +8,7 @@ from mtprompt import Prompt, to_int
 from tqdm import tqdm
 
 from _constants import COVER_NAMES
-from _common import tqdm_dim
+from _common import collect_dirs_to_process, tqdm_dim
 
 MAX_COVER_W = 300
 MAX_COVER_H = 450
@@ -26,17 +26,7 @@ def main():
       default=1
     )
 
-  parent_depth = parent_dir.rstrip(os.sep).count(os.sep)
-
-  dirs_to_process = []
-  for root, dirs, _ in os.walk(parent_dir):
-    current_depth = root.rstrip(os.sep).count(os.sep) - parent_depth
-    if current_depth >= depth:
-      dirs.clear()
-      continue
-
-    for dir_name in dirs:
-      dirs_to_process.append(os.path.join(root, dir_name))
+  dirs_to_process = collect_dirs_to_process(parent_dir, depth)
 
   with ThreadPoolExecutor() as executor, tqdm(total = len(dirs_to_process), desc = f'Processing "{parent_dir}"') as progress:
     for _ in executor.map(process_dir, dirs_to_process):

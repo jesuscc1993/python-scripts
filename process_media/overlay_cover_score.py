@@ -9,11 +9,11 @@ from PIL import Image, ImageDraw, ImageFont
 from concurrent.futures import ThreadPoolExecutor
 from mtfont import Font
 from mtlogger import logger
-from mtprompt import Prompt
+from mtprompt import Prompt, to_int
 from tqdm import tqdm
 from xml.etree import ElementTree
 
-from _common import tqdm_dim
+from _common import collect_dirs_to_process, tqdm_dim
 from _constants import COVER_NAMES
 
 COMIC_INFO_FILENAME = 'ComicInfo.xml'
@@ -44,17 +44,19 @@ VALUE_HIGHEST = 80
 def main():
   if len(sys.argv) > 1:
     parent_dir = sys.argv[1]
+    depth = to_int(sys.argv[2]) if len(sys.argv) > 2 else 1
   else:
     parent_dir = Prompt.dir(
       'Enter the path to the directory containing your media'
     )
+    depth = Prompt.int(
+      'Enter the depth for processing subfolders',
+      default=1
+    )
 
   font = Font.load_by_path(FONT_PATH, FONT_SIZE)
 
-  dirs_to_process = []
-  for entry in os.scandir(parent_dir):
-    if entry.is_dir():
-      dirs_to_process.append(entry.path)
+  dirs_to_process = collect_dirs_to_process(parent_dir, depth)
 
   with ThreadPoolExecutor() as executor, tqdm(total = len(dirs_to_process), desc = f'Processing "{parent_dir}"') as progress:
     for _ in executor.map(lambda dir: process_dir(dir, font), dirs_to_process):

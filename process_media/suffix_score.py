@@ -7,7 +7,9 @@ from typing import Union
 
 from mal import Anime, AnimeSearch, AnimeSearchResult, Manga, MangaSearch, MangaSearchResult, config
 from mtlogger import logger
-from mtprompt import Prompt
+from mtprompt import Prompt, to_int
+
+from _common import collect_dirs_to_process
 
 ANIME_MEDIA_TYPE = 'anime'
 MANGA_MEDIA_TYPE = 'manga'
@@ -25,10 +27,15 @@ ENTRY_URL_REGEX = re.compile(r'^https://myanimelist\.net/(anime|manga)/(\d+)/')
 def main():
   if len(sys.argv) > 1:
     parent_dir = sys.argv[1]
-    media_type = sys.argv[2]
+    depth = to_int(sys.argv[2]) if len(sys.argv) > 2 else 1
+    media_type = MEDIA_TYPES[to_int(sys.argv[3]) - 1] if len(sys.argv) > 3 else ANIME_MEDIA_TYPE
   else:
     parent_dir = Prompt.dir(
       'Enter the path to the directory containing your media'
+    )
+    depth = Prompt.int(
+      'Enter the depth for processing subfolders',
+      default=1
     )
     media_type = Prompt.option(
       MEDIA_TYPES,
@@ -43,9 +50,9 @@ def main():
   logger.log(f'Suffixing scores in "{parent_dir}"...')
   logger.hr()
 
-  for entry in os.scandir(parent_dir):
-    if entry.is_dir() and not re.fullmatch(r'[\(\[\{].*[\)\]\}]', entry.name):
-      process_dir(entry.path, media_type)
+  for dir_path in collect_dirs_to_process(parent_dir, depth):
+    if not re.fullmatch(r'[\(\[\{].*[\)\]\}]', os.path.basename(dir_path)):
+      process_dir(dir_path, media_type)
       logger.hr()
 
   logger.success(f'Finished suffixing scores in "{parent_dir}".')
