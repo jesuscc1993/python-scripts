@@ -13,13 +13,10 @@ from mtprompt import Prompt
 from tqdm import tqdm
 from xml.etree import ElementTree
 
+from _common import tqdm_dim
+from _constants import COVER_NAMES
+
 COMIC_INFO_FILENAME = 'ComicInfo.xml'
-COVER_NAMES = [
-  'cover.jpeg',
-  'cover.jpg',
-  'cover.png',
-  'cover.webp',
-]
 DEFAULT_COVER_NAME = 'cover.jpg'
 COVER_BAK_EXT = '.bak'
 COVER_W = 212
@@ -49,7 +46,7 @@ def main():
     parent_dir = sys.argv[1]
   else:
     parent_dir = Prompt.dir(
-      'Enter the path to the directory containing your manga'
+      'Enter the path to the directory containing your media'
     )
 
   font = Font.load_by_path(FONT_PATH, FONT_SIZE)
@@ -64,11 +61,6 @@ def main():
       progress.update(1)
 
   logger.success(f'Finished overlaying scores in "{parent_dir}".')
-
-def tqdm_dim(
-  msg: str,
-):
-  tqdm.write(logger.format_trace(msg))
 
 def find_cover(
   dir: str,
