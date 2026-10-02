@@ -2,7 +2,7 @@
 
 ## Description
 
-Various scripts for interacting with Steam.
+Collection of scripts for interacting with Steam.
 
 ## Common
 

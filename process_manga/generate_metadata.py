@@ -3,7 +3,7 @@ import re
 import requests
 import sys
 
-from mal import Manga, MangaSearch, MangaSearchResult
+from mal import Manga, MangaSearch, MangaSearchResult, config
 from mtattr import Attr
 from mtlogger import logger
 from mtprompt import Prompt
@@ -17,6 +17,8 @@ COVER_FILENAME = 'cover.jpg'
 NO_META_FILES = ['.noxml', '.nomedia']
 ALL_FILES = [COMIC_INFO_FILENAME, COVER_FILENAME] + NO_META_FILES
 NO_RESULTS_FOUND_ERROR = 'No results found'
+
+ENTRY_URL_REGEX = re.compile(r'^https://myanimelist\.net/manga/(\d+)/')
 
 def main():
   if len(sys.argv) > 1:
@@ -52,6 +54,15 @@ def process_dir(
 
 def format_result_title(result: MangaSearchResult):
   return f'{result.title} {logger.format_trace("(" + result.type + ")")}'
+
+def find_exact_match(name: str):
+  response = requests.get(f'{config.MAL_ENDPOINT}manga.php?q={name}', timeout=10)
+
+  match = ENTRY_URL_REGEX.match(response.url)
+  if not match:
+    return None
+
+  return Manga(int(match.group(1)))
 
 def write_comic_info(
   dir_path: str,
@@ -125,13 +136,21 @@ def fetch_manga_info(dir_path: str, name: str):
           raise ValueError(NO_RESULTS_FOUND_ERROR)
       except ValueError as ex:
         if str(ex) == NO_RESULTS_FOUND_ERROR:
-          logger.warn(f'  Skipping "{dir_name}". No results found for name "{name}".')
-          return
-        raise
+          # MAL redirects straight to the entry page on an exact title match,
+          # which the library mistakes for a search page with no results
+          exact_match = find_exact_match(name)
+          if exact_match is None:
+            logger.warn(f'  Skipping "{dir_name}". No results found for query "{name}".')
+            return
+          results = [exact_match]
+        else:
+          raise
 
       exact_match = next((r for r in results if r.title.lower() == name.lower()), None)
       if exact_match:
         result = exact_match
+      elif len(results) == 1:
+        result = results[0]
       else:
         logger.log(f'{name}:')
         for i, result in enumerate(results):

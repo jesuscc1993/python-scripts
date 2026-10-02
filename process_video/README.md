@@ -2,7 +2,7 @@
 
 ## Description
 
-Various scripts for processing video files and subtitles.
+Collection of scripts for processing video files and subtitles.
 
 ## Scripts
 

@@ -2,7 +2,7 @@
 
 ## Description
 
-Various scripts for downloading and converting audio.
+Collection of scripts for downloading and converting audio.
 
 ## Scripts
 

@@ -1,5 +1,9 @@
 # Compress
 
+## Description
+
+Collection of scripts for compressing/extracting folders and archives.
+
 ## Scripts
 
 ### [compress_folder.py](compress_folder.py)

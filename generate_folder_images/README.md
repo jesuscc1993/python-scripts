@@ -3,7 +3,7 @@
 ## Description
 
 Iterates folders and generates folder.jpg for each one.<br>
-Each different script will generate these images from different sources.<br>
+Each different script will generate these images from different sources.
 
 ## Scripts
 

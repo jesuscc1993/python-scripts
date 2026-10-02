@@ -2,8 +2,8 @@
 
 ## Description
 
-Various scripts for creating symlinks.<br>
-Windows only.
+Collection of scripts for creating symlinks.<br>
+<strong>Windows only.</strong>
 
 ## Instructions
 

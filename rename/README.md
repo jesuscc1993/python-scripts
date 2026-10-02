@@ -1,5 +1,9 @@
 # Rename
 
+## Description
+
+Collection of scripts for renaming files and folders sequentially or by pattern.
+
 ## Scripts
 
 ### [rename_files_sequentially.py](rename_files_sequentially.py)

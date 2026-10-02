@@ -4,7 +4,7 @@
 
 Iterates folders and generates icons for each one.<br>
 Each different script will generate these icons from different sources.<br>
-Windows only.
+<strong>Windows only.</strong>
 
 ## Scripts
 

@@ -1,5 +1,9 @@
 # Delete
 
+## Description
+
+Collection of scripts for deleting empty folders and files.
+
 ## Scripts
 
 ### [delete_empty_folders.py](delete_empty_folders.py)

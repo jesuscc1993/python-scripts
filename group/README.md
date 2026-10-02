@@ -2,7 +2,7 @@
 
 ## Description
 
-Various scripts for grouping files into subfolders.
+Collection of scripts for grouping files into subfolders.
 
 ## Scripts
 

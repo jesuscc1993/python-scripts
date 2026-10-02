@@ -2,7 +2,7 @@
 
 ## Description
 
-Various scripts for processing ebooks.
+Collection of scripts for processing ebooks.
 
 ## Scripts
 

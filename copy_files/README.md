@@ -2,7 +2,7 @@
 
 ## Description
 
-Various scripts for copying, backing up and restoring files.
+Collection of scripts for copying, backing up and restoring files.
 
 ## Scripts
 

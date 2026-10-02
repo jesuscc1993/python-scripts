@@ -2,8 +2,8 @@
 
 ## Description
 
-Various scripts for freeing up disk space.<br>
-Windows only.
+Collection of scripts for freeing up disk space.<br>
+<strong>Windows only.</strong>
 
 ## Scripts
 

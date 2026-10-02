@@ -2,7 +2,7 @@
 
 ## Description
 
-Various scripts for working with Jira tickets.
+Collection of scripts for working with Jira tickets.
 
 ## Specific Requirements
 
