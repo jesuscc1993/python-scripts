@@ -53,6 +53,9 @@ def process_file(
   dest_file_path = os.path.join(output_path, subtitles_file_name)
   extract_subtitles(file_path, dest_file_path, file_name)
 
+  if os.path.isdir(output_path) and not os.listdir(output_path):
+    os.rmdir(output_path)
+
 def process_directory(
   dir_path: str,
 ):
