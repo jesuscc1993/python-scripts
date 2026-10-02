@@ -20,6 +20,7 @@ COVER_NAMES = [
   'cover.png',
   'cover.webp',
 ]
+DEFAULT_COVER_NAME = 'cover.jpg'
 COVER_BAK_EXT = '.bak'
 COVER_W = 212
 COVER_H = 318
@@ -137,7 +138,7 @@ def process_cover(
     shutil.copy(cover_img_path, cover_img_bak_path)
     os.remove(cover_img_path)
 
-  processed_cover_img_path = os.path.join(dir, COVER_NAMES[0])
+  processed_cover_img_path = os.path.join(dir, DEFAULT_COVER_NAME)
   img = Image.open(cover_img_bak_path).convert('RGBA')
   img = resize_cover(img, COVER_W, COVER_H)
   img = overlay_score(img, score, font)
