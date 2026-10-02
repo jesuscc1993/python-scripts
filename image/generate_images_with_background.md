@@ -5,10 +5,8 @@
 Composites foreground images onto a background image (or a folder of background images), optionally applying a tint to the background and resizing both layers independently.<br>
 Supports `.svg` backgrounds, which get rasterized before compositing.
 
-## Requirements
+## Specific Requirements
 
-- Having python installed.
-- Running `pip install -r requirements.txt` to install the required dependencies.
 - Having ImageMagick's `magick` command available on PATH (only required for `.svg` backgrounds).
 
 ## Running

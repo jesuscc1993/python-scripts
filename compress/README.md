@@ -1,35 +1,29 @@
 # Compress
 
-## Compress Folders
+## Scripts
 
-### Description
+### [compress_folder.py](compress_folder.py)
+
+Compresses a single folder as an archive.
+
+### [compress_folders.py](compress_folders.py)
 
 Compresses each folder as a file for a single path.
 Not recursive.
 
-### Requirements
-
-- Having python installed.
-- Running `pip install -r requirements.txt` to install the required dependencies.
-
-### Running
-
-- Run `compress_folders.py`.
-- Run `python compress_folders.py` in the terminal.
-
-## Compress Images
-
-### Description
+### [compress_images.py](compress_images.py)
 
 Compresses images recursively to the configured format and quality.
 Then keeps the image that weights the least between the og and the new one.
 
-### Requirements
+### [compress_subfolders.py](compress_subfolders.py)
 
-- Having python installed.
-- Running `pip install -r requirements.txt` to install the required dependencies.
+Compresses the subfolders found at a given depth range within a parent folder.
 
-### Running
+### [extract_archive.py](extract_archive.py)
 
-- Run `compress_images.py`.
-- Run `python compress_images.py` in the terminal.
+Extracts a single archive.
+
+### [extract_archives.py](extract_archives.py)
+
+Recursively extracts every archive found within a parent folder.

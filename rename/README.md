@@ -1,11 +1,16 @@
-# Rename Files
+# Rename
 
-## Description
+## Scripts
 
-Iterates folder items and renames them sequentially.
+### [rename_files_sequentially.py](rename_files_sequentially.py)
+
+Iterates folder files and renames them sequentially.
 Useful to get consecutively named items when some are missing (e.g. 1,2,6 > 1,2,3).
 
-## Running
+### [rename_subfolders_sequentially.py](rename_subfolders_sequentially.py)
 
-- Run `rename-files-sequentially.py`.
-- Run `python rename-files-sequentially.py` in the terminal.
+Same as above, but only affects subfolders, leaving files untouched.
+
+### [rename_zip_to_cbz.py](rename_zip_to_cbz.py)
+
+Recursively renames `.zip` files to `.cbz`.

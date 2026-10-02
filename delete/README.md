@@ -1,11 +1,12 @@
-# Delete Empty Folders
+# Delete
 
-## Description
+## Scripts
+
+### [delete_empty_folders.py](delete_empty_folders.py)
 
 Recursively deletes empty folders.<br>
 Not that some software relies on some folders existing and may fail without them.
 
-## Running
+### [delete_from_target_if_exists_on_source.py](delete_from_target_if_exists_on_source.py)
 
-- Run `delete-empty-folders.py`.
-- Run `python delete-empty-folders.py` in the terminal.
+Deletes files from a target folder if they also exist in a source folder, then deletes any empty folders left behind in the target.

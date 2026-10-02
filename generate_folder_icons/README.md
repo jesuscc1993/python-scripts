@@ -6,26 +6,28 @@ Iterates folders and generates icons for each one.<br>
 Each different script will generate these icons from different sources.<br>
 Windows only.
 
-## Requirements
+## Scripts
 
-- Having python installed.
-- Running `pip install -r requirements.txt` to install the required dependencies.
+### [generate_icons_from_all_images.py](generate_icons_from_all_images.py)
 
-#### Running
+Will generate an icon from every image found inside the folder.
 
-- Run `SCRIPT_NAME.py`.
-- Run `python SCRIPT_NAME.py` in the terminal.
+### [generate_icons_from_exes.py](generate_icons_from_exes.py)
 
-(replace SCRIPT_NAME with your script of choice)
+Will generate an icon from the first non-blacklisted `.exe` found inside the folder.
 
-### generate-icons-from-folder-images
+### [generate_icons_from_folder_images.py](generate_icons_from_folder_images.py)
 
 Will look for `folder.jpg` / `cover.jpg` / `AlbumArtSmall.jpg` files inside the folder.
 
-### generate-ps-save-icons
+### [generate_ps_save_icons.py](generate_ps_save_icons.py)
 
 Will look for `ICON0.PNG` files inside the folder.<br>
 Only compatible with PSP and PS3 saves, which are the only save types that include an unpacked image alongside saves.
+
+### [overlay_icons_with_file_size.py](overlay_icons_with_file_size.py)
+
+Overlays the folder's size in GB onto its existing icon.
 
 ## Notes
 

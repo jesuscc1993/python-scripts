@@ -15,6 +15,7 @@ Collection of my own python scripts.
 - [generate_folder_images](generate_folder_images)
 - [generate_shortcuts](generate_shortcuts)
 - [group](group)
+- [image](image)
 - [jira](jira)
 - [miscellaneous](miscellaneous)
 - [overlay](overlay)
@@ -25,8 +26,26 @@ Collection of my own python scripts.
 - [process_games](process_games)
 - [process_manga](process_manga)
 - [process_video](process_video)
-- [relativize_folder_icons](relativize_folder_icons)
 - [rename](rename)
-- [replace_files_with_dummies](replace_files_with_dummies)
+- [replace](replace)
 - [steam](steam)
 - [symlinks](symlinks)
+
+## General Requirements
+
+- Having python3 installed.
+- Having the required dependencies installed.
+  - You can run `install_all_dependencies.py` from the root level
+  - You can run `pip install -r requirements.txt` individually from each module
+- Having the required packages installed.
+  - You can run `install_all_packages.py` from the root level
+  - You can run `pip install .` individually from each package
+
+## Running
+
+- Execute `SCRIPT_NAME.py` from the file explorer.
+- Run `py SCRIPT_NAME.py` from the terminal.
+  - Depending on your installation, the executable may be either of these: `py` `py3` `python` `python3`.
+  - Depending on the script, additional arguments may be used.<br>Check the individual scripts for more info.
+
+(replace SCRIPT_NAME with your script of choice)
