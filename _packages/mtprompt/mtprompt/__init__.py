@@ -120,6 +120,41 @@ class Prompt:
       return val if val else default
 
   @staticmethod
+  def option(
+    options: list,
+    prompt = '',
+    *,
+    optional = False,
+    default = None
+  ):
+    if not isinstance(options, list):
+      raise TypeError('A list of options must be passed.')
+
+    prompt = prompt.strip(' "\'')
+
+    while True:
+      full_prompt = format_prompt(prompt, default, use_colon=False)
+      for i, option in enumerate(options):
+        full_prompt += f'\n {i + 1} - {option}'
+      full_prompt += f'\n:'
+
+      val = input(full_prompt).strip()
+
+      if not val:
+        if default is None and not optional:
+          logger.error('An option is required.\n')
+          continue
+        logger.log()
+        return default
+
+      if not val.isdigit() or not (1 <= int(val) <= len(options)):
+        logger.error(f'Input "{val}" is not a valid index.\n')
+        continue
+
+      logger.log()
+      return options[int(val) - 1]
+
+  @staticmethod
   def int(
     prompt = '',
     *,
@@ -315,7 +350,7 @@ class Prompt:
 
     os._exit(0)
 
-def format_prompt(prompt: str, default: str = None):
+def format_prompt(prompt: str, default: str = None, use_colon = True):
   formatted_prompt = prompt.strip(' ')
   formatted_default = f'(default: {default})' if default else ''
-  return f'{formatted_prompt}{' ' if formatted_default and not formatted_prompt.endswith('\n') else ''}{formatted_default}{"\n: " if formatted_prompt or formatted_default else ""}'
+  return f'{formatted_prompt}{' ' if formatted_default and not formatted_prompt.endswith('\n') else ''}{formatted_default}{"\n: " if use_colon and (formatted_prompt or formatted_default) else ""}'

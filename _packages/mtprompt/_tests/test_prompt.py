@@ -98,24 +98,24 @@ class ToListTests(unittest.TestCase):
     with self.assertRaises(ValueError):
       to_list('"foo,bar')
 
-class PromptIntTests(unittest.TestCase):
+class PromptStrTests(unittest.TestCase):
 
   def call(self, inputs, **kwargs):
     input_iter = iter(inputs)
     with patch('builtins.input', side_effect = lambda _ = '': next(input_iter)), redirect_stdout(io.StringIO()):
-      return Prompt.int('p', **kwargs)
+      return Prompt.str('p', **kwargs)
 
   def test_valid(self):
-    self.assertEqual(self.call(['42']), 42)
+    self.assertEqual(self.call(['foo']), 'foo')
 
-  def test_retries_on_invalid(self):
-    self.assertEqual(self.call(['foo', '7']), 7)
+  def test_retries_on_required_empty(self):
+    self.assertEqual(self.call(['', 'foo']), 'foo')
 
   def test_optional_empty(self):
     self.assertIsNone(self.call([''], optional = True))
 
   def test_default_on_empty(self):
-    self.assertEqual(self.call([''], default = 9), 9)
+    self.assertEqual(self.call([''], default = 'foo'), 'foo')
 
 class PromptListTests(unittest.TestCase):
 
@@ -145,6 +145,73 @@ class PromptListTests(unittest.TestCase):
   def test_default_on_empty(self):
     self.assertEqual(self.call([''], default = ['foo']), ['foo'])
 
+class PromptOptionTests(unittest.TestCase):
+
+  def call(self, inputs, options = ['foo', 'bar', 'baz'], **kwargs):
+    input_iter = iter(inputs)
+    with patch('builtins.input', side_effect = lambda _ = '': next(input_iter)), redirect_stdout(io.StringIO()):
+      return Prompt.option(options, 'p', **kwargs)
+
+  def test_valid(self):
+    self.assertEqual(self.call(['2']), 'bar')
+
+  def test_retries_on_non_digit(self):
+    self.assertEqual(self.call(['foo', '1']), 'foo')
+
+  def test_retries_on_out_of_range(self):
+    self.assertEqual(self.call(['9', '3']), 'baz')
+
+  def test_optional_empty(self):
+    self.assertIsNone(self.call([''], optional = True))
+
+  def test_default_on_empty(self):
+    self.assertEqual(self.call([''], default = 'bar'), 'bar')
+
+  def test_accepts_non_string_items(self):
+    self.assertEqual(self.call(['2'], options = [1, 2, 3]), 2)
+
+  def test_raises_on_non_list(self):
+    with self.assertRaises(TypeError):
+      self.call(['1'], options = 'foo,bar')
+
+class PromptIntTests(unittest.TestCase):
+
+  def call(self, inputs, **kwargs):
+    input_iter = iter(inputs)
+    with patch('builtins.input', side_effect = lambda _ = '': next(input_iter)), redirect_stdout(io.StringIO()):
+      return Prompt.int('p', **kwargs)
+
+  def test_valid(self):
+    self.assertEqual(self.call(['42']), 42)
+
+  def test_retries_on_invalid(self):
+    self.assertEqual(self.call(['foo', '7']), 7)
+
+  def test_optional_empty(self):
+    self.assertIsNone(self.call([''], optional = True))
+
+  def test_default_on_empty(self):
+    self.assertEqual(self.call([''], default = 9), 9)
+
+class PromptFloatTests(unittest.TestCase):
+
+  def call(self, inputs, **kwargs):
+    input_iter = iter(inputs)
+    with patch('builtins.input', side_effect = lambda _ = '': next(input_iter)), redirect_stdout(io.StringIO()):
+      return Prompt.float('p', **kwargs)
+
+  def test_valid(self):
+    self.assertEqual(self.call(['4.2']), 4.2)
+
+  def test_retries_on_invalid(self):
+    self.assertEqual(self.call(['foo', '0.7']), 0.7)
+
+  def test_optional_empty(self):
+    self.assertIsNone(self.call([''], optional = True))
+
+  def test_default_on_empty(self):
+    self.assertEqual(self.call([''], default = 0.9), 0.9)
+
 class PromptBoolTests(unittest.TestCase):
 
   def call(self, inputs, **kwargs):
@@ -165,24 +232,81 @@ class PromptBoolTests(unittest.TestCase):
   def test_retries_when_required(self):
     self.assertTrue(self.call(['', 'y']))
 
-class PromptFloatTests(unittest.TestCase):
+class PromptPathTests(unittest.TestCase):
+
+  def setUp(self):
+    self.tmp_dir = tempfile.mkdtemp()
+    self.tmp_file = os.path.join(self.tmp_dir, 'file.txt')
+    with open(self.tmp_file, 'w') as f:
+      f.write('data')
 
   def call(self, inputs, **kwargs):
     input_iter = iter(inputs)
     with patch('builtins.input', side_effect = lambda _ = '': next(input_iter)), redirect_stdout(io.StringIO()):
-      return Prompt.float('p', **kwargs)
+      return Prompt.path('p', **kwargs)
 
   def test_valid(self):
-    self.assertEqual(self.call(['4.2']), 4.2)
+    self.assertEqual(self.call([self.tmp_file]), self.tmp_file)
 
-  def test_retries_on_invalid(self):
-    self.assertEqual(self.call(['foo', '0.7']), 0.7)
+  def test_retries_on_missing_path(self):
+    missing = os.path.join(self.tmp_dir, 'missing')
+    self.assertEqual(self.call([missing, self.tmp_dir]), self.tmp_dir)
 
   def test_optional_empty(self):
     self.assertIsNone(self.call([''], optional = True))
 
   def test_default_on_empty(self):
-    self.assertEqual(self.call([''], default = 0.9), 0.9)
+    self.assertEqual(self.call([''], default = self.tmp_dir), self.tmp_dir)
+
+class PromptDirTests(unittest.TestCase):
+
+  def setUp(self):
+    self.tmp_dir = tempfile.mkdtemp()
+    self.tmp_file = os.path.join(self.tmp_dir, 'file.txt')
+    with open(self.tmp_file, 'w') as f:
+      f.write('data')
+
+  def call(self, inputs, **kwargs):
+    input_iter = iter(inputs)
+    with patch('builtins.input', side_effect = lambda _ = '': next(input_iter)), redirect_stdout(io.StringIO()):
+      return Prompt.dir('p', **kwargs)
+
+  def test_valid(self):
+    self.assertEqual(self.call([self.tmp_dir]), self.tmp_dir)
+
+  def test_retries_on_file_path(self):
+    self.assertEqual(self.call([self.tmp_file, self.tmp_dir]), self.tmp_dir)
+
+  def test_optional_empty(self):
+    self.assertIsNone(self.call([''], optional = True))
+
+  def test_default_on_empty(self):
+    self.assertEqual(self.call([''], default = self.tmp_dir), self.tmp_dir)
+
+class PromptFileTests(unittest.TestCase):
+
+  def setUp(self):
+    self.tmp_dir = tempfile.mkdtemp()
+    self.tmp_file = os.path.join(self.tmp_dir, 'file.txt')
+    with open(self.tmp_file, 'w') as f:
+      f.write('data')
+
+  def call(self, inputs, **kwargs):
+    input_iter = iter(inputs)
+    with patch('builtins.input', side_effect = lambda _ = '': next(input_iter)), redirect_stdout(io.StringIO()):
+      return Prompt.file('p', **kwargs)
+
+  def test_valid(self):
+    self.assertEqual(self.call([self.tmp_file]), self.tmp_file)
+
+  def test_retries_on_dir_path(self):
+    self.assertEqual(self.call([self.tmp_dir, self.tmp_file]), self.tmp_file)
+
+  def test_optional_empty(self):
+    self.assertIsNone(self.call([''], optional = True))
+
+  def test_default_on_empty(self):
+    self.assertEqual(self.call([''], default = self.tmp_file), self.tmp_file)
 
 if __name__ == '__main__':
   unittest.main()
