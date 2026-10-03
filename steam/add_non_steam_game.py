@@ -52,9 +52,20 @@ def main():
   inner = root.get('shortcuts', {})
   shortcut_appid = generate_app_id(exe)
 
-  if any(g.get('appid') == shortcut_appid for g in inner.values()):
-    logger.warn(f'Skipping "{exe}". Game is already present as appid {shortcut_appid}.')
-    return
+  existing_key = next(
+    (
+      key for key,
+      shortcut in inner.items() if shortcut.get('appid') == shortcut_appid
+    ),
+    None,
+  )
+  if existing_key:
+    override = Prompt.bool(
+      f'"{os.path.basename(exe)}" is already present as appid {shortcut_appid}.\nOverride?',
+      default = True
+    )
+    if not override:
+      return
 
   entry['appid'] = shortcut_appid
   entry['appname'] = app_name or Path(exe).stem
@@ -64,7 +75,7 @@ def main():
 
   logger.debug(f'Generated entry:\n{stringify(entry)}\n')
 
-  inner[str(len(inner))] = entry
+  inner[existing_key if existing_key else str(len(inner))] = entry
   root['shortcuts'] = inner
 
   serialized = serialize_object(root)
