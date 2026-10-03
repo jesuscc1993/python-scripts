@@ -292,7 +292,7 @@ def overlay_file_size_48(
   unit_text: str,
   ico_img: Image.Image,
 ):
-  img = ico_img.resize((SIZE_48, SIZE_48), Image.LANCZOS)
+  img = Image.new('RGBA', (SIZE_48, SIZE_48), (0, 0, 0, 0))
 
   value_font = Font.load_by_path(FONT_PATH, VALUE_FONT_SIZE_48)
   unit_font = Font.load_by_path(FONT_PATH, UNITS_FONT_SIZE_48)
@@ -309,9 +309,15 @@ def overlay_file_size_48(
   gap = 2
   padding = 3
   box_h = value_h + padding * 2
-  box_x = 0
   box_w = SIZE_48
+  box_x = 0
   box_y = 0
+
+  icon_size = SIZE_48 - box_h
+  icon_x = (SIZE_48 - icon_size) // 2
+  icon_y = SIZE_48 - icon_size
+  resized_icon = ico_img.resize((icon_size, icon_size), Image.LANCZOS)
+  img.paste(resized_icon, (icon_x, icon_y), resized_icon)
 
   box = Image.new('RGBA', (box_w, box_h), (0, 0, 0, 0))
   ImageDraw.Draw(box).rectangle([0, 0, box_w - 1, box_h - 1], fill=BG_COLOR)
@@ -319,7 +325,7 @@ def overlay_file_size_48(
 
   draw = ImageDraw.Draw(img)
   total_text_w = value_w + gap + unit_w
-  text_start_x = (SIZE_48 - total_text_w) // 2
+  text_start_x = box_x + (box_w - total_text_w) // 2
   draw.text(
     (text_start_x - bbox_value[0], box_y + padding - bbox_value[1]),
     value_text,
