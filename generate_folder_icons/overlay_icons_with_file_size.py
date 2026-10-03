@@ -13,14 +13,13 @@ from mtattr import Attr
 from mtfont import Font, SegoeFontName
 from mtlogger import logger
 from mtfs import read_text_file
-from mtprompt import Prompt, to_dir, to_int
+from mtprompt import Prompt, to_bool, to_dir, to_int
 
 from _constants import DESKTOP_INI_FILENAME, HIDDEN_SYSTEM_FILE_ATTRS, ICO_FILENAME, MAX_ICO_SIZE, PREFERRED_ENCODING
 from _common import get_ini_icon, read_ini, set_folder_icon, write_hidden_file
 
 DEBUG = False
 FORCE_RECALCULATE = False
-OVERWRITE = False
 OVERLAY_SMALLER_THAN_GB = False
 
 FONT_PATH = Font.find_by_name(SegoeFontName.BOLD)
@@ -46,6 +45,7 @@ def main():
   if len(sys.argv) > 1:
     parent_path = to_dir(sys.argv[1])
     depth = to_int(sys.argv[2]) if len(sys.argv) > 2 else 1
+    overwrite_existing = to_bool(sys.argv[3]) if len(sys.argv) > 3 else False
   else:
     parent_path = Prompt.dir(
       'Enter the path to the directory containing the exes you want to process'
@@ -54,11 +54,15 @@ def main():
       'Enter the depth for processing subfolders',
       default=1
     )
+    overwrite_existing = Prompt.bool(
+      'Overwrite existing icons?',
+      default=False
+    )
 
   parent_path = os.path.abspath(parent_path)
 
   if depth == 0:
-    process_dir(parent_path, overwrite_existing=OVERWRITE)
+    process_dir(parent_path, overwrite_existing)
   else:
     parent_depth = parent_path.rstrip(os.sep).count(os.sep)
 
@@ -73,7 +77,7 @@ def main():
       for dir_name in dirs:
         child_path = os.path.join(root, dir_name)
         logger.log()
-        process_dir(child_path, overwrite_existing=OVERWRITE)
+        process_dir(child_path, overwrite_existing)
 
   mtsound.notify()
   logger.success(f'Finished setting icons for "{parent_path}".', prefix_newline=True)
@@ -321,9 +325,6 @@ def overlay_file_size_48(
   gap = 2
   padding = 3
   box_h = value_h + padding * 2
-  box_w = SIZE_48
-  box_x = 0
-  box_y = 0
 
   max_w = SIZE_48
   max_h = SIZE_48 - box_h
@@ -334,6 +335,12 @@ def overlay_file_size_48(
   icon_x = (SIZE_48 - resized_w) // 2
   icon_y = box_h + (max_h - resized_h) // 2
   img.paste(resized_icon, (icon_x, icon_y), resized_icon)
+
+  content_w = value_w + gap + unit_w + padding * 2
+  box_w = max(resized_w, min(content_w, SIZE_48))
+  box_w += box_w % 2
+  box_x = (SIZE_48 - box_w) // 2
+  box_y = 0
 
   box = Image.new('RGBA', (box_w, box_h), (0, 0, 0, 0))
   ImageDraw.Draw(box).rectangle([0, 0, box_w - 1, box_h - 1], fill=BG_COLOR)
