@@ -20,7 +20,7 @@ from _common import get_ini_icon, read_ini, set_folder_icon, write_hidden_file
 
 DEBUG = False
 FORCE_RECALCULATE = False
-OVERWRITE = False
+OVERWRITE = True
 OVERLAY_SMALLER_THAN_GB = False
 
 FONT_PATH = Font.find_by_name(SegoeFontName.BOLD)
@@ -35,6 +35,8 @@ UNITS_FONT_SIZE_256 = int(VALUE_FONT_SIZE_256 * 0.775)
 SIZE_48 = 48
 VALUE_FONT_SIZE_48 = 14
 UNITS_FONT_SIZE_48 = int(VALUE_FONT_SIZE_48 * 0.8)
+
+SIZE_16 = 16
 
 BG_COLOR = (25, 25, 25, 255)
 VALUE_COLOR = (255, 255, 255, 255)
@@ -171,17 +173,20 @@ def process_dir(
     img_256 = overlay_file_size_256(size_parts[0], size_parts[1], ico_img)
     img_48 = overlay_file_size_48(size_parts[0], size_parts[1], ico_img)
 
-    other_frames = []
     with Image.open(bak_ico_path) as bak:
-      bak_sizes = bak.info.get('sizes', set())
-      for size in bak_sizes:
-        if size not in {(256, 256), (48, 48)}:
-          bak.size = size
-          other_frames.append(bak.copy())
-      if (16, 16) not in bak_sizes:
-        other_frames.append(ico_img.resize((16, 16), Image.LANCZOS))
+      if (SIZE_16, SIZE_16) in bak.info.get('sizes', set()):
+        bak.size = (SIZE_16, SIZE_16)
+        img_16 = bak.copy()
+      else:
+        img_16 = ico_img.resize((SIZE_16, SIZE_16), Image.LANCZOS)
 
-    img_256.save(new_ico_path, format='ICO', append_images=[img_48] + other_frames)
+    append_images = [img_48, img_16]
+    img_256.save(
+      new_ico_path,
+      format='ICO',
+      sizes=[img_256.size] + [image.size for image in append_images],
+      append_images=append_images
+    )
     logger.success(f'Saved "{new_ico_path}".')
 
     if DEBUG:
@@ -238,6 +243,12 @@ def calculate_dir_size(
 
   return formatted_size
 
+def crop_to_content(
+  img: Image.Image,
+):
+  bbox = img.split()[-1].getbbox()
+  return img.crop(bbox) if bbox else img
+
 def overlay_file_size_256(
   value_text: str,
   unit_text: str,
@@ -292,6 +303,7 @@ def overlay_file_size_48(
   unit_text: str,
   ico_img: Image.Image,
 ):
+  ico_img = crop_to_content(ico_img)
   img = Image.new('RGBA', (SIZE_48, SIZE_48), (0, 0, 0, 0))
 
   value_font = Font.load_by_path(FONT_PATH, VALUE_FONT_SIZE_48)
@@ -309,14 +321,18 @@ def overlay_file_size_48(
   gap = 2
   padding = 3
   box_h = value_h + padding * 2
-  box_w = SIZE_48 - box_h
-  box_x = (SIZE_48 - box_w) // 2
+  box_w = SIZE_48
+  box_x = 0
   box_y = 0
 
-  icon_size = box_w
-  icon_x = (SIZE_48 - icon_size) // 2
-  icon_y = SIZE_48 - icon_size
-  resized_icon = ico_img.resize((icon_size, icon_size), Image.LANCZOS)
+  max_w = SIZE_48
+  max_h = SIZE_48 - box_h
+  scale = min(max_w / ico_img.width, max_h / ico_img.height)
+  resized_w = round(ico_img.width * scale)
+  resized_h = round(ico_img.height * scale)
+  resized_icon = ico_img.resize((resized_w, resized_h), Image.LANCZOS)
+  icon_x = (SIZE_48 - resized_w) // 2
+  icon_y = box_h + (max_h - resized_h) // 2
   img.paste(resized_icon, (icon_x, icon_y), resized_icon)
 
   box = Image.new('RGBA', (box_w, box_h), (0, 0, 0, 0))
