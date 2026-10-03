@@ -309,11 +309,11 @@ def overlay_file_size_48(
   gap = 2
   padding = 3
   box_h = value_h + padding * 2
-  box_w = SIZE_48
-  box_x = 0
+  box_w = SIZE_48 - box_h
+  box_x = (SIZE_48 - box_w) // 2
   box_y = 0
 
-  icon_size = SIZE_48 - box_h
+  icon_size = box_w
   icon_x = (SIZE_48 - icon_size) // 2
   icon_y = SIZE_48 - icon_size
   resized_icon = ico_img.resize((icon_size, icon_size), Image.LANCZOS)
