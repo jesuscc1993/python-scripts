@@ -92,7 +92,7 @@ def image_to_ico(
 def set_folder_icon(
   folder_path: str,
   ico_path: str,
-  override_existing = False,
+  overwrite_existing = False,
 ):
   try:
     desktop_ini_path = os.path.join(folder_path, DESKTOP_INI_FILENAME)
@@ -102,7 +102,7 @@ def set_folder_icon(
 
     config, encoding = read_ini(desktop_ini_path)
 
-    if get_ini_icon(config) and not override_existing:
+    if get_ini_icon(config) and not overwrite_existing:
       logger.trace(f'Skipping "{folder_path}". A folder icon is already set.')
       return
 

@@ -22,26 +22,26 @@ CACHE_TTL = 24 * 60 * 60
 def main():
   if len(sys.argv) > 1:
     parent_folder = to_dir(sys.argv[1])
-    override_existing = to_bool(sys.argv[2]) if len(sys.argv) > 2 else False
+    overwrite_existing = to_bool(sys.argv[2]) if len(sys.argv) > 2 else False
   else:
-    parent_folder, override_existing = prompt_params()
+    parent_folder, overwrite_existing = prompt_params()
 
-  generate_covers(parent_folder, override_existing)
+  generate_covers(parent_folder, overwrite_existing)
 
 def prompt_params():
   parent_folder = Prompt.dir(
     'Enter the path to the parent folder containing your Switch saves'
   )
-  override_existing = Prompt.bool(
-    'Override existing images?',
+  overwrite_existing = Prompt.bool(
+    'Overwrite existing images?',
     default=False
   )
 
-  return parent_folder, override_existing
+  return parent_folder, overwrite_existing
 
 def generate_covers(
   parent_folder_path: str,
-  override_existing: bool,
+  overwrite_existing: bool,
 ):
   logger.log('Generating cover images...')
 
@@ -51,7 +51,7 @@ def generate_covers(
     folder_path = os.path.join(parent_folder_path, folder_name)
 
     if os.path.isdir(folder_path):
-      process_folder(folder_path, folder_name, mapping.get(folder_name), override_existing)
+      process_folder(folder_path, folder_name, mapping.get(folder_name), overwrite_existing)
 
   mtsound.notify()
   logger.log('\nFinished generating cover images.')
@@ -60,12 +60,12 @@ def process_folder(
   folder_path: str,
   folder_name: str,
   entry: dict,
-  override_existing: bool,
+  overwrite_existing: bool,
 ):
   formatted_name = folder_name.rjust(ID_LENGTH)
   cover_path = os.path.join(folder_path, FOLDER_IMAGE_FILENAME)
 
-  if os.path.exists(cover_path) and not override_existing:
+  if os.path.exists(cover_path) and not overwrite_existing:
     logger.trace(f'  [{formatted_name}] {FOLDER_IMAGE_FILENAME} already exists.')
     return
 

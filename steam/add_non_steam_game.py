@@ -59,13 +59,11 @@ def main():
     ),
     None,
   )
-  if existing_key:
-    override = Prompt.bool(
-      f'"{os.path.basename(exe)}" is already present as appid {shortcut_appid}.\nOverride?',
-      default = True
-    )
-    if not override:
-      return
+  if existing_key and not Prompt.bool(
+    f'"{os.path.basename(exe)}" is already present as appid {shortcut_appid}.\nOverwrite?',
+    default = True
+  ):
+    return
 
   entry['appid'] = shortcut_appid
   entry['appname'] = app_name or Path(exe).stem

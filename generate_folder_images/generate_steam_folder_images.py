@@ -33,11 +33,11 @@ def main():
   if len(sys.argv) > 1:
     parent_folder = to_dir(sys.argv[1])
     cover_type = sys.argv[2] if len(sys.argv) > 2 else 'capsule'
-    override_existing = to_bool(sys.argv[3]) if len(sys.argv) > 3 else False
+    overwrite_existing = to_bool(sys.argv[3]) if len(sys.argv) > 3 else False
   else:
-    parent_folder, cover_type, override_existing = prompt_params()
+    parent_folder, cover_type, overwrite_existing = prompt_params()
 
-  generate_covers(parent_folder, cover_type, override_existing)
+  generate_covers(parent_folder, cover_type, overwrite_existing)
 
 def prompt_params():
   parent_folder = Prompt.dir(
@@ -47,17 +47,17 @@ def prompt_params():
     'Enter cover type [capsule | header | library]',
     default='capsule'
   )
-  override_existing = Prompt.bool(
-    'Override existing images?',
+  overwrite_existing = Prompt.bool(
+    'Overwrite existing images?',
     default=False
   )
 
-  return parent_folder, cover_type, override_existing
+  return parent_folder, cover_type, overwrite_existing
 
 def generate_covers(
   parent_folder_path: str,
   cover_type: str,
-  override_existing: bool,
+  overwrite_existing: bool,
 ):
   cover_url = COVER_URL_MAP.get(cover_type)
   if not cover_url:
@@ -70,7 +70,7 @@ def generate_covers(
     folder_path = os.path.join(parent_folder_path, folder_name)
 
     if os.path.isdir(folder_path) and folder_name.isdigit():
-      process_folder(folder_path, folder_name, cover_url, override_existing)
+      process_folder(folder_path, folder_name, cover_url, overwrite_existing)
 
   mtsound.notify()
   logger.log('\nFinished generating cover images.')
@@ -79,12 +79,12 @@ def process_folder(
   folder_path: str,
   folder_name: str,
   cover_url: str,
-  override_existing: bool,
+  overwrite_existing: bool,
 ):
   cover_path = os.path.join(folder_path, FOLDER_IMAGE_FILENAME)
   formatted_name = folder_name.rjust(ID_LENGTH)
 
-  if os.path.exists(cover_path) and not override_existing:
+  if os.path.exists(cover_path) and not overwrite_existing:
     logger.trace(f'  [{formatted_name}] {FOLDER_IMAGE_FILENAME} already exists.')
     return
 

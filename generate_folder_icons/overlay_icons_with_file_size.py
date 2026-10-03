@@ -20,7 +20,7 @@ from _common import get_ini_icon, read_ini, set_folder_icon, write_hidden_file
 
 DEBUG = False
 FORCE_RECALCULATE = False
-OVERRIDE = False
+OVERWRITE = False
 OVERLAY_SMALLER_THAN_GB = False
 
 FONT_PATH = Font.find_by_name(SegoeFontName.BOLD)
@@ -56,7 +56,7 @@ def main():
   parent_path = os.path.abspath(parent_path)
 
   if depth == 0:
-    process_dir(parent_path, override_existing=OVERRIDE)
+    process_dir(parent_path, overwrite_existing=OVERWRITE)
   else:
     parent_depth = parent_path.rstrip(os.sep).count(os.sep)
 
@@ -71,7 +71,7 @@ def main():
       for dir_name in dirs:
         child_path = os.path.join(root, dir_name)
         logger.log()
-        process_dir(child_path, override_existing=OVERRIDE)
+        process_dir(child_path, overwrite_existing=OVERWRITE)
 
   mtsound.notify()
   logger.success(f'Finished setting icons for "{parent_path}".', prefix_newline=True)
@@ -91,7 +91,7 @@ def has_exclusion_file(
 
 def process_dir(
   dir_path: str,
-  override_existing = False,
+  overwrite_existing = False,
 ):
   try:
     ini_path = os.path.join(dir_path, DESKTOP_INI_FILENAME)
@@ -111,9 +111,9 @@ def process_dir(
     new_ico_path = os.path.join(dir_path, new_ico_name)
     bak_ico_path = os.path.join(dir_path, ICO_BAK_FILENAME)
     dir_size_path = os.path.join(dir_path, DIR_SIZE_FILENAME)
-    override = override_existing or new_ico_name not in ico_path
+    overwrite = overwrite_existing or new_ico_name not in ico_path
 
-    if not FORCE_RECALCULATE and not override_existing and os.path.exists(new_ico_path) and os.path.exists(dir_size_path):
+    if not FORCE_RECALCULATE and not overwrite_existing and os.path.exists(new_ico_path) and os.path.exists(dir_size_path):
       if os.path.getmtime(new_ico_path) > os.path.getmtime(dir_size_path):
         logger.trace(f'  Skipping "{dir_path}". Icon is up to date.')
         return
@@ -192,7 +192,7 @@ def process_dir(
       img_48.save(os.path.join(debug_dir, '48.png'), format='PNG')
 
     if ico_path != os.path.basename(bak_ico_path):
-      set_folder_icon(dir_path, new_ico_name, override_existing=override)
+      set_folder_icon(dir_path, new_ico_name, overwrite_existing=overwrite)
 
     Attr.hide(new_ico_path)
 
