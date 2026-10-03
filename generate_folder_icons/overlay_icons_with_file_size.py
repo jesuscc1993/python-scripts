@@ -20,7 +20,7 @@ from _common import get_ini_icon, read_ini, set_folder_icon, write_hidden_file
 
 DEBUG = False
 FORCE_RECALCULATE = False
-OVERWRITE = True
+OVERWRITE = False
 OVERLAY_SMALLER_THAN_GB = False
 
 FONT_PATH = Font.find_by_name(SegoeFontName.BOLD)
