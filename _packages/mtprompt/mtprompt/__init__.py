@@ -34,7 +34,7 @@ def to_float(val: str):
     raise ValueError(f'Input "{val}" is not a valid number.')
 
 def to_path(val: str):
-  val = val.strip(' "')
+  val = os.path.abspath(val.strip(' "'))
 
   if not os.path.exists(val):
     raise ValueError(f'Path "{val}" does not exist.')
@@ -42,7 +42,7 @@ def to_path(val: str):
   return val
 
 def to_dir(val: str):
-  val = val.strip(' "')
+  val = os.path.abspath(val.strip(' "'))
 
   if not os.path.isdir(val):
     raise ValueError(f'Path "{val}" is not a directory.')
@@ -50,7 +50,7 @@ def to_dir(val: str):
   return val
 
 def to_file(val: str):
-  val = val.strip(' "')
+  val = os.path.abspath(val.strip(' "'))
 
   if not os.path.isfile(val):
     raise ValueError(f'Path "{val}" is not a file.')
