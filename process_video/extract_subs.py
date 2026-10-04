@@ -78,10 +78,12 @@ def extract_subtitles(
   logger.log(f'Extracting {LANGUAGE} subtitles for "{file_name}"...')
   cmd = [
     'ffmpeg',
+    '-y',
+    '-analyzeduration', '0',
+    '-probesize', '5000000',
     '-i', src_file_path,
     '-map', f'0:{stream_idx}',
     '-c:s', 'srt',
-    '-y',
     dest_file_path
   ]
   subprocess.run(cmd, stdout = subprocess.DEVNULL, stderr = subprocess.DEVNULL)
@@ -102,6 +104,8 @@ def find_subtitle_stream(src_file_path: str, target_language: str) -> str | None
       [
         'ffprobe',
         '-v', 'quiet',
+        '-analyzeduration', '0',
+        '-probesize', '5000000',
         '-print_format', 'json',
         '-show_streams',
         src_file_path

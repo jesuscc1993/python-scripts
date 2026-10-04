@@ -169,8 +169,10 @@ def get_video_info(
   try:
     result = subprocess.run(
       [
-        'ffprobe', '-v', 'quiet',
-        '-analyzeduration', '0', '-probesize', '5000000',
+        'ffprobe',
+        '-v', 'quiet',
+        '-analyzeduration', '0',
+        '-probesize', '5000000',
         '-print_format', 'json',
         '-show_format',
         file_path
@@ -213,9 +215,11 @@ def capture_frame(
 ):
   subprocess.run(
     [
-      'ffmpeg', '-y',
+      'ffmpeg',
+      '-y',
       '-loglevel', 'error',
-      '-analyzeduration', '0', '-probesize', '5000000',
+      '-analyzeduration', '0',
+      '-probesize', '5000000',
       '-ss', str(seek_secs),
       '-i', file_path,
       '-vframes', '1',
