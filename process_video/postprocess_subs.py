@@ -4,9 +4,8 @@ import sys
 from mtlogger import logger
 from mtprompt import Prompt, to_path
 
-from _common import add_missing_spaces_to_subs_file, fix_invalid_chars_in_subs_file, strip_tags_from_subs_file
-
-SUBTITLE_EXT = '.srt'
+from _common import add_missing_spaces_to_subs_file, fix_invalid_chars_in_subs_file, post_process_subs_file
+from _constants import SUBTITLE_EXTS
 
 def main():
   if len(sys.argv) > 1:
@@ -16,24 +15,31 @@ def main():
       'Enter the path to an SRT file or directory'
     )
 
+  logger.log(f'Processing subtitle files in "{input_path}"...')
+  logger.hr()
+
   if os.path.isfile(input_path):
     process_file(input_path)
   else:
     process_directory(input_path)
+
+  logger.hr()
+  logger.log(f'Finished processing subtitle files in "{input_path}".')
 
 def process_file(
   file_path: str,
 ):
   file_name = os.path.basename(file_path)
   ext = os.path.splitext(file_name)[1].lower()
-  if ext != SUBTITLE_EXT:
+  if ext not in SUBTITLE_EXTS:
     return
 
   dest_file_path = file_path
-  strip_tags_from_subs_file(dest_file_path)
+  post_process_subs_file(dest_file_path, ext)
+
   add_missing_spaces_to_subs_file(dest_file_path)
   fix_invalid_chars_in_subs_file(dest_file_path)
-  logger.log(f'Fixed subtitles for "{file_name}".')
+  logger.success(f'Processed "{file_name}" subtitles file.')
 
 def process_directory(
   dir_path: str,

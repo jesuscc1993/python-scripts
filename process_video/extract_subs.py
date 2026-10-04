@@ -3,7 +3,8 @@ import os
 import subprocess
 import sys
 
-from _common import strip_tags_from_subs_file
+from _common import post_process_subs_file
+from _constants import SUBTITLE_EXTS_BY_CODEC, VIDEO_EXTS
 from mtlogger import logger
 from mtprompt import Prompt, to_path
 
@@ -11,8 +12,6 @@ EXTRACT_TO_FOLDER = True
 
 LANGUAGE = 'eng'
 SUBTITLES_PATH = 'subtitles'
-SUBTITLE_EXT = '.srt'
-VIDEO_EXTS = ['.mp4', '.mkv']
 
 def main():
   if len(sys.argv) > 1:
@@ -22,19 +21,32 @@ def main():
       'Enter the path to a video file or directory'
     )
 
+  logger.log(f'Extracting subs for "{input_path}"...')
+  logger.hr()
+
   if os.path.isfile(input_path):
     process_file(input_path)
   else:
     process_directory(input_path)
+
+  logger.hr()
+  logger.log(f'Finished extracting subs for "{input_path}".')
 
 def process_file(
   file_path: str,
 ):
   file_name = os.path.basename(file_path)
   name, ext = os.path.splitext(file_name)
-  subtitles_file_name = name + SUBTITLE_EXT
   if ext.lower() not in VIDEO_EXTS:
     return
+
+  stream_idx, codec_name = find_subtitle_stream(file_path, LANGUAGE.lower())
+  if stream_idx is None:
+    logger.warn(f'Skipping "{file_name}". No {LANGUAGE} subtitles found.\n')
+    return
+
+  subtitle_ext = SUBTITLE_EXTS_BY_CODEC[codec_name]
+  subtitles_file_name = name + subtitle_ext
 
   dir_path = os.path.dirname(file_path)
   in_place_output_path = dir_path
@@ -51,7 +63,7 @@ def process_file(
     output_path = in_place_output_path
 
   dest_file_path = os.path.join(output_path, subtitles_file_name)
-  extract_subtitles(file_path, dest_file_path, file_name)
+  extract_subtitles(file_path, dest_file_path, file_name, stream_idx, subtitle_ext)
 
   if os.path.isdir(output_path) and not os.listdir(output_path):
     os.rmdir(output_path)
@@ -67,13 +79,10 @@ def extract_subtitles(
   src_file_path: str,
   dest_file_path: str,
   file_name: str,
+  stream_idx: str,
+  subtitle_ext: str,
 ):
   no_subs_found_message = f'Skipping "{file_name}". No {LANGUAGE} subtitles found.\n'
-
-  stream_idx = find_subtitle_stream(src_file_path, LANGUAGE.lower())
-  if stream_idx is None:
-    logger.warn(no_subs_found_message)
-    return
 
   logger.log(f'Extracting {LANGUAGE} subtitles for "{file_name}"...')
   cmd = [
@@ -83,7 +92,7 @@ def extract_subtitles(
     '-probesize', '5000000',
     '-i', src_file_path,
     '-map', f'0:{stream_idx}',
-    '-c:s', 'srt',
+    '-c:s', 'copy',
     dest_file_path
   ]
   subprocess.run(cmd, stdout = subprocess.DEVNULL, stderr = subprocess.DEVNULL)
@@ -93,12 +102,12 @@ def extract_subtitles(
       os.remove(dest_file_path)
       logger.warn(no_subs_found_message)
     else:
-      strip_tags_from_subs_file(dest_file_path)
+      post_process_subs_file(dest_file_path, subtitle_ext)
       logger.success(f'Extracted "{dest_file_path}".\n')
   else:
     logger.warn(no_subs_found_message)
 
-def find_subtitle_stream(src_file_path: str, target_language: str) -> str | None:
+def find_subtitle_stream(src_file_path: str, target_language: str) -> tuple[str | None, str | None]:
   try:
     result = subprocess.run(
       [
@@ -115,15 +124,15 @@ def find_subtitle_stream(src_file_path: str, target_language: str) -> str | None
       timeout = 5
     )
     for stream in json.loads(result.stdout).get('streams', []):
-      if stream.get('codec_type') == 'subtitle':
+      if stream.get('codec_type') == 'subtitle' and stream.get('codec_name') in SUBTITLE_EXTS_BY_CODEC:
         tags = stream.get('tags', {})
         language = tags.get('language', '').lower()
         if language.startswith(target_language):
-          return stream['index']
+          return stream['index'], stream.get('codec_name')
 
   except Exception:
     logger.failure(f'Failed to find subtitle stream for "{src_file_path}".')
-  return None
+  return None, None
 
 if __name__ == '__main__':
   try:

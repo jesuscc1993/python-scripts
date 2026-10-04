@@ -43,10 +43,12 @@
         { "class": "sass", "ext": "scss" },
         "settings",
         "srt",
+        "ssa",
         "ts",
         { "class": "ts", "ext": "tsx" },
         "txt",
         "vdf",
+        "vtt",
         "xml",
         "yaml",
         "yml"
