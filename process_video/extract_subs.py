@@ -68,13 +68,14 @@ def extract_subtitles(
   dest_file_path: str,
   file_name: str,
 ):
-  no_subs_found_message = f'Skipping "{file_name}". No {LANGUAGE} subtitles found.'
+  no_subs_found_message = f'Skipping "{file_name}". No {LANGUAGE} subtitles found.\n'
 
   stream_idx = find_subtitle_stream(src_file_path, LANGUAGE.lower())
   if stream_idx is None:
     logger.warn(no_subs_found_message)
     return
 
+  logger.log(f'Extracting {LANGUAGE} subtitles for "{file_name}"...')
   cmd = [
     'ffmpeg',
     '-i', src_file_path,
@@ -91,7 +92,7 @@ def extract_subtitles(
       logger.warn(no_subs_found_message)
     else:
       strip_tags_from_subs_file(dest_file_path)
-      logger.log(f'Extracted {LANGUAGE} subtitles for "{file_name}".')
+      logger.success(f'Extracted "{dest_file_path}".\n')
   else:
     logger.warn(no_subs_found_message)
 
