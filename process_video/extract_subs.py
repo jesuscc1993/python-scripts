@@ -41,7 +41,7 @@ def process_file(
   in_folder_output_path = os.path.join(dir_path, SUBTITLES_PATH)
 
   if any(os.path.exists(os.path.join(path, subtitles_file_name)) for path in [in_place_output_path, in_folder_output_path]):
-    logger.trace(f'Skipping "{file_name}". Subtitles file already exists.')
+    logger.trace(f'Skipping "{file_name}". Subtitles file already exists.\n')
     return
 
   if EXTRACT_TO_FOLDER:
