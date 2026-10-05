@@ -8,7 +8,6 @@ from contextlib import redirect_stdout
 from unittest.mock import patch
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
-
 from mtprompt import Prompt, to_bool, to_float, to_int, to_list, to_path, to_dir, to_file
 
 class ToBoolTests(unittest.TestCase):

@@ -2,19 +2,19 @@ import sys
 import os
 import tempfile
 import unittest
-from unittest.mock import patch
 
 from mtfs import read_text_file, write_text_file
+from unittest.mock import patch
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
-from _common import add_missing_spaces_to_subs_file, fix_invalid_chars_in_subs_file, strip_tags_from_subs_file, strip_attribute, STRIP_SETTINGS, ENCODING
+from _common import add_missing_spaces_to_subs_file, fix_invalid_chars_in_subs_file, post_process_subs_file, strip_tags_from_subs_file, strip_attribute, STRIP_SETTINGS, ENCODING
 
-def process(func, content):
+def process(func, content, *args):
   fd, path = tempfile.mkstemp()
   os.close(fd)
   try:
     write_text_file(path, content, ENCODING)
-    func(path)
+    func(path, *args)
     return read_text_file(path, ENCODING)
   finally:
     os.remove(path)
@@ -65,6 +65,28 @@ class TestStripAttribute(unittest.TestCase):
 
   def test_keeps_unchanged_when_attribute_not_present(self):
     self.assertEqual(strip_attribute('<font size="1">', 'color'), '<font size="1">')
+
+class TestPostProcessSubsFile(unittest.TestCase):
+  def test_strips_html_tags_for_srt_ext_when_strip_tags_enabled(self):
+    with patch('_common.STRIP_TAGS', True):
+      result = process(post_process_subs_file, '<font color="#FFFFFF">Hi</font>', '.srt')
+    self.assertEqual(result, 'Hi')
+
+  def test_keeps_html_tags_for_srt_ext_when_strip_tags_disabled(self):
+    with patch('_common.STRIP_TAGS', False):
+      result = process(post_process_subs_file, '<font color="#FFFFFF">Hi</font>', '.srt')
+    self.assertEqual(result, '<font color="#FFFFFF">Hi</font>')
+
+  def test_runs_ass_post_processing_for_ass_ext(self):
+    content = r'Dialogue: 0,0:00:01.00,0:00:02.00,Default,,0,0,0,,{\c&HFFFFFF&}Hello'
+    with patch('_ass_common.REPLACE_COLOR', True), patch('_ass_common.FORCE_BORDER_COLOR', False), patch('_ass_common.FORCE_TEXT_COLOR', False):
+      result = process(post_process_subs_file, content, '.ass')
+    self.assertIn(r'{\c&H55FFFF&}', result)
+
+  def test_ignores_unsupported_ext(self):
+    content = '<font color="#FFFFFF">Hi</font>'
+    result = process(post_process_subs_file, content, '.txt')
+    self.assertEqual(result, content)
 
 if __name__ == '__main__':
   unittest.main()

@@ -3,7 +3,6 @@ import sys
 import unittest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
-
 from _common import calc_fit_size, center_offset, is_image_file, round_to_even
 
 class RoundToEvenTests(unittest.TestCase):

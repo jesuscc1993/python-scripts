@@ -6,11 +6,7 @@ from mtlogger import logger
 from mtfs import read_text_file, write_text_file
 from mtprompt import Prompt
 
-from _constants import ASS_SUBTITLE_EXTS, VTT_EXT
-
-SRT_TIME_PATTERN = r'(\d{2}:\d{2}:\d{2},\d{3})\s*-->\s*(\d{2}:\d{2}:\d{2},\d{3})'
-VTT_TIME_PATTERN = r'(\d{2}:\d{2}:\d{2}\.\d{3})\s*-->\s*(\d{2}:\d{2}:\d{2}\.\d{3})'
-ASS_TIME_PATTERN = r'(\d+,)(\d+:\d{2}:\d{2}\.\d{2}),(\d+:\d{2}:\d{2}\.\d{2})'
+from _constants import ASS_SUBTITLE_EXTS, ASS_TIME_PATTERN, SRT_TIME_PATTERN, VTT_EXT, VTT_TIME_PATTERN
 
 def main():
   subs_file = Prompt.file(

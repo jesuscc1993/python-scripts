@@ -5,7 +5,6 @@ import tempfile
 import unittest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
-
 from mtfs import read_file, read_json_file, read_text_file, write_file, write_json_file, write_text_file
 
 TEST_DIR = os.path.join(tempfile.gettempdir(), 'mtfs-tests')

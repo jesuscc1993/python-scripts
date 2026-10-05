@@ -1,9 +1,15 @@
 REPLACE_COLOR = True
+FORCE_TEXT_COLOR = False
+FORCE_BORDER_COLOR = True
 STRIP_TAGS = True
 
 ## BBGGRR
 LOOKUP_TEXT_COLOR = 'FFFFFF'
-REPLACEMENT_TEXT_COLOR = '55FFFF'
+PREFERRED_TEXT_COLOR = '55FFFF'
+PREFERRED_BORDER_COLOR = '000000'
+
+HEX_DIGIT_PATTERN = r'[0-9A-Fa-f]'
+HEX_COLOUR_VALUE_PATTERN = rf'{HEX_DIGIT_PATTERN}{{6}}$'
 
 ENCODING = 'utf-8'
 HTML_FONT_ATTRIBUTES = ['color', 'face', 'size']
@@ -52,3 +58,14 @@ ASS_SUBTITLE_EXTS = {
   ASS_EXT,
   SSA_EXT
 }
+
+ASS_STYLE_PRIMARY_COLOUR_FIELD = 'PrimaryColour'
+ASS_STYLE_OUTLINE_COLOUR_FIELD = 'OutlineColour'
+ASS_STYLE_OUTLINE_FIELD = 'Outline'
+
+ASS_STYLE_FORMAT_LINE_PATTERN = r'Format:\s*([^\r\n]+)'
+ASS_STYLE_LINE_PATTERN = r'Style:\s*([^\r\n]+)'
+
+SRT_TIME_PATTERN = r'(\d{2}:\d{2}:\d{2},\d{3})\s*-->\s*(\d{2}:\d{2}:\d{2},\d{3})'
+VTT_TIME_PATTERN = r'(\d{2}:\d{2}:\d{2}\.\d{3})\s*-->\s*(\d{2}:\d{2}:\d{2}\.\d{3})'
+ASS_TIME_PATTERN = r'(\d+,)(\d+:\d{2}:\d{2}\.\d{2}),(\d+:\d{2}:\d{2}\.\d{2})'
