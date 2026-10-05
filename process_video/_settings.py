@@ -1,0 +1,17 @@
+SETTINGS = {
+  'replace_color': True,
+  'force_text_color': False,
+  'force_border_color': True,
+  'strip_settings': {
+    'enabled': True,
+
+    'color': False,
+    'face': False,
+    'fonts': True,
+    'size': False,
+  },
+
+  'lookup_text_color': 'FFFFFF',
+  'preferred_text_color': 'FFFF55',
+  'preferred_border_color': '000000',
+}

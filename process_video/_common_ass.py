@@ -3,36 +3,42 @@ import re
 from functools import partial
 from mtfs import read_text_file, write_text_file
 
-from _constants import ASS_STYLE_FORMAT_LINE_PATTERN, ASS_STYLE_LINE_PATTERN, ASS_STYLE_OUTLINE_COLOUR_FIELD, ASS_STYLE_OUTLINE_FIELD, ASS_STYLE_PRIMARY_COLOUR_FIELD, ENCODING, FORCE_BORDER_COLOR, FORCE_TEXT_COLOR, PREFERRED_BORDER_COLOR, HEX_COLOUR_VALUE_PATTERN, HEX_DIGIT_PATTERN, LOOKUP_TEXT_COLOR, REPLACE_COLOR, PREFERRED_TEXT_COLOR
+from _constants import ASS_STYLE_FORMAT_LINE_PATTERN, ASS_STYLE_LINE_PATTERN, ASS_STYLE_OUTLINE_COLOUR_FIELD, ASS_STYLE_OUTLINE_FIELD, ASS_STYLE_PRIMARY_COLOUR_FIELD, ENCODING, HEX_COLOUR_VALUE_PATTERN, HEX_DIGIT_PATTERN
+from _settings import SETTINGS
 
-def post_process_ass_file(
+def rgb_to_bgr(
+  rgb_color: str,
+):
+  return rgb_color[4:6] + rgb_color[2:4] + rgb_color[0:2]
+
+def post_process_ass_subtitles(
   file_path: str,
 ):
   content = read_text_file(file_path, ENCODING)
 
-  if REPLACE_COLOR:
+  if SETTINGS['replace_color']:
     content = re.sub(
-      rf'(&H{HEX_DIGIT_PATTERN}{{0,2}}){LOOKUP_TEXT_COLOR}',
-      rf'\g<1>{PREFERRED_TEXT_COLOR}',
+      rf'(&H{HEX_DIGIT_PATTERN}{{0,2}}){rgb_to_bgr(SETTINGS["lookup_text_color"])}',
+      rf'\g<1>{rgb_to_bgr(SETTINGS["preferred_text_color"])}',
       content,
       flags = re.IGNORECASE
     )
 
   field_indices = build_ass_style_field_indices(content)
 
-  if FORCE_TEXT_COLOR:
+  if SETTINGS['force_text_color']:
     content = re.sub(
       ASS_STYLE_LINE_PATTERN,
       partial(
         replace_ass_style_colour,
         field_indices=field_indices,
         field_name=ASS_STYLE_PRIMARY_COLOUR_FIELD,
-        replacement_color=PREFERRED_TEXT_COLOR
+        replacement_color=rgb_to_bgr(SETTINGS['preferred_text_color'])
       ),
       content
     )
 
-  if FORCE_BORDER_COLOR:
+  if SETTINGS['force_border_color']:
     content = re.sub(
       ASS_STYLE_LINE_PATTERN,
       partial(
@@ -40,7 +46,7 @@ def post_process_ass_file(
         field_indices=field_indices,
         condition_field_name=ASS_STYLE_OUTLINE_FIELD,
         field_name=ASS_STYLE_OUTLINE_COLOUR_FIELD,
-        replacement_color=PREFERRED_BORDER_COLOR
+        replacement_color=rgb_to_bgr(SETTINGS['preferred_border_color'])
       ),
       content
     )

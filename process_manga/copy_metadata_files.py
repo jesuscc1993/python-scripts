@@ -54,7 +54,7 @@ def main():
   mtsound.notify()
   Prompt.enter_to_exit()
 
-def sanitize_name(name: str) -> str:
+def sanitize_name(name: str):
   return re.sub(r'\s*[\(\{]\d{1,3}[\)\}]\s*$', '', name).strip()
 
 def copy_file(src: str, dst_dir: str, file_name: str):

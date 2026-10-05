@@ -1,25 +1,12 @@
-REPLACE_COLOR = True
-FORCE_TEXT_COLOR = False
-FORCE_BORDER_COLOR = True
-STRIP_TAGS = True
-
-## BBGGRR
-LOOKUP_TEXT_COLOR = 'FFFFFF'
-PREFERRED_TEXT_COLOR = '55FFFF'
-PREFERRED_BORDER_COLOR = '000000'
-
+ENCODING = 'utf-8'
 HEX_DIGIT_PATTERN = r'[0-9A-Fa-f]'
 HEX_COLOUR_VALUE_PATTERN = rf'{HEX_DIGIT_PATTERN}{{6}}$'
 
-ENCODING = 'utf-8'
-HTML_FONT_ATTRIBUTES = ['color', 'face', 'size']
-
-STRIP_SETTINGS = {
-  'fonts': True,
-  'color': False,
-  'face': False,
-  'size': False,
-}
+HTML_FONT_ATTRIBUTES = [
+  'color',
+  'face',
+  'size'
+]
 
 VIDEO_EXTS = [
   '.mp4',

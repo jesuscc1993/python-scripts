@@ -2,8 +2,9 @@ import re
 
 from mtfs import read_text_file, write_text_file
 
-from _ass_common import post_process_ass_file
-from _constants import ASS_SUBTITLE_EXTS, ENCODING, HTML_FONT_ATTRIBUTES, STRIP_SETTINGS, SUBTITLE_EXTS_WITH_HTML_TAGS, STRIP_TAGS
+from _common_ass import post_process_ass_subtitles
+from _common_html import post_process_html_subtitles
+from _constants import ASS_SUBTITLE_EXTS, ENCODING, SUBTITLE_EXTS_WITH_HTML_TAGS
 
 def add_missing_spaces_to_subs_file(
   file_path: str,
@@ -25,26 +26,7 @@ def post_process_subs_file(
   file_path: str,
   ext: str,
 ):
-  if ext in SUBTITLE_EXTS_WITH_HTML_TAGS and STRIP_TAGS:
-    strip_tags_from_subs_file(file_path)
+  if ext in SUBTITLE_EXTS_WITH_HTML_TAGS:
+    post_process_html_subtitles(file_path)
   elif ext in ASS_SUBTITLE_EXTS:
-    post_process_ass_file(file_path)
-
-def strip_tags_from_subs_file(
-  file_path: str,
-):
-  content = read_text_file(file_path, ENCODING)
-  if STRIP_SETTINGS.get('fonts'):
-    content = re.sub(r'</?font\b[^>]*>', '', content, flags = re.IGNORECASE)
-  else:
-    for attr in HTML_FONT_ATTRIBUTES:
-      if STRIP_SETTINGS.get(attr):
-        content = strip_attribute(content, attr)
-
-  write_text_file(file_path, content, ENCODING)
-
-def strip_attribute(
-  content: str,
-  attribute: str,
-):
-  return re.sub(rf'\s*\b{attribute}=["\'][^"\']*["\']', '', content, flags = re.IGNORECASE)
+    post_process_ass_subtitles(file_path)
