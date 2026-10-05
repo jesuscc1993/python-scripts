@@ -1,7 +1,7 @@
 SETTINGS = {
   'replace_color': True,
   'force_text_color': False,
-  'force_border_color': True,
+  'force_border_color': False,
   'strip_settings': {
     'enabled': True,
 
