@@ -8,6 +8,14 @@ HTML_FONT_ATTRIBUTES = [
   'size'
 ]
 
+HTML_SUPPORTED_TAGS = [
+  'b',
+  'font',
+  'i',
+  's',
+  'u'
+]
+
 VIDEO_EXTS = [
   '.mp4',
   '.mkv'

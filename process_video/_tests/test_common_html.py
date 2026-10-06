@@ -7,7 +7,7 @@ from mtfs import read_text_file, write_text_file
 from unittest.mock import patch
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
-from _common_html import post_process_html_subtitles, replace_html_text_color, strip_html_tags, strip_attribute
+from _common_html import post_process_html_subtitles, replace_html_text_color, strip_html_tags, strip_attribute, strip_unsupported_tags
 from _constants import ENCODING
 from _settings import SETTINGS
 
@@ -29,6 +29,20 @@ class TestStripHtmlTags(unittest.TestCase):
     with patch.dict(SETTINGS['strip_settings'], { 'fonts': False, 'color': True }):
       result = strip_html_tags('<font color="red" size="1">Hi</font>')
     self.assertEqual(result, '<font size="1">Hi</font>')
+
+  def test_removes_span_tags_but_keeps_supported_tags(self):
+    result = strip_html_tags('<i>No.</i><span style="style2"> </i><i>Nada.</i>')
+    self.assertEqual(result, '<i>No.</i> </i><i>Nada.</i>')
+
+class TestStripUnsupportedTags(unittest.TestCase):
+  def test_removes_span_tags(self):
+    self.assertEqual(strip_unsupported_tags('<span style="style2">foo</span>'), 'foo')
+
+  def test_keeps_supported_tags(self):
+    self.assertEqual(strip_unsupported_tags('<b>foo</b><i>bar</i><u>baz</u><s>qux</s>'), '<b>foo</b><i>bar</i><u>baz</u><s>qux</s>')
+
+  def test_keeps_font_tags(self):
+    self.assertEqual(strip_unsupported_tags('<font color="red">foo</font>'), '<font color="red">foo</font>')
 
 class TestReplaceHtmlTextColor(unittest.TestCase):
   def test_replaces_white_color_with_hash_prefix(self):

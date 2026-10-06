@@ -2,7 +2,7 @@ import re
 
 from mtfs import read_text_file, write_text_file
 
-from _constants import ENCODING, HTML_FONT_ATTRIBUTES
+from _constants import ENCODING, HTML_FONT_ATTRIBUTES, HTML_SUPPORTED_TAGS
 from _settings import SETTINGS
 
 def post_process_html_subtitles(
@@ -30,6 +30,8 @@ def replace_html_text_color(
 def strip_html_tags(
   content: str,
 ):
+  content = strip_unsupported_tags(content)
+
   if SETTINGS['strip_settings'].get('fonts'):
     content = re.sub(r'</?font\b[^>]*>', '', content, flags = re.IGNORECASE)
   else:
@@ -49,3 +51,9 @@ def strip_attribute(
     content,
     flags = re.IGNORECASE
   )
+
+def strip_unsupported_tags(
+  content: str,
+):
+  supported_tags_pattern = '|'.join(HTML_SUPPORTED_TAGS)
+  return re.sub(rf'</?(?!(?:{supported_tags_pattern})\b)\w+\b[^>]*>', '', content, flags = re.IGNORECASE)
