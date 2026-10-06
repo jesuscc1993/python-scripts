@@ -43,12 +43,13 @@ def process_directory(
   mutagen_files = []
   ffmpeg_files = []
 
-  for f in os.listdir(dir_path):
-    ext = get_ext(f)
-    if ext in MUTAGEN_EXTS:
-      mutagen_files.append(os.path.join(dir_path, f))
-    elif ext in OTHER_VIDEO_EXTS:
-      ffmpeg_files.append(os.path.join(dir_path, f))
+  for root, _, files in os.walk(dir_path):
+    for f in files:
+      ext = get_ext(f)
+      if ext in MUTAGEN_EXTS:
+        mutagen_files.append(os.path.join(root, f))
+      elif ext in OTHER_VIDEO_EXTS:
+        ffmpeg_files.append(os.path.join(root, f))
 
   video_files = mutagen_files + ffmpeg_files
 
