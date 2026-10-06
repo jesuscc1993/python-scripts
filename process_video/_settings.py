@@ -1,4 +1,5 @@
 SETTINGS = {
+  'extract_to_folder': False,
   'replace_color': True,
   'force_text_color': False,
   'force_border_color': False,

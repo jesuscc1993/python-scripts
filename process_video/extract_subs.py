@@ -3,12 +3,12 @@ import os
 import subprocess
 import sys
 
-from _common import post_process_subs_file
-from _constants import SUBTITLE_EXTS_BY_CODEC, VIDEO_EXTS
 from mtlogger import logger
 from mtprompt import Prompt, to_path
 
-EXTRACT_TO_FOLDER = True
+from _common import post_process_subs_file
+from _constants import SUBTITLE_EXTS_BY_CODEC, VIDEO_EXTS
+from _settings import SETTINGS
 
 LANGUAGE = 'eng'
 SUBTITLES_PATH = 'subtitles'
@@ -56,7 +56,7 @@ def process_file(
     logger.trace(f'Skipping "{file_name}". Subtitles file already exists.\n')
     return
 
-  if EXTRACT_TO_FOLDER:
+  if SETTINGS['extract_to_folder']:
     output_path = in_folder_output_path
     os.makedirs(output_path, exist_ok = True)
   else:
