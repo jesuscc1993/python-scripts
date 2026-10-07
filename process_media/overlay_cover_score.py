@@ -7,6 +7,7 @@ import sys
 
 from PIL import Image, ImageDraw, ImageFont
 from concurrent.futures import ThreadPoolExecutor
+from mtattr import Attr
 from mtfont import Font
 from mtlogger import logger
 from mtprompt import Prompt, to_int
@@ -15,6 +16,7 @@ from xml.etree import ElementTree
 
 from _common import collect_dirs_to_process, tqdm_dim
 from _constants import COVER_NAMES
+from _settings import SETTINGS
 
 COMIC_INFO_FILENAME = 'ComicInfo.xml'
 DEFAULT_COVER_NAME = 'cover.jpg'
@@ -137,6 +139,9 @@ def process_cover(
   img = resize_cover(img, COVER_W, COVER_H)
   img = overlay_score(img, score, font)
   img.save(processed_cover_img_path, quality=100)
+
+  Attr.set_hidden(processed_cover_img_path, SETTINGS.get("hide_cover"))
+  Attr.set_hidden(cover_img_bak_path, SETTINGS.get("hide_cover_bak"))
 
   tqdm.write(logger.format_debug(f'Applied score overlay to "{os.path.basename(dir)}".'))
 
