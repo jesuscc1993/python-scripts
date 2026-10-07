@@ -18,6 +18,10 @@ Generates a cover image for each video, overlaying its runtime/resolution.
 
 Fixes invalid characters, adds missing spaces and strips tags from `.srt` files.
 
+### [delete_stale_subs.py](delete_stale_subs.py)
+
+Moves subtitle files to the Recycle Bin when no same-name `.mp4` or `.mkv` video exists beside them. Also checks subtitle files in a `subs` or `subtitles` subfolder against videos in its parent folder.
+
 ### [shift_subs.py](shift_subs.py)
 
 Shifts every timestamp in an `.srt` file by a given amount of milliseconds.
