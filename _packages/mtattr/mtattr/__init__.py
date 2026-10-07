@@ -38,6 +38,15 @@ class Attr:
       subprocess.run(['attrib'] + ['-' + attr for attr in attrs] + [path], check=True)
 
   @staticmethod
+  def set(
+    path: str,
+    attrs: list[AttrKey],
+    present: bool,
+  ):
+    fn = Attr.add if present else Attr.remove
+    fn(path, attrs)
+
+  @staticmethod
   def has(
     path: str,
     attr: AttrKey,
@@ -80,6 +89,27 @@ class Attr:
     path: str,
   ):
     return Attr.has(path, 'r')
+
+  @staticmethod
+  def set_hidden(
+    path: str,
+    present: bool,
+  ):
+    Attr.set(path, ['h'], present)
+
+  @staticmethod
+  def set_system(
+    path: str,
+    present: bool,
+  ):
+    Attr.set(path, ['s'], present)
+
+  @staticmethod
+  def set_readonly(
+    path: str,
+    present: bool,
+  ):
+    Attr.set(path, ['r'], present)
 
   @staticmethod
   def toggle_hidden(

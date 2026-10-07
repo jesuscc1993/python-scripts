@@ -4,7 +4,11 @@ import sys
 from pathlib import Path
 from mtlogger import logger
 
-test_dirs = sorted(Path('.').rglob('_tests'))
+test_dirs = sorted(
+  test_dir
+  for test_dir in Path('.').rglob('_tests')
+  if 'build' not in test_dir.parts
+)
 results = []
 
 for test_dir in test_dirs:
