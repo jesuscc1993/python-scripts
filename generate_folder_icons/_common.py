@@ -10,6 +10,7 @@ from mtfs import write_text_file
 from tqdm import tqdm
 
 from _constants import DEFAULT_ICO_SIZES, DESKTOP_INI_FILENAME, FALLBACK_ENCODING, HIDDEN_FILE_ATTRS, HIDDEN_SYSTEM_FILE_ATTRS, ICO_FILENAME, INI_ICON_KEY, INI_SHELL_SECTION, MAX_ICO_SIZE, PREFERRED_ENCODING
+from _settings import HIDE_GENERATED_ICONS
 
 def process_parent_folder(
   parent_folder_path: str,
@@ -108,6 +109,8 @@ def set_folder_icon(
 
     set_ini_icon(config, ico_path)
     write_ini(desktop_ini_path, config, encoding)
+    if HIDE_GENERATED_ICONS and os.path.splitext(ico_path)[1].lower() == '.ico':
+      Attr.hide(os.path.join(folder_path, ico_path))
     Attr.hide(desktop_ini_path)
     Attr.add(folder_path, ['s'])
 

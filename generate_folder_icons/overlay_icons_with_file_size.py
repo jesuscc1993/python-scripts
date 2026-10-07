@@ -203,8 +203,6 @@ def process_dir(
     if ico_path != os.path.basename(bak_ico_path):
       set_folder_icon(dir_path, new_ico_name, overwrite_existing=overwrite)
 
-    Attr.hide(new_ico_path)
-
   except Exception as ex:
     logger.error(f'Could not process "{dir_path}": {ex}')
 
