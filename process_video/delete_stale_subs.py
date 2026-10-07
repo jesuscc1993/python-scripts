@@ -69,9 +69,7 @@ def delete_stale_subtitle_files(
 
 	for file_path in stale_files:
 		send2trash(file_path)
-		logger.log(f'Moved "{file_path}" to the Recycle Bin.')
-
-	logger.success(f'Moved {len(stale_files)} stale subtitle files to the Recycle Bin.')
+		logger.success(f'Moved "{file_path}" to the Recycle Bin.')
 
 if __name__ == '__main__':
 	try:
