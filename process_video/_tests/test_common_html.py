@@ -7,7 +7,7 @@ from mtfs import read_text_file, write_text_file
 from unittest.mock import patch
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
-from _common_html import post_process_html_subtitles, replace_html_text_color, strip_html_tags, strip_attribute, strip_unsupported_tags
+from _common_html import post_process_html_subtitles, replace_html_text_color, force_html_font, strip_html_tags, strip_attribute, strip_unsupported_tags
 from _constants import ENCODING
 from _settings import SETTINGS
 
@@ -61,11 +61,32 @@ class TestStripAttribute(unittest.TestCase):
   def test_keeps_unchanged_when_attribute_not_present(self):
     self.assertEqual(strip_attribute('<font size="1">', 'color'), '<font size="1">')
 
+class TestForceHtmlFont(unittest.TestCase):
+  def test_replaces_existing_face_attribute(self):
+    with patch.dict(SETTINGS, { 'preferred_font': 'Quicksand SemiBold' }):
+      result = force_html_font('<font face="Arial">Hi</font>')
+    self.assertEqual(result, '<font face="Quicksand SemiBold">Hi</font>')
+
+  def test_inserts_face_attribute_when_missing(self):
+    with patch.dict(SETTINGS, { 'preferred_font': 'Quicksand SemiBold' }):
+      result = force_html_font('<font color="red">Hi</font>')
+    self.assertEqual(result, '<font color="red" face="Quicksand SemiBold">Hi</font>')
+
 class TestPostProcessHtmlSubtitles(unittest.TestCase):
   def test_strips_tags_and_replaces_color_in_one_pass(self):
     with patch.dict(SETTINGS, { 'replace_color': True }), patch.dict(SETTINGS['strip_settings'], { 'enabled': False }):
       result = process(post_process_html_subtitles, '<font color="#FFFFFF">Hi</font>')
     self.assertEqual(result, '<font color="#FFFF55">Hi</font>')
+
+  def test_forces_font_when_fonts_setting_disabled(self):
+    with patch.dict(SETTINGS, { 'force_font': True, 'preferred_font': 'Quicksand SemiBold' }), patch.dict(SETTINGS['strip_settings'], { 'enabled': False, 'fonts': False }):
+      result = process(post_process_html_subtitles, '<font face="Arial">Hi</font>')
+    self.assertEqual(result, '<font face="Quicksand SemiBold">Hi</font>')
+
+  def test_does_not_force_font_when_fonts_setting_enabled(self):
+    with patch.dict(SETTINGS, { 'force_font': True, 'preferred_font': 'Quicksand SemiBold' }), patch.dict(SETTINGS['strip_settings'], { 'enabled': False, 'fonts': True }):
+      result = process(post_process_html_subtitles, '<font face="Arial">Hi</font>')
+    self.assertEqual(result, '<font face="Arial">Hi</font>')
 
 if __name__ == '__main__':
   unittest.main()

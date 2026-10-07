@@ -14,6 +14,8 @@ def post_process_html_subtitles(
     content = strip_html_tags(content)
   if SETTINGS['replace_color'] and not SETTINGS['strip_settings']['color']:
     content = replace_html_text_color(content)
+  if SETTINGS['force_font'] and not SETTINGS['strip_settings']['fonts']:
+    content = force_html_font(content)
 
   write_text_file(file_path, content, ENCODING)
 
@@ -26,6 +28,19 @@ def replace_html_text_color(
     content,
     flags = re.IGNORECASE
   )
+
+def force_html_font(
+  content: str,
+):
+  def replace_face_attribute(
+    match: re.Match,
+  ):
+    tag = match.group(0)
+    if re.search(r'\bface=["\'][^"\']*["\']', tag, flags = re.IGNORECASE):
+      return re.sub(r'face=["\'][^"\']*["\']', f'face="{SETTINGS["preferred_font"]}"', tag, flags = re.IGNORECASE)
+    return tag[:-1] + f' face="{SETTINGS["preferred_font"]}">'
+
+  return re.sub(r'<font\b[^>]*>', replace_face_attribute, content, flags = re.IGNORECASE)
 
 def strip_html_tags(
   content: str,
