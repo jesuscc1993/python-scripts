@@ -23,7 +23,8 @@ def post_process_html_subtitles(
 def strip_conversion_leftovers(
   content: str,
 ):
-  return re.sub(r'\{\\an[1-9]\}', '', content)
+  # content = re.sub(r'\{\\an[1-9]\}', '', content)
+  return content
 
 def replace_html_text_color(
   content: str,
