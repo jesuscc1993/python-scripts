@@ -1,4 +1,6 @@
+import os
 import re
+import subprocess
 
 from mtfs import read_text_file, write_text_file
 
@@ -30,3 +32,16 @@ def post_process_subs_file(
     post_process_html_subtitles(file_path)
   elif ext in ASS_SUBTITLE_EXTS:
     post_process_ass_subtitles(file_path)
+
+def get_ext(
+  file_path: str,
+):
+  return os.path.splitext(file_path)[1].lower()
+
+def generate_tmp_dir(
+  dir_path: str,
+):
+  tmp_dir = os.path.join(dir_path, '.tmp')
+  os.makedirs(tmp_dir, exist_ok=True)
+  subprocess.run(['attrib', '+H', tmp_dir], capture_output=True)
+  return tmp_dir

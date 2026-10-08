@@ -14,6 +14,10 @@ Extracts embedded subtitle tracks from video files as `.srt`.
 
 Generates a cover image for each video, overlaying its runtime/resolution.
 
+### [remove_video_covers.py](remove_video_covers.py)
+
+Removes embedded cover images from supported video files.
+
 ### [postprocess_subs.py](postprocess_subs.py)
 
 Fixes invalid characters, adds missing spaces and strips tags from `.srt` files.

@@ -14,9 +14,8 @@ from mutagen.asf import ASF, ASFByteArrayAttribute
 from mutagen.mp4 import MP4, MP4Cover
 from tqdm import tqdm
 
-MUTAGEN_EXTS = {'.mp4', '.m4v', '.mov', '.wmv'}
-OTHER_VIDEO_EXTS = {'.mkv', '.avi'}
-COMBINED_VIDEO_EXTS = MUTAGEN_EXTS | OTHER_VIDEO_EXTS
+from _common import generate_tmp_dir, get_ext
+from _constants import MKV_EXT, MP4_EXTS, VIDEO_EXTS, WMV_EXT
 
 SCREENSHOT_SECS = 3 * 60
 
@@ -47,7 +46,7 @@ def main():
       process_directory(input_path, tmp_dir)
 
   finally:
-    shutil.rmtree(tmp_dir, ignore_errors = True)
+    shutil.rmtree(tmp_dir, ignore_errors=True)
 
   logger.hr()
   logger.log(f'Finished generating video covers for "{input_path}".')
@@ -56,18 +55,16 @@ def process_directory(
   dir_path: str,
   tmp_dir: str,
 ):
-  mutagen_files = []
-  ffmpeg_files = []
+  video_files = []
 
-  for root, _, files in os.walk(dir_path):
-    for f in files:
-      ext = get_ext(f)
-      if ext in MUTAGEN_EXTS:
-        mutagen_files.append(os.path.join(root, f))
-      elif ext in OTHER_VIDEO_EXTS:
-        ffmpeg_files.append(os.path.join(root, f))
+  for root, dirs, file_names in os.walk(dir_path):
+    if os.path.abspath(root) == os.path.abspath(tmp_dir):
+      dirs[:] = []
+      continue
 
-  video_files = mutagen_files + ffmpeg_files
+    for file_name in file_names:
+      if get_ext(file_name) in VIDEO_EXTS:
+        video_files.append(os.path.join(root, file_name))
 
   if not video_files:
     tqdm.write('No video files found.')
@@ -75,11 +72,6 @@ def process_directory(
 
   for file_path in tqdm(video_files, unit = 'file'):
     process_file(file_path, tmp_dir)
-
-def get_ext(
-  file_path: str,
-):
-  return os.path.splitext(file_path)[1].lower()
 
 def process_file(
   file_path: str,
@@ -111,8 +103,10 @@ def process_file(
     img = draw_stats_overlay(img, duration_secs, file_size)
     img.save(frame_path, 'JPEG', quality = 90)
 
-    if ext in MUTAGEN_EXTS:
-      embed_cover_mutagen(file_path, frame_path)
+    if ext in MP4_EXTS:
+      embed_mp4_cover(file_path, frame_path)
+    elif ext == WMV_EXT:
+      embed_asf_cover(file_path, frame_path)
     else:
       embed_cover_ffmpeg(file_path, frame_path, out_path, ext)
       os.replace(out_path, file_path)
@@ -121,28 +115,23 @@ def process_file(
   except Exception as ex:
     tqdm.write(f'  Failed: {ex}')
 
-def generate_tmp_dir(
-    dir_path: str,
-):
-  tmp_dir = os.path.join(dir_path, '.tmp')
-  os.makedirs(tmp_dir, exist_ok = True)
-  subprocess.run(['attrib', '+H', tmp_dir], capture_output = True)
-  return tmp_dir
-
-def embed_cover_mutagen(
+def embed_mp4_cover(
   file_path: str,
   cover_path: str,
 ):
   data = read_file(cover_path)
-  ext = get_ext(file_path)
-  if ext == '.wmv':
-    tags = ASF(file_path)
-    tags['WM/Picture'] = [ASFByteArrayAttribute(data)]
-    tags.save()
-  else:
-    tags = MP4(file_path)
-    tags['covr'] = [MP4Cover(data, MP4Cover.FORMAT_JPEG)]
-    tags.save()
+  tags = MP4(file_path)
+  tags['covr'] = [MP4Cover(data, MP4Cover.FORMAT_JPEG)]
+  tags.save()
+
+def embed_asf_cover(
+  file_path: str,
+  cover_path: str,
+):
+  data = read_file(cover_path)
+  tags = ASF(file_path)
+  tags['WM/Picture'] = [ASFByteArrayAttribute(data)]
+  tags.save()
 
 def embed_cover_ffmpeg(
   file_path: str,
@@ -150,7 +139,7 @@ def embed_cover_ffmpeg(
   output_path: str,
   ext: str,
 ):
-  if ext == '.mkv':
+  if ext == MKV_EXT:
     cmd = [
       'ffmpeg', '-y',
       '-loglevel', 'error',
