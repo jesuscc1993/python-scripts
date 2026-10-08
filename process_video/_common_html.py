@@ -9,6 +9,7 @@ def post_process_html_subtitles(
   file_path: str,
 ):
   content = read_text_file(file_path, ENCODING)
+  content = strip_conversion_leftovers(content)
 
   if SETTINGS['strip_settings']['enabled']:
     content = strip_html_tags(content)
@@ -18,6 +19,11 @@ def post_process_html_subtitles(
     content = force_html_font(content)
 
   write_text_file(file_path, content, ENCODING)
+
+def strip_conversion_leftovers(
+  content: str,
+):
+  return re.sub(r'\{\\an[1-9]\}', '', content)
 
 def replace_html_text_color(
   content: str,

@@ -7,7 +7,7 @@ from mtfs import read_text_file, write_text_file
 from unittest.mock import patch
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
-from _common_html import post_process_html_subtitles, replace_html_text_color, force_html_font, strip_html_tags, strip_attribute, strip_unsupported_tags
+from _common_html import post_process_html_subtitles, replace_html_text_color, force_html_font, strip_conversion_leftovers, strip_html_tags, strip_attribute, strip_unsupported_tags
 from _constants import ENCODING
 from _settings import SETTINGS
 
@@ -33,6 +33,15 @@ class TestStripHtmlTags(unittest.TestCase):
   def test_removes_span_tags_but_keeps_supported_tags(self):
     result = strip_html_tags('<i>No.</i><span style="style2"> </i><i>Nada.</i>')
     self.assertEqual(result, '<i>No.</i> </i><i>Nada.</i>')
+
+class TestStripConversionLeftovers(unittest.TestCase):
+  def test_removes_ass_alignment_overrides(self):
+    result = strip_conversion_leftovers(r'{\an7}Top left\N{\an9}Top right')
+    self.assertEqual(result, r'Top left\NTop right')
+
+  def test_keeps_text_and_non_alignment_braces(self):
+    content = 'Text {not an override} and {\\an0}'
+    self.assertEqual(strip_conversion_leftovers(content), content)
 
 class TestStripUnsupportedTags(unittest.TestCase):
   def test_removes_span_tags(self):
