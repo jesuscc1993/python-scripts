@@ -9,7 +9,7 @@ from PIL import Image, ImageDraw, ImageFont
 from mtfont import Font, SegoeFontName
 from mtfs import read_file
 from mtlogger import logger
-from mtprompt import Prompt, to_dir
+from mtprompt import Prompt, to_path
 from mutagen.asf import ASF, ASFByteArrayAttribute
 from mutagen.mp4 import MP4, MP4Cover
 from tqdm import tqdm
@@ -29,16 +29,32 @@ OVERLAY_BG_ALPHA = 192
 
 def main():
   if len(sys.argv) > 1:
-    input_path = to_dir(sys.argv[1])
+    input_path = to_path(sys.argv[1])
   else:
-    input_path = Prompt.dir(
-      'Enter the path to the directory containing the videos you want to process'
+    input_path = Prompt.path(
+      'Enter the path to a video file or directory'
     )
 
-  process_directory(input_path)
+  logger.log(f'Generating video covers for "{input_path}"...')
+  logger.hr()
+
+  try:
+    if os.path.isfile(input_path):
+      tmp_dir = generate_tmp_dir(os.path.dirname(input_path))
+      process_file(input_path, tmp_dir)
+    else:
+      tmp_dir = generate_tmp_dir(input_path)
+      process_directory(input_path, tmp_dir)
+
+  finally:
+    shutil.rmtree(tmp_dir, ignore_errors = True)
+
+  logger.hr()
+  logger.log(f'Finished generating video covers for "{input_path}".')
 
 def process_directory(
   dir_path: str,
+  tmp_dir: str,
 ):
   mutagen_files = []
   ffmpeg_files = []
@@ -57,18 +73,8 @@ def process_directory(
     tqdm.write('No video files found.')
     return
 
-  logger.debug('Generating video covers...')
-
-  tmp_dir = os.path.join(dir_path, '.tmp')
-  os.makedirs(tmp_dir, exist_ok = True)
-  subprocess.run(['attrib', '+H', tmp_dir], capture_output = True)
-
-  try:
-    for file_path in tqdm(video_files, unit = 'file'):
-      process_file(file_path, tmp_dir)
-  finally:
-    shutil.rmtree(tmp_dir, ignore_errors = True)
-    logger.success('Finished generating video covers.')
+  for file_path in tqdm(video_files, unit = 'file'):
+    process_file(file_path, tmp_dir)
 
 def get_ext(
   file_path: str,
@@ -114,6 +120,14 @@ def process_file(
     tqdm.write(f'  Embedded cover into: {name}')
   except Exception as ex:
     tqdm.write(f'  Failed: {ex}')
+
+def generate_tmp_dir(
+    dir_path: str,
+):
+  tmp_dir = os.path.join(dir_path, '.tmp')
+  os.makedirs(tmp_dir, exist_ok = True)
+  subprocess.run(['attrib', '+H', tmp_dir], capture_output = True)
+  return tmp_dir
 
 def embed_cover_mutagen(
   file_path: str,

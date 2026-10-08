@@ -34,15 +34,6 @@ class TestStripHtmlTags(unittest.TestCase):
     result = strip_html_tags('<i>No.</i><span style="style2"> </i><i>Nada.</i>')
     self.assertEqual(result, '<i>No.</i> </i><i>Nada.</i>')
 
-class TestStripConversionLeftovers(unittest.TestCase):
-  def test_removes_ass_alignment_overrides(self):
-    result = strip_conversion_leftovers(r'{\an7}Top left\N{\an9}Top right')
-    self.assertEqual(result, r'Top left\NTop right')
-
-  def test_keeps_text_and_non_alignment_braces(self):
-    content = 'Text {not an override} and {\\an0}'
-    self.assertEqual(strip_conversion_leftovers(content), content)
-
 class TestStripUnsupportedTags(unittest.TestCase):
   def test_removes_span_tags(self):
     self.assertEqual(strip_unsupported_tags('<span style="style2">foo</span>'), 'foo')

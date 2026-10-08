@@ -22,7 +22,7 @@ Fixes invalid characters, adds missing spaces and strips tags from `.srt` files.
 
 Moves subtitle files to the Recycle Bin when no same-name `.mp4` or `.mkv` video exists beside them. Also checks subtitle files in a `subs` or `subtitles` subfolder against videos in its parent folder.
 
-### [conver_to_srt.py](conver_to_srt.py)
+### [convert_to_srt.py](convert_to_srt.py)
 
 Converts supported non-SRT subtitle files to `.srt` with FFmpeg and moves the original to the Recycle Bin after successful conversion. Existing `.srt` files are not overwritten.
 
