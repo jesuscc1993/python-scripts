@@ -3,7 +3,7 @@ import re
 from functools import partial
 from mtfs import read_text_file, write_text_file
 
-from _constants import ASS_STYLE_BACK_COLOUR_FIELD, ASS_STYLE_FONTNAME_FIELD, ASS_STYLE_FORMAT_LINE_PATTERN, ASS_STYLE_LINE_PATTERN, ASS_STYLE_OUTLINE_COLOUR_FIELD, ASS_STYLE_OUTLINE_FIELD, ASS_STYLE_PRIMARY_COLOUR_FIELD, ENCODING, HEX_COLOUR_VALUE_PATTERN, HEX_DIGIT_PATTERN
+from _constants import ASS_STYLE_BACK_COLOUR_FIELD, ASS_STYLE_FONTNAME_FIELD, ASS_STYLE_FORMAT_LINE_PATTERN, ASS_STYLE_LINE_PATTERN, ASS_STYLE_OUTLINE_COLOUR_FIELD, ASS_STYLE_OUTLINE_FIELD, ASS_STYLE_PRIMARY_COLOUR_FIELD, ASS_STYLE_SHADOW_FIELD, ENCODING, HEX_COLOUR_VALUE_PATTERN, HEX_DIGIT_PATTERN
 from _settings import SETTINGS
 
 def rgb_to_bgr(
@@ -103,20 +103,7 @@ def post_process_ass_subtitles(
       content
     )
 
-  if SETTINGS['replace_outline_thickness']:
-    content = re.sub(
-      ASS_STYLE_LINE_PATTERN,
-      partial(
-        replace_ass_style_field,
-        field_indices=field_indices,
-        field_name=ASS_STYLE_OUTLINE_FIELD,
-        replacement_value=SETTINGS['preferred_outline_thickness'],
-        lookup_values=SETTINGS['lookup_outline_thicknesses']
-      ),
-      content
-    )
-
-  if SETTINGS['force_outline_thickness']:
+  if SETTINGS['force_outline_thickness_and_shadow_offset']:
     content = re.sub(
       ASS_STYLE_LINE_PATTERN,
       partial(
@@ -127,6 +114,17 @@ def post_process_ass_subtitles(
       ),
       content
     )
+    content = re.sub(
+      ASS_STYLE_LINE_PATTERN,
+      partial(
+        replace_ass_style_field,
+        field_indices=field_indices,
+        field_name=ASS_STYLE_SHADOW_FIELD,
+        replacement_value=SETTINGS['preferred_shadow_offset']
+      ),
+      content
+    )
+    content = set_scaled_border_and_shadow_off(content)
 
   if SETTINGS['force_font']:
     content = re.sub(
@@ -141,6 +139,39 @@ def post_process_ass_subtitles(
     )
 
   write_text_file(file_path, content, ENCODING)
+
+def set_scaled_border_and_shadow_off(
+  content: str,
+):
+  lines = content.splitlines(keepends=True)
+  line_ending = '\r\n' if '\r\n' in content else '\n'
+  script_info_index = next(
+    (index for index, line in enumerate(lines) if line.strip().casefold() == '[script info]'),
+    None
+  )
+
+  if script_info_index is None:
+    return f'[Script Info]{line_ending}ScaledBorderAndShadow: no{line_ending}{line_ending}{content}'
+
+  section_end_index = next(
+    (index for index in range(script_info_index + 1, len(lines)) if lines[index].strip().startswith('[')),
+    len(lines)
+  )
+  setting_index = next(
+    (index for index in range(script_info_index + 1, section_end_index) if re.match(r'\s*ScaledBorderAndShadow\s*:', lines[index], flags=re.IGNORECASE)),
+    None
+  )
+
+  if setting_index is None:
+    lines.insert(script_info_index + 1, f'ScaledBorderAndShadow: no{line_ending}')
+  else:
+    original_line = lines[setting_index]
+    ending = '\r\n' if original_line.endswith('\r\n') else '\n' if original_line.endswith('\n') else ''
+    setting_name = original_line.split(':', 1)[0].strip()
+    indentation = original_line[:len(original_line) - len(original_line.lstrip())]
+    lines[setting_index] = f'{indentation}{setting_name}: no{ending}'
+
+  return ''.join(lines)
 
 def build_ass_style_field_indices(
   content: str,

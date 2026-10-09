@@ -78,17 +78,6 @@ class TestPostProcessAssFile(unittest.TestCase):
     self.assertIn('Style: Matched,Quicksand,20,', result)
     self.assertIn('Style: Unmatched,Times New Roman,20,', result)
 
-  def test_replaces_outline_thickness_only_for_lookup_values(self):
-    content = (
-      'Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding\n'
-      'Style: Matched,Arial,20,&H00FFFFFF,&H000000FF,&H00445566,&H00000000,0,0,0,0,100,100,0,0,1,2,1,8,10,10,20,1\n'
-      'Style: Unmatched,Arial,20,&H00FFFFFF,&H000000FF,&H00445566,&H00000000,0,0,0,0,100,100,0,0,1,4,1,8,10,10,20,1\n'
-    )
-    with patch.dict(SETTINGS, { 'replace_foreground_color': False, 'replace_border_color': False, 'replace_background_color': False, 'replace_outline_thickness': True, 'lookup_outline_thicknesses': ['2'], 'preferred_outline_thickness': '6', 'force_outline_thickness': False, 'force_border_color': False, 'force_foreground_color': False, 'force_font': False }):
-      result = process(post_process_ass_subtitles, content)
-    self.assertIn('1,6,1,8,', result)
-    self.assertIn('1,4,1,8,', result)
-
   def test_forces_border_color_only_when_outline_width_positive(self):
     content = (
       'Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding\n'
@@ -109,23 +98,42 @@ class TestPostProcessAssFile(unittest.TestCase):
       result = process(post_process_ass_subtitles, content)
     self.assertIn('&H00445566', result)
 
-  def test_forces_outline_thickness_when_enabled(self):
+  def test_forces_outline_thickness_and_shadow_offset_and_disables_scaling(self):
     content = (
+      '[Script Info]\n'
+      'ScaledBorderAndShadow: yes\n'
+      '\n'
+      '[V4+ Styles]\n'
       'Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding\n'
       'Style: Default,Arial,20,&H00FFFFFF,&H000000FF,&H00445566,&H00000000,0,0,0,0,100,100,0,0,1,4,1,8,10,10,20,1\n'
     )
-    with patch.dict(SETTINGS, { 'replace_foreground_color': False, 'force_border_color': False, 'force_outline_thickness': True, 'preferred_outline_thickness': '2', 'force_foreground_color': False, 'force_font': False }):
+    with patch.dict(SETTINGS, { 'replace_foreground_color': False, 'replace_border_color': False, 'replace_background_color': False, 'force_border_color': False, 'force_outline_thickness_and_shadow_offset': True, 'preferred_outline_thickness': '2', 'preferred_shadow_offset': '4', 'force_foreground_color': False, 'force_font': False }):
       result = process(post_process_ass_subtitles, content)
-    self.assertIn(',1,2,1,8,', result)
+    self.assertIn('ScaledBorderAndShadow: no', result)
+    self.assertIn('1,2,4,8,', result)
 
-  def test_does_not_force_outline_thickness_when_disabled(self):
+  def test_does_not_change_outline_shadow_or_scaling_when_disabled(self):
     content = (
+      '[Script Info]\n'
+      'ScaledBorderAndShadow: yes\n'
+      '\n'
+      '[V4+ Styles]\n'
       'Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding\n'
       'Style: Default,Arial,20,&H00FFFFFF,&H000000FF,&H00445566,&H00000000,0,0,0,0,100,100,0,0,1,4,1,8,10,10,20,1\n'
     )
-    with patch.dict(SETTINGS, { 'replace_foreground_color': False, 'force_border_color': False, 'force_outline_thickness': False, 'force_foreground_color': False, 'force_font': False }):
+    with patch.dict(SETTINGS, { 'replace_foreground_color': False, 'replace_border_color': False, 'replace_background_color': False, 'force_border_color': False, 'force_outline_thickness_and_shadow_offset': False, 'force_foreground_color': False, 'force_font': False }):
       result = process(post_process_ass_subtitles, content)
-    self.assertIn(',1,4,1,8,', result)
+    self.assertEqual(result, content)
+
+  def test_adds_script_info_scaling_setting_when_missing(self):
+    content = (
+      '[V4+ Styles]\n'
+      'Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding\n'
+      'Style: Default,Arial,20,&H00112233,&H000000FF,&H00445566,&H00112233,0,0,0,0,100,100,0,0,1,4,1,8,10,10,20,1\n'
+    )
+    with patch.dict(SETTINGS, { 'replace_foreground_color': False, 'replace_border_color': False, 'replace_background_color': False, 'force_border_color': False, 'force_outline_thickness_and_shadow_offset': True, 'preferred_outline_thickness': '2', 'preferred_shadow_offset': '4', 'force_foreground_color': False, 'force_font': False }):
+      result = process(post_process_ass_subtitles, content)
+    self.assertTrue(result.startswith('[Script Info]\nScaledBorderAndShadow: no\n\n[V4+ Styles]'))
 
   def test_forces_foreground_color_unconditionally_when_enabled(self):
     content = (
