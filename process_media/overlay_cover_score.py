@@ -141,18 +141,32 @@ def process_cover(
   score: int,
   font: ImageFont.FreeTypeFont,
 ):
-  if not os.path.exists(cover_img_bak_path):
-    shutil.copy(cover_img_path, cover_img_bak_path)
-    os.remove(cover_img_path)
+  try:
+    processed_cover_img_path = os.path.join(dir, DEFAULT_COVER_NAME)
+    Attr.show(processed_cover_img_path)
 
-  processed_cover_img_path = os.path.join(dir, DEFAULT_COVER_NAME)
-  img = Image.open(cover_img_bak_path).convert('RGBA')
-  img = resize_cover(img, COVER_W, COVER_H)
-  img = overlay_score(img, score, font)
-  img.save(processed_cover_img_path, quality=100)
+    if processed_cover_img_path:
+      Attr.show(processed_cover_img_path)
+    if cover_img_bak_path:
+      Attr.show(cover_img_bak_path)
 
-  Attr.set_hidden(processed_cover_img_path, SETTINGS.get("hide_cover"))
-  Attr.set_hidden(cover_img_bak_path, SETTINGS.get("hide_cover_bak"))
+    if not os.path.exists(cover_img_bak_path):
+      shutil.copy(cover_img_path, cover_img_bak_path)
+    if (
+      cover_img_path and
+      cover_img_path != processed_cover_img_path and
+      os.path.exists(cover_img_path)
+    ):
+      os.remove(cover_img_path)
+
+    img = Image.open(cover_img_bak_path).convert('RGBA')
+    img = resize_cover(img, COVER_W, COVER_H)
+    img = overlay_score(img, score, font)
+    img.save(processed_cover_img_path, quality=100)
+
+  finally:
+    Attr.set_hidden(processed_cover_img_path, SETTINGS.get("hide_cover"))
+    Attr.set_hidden(cover_img_bak_path, SETTINGS.get("hide_cover_bak"))
 
   tqdm.write(logger.format_debug(f'Applied score overlay to "{os.path.basename(dir)}".'))
 
