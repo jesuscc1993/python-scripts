@@ -36,7 +36,7 @@ class TestPostProcessAssFile(unittest.TestCase):
 
   def test_replaces_multiple_foreground_colors_when_enabled(self):
     content = r'Dialogue: 0,0:00:01.00,0:00:02.00,Default,,0,0,0,,{\c&HFFFFFF&}foo{\c&H332211&}bar'
-    with patch.dict(SETTINGS, { 'replace_foreground_color': True, 'lookup_foreground_colors': ['FFFFFF', '112233'], 'force_border_color': False, 'force_foreground_color': False, 'force_font': False }):
+    with patch.dict(SETTINGS, { 'replace_foreground_color': True, 'lookup_foreground_colors': ['FFFFFF', '112233'], 'force_border_color': False, 'force_foreground_color': False, 'force_outline_thickness_and_shadow_offset': False, 'force_font': False }):
       result = process(post_process_ass_subtitles, content)
     self.assertEqual(result, r'Dialogue: 0,0:00:01.00,0:00:02.00,Default,,0,0,0,,{\c&H55FFFF&}foo{\c&H55FFFF&}bar')
 
@@ -155,7 +155,7 @@ class TestPostProcessAssFile(unittest.TestCase):
 
   def test_skips_force_colors_when_format_line_is_missing(self):
     content = 'Style: Default,Arial,20,&H00112233,&H000000FF,&H00445566,&H00000000,0,0,0,0,100,100,0,0,1,2,1,8,10,10,20,1\n'
-    with patch.dict(SETTINGS, { 'replace_foreground_color': False, 'force_border_color': True, 'force_foreground_color': True, 'force_font': False }):
+    with patch.dict(SETTINGS, { 'replace_foreground_color': False, 'force_border_color': True, 'force_foreground_color': True, 'force_outline_thickness_and_shadow_offset': False, 'force_font': False }):
       result = process(post_process_ass_subtitles, content)
     self.assertEqual(result, content)
 
