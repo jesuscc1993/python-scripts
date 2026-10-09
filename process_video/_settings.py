@@ -32,5 +32,5 @@ SETTINGS = {
   'preferred_border_color': '000000',
   'preferred_font': 'Quicksand SemiBold',
   'preferred_foreground_color': 'FFFF55',
-  'preferred_outline_thickness': '6',
+  'preferred_outline_thickness': '2',
 }
