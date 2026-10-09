@@ -31,7 +31,7 @@ def replace_html_foreground_color(
 ):
   for lookup_foreground_color in SETTINGS['lookup_foreground_colors']:
     content = re.sub(
-      rf'(color=["\'])#?{re.escape(lookup_foreground_color)}(["\'])',
+      rf'(color=["\'])#?{re.escape(lookup_foreground_color[:6])}(?:[0-9A-Fa-f]{{2}})?(["\'])',
       rf'\g<1>#{SETTINGS["preferred_foreground_color"]}\g<2>',
       content,
       flags = re.IGNORECASE

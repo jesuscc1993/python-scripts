@@ -1,4 +1,6 @@
-# NOTE: outline thickness and shadow offset are combined into a single setting
+# NOTES:
+# * background color applies both to the background and shadow.
+# * outline thickness and shadow offset are combined into a single setting
 # because they depend on the combination of the ScaledBorderAndShadow flag and
 # the video resolution.
 
@@ -15,25 +17,25 @@ SETTINGS = {
   },
 
   'replace_background_color': True,
-  'replace_border_color': True,
   'replace_font': False,
   'replace_foreground_color': True,
+  'replace_outline_color': False,
 
-  'force_background_color': False,
-  'force_border_color': False,
+  'force_background_color': True,
   'force_font': True,
   'force_foreground_color': False,
+  'force_outline_color': False,
   'force_outline_thickness_and_shadow_offset': True,
 
-  'lookup_background_colors': ['000040'],
-  'lookup_border_colors': ['000040'],
+  'lookup_background_colors': ['000040FF'],
   'lookup_fonts': [],
-  'lookup_foreground_colors': ['FFFFFF'],
+  'lookup_foreground_colors': ['FFFFFFFF'],
+  'lookup_outline_colors': ['000040FF'],
 
-  'preferred_background_color': '000000',
-  'preferred_border_color': '000000',
+  'preferred_background_color': '000000FF',
   'preferred_font': 'Quicksand SemiBold',
-  'preferred_foreground_color': 'FFFF55',
+  'preferred_foreground_color': 'FFFF55FF',
+  'preferred_outline_color': '000000FF',
   'preferred_outline_thickness': '5.0',
   'preferred_shadow_offset': '2.5',
 }

@@ -46,10 +46,15 @@ class TestStripUnsupportedTags(unittest.TestCase):
 
 class TestReplaceHtmlForegroundColor(unittest.TestCase):
   def test_replaces_white_color_with_hash_prefix(self):
-    self.assertEqual(replace_html_foreground_color('<font color="#FFFFFF">Hi</font>'), '<font color="#FFFF55">Hi</font>')
+    self.assertEqual(replace_html_foreground_color('<font color="#FFFFFF">Hi</font>'), '<font color="#FFFF55FF">Hi</font>')
 
   def test_replaces_white_color_without_hash_prefix(self):
-    self.assertEqual(replace_html_foreground_color('<font color="FFFFFF">Hi</font>'), '<font color="#FFFF55">Hi</font>')
+    self.assertEqual(replace_html_foreground_color('<font color="FFFFFF">Hi</font>'), '<font color="#FFFF55FF">Hi</font>')
+
+  def test_replaces_color_with_configured_alpha(self):
+    with patch.dict(SETTINGS, { 'preferred_foreground_color': '12345680' }):
+      result = replace_html_foreground_color('<font color="#FFFFFF">Hi</font>')
+    self.assertEqual(result, '<font color="#12345680">Hi</font>')
 
   def test_keeps_unchanged_when_color_is_not_white(self):
     self.assertEqual(replace_html_foreground_color('<font color="#123456">Hi</font>'), '<font color="#123456">Hi</font>')
@@ -57,7 +62,7 @@ class TestReplaceHtmlForegroundColor(unittest.TestCase):
   def test_replaces_multiple_lookup_colors(self):
     with patch.dict(SETTINGS, { 'lookup_foreground_colors': ['FFFFFF', '112233'] }):
       result = replace_html_foreground_color('<font color="#FFFFFF">foo</font><font color="112233">bar</font>')
-    self.assertEqual(result, '<font color="#FFFF55">foo</font><font color="#FFFF55">bar</font>')
+    self.assertEqual(result, '<font color="#FFFF55FF">foo</font><font color="#FFFF55FF">bar</font>')
 
 class TestStripAttribute(unittest.TestCase):
   def test_removes_matching_attribute(self):
@@ -81,7 +86,7 @@ class TestPostProcessHtmlSubtitles(unittest.TestCase):
   def test_strips_tags_and_replaces_color_in_one_pass(self):
     with patch.dict(SETTINGS, { 'replace_foreground_color': True }), patch.dict(SETTINGS['strip_settings'], { 'enabled': False }):
       result = process(post_process_html_subtitles, '<font color="#FFFFFF">Hi</font>')
-    self.assertEqual(result, '<font color="#FFFF55">Hi</font>')
+    self.assertEqual(result, '<font color="#FFFF55FF">Hi</font>')
 
   def test_forces_font_when_fonts_setting_disabled(self):
     with patch.dict(SETTINGS, { 'force_font': True, 'preferred_font': 'Quicksand SemiBold' }), patch.dict(SETTINGS['strip_settings'], { 'enabled': False, 'fonts': False }):

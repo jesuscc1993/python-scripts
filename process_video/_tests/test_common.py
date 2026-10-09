@@ -64,7 +64,7 @@ class TestPostProcessSubsFile(unittest.TestCase):
   def test_replaces_white_font_color_for_srt_ext_when_replace_foreground_color_enabled(self):
     with patch.dict(SETTINGS, { 'replace_foreground_color': True }), patch.dict(SETTINGS['strip_settings'], { 'enabled': False }):
       result = process(post_process_subs_file, '<font color="#FFFFFF">Hi</font>', '.srt')
-    self.assertEqual(result, '<font color="#FFFF55">Hi</font>')
+    self.assertEqual(result, '<font color="#FFFF55FF">Hi</font>')
 
   def test_keeps_white_font_color_for_srt_ext_when_replace_foreground_color_disabled(self):
     with patch.dict(SETTINGS, { 'replace_foreground_color': False }), patch.dict(SETTINGS['strip_settings'], { 'enabled': False }):
@@ -78,9 +78,9 @@ class TestPostProcessSubsFile(unittest.TestCase):
 
   def test_runs_ass_post_processing_for_ass_ext(self):
     content = r'Dialogue: 0,0:00:01.00,0:00:02.00,Default,,0,0,0,,{\c&HFFFFFF&}Hello'
-    with patch.dict(SETTINGS, { 'replace_foreground_color': True, 'force_border_color': False, 'force_foreground_color': False }):
+    with patch.dict(SETTINGS, { 'replace_foreground_color': True, 'force_outline_color': False, 'force_foreground_color': False }):
       result = process(post_process_subs_file, content, '.ass')
-    self.assertIn(r'{\c&H55FFFF&}', result)
+    self.assertIn(r'{\c&H0055FFFF&}', result)
 
   def test_ignores_unsupported_ext(self):
     content = '<font color="#FFFFFF">Hi</font>'
