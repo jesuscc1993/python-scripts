@@ -20,7 +20,7 @@ SETTINGS = {
   'force_border_color': False,
   'force_font': True,
   'force_foreground_color': False,
-  'force_outline_thickness': True,
+  'force_outline_thickness': False,
 
   'lookup_background_colors': ['000040'],
   'lookup_border_colors': ['000040'],
@@ -32,5 +32,5 @@ SETTINGS = {
   'preferred_border_color': '000000',
   'preferred_font': 'Quicksand SemiBold',
   'preferred_foreground_color': 'FFFF55',
-  'preferred_outline_thickness': '2',
+  'preferred_outline_thickness': '6',
 }
