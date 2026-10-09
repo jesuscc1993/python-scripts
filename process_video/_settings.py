@@ -23,7 +23,7 @@ SETTINGS = {
   'force_border_color': False,
   'force_font': True,
   'force_foreground_color': False,
-  'force_outline_thickness_and_shadow_offset': False,
+  'force_outline_thickness_and_shadow_offset': True,
 
   'lookup_background_colors': ['000040'],
   'lookup_border_colors': ['000040'],
