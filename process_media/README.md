@@ -10,10 +10,10 @@ Collection of scripts that process media (anime or manga).<br>
 
 Downsizes each folder's cover image to fit within a maximum size.
 
+### [fetch_and_suffix_score.py](fetch_and_suffix_score.py)
+
+Searches MyAnimeList and appends the score to the end of each folder's name.
+
 ### [overlay_cover_score.py](overlay_cover_score.py)
 
 Overlays the MAL score onto each folder's cover image.
-
-### [suffix_score.py](suffix_score.py)
-
-Searches MyAnimeList and appends the score to the end of each folder's name.
