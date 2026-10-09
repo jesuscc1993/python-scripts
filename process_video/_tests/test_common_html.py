@@ -7,7 +7,7 @@ from mtfs import read_text_file, write_text_file
 from unittest.mock import patch
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
-from _common_html import post_process_html_subtitles, replace_html_text_color, force_html_font, strip_conversion_leftovers, strip_html_tags, strip_attribute, strip_unsupported_tags
+from _common_html import post_process_html_subtitles, replace_html_foreground_color, force_html_font, strip_conversion_leftovers, strip_html_tags, strip_attribute, strip_unsupported_tags
 from _constants import ENCODING
 from _settings import SETTINGS
 
@@ -44,15 +44,20 @@ class TestStripUnsupportedTags(unittest.TestCase):
   def test_keeps_font_tags(self):
     self.assertEqual(strip_unsupported_tags('<font color="red">foo</font>'), '<font color="red">foo</font>')
 
-class TestReplaceHtmlTextColor(unittest.TestCase):
+class TestReplaceHtmlForegroundColor(unittest.TestCase):
   def test_replaces_white_color_with_hash_prefix(self):
-    self.assertEqual(replace_html_text_color('<font color="#FFFFFF">Hi</font>'), '<font color="#FFFF55">Hi</font>')
+    self.assertEqual(replace_html_foreground_color('<font color="#FFFFFF">Hi</font>'), '<font color="#FFFF55">Hi</font>')
 
   def test_replaces_white_color_without_hash_prefix(self):
-    self.assertEqual(replace_html_text_color('<font color="FFFFFF">Hi</font>'), '<font color="#FFFF55">Hi</font>')
+    self.assertEqual(replace_html_foreground_color('<font color="FFFFFF">Hi</font>'), '<font color="#FFFF55">Hi</font>')
 
   def test_keeps_unchanged_when_color_is_not_white(self):
-    self.assertEqual(replace_html_text_color('<font color="#123456">Hi</font>'), '<font color="#123456">Hi</font>')
+    self.assertEqual(replace_html_foreground_color('<font color="#123456">Hi</font>'), '<font color="#123456">Hi</font>')
+
+  def test_replaces_multiple_lookup_colors(self):
+    with patch.dict(SETTINGS, { 'lookup_foreground_colors': ['FFFFFF', '112233'] }):
+      result = replace_html_foreground_color('<font color="#FFFFFF">foo</font><font color="112233">bar</font>')
+    self.assertEqual(result, '<font color="#FFFF55">foo</font><font color="#FFFF55">bar</font>')
 
 class TestStripAttribute(unittest.TestCase):
   def test_removes_matching_attribute(self):
@@ -74,7 +79,7 @@ class TestForceHtmlFont(unittest.TestCase):
 
 class TestPostProcessHtmlSubtitles(unittest.TestCase):
   def test_strips_tags_and_replaces_color_in_one_pass(self):
-    with patch.dict(SETTINGS, { 'replace_color': True }), patch.dict(SETTINGS['strip_settings'], { 'enabled': False }):
+    with patch.dict(SETTINGS, { 'replace_foreground_color': True }), patch.dict(SETTINGS['strip_settings'], { 'enabled': False }):
       result = process(post_process_html_subtitles, '<font color="#FFFFFF">Hi</font>')
     self.assertEqual(result, '<font color="#FFFF55">Hi</font>')
 

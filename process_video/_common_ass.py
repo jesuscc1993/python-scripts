@@ -3,7 +3,7 @@ import re
 from functools import partial
 from mtfs import read_text_file, write_text_file
 
-from _constants import ASS_STYLE_FONTNAME_FIELD, ASS_STYLE_FORMAT_LINE_PATTERN, ASS_STYLE_LINE_PATTERN, ASS_STYLE_OUTLINE_COLOUR_FIELD, ASS_STYLE_OUTLINE_FIELD, ASS_STYLE_PRIMARY_COLOUR_FIELD, ENCODING, HEX_COLOUR_VALUE_PATTERN, HEX_DIGIT_PATTERN
+from _constants import ASS_STYLE_BACK_COLOUR_FIELD, ASS_STYLE_FONTNAME_FIELD, ASS_STYLE_FORMAT_LINE_PATTERN, ASS_STYLE_LINE_PATTERN, ASS_STYLE_OUTLINE_COLOUR_FIELD, ASS_STYLE_OUTLINE_FIELD, ASS_STYLE_PRIMARY_COLOUR_FIELD, ENCODING, HEX_COLOUR_VALUE_PATTERN, HEX_DIGIT_PATTERN
 from _settings import SETTINGS
 
 def rgb_to_bgr(
@@ -16,24 +16,51 @@ def post_process_ass_subtitles(
 ):
   content = read_text_file(file_path, ENCODING)
 
-  if SETTINGS['replace_color']:
-    content = re.sub(
-      rf'(&H{HEX_DIGIT_PATTERN}{{0,2}}){rgb_to_bgr(SETTINGS["lookup_text_color"])}',
-      rf'\g<1>{rgb_to_bgr(SETTINGS["preferred_text_color"])}',
-      content,
-      flags = re.IGNORECASE
-    )
+  if SETTINGS['replace_foreground_color']:
+    for lookup_foreground_color in SETTINGS['lookup_foreground_colors']:
+      content = re.sub(
+        rf'(&H{HEX_DIGIT_PATTERN}{{0,2}}){rgb_to_bgr(lookup_foreground_color)}',
+        rf'\g<1>{rgb_to_bgr(SETTINGS["preferred_foreground_color"])}',
+        content,
+        flags = re.IGNORECASE
+      )
 
   field_indices = build_ass_style_field_indices(content)
 
-  if SETTINGS['force_text_color']:
+  if SETTINGS['replace_border_color']:
+    content = re.sub(
+      ASS_STYLE_LINE_PATTERN,
+      partial(
+        replace_ass_style_colour,
+        field_indices=field_indices,
+        field_name=ASS_STYLE_OUTLINE_COLOUR_FIELD,
+        replacement_color=rgb_to_bgr(SETTINGS['preferred_border_color']),
+        lookup_colors=SETTINGS['lookup_border_colors']
+      ),
+      content
+    )
+
+  if SETTINGS['replace_background_color']:
+    content = re.sub(
+      ASS_STYLE_LINE_PATTERN,
+      partial(
+        replace_ass_style_colour,
+        field_indices=field_indices,
+        field_name=ASS_STYLE_BACK_COLOUR_FIELD,
+        replacement_color=rgb_to_bgr(SETTINGS['preferred_background_color']),
+        lookup_colors=SETTINGS['lookup_background_colors']
+      ),
+      content
+    )
+
+  if SETTINGS['force_foreground_color']:
     content = re.sub(
       ASS_STYLE_LINE_PATTERN,
       partial(
         replace_ass_style_colour,
         field_indices=field_indices,
         field_name=ASS_STYLE_PRIMARY_COLOUR_FIELD,
-        replacement_color=rgb_to_bgr(SETTINGS['preferred_text_color'])
+        replacement_color=rgb_to_bgr(SETTINGS['preferred_foreground_color'])
       ),
       content
     )
@@ -47,6 +74,56 @@ def post_process_ass_subtitles(
         condition_field_name=ASS_STYLE_OUTLINE_FIELD,
         field_name=ASS_STYLE_OUTLINE_COLOUR_FIELD,
         replacement_color=rgb_to_bgr(SETTINGS['preferred_border_color'])
+      ),
+      content
+    )
+
+  if SETTINGS['force_background_color']:
+    content = re.sub(
+      ASS_STYLE_LINE_PATTERN,
+      partial(
+        replace_ass_style_colour,
+        field_indices=field_indices,
+        field_name=ASS_STYLE_BACK_COLOUR_FIELD,
+        replacement_color=rgb_to_bgr(SETTINGS['preferred_background_color'])
+      ),
+      content
+    )
+
+  if SETTINGS['replace_font']:
+    content = re.sub(
+      ASS_STYLE_LINE_PATTERN,
+      partial(
+        replace_ass_style_field,
+        field_indices=field_indices,
+        field_name=ASS_STYLE_FONTNAME_FIELD,
+        replacement_value=SETTINGS['preferred_font'],
+        lookup_values=SETTINGS['lookup_fonts']
+      ),
+      content
+    )
+
+  if SETTINGS['replace_outline_thickness']:
+    content = re.sub(
+      ASS_STYLE_LINE_PATTERN,
+      partial(
+        replace_ass_style_field,
+        field_indices=field_indices,
+        field_name=ASS_STYLE_OUTLINE_FIELD,
+        replacement_value=SETTINGS['preferred_outline_thickness'],
+        lookup_values=SETTINGS['lookup_outline_thicknesses']
+      ),
+      content
+    )
+
+  if SETTINGS['force_outline_thickness']:
+    content = re.sub(
+      ASS_STYLE_LINE_PATTERN,
+      partial(
+        replace_ass_style_field,
+        field_indices=field_indices,
+        field_name=ASS_STYLE_OUTLINE_FIELD,
+        replacement_value=SETTINGS['preferred_outline_thickness']
       ),
       content
     )
@@ -80,6 +157,7 @@ def replace_ass_style_colour(
   field_name: str,
   replacement_color: str,
   condition_field_name: str | None = None,
+  lookup_colors: list[str] | None = None,
 ):
   field_index = field_indices.get(field_name)
   condition_index = field_indices.get(condition_field_name) if condition_field_name else None
@@ -90,6 +168,11 @@ def replace_ass_style_colour(
   if len(fields) <= max(field_index, condition_index or 0):
     return match.group(0)
   if condition_index is None or float(fields[condition_index]) > 0:
+    if lookup_colors is not None and not any(
+      re.search(rf'{HEX_DIGIT_PATTERN}{{0,2}}{rgb_to_bgr(lookup_color)}$', fields[field_index], flags=re.IGNORECASE)
+      for lookup_color in lookup_colors
+    ):
+      return match.group(0)
     fields[field_index] = re.sub(HEX_COLOUR_VALUE_PATTERN, replacement_color, fields[field_index])
   return 'Style: ' + ','.join(fields)
 
@@ -98,6 +181,7 @@ def replace_ass_style_field(
   field_indices: dict[str, int],
   field_name: str,
   replacement_value: str,
+  lookup_values: list[str] | None = None,
 ):
   field_index = field_indices.get(field_name)
   if field_index is None:
@@ -105,6 +189,11 @@ def replace_ass_style_field(
 
   fields = match.group(1).split(',')
   if len(fields) <= field_index:
+    return match.group(0)
+  if lookup_values is not None and not any(
+    fields[field_index].strip().casefold() == lookup_value.strip().casefold()
+    for lookup_value in lookup_values
+  ):
     return match.group(0)
   fields[field_index] = replacement_value
   return 'Style: ' + ','.join(fields)

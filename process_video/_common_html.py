@@ -13,8 +13,8 @@ def post_process_html_subtitles(
 
   if SETTINGS['strip_settings']['enabled']:
     content = strip_html_tags(content)
-  if SETTINGS['replace_color'] and not SETTINGS['strip_settings']['color']:
-    content = replace_html_text_color(content)
+  if SETTINGS['replace_foreground_color'] and not SETTINGS['strip_settings']['color']:
+    content = replace_html_foreground_color(content)
   if SETTINGS['force_font'] and not SETTINGS['strip_settings']['fonts']:
     content = force_html_font(content)
 
@@ -26,15 +26,17 @@ def strip_conversion_leftovers(
   # content = re.sub(r'\{\\an[1-9]\}', '', content)
   return content
 
-def replace_html_text_color(
+def replace_html_foreground_color(
   content: str,
 ):
-  return re.sub(
-    rf'(color=["\'])#?{SETTINGS["lookup_text_color"]}(["\'])',
-    rf'\g<1>#{SETTINGS["preferred_text_color"]}\g<2>',
-    content,
-    flags = re.IGNORECASE
-  )
+  for lookup_foreground_color in SETTINGS['lookup_foreground_colors']:
+    content = re.sub(
+      rf'(color=["\'])#?{re.escape(lookup_foreground_color)}(["\'])',
+      rf'\g<1>#{SETTINGS["preferred_foreground_color"]}\g<2>',
+      content,
+      flags = re.IGNORECASE
+    )
+  return content
 
 def force_html_font(
   content: str,
