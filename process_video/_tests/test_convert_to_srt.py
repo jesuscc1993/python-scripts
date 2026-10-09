@@ -43,6 +43,8 @@ class TestConvertToSrt(unittest.TestCase):
     run.assert_called_once_with(
       ['ffmpeg', '-v', 'error', '-n', '-i', input_path, '-c:s', 'srt', output_path],
       capture_output=True,
+      encoding='utf-8',
+      errors='replace',
       text=True
     )
     self.assertTrue(os.path.isfile(output_path))
@@ -68,6 +70,8 @@ class TestConvertToSrt(unittest.TestCase):
     run.assert_called_once_with(
       ['ffmpeg', '-v', 'error', '-n', '-i', input_path, '-c:s', 'srt', output_path],
       capture_output=True,
+      encoding='utf-8',
+      errors='replace',
       text=True
     )
     trash.assert_not_called()
