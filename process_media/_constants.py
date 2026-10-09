@@ -4,7 +4,10 @@ COVER_NAMES = [
   'cover.png',
   'cover.webp',
 ]
+
 DIRECTORY_BLACKLIST = [
   'subs',
   'subtitles'
 ]
+
+METADATA_FILENAME = 'metadata.json'

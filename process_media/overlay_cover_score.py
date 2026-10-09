@@ -14,7 +14,7 @@ from mtprompt import Prompt, to_int
 from tqdm import tqdm
 from xml.etree import ElementTree
 
-from _common import collect_dirs_to_process, tqdm_dim
+from _common import collect_dirs_to_process, read_metadata, tqdm_dim
 from _constants import COVER_NAMES
 from _settings import SETTINGS
 
@@ -100,8 +100,10 @@ def process_dir(
   if cover_img_bak_path is None:
     cover_img_bak_path = get_cover_path(dir, os.path.basename(cover_img_path), is_backup=True)
 
-  score_match = re.search(r'\{(\d{1,3})?\}', os.path.basename(dir))
-  score = int(score_match.group(1)) if score_match else None
+  score = read_score_from_metadata(dir)
+  if score is None:
+    score_match = re.search(r'\{(\d{1,3})?\}', os.path.basename(dir))
+    score = int(score_match.group(1)) if score_match else None
   if score is None:
     score = read_score_from_comic_info(dir)
   if score is None:
@@ -109,6 +111,15 @@ def process_dir(
     return
 
   process_cover(dir, cover_img_path, cover_img_bak_path, score, font)
+
+def read_score_from_metadata(
+  dir: str,
+):
+  try:
+    metadata = read_metadata(dir, {})
+    return int(metadata['score']) if metadata.get('score') is not None else None
+  except Exception:
+    return None
 
 def read_score_from_comic_info(
   dir: str,

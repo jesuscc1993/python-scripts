@@ -1,10 +1,11 @@
+import json
 import os
 
 from mtattr import Attr
 from mtlogger import logger
 from tqdm import tqdm
 
-from _constants import DIRECTORY_BLACKLIST
+from _constants import DIRECTORY_BLACKLIST, METADATA_FILENAME
 
 def tqdm_dim(
   msg: str,
@@ -38,3 +39,34 @@ def should_skip_dir(
     return True
 
   return os.path.basename(dir_path).lower() in DIRECTORY_BLACKLIST
+
+def read_metadata(
+  dir_path: str,
+  default: dict | None = None,
+):
+  metadata_path = os.path.join(dir_path, METADATA_FILENAME)
+  if not os.path.isfile(metadata_path):
+    return default
+
+  try:
+    Attr.show(metadata_path)
+    with open(metadata_path, encoding='utf-8') as metadata_file:
+      metadata = json.load(metadata_file)
+    if not isinstance(metadata, dict):
+      raise ValueError(f'Invalid metadata in "{metadata_path}": expected a JSON object.')
+    return metadata
+  finally:
+    Attr.hide(metadata_path)
+
+def write_metadata(
+  dir_path: str,
+  metadata: dict,
+):
+  metadata_path = os.path.join(dir_path, METADATA_FILENAME)
+  try:
+    Attr.show(metadata_path)
+    with open(metadata_path, 'w', encoding='utf-8') as metadata_file:
+      json.dump(metadata, metadata_file, indent=2)
+  finally:
+    Attr.hide(metadata_path)
+
