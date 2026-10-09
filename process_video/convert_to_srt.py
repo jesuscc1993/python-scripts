@@ -62,8 +62,10 @@ def convert_to_srt(
 			'-c:s', 'srt',
 			output_file_path
 		],
-		capture_output = True,
-		text = True
+    capture_output = True,
+    encoding = 'utf-8',
+    errors = 'replace',
+    text = True,
 	)
 
 	if result.returncode != 0 or not os.path.isfile(output_file_path) or os.path.getsize(output_file_path) == 0:

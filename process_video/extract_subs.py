@@ -120,8 +120,9 @@ def find_subtitle_stream(src_file_path: str, target_language: str) -> tuple[str 
         src_file_path
       ],
       capture_output = True,
+      encoding = 'utf-8',
+      errors = 'replace',
       text = True,
-      timeout = 5
     )
     for stream in json.loads(result.stdout).get('streams', []):
       if stream.get('codec_type') == 'subtitle' and stream.get('codec_name') in SUBTITLE_EXTS_BY_CODEC:
