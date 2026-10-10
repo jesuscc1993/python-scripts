@@ -52,5 +52,6 @@ Collection of my own python scripts.
 
 ## Git Hooks
 
-- Run `git config core.hooksPath hooks` once per clone to enable the tracked hooks in [hooks](hooks).
+- Run `git config core.hooksPath _hooks` once per clone to enable the tracked hooks in [\_hooks](_hooks).
+- The `pre-commit` hook runs `ruff check --fix` and `ruff format` on staged files and re-stages the changes.
 - The `pre-push` hook runs `run_all_tests.py` and blocks the push if any test fails.
