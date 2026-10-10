@@ -115,6 +115,8 @@ def find_cover_streams(
       file_path
     ],
     capture_output=True,
+    encoding='utf-8',
+    errors='replace',
     text=True
   )
   if result.returncode != 0:
@@ -166,4 +168,4 @@ if __name__ == '__main__':
   except Exception as ex:
     logger.unhandled_error(ex)
 
-  Prompt.enter_to_exit(timeout=True)
+  Prompt.enter_to_exit()
