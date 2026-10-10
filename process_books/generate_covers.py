@@ -41,6 +41,7 @@ HUE_VALUE = 0.85
 # Author, Series and Number are all optional, but each one requires the ones before it
 TAG_PATTERN = re.compile(r'^\[([^\]]+)\]\s*')
 
+
 def main():
   if len(sys.argv) > 1:
     parent_dir = sys.argv[1]
@@ -60,6 +61,7 @@ def main():
   logger.hr()
   logger.success(f'Finished generating covers in "{parent_dir}".')
 
+
 def process_file(
   file_path: str,
 ):
@@ -74,9 +76,10 @@ def process_file(
   img = generate_cover(book_data, stem)
 
   cover_path = os.path.join(os.path.dirname(file_path), f'{stem}{COVER_EXT}')
-  img.save(cover_path, quality = 95)
+  img.save(cover_path, quality=95)
 
   logger.success(f'Generated cover for "{file_name}".')
+
 
 def parse_book_name(
   name: str,
@@ -90,22 +93,23 @@ def parse_book_name(
   match = TAG_PATTERN.match(remaining)
   if match:
     author = match.group(1).strip()
-    remaining = remaining[match.end():]
+    remaining = remaining[match.end() :]
 
     match = TAG_PATTERN.match(remaining)
     if match:
       series = match.group(1).strip()
-      remaining = remaining[match.end():]
+      remaining = remaining[match.end() :]
 
       match = TAG_PATTERN.match(remaining)
       if match:
         number = match.group(1).strip()
-        remaining = remaining[match.end():]
+        remaining = remaining[match.end() :]
 
   title = re.sub(r'\[.*?\]', '', remaining).strip()
   title = re.sub(r'\s+', ' ', title)
 
-  return { 'author': author, 'series': series, 'number': number, 'title': title }
+  return {'author': author, 'series': series, 'number': number, 'title': title}
+
 
 def generate_cover(
   book_data: dict,
@@ -122,6 +126,7 @@ def generate_cover(
 
   return img
 
+
 def get_hash_color(
   text: str,
 ):
@@ -131,19 +136,22 @@ def get_hash_color(
 
   return (round(r * 255), round(g * 255), round(b * 255))
 
+
 def measure(
   draw: ImageDraw.ImageDraw,
   text: str,
   font: ImageFont.FreeTypeFont,
 ):
-  bbox = draw.textbbox((0, 0), text, font = font)
+  bbox = draw.textbbox((0, 0), text, font=font)
   return bbox[2] - bbox[0], bbox[3] - bbox[1]
+
 
 def line_height(
   font: ImageFont.FreeTypeFont,
 ):
   ascent, descent = font.getmetrics()
   return ascent + descent
+
 
 def draw_text(
   draw: ImageDraw.ImageDraw,
@@ -153,8 +161,9 @@ def draw_text(
   y: int,
   fill,
 ):
-  bbox = draw.textbbox((0, 0), text, font = font)
-  draw.text((x - bbox[0], y), text, font = font, fill = fill)
+  bbox = draw.textbbox((0, 0), text, font=font)
+  draw.text((x - bbox[0], y), text, font=font, fill=fill)
+
 
 def wrap_lines(
   draw: ImageDraw.ImageDraw,
@@ -181,6 +190,7 @@ def wrap_lines(
 
   return lines
 
+
 def ellipsize(
   draw: ImageDraw.ImageDraw,
   text: str,
@@ -194,6 +204,7 @@ def ellipsize(
     text = text[:-1]
 
   return f'{text}…' if text else '…'
+
 
 def balance_lines(
   draw: ImageDraw.ImageDraw,
@@ -210,7 +221,9 @@ def balance_lines(
 
   for cuts in combinations(range(1, len(words)), num_lines - 1):
     points = (0,) + cuts + (len(words),)
-    lines = [' '.join(words[points[i]:points[i + 1]]) for i in range(num_lines)]
+    lines = [
+      ' '.join(words[points[i] : points[i + 1]]) for i in range(num_lines)
+    ]
     widths = [measure(draw, line, font)[0] for line in lines]
 
     if any(width > max_width for width in widths):
@@ -222,6 +235,7 @@ def balance_lines(
       best_split = lines
 
   return best_split
+
 
 def try_fit_lines(
   draw: ImageDraw.ImageDraw,
@@ -241,12 +255,14 @@ def try_fit_lines(
 
   return None
 
+
 def block_height(
   font: ImageFont.FreeTypeFont,
   num_lines: int,
 ):
   height = line_height(font)
   return height + height * SAME_FONT_LINE_SPACING * (num_lines - 1)
+
 
 def fit_text_lines(
   draw: ImageDraw.ImageDraw,
@@ -270,6 +286,7 @@ def fit_text_lines(
 
   return lines, font
 
+
 def fit_single_line(
   draw: ImageDraw.ImageDraw,
   text: str,
@@ -286,12 +303,14 @@ def fit_single_line(
 
   return Font.load_by_path(FONT_PATH, 1)
 
+
 def draw_black_box(
   draw: ImageDraw.ImageDraw,
   y0: int,
   height: int,
 ):
-  draw.rectangle([0, y0, COVER_W, y0 + height], fill = BG_COLOR)
+  draw.rectangle([0, y0, COVER_W, y0 + height], fill=BG_COLOR)
+
 
 def draw_line_block(
   draw: ImageDraw.ImageDraw,
@@ -304,7 +323,8 @@ def draw_line_block(
 
   line_heights = [line_height(font) for _, font, _ in blocks]
   advances = [
-    line_heights[i] * (SAME_FONT_LINE_SPACING if blocks[i][1] is blocks[i + 1][1] else 1)
+    line_heights[i]
+    * (SAME_FONT_LINE_SPACING if blocks[i][1] is blocks[i + 1][1] else 1)
     for i in range(len(blocks) - 1)
   ]
   total_height = sum(advances) + line_heights[-1]
@@ -313,16 +333,10 @@ def draw_line_block(
   for i, (text, font, fill) in enumerate(blocks):
     width, _ = measure(draw, text, font)
     x = (COVER_W - width) // 2
-    draw_text(
-      draw,
-      text,
-      font,
-      x,
-      y,
-      fill
-    )
+    draw_text(draw, text, font, x, y, fill)
     if i < len(advances):
       y += advances[i]
+
 
 def draw_small_text(
   draw: ImageDraw.ImageDraw,
@@ -334,11 +348,7 @@ def draw_small_text(
   if not text:
     return
 
-  draw_black_box(
-    draw,
-    y_offset,
-    SMALL_TEXT_H
-  )
+  draw_black_box(draw, y_offset, SMALL_TEXT_H)
 
   max_width = COVER_W * MAX_TEXT_TO_SIZE_RATIO
   max_height = SMALL_TEXT_H * MAX_TEXT_TO_SIZE_RATIO
@@ -349,14 +359,8 @@ def draw_small_text(
   x = (COVER_W - width) // 2
   y = y_offset + (SMALL_TEXT_H - line_height(font)) // 2
 
-  draw_text(
-    draw,
-    line,
-    font,
-    x,
-    y,
-    color
-  )
+  draw_text(draw, line, font, x, y, color)
+
 
 def draw_title_section(
   draw: ImageDraw.ImageDraw,
@@ -365,45 +369,31 @@ def draw_title_section(
   title = book_data['title']
   series = book_data['series']
 
-  draw_black_box(
-    draw,
-    0,
-    TITLE_H
-  )
+  draw_black_box(draw, 0, TITLE_H)
 
   max_width = COVER_W * MAX_TEXT_TO_SIZE_RATIO
   max_height = TITLE_H * MAX_TEXT_TO_SIZE_RATIO
 
   title_lines, title_font = fit_text_lines(
-    draw,
-    title,
-    max_width,
-    max_height,
-    MAX_TITLE_LINES,
-    TITLE_FONT_SIZE
+    draw, title, max_width, max_height, MAX_TITLE_LINES, TITLE_FONT_SIZE
   )
   blocks = [(line, title_font, PRIMARY_FG_COLOR) for line in title_lines]
 
-  y_offset = SERIES_H * (MAX_TITLE_LINES - len(title_lines) + 1) * .1 if series else 0
-  print('y_offset', y_offset)
-  draw_line_block(
-    draw,
-    blocks,
-    y_offset,
-    TITLE_H
+  y_offset = (
+    SERIES_H * (MAX_TITLE_LINES - len(title_lines) + 1) * 0.1 if series else 0
   )
+  print('y_offset', y_offset)
+  draw_line_block(draw, blocks, y_offset, TITLE_H)
+
 
 def draw_series_section(
   draw: ImageDraw.ImageDraw,
   book_data: dict,
 ):
   draw_small_text(
-    draw,
-    book_data['series'],
-    TITLE_H,
-    SECONDARY_FG_COLOR,
-    SERIES_FONT_SIZE
+    draw, book_data['series'], TITLE_H, SECONDARY_FG_COLOR, SERIES_FONT_SIZE
   )
+
 
 def draw_index_section(
   draw: ImageDraw.ImageDraw,
@@ -423,14 +413,8 @@ def draw_index_section(
   x = (COVER_W - width) // 2
   y = y_offset + (CENTER_H - line_height(font)) // 2
 
-  draw_text(
-    draw,
-    number,
-    font,
-    x,
-    y,
-    BG_COLOR
-  )
+  draw_text(draw, number, font, x, y, BG_COLOR)
+
 
 def draw_writer_section(
   draw: ImageDraw.ImageDraw,
@@ -441,8 +425,9 @@ def draw_writer_section(
     book_data['author'],
     TITLE_H + AUTHOR_H + CENTER_H,
     PRIMARY_FG_COLOR,
-    WRITER_FONT_SIZE
+    WRITER_FONT_SIZE,
   )
+
 
 if __name__ == '__main__':
   try:

@@ -12,11 +12,16 @@ from _settings import BLACK_THRESHOLD, WHITE_THRESHOLD, MAX_PAGE_ASPECT_RATIO
 # settings
 HEIGHT_THRESHOLD = 48
 
+
 def main():
   if len(sys.argv) > 1:
     process_parent_folder(to_dir(sys.argv[1]))
   else:
-    select_parent_folder('Enter the path to the parent folder containing the folders or images you want to crop the blanks of:\n', process_parent_folder)
+    select_parent_folder(
+      'Enter the path to the parent folder containing the folders or images you want to crop the blanks of:\n',
+      process_parent_folder,
+    )
+
 
 def process_parent_folder(
   folder_path: str,
@@ -25,6 +30,7 @@ def process_parent_folder(
 
   logger.success(f'Finished cropping webtoons in "{folder_path}".')
 
+
 def process_image(
   file_path: str,
 ):
@@ -32,16 +38,16 @@ def process_image(
     with Image.open(file_path) as img:
       blank_free_image = crop_blanks(img)
 
-      if (image_needs_splitting(blank_free_image)):
+      if image_needs_splitting(blank_free_image):
         save_image_splits(blank_free_image, file_path)
-      elif (
-        blank_free_image.height != img.height or
-        is_image_uncompressed(file_path)
+      elif blank_free_image.height != img.height or is_image_uncompressed(
+        file_path
       ):
         save_image_to_path(blank_free_image, file_path)
 
   except Exception as ex:
     logger.error(f'Could not process {file_path}:\n{ex}')
+
 
 def is_blank_strip(
   image_strip: Image.Image,
@@ -50,6 +56,7 @@ def is_blank_strip(
   min_pixel, max_pixel = gray_strip.getextrema()
   return min_pixel >= WHITE_THRESHOLD or max_pixel <= BLACK_THRESHOLD
 
+
 def process_strip(
   strip: Image.Image,
   height: int,
@@ -57,6 +64,7 @@ def process_strip(
   if height > HEIGHT_THRESHOLD:
     return strip.resize((strip.width, HEIGHT_THRESHOLD))
   return strip
+
 
 def crop_blanks(
   img: Image.Image,
@@ -93,12 +101,14 @@ def crop_blanks(
 
   return stitched_image
 
+
 def image_needs_splitting(
   img: Image.Image,
 ):
   width, height = img.size
   aspect_ratio = width / height
   return aspect_ratio < MAX_PAGE_ASPECT_RATIO
+
 
 def save_image_splits(
   img: Image.Image,
@@ -115,7 +125,7 @@ def save_image_splits(
       top = i * split_height
       bottom = (i + 1) * split_height if i < num_splits - 1 else height
       split_image = img.crop((0, top, width, bottom))
-      split_file_path = f"{base_name}.{i + 1}{ext}"
+      split_file_path = f'{base_name}.{i + 1}{ext}'
       save_image_to_path(split_image, split_file_path, keep=True)
     os.remove(original_img_path)
 
@@ -123,9 +133,10 @@ def save_image_splits(
     logger.error(f'Could not save split images for {original_img_path}:\n{ex}')
 
     for i in range(num_splits):
-      split_file_path = f"{base_name}.{i + 1}{ext}"
+      split_file_path = f'{base_name}.{i + 1}{ext}'
       if os.path.exists(split_file_path):
         os.remove(split_file_path)
+
 
 if __name__ == '__main__':
   try:

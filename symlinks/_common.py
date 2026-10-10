@@ -1,4 +1,3 @@
-
 import ctypes
 import os
 import shutil
@@ -7,11 +6,12 @@ import sys
 from mtlogger import logger
 from pathlib import Path
 
+
 def make_link(
   dest: str,
   src: str,
   target_is_dir: bool,
-  make_dirs = True,
+  make_dirs=True,
 ):
   dest_path = os.path.expandvars(dest)
   src_path = os.path.expandvars(src)
@@ -39,6 +39,7 @@ def make_link(
   except Exception as ex:
     logger.error(f'Failed to link "{dest_path}" to "{src_path}": {ex}')
 
+
 def remove_link(
   location: str,
 ):
@@ -53,22 +54,27 @@ def remove_link(
       shutil.move(location, new_location)
       logger.debug(f'  Backed up existing "{location}" as "{new_location}".')
 
+
 def link_dir(
   dest: str,
   src: str,
-  make_dirs = True,
+  make_dirs=True,
 ):
   return make_link(dest, src, target_is_dir=True, make_dirs=make_dirs)
+
 
 def link_file(
   target: str,
   source: str,
-  make_dirs = True,
+  make_dirs=True,
 ):
   return make_link(target, source, target_is_dir=False, make_dirs=make_dirs)
+
 
 def run_as_admin():
   if os.name == 'nt' and not ctypes.windll.shell32.IsUserAnAdmin():
     params = ' '.join([f'"{arg}"' for arg in sys.argv])
-    ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, params, None, 1)
+    ctypes.windll.shell32.ShellExecuteW(
+      None, 'runas', sys.executable, params, None, 1
+    )
     sys.exit(0)

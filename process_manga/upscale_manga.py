@@ -7,18 +7,26 @@ from mtprompt import Prompt, to_dir
 
 from _common import process_folder_images, select_parent_folder
 
-binary_path = os.path.join(os.path.dirname(__file__), 'binaries/realesrgan/realesrgan-ncnn-vulkan.exe')
+binary_path = os.path.join(
+  os.path.dirname(__file__), 'binaries/realesrgan/realesrgan-ncnn-vulkan.exe'
+)
+
 
 def main():
   if len(sys.argv) > 1:
     process_parent_folder(to_dir(sys.argv[1]))
   else:
-    select_parent_folder('Enter the path to the parent folder containing the folders or images you want to upscale:\n', process_parent_folder)
+    select_parent_folder(
+      'Enter the path to the parent folder containing the folders or images you want to upscale:\n',
+      process_parent_folder,
+    )
+
 
 def process_parent_folder(
   folder_path: str,
 ):
   process_folder_images(folder_path, process_image)
+
 
 def process_image(
   file_path: str,
@@ -27,18 +35,23 @@ def process_image(
     subprocess.run(
       [
         binary_path,
-        '-i', file_path,
-        '-o', file_path,
-        '-s', '2',
-        '-n', 'realesr-animevideov3-x2'
+        '-i',
+        file_path,
+        '-o',
+        file_path,
+        '-s',
+        '2',
+        '-n',
+        'realesr-animevideov3-x2',
       ],
       check=False,
       stdout=subprocess.DEVNULL,
-      stderr=subprocess.DEVNULL
+      stderr=subprocess.DEVNULL,
     )
 
   except Exception as ex:
     logger.error(f'Could not process "{file_path}":\n{ex}')
+
 
 if __name__ == '__main__':
   try:

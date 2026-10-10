@@ -7,15 +7,29 @@ from win32com.client import Dispatch
 
 from _constants import BINARY_BLACKLIST, ROM_EXTS, BINARY_BY_PLATFORM
 
+
 def main():
-  binaries_dir = to_dir(sys.argv[1]) if len(sys.argv) > 1 else Prompt.dir('Enter the path to the directory containing the emulator binaries')
-  roms_dir = to_dir(sys.argv[2]) if len(sys.argv) > 2 else Prompt.dir('Enter the path to the directory containing the ROMs')
-  out_dir = sys.argv[3] if len(sys.argv) > 3 else os.path.join(roms_dir, 'shortcuts')
+  binaries_dir = (
+    to_dir(sys.argv[1])
+    if len(sys.argv) > 1
+    else Prompt.dir(
+      'Enter the path to the directory containing the emulator binaries'
+    )
+  )
+  roms_dir = (
+    to_dir(sys.argv[2])
+    if len(sys.argv) > 2
+    else Prompt.dir('Enter the path to the directory containing the ROMs')
+  )
+  out_dir = (
+    sys.argv[3] if len(sys.argv) > 3 else os.path.join(roms_dir, 'shortcuts')
+  )
 
   binaries = find_binaries(binaries_dir)
   roms_by_platform = find_roms(roms_dir)
 
   generate_shortcuts(binaries, roms_by_platform, out_dir)
+
 
 def find_binaries(
   binaries_dir: str,
@@ -42,6 +56,7 @@ def find_binaries(
 
   return binaries
 
+
 def find_roms(
   roms_dir: str,
 ):
@@ -59,7 +74,9 @@ def find_roms(
       platform_dirs.append((entry.lower(), platform_path))
 
   if not platform_dirs:
-    platform_dirs.append((os.path.basename(os.path.normpath(roms_dir)).lower(), roms_dir))
+    platform_dirs.append(
+      (os.path.basename(os.path.normpath(roms_dir)).lower(), roms_dir)
+    )
 
   for platform, path in platform_dirs:
     roms = []
@@ -71,6 +88,7 @@ def find_roms(
       roms_by_platform[platform] = roms
 
   return roms_by_platform
+
 
 def generate_shortcuts(
   binaries: dict,
@@ -86,6 +104,7 @@ def generate_shortcuts(
     platform_out_dir = os.path.join(out_dir, platform)
     os.makedirs(platform_out_dir, exist_ok=True)
     generate_shortcuts_for_platform(binary, roms, platform_out_dir)
+
 
 def find_binary_for_platform(
   platform: str,
@@ -108,6 +127,7 @@ def find_binary_for_platform(
 
   return None
 
+
 def generate_shortcuts_for_platform(
   binary: str,
   roms: list,
@@ -115,6 +135,7 @@ def generate_shortcuts_for_platform(
 ):
   for rom in roms:
     generate_rom_shortcut(binary, rom, out_dir)
+
 
 def generate_rom_shortcut(
   binary: str,
@@ -139,6 +160,7 @@ def generate_rom_shortcut(
 
   except Exception as ex:
     logger.error(f'Failed to create shortcut for "{rom}":\n{ex}')
+
 
 if __name__ == '__main__':
   try:

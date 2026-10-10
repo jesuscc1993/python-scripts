@@ -8,11 +8,21 @@ from spotdl.utils.search import parse_query
 
 from _constants import OUTPUT_DIR_PATH
 
+
 def main():
-  spotify_url = sys.argv[1] if len(sys.argv) > 1 else Prompt.str('Enter a Spotify track/album/playlist URL')
-  output_dir_path = sys.argv[2] if len(sys.argv) > 2 else os.path.join(OUTPUT_DIR_PATH, 'spotify')
+  spotify_url = (
+    sys.argv[1]
+    if len(sys.argv) > 1
+    else Prompt.str('Enter a Spotify track/album/playlist URL')
+  )
+  output_dir_path = (
+    sys.argv[2]
+    if len(sys.argv) > 2
+    else os.path.join(OUTPUT_DIR_PATH, 'spotify')
+  )
 
   download_from_spotify(output_dir_path, spotify_url)
+
 
 def download_from_spotify(
   output_dir_path: str,
@@ -27,19 +37,23 @@ def download_from_spotify(
   except Exception as ex:
     logger.error(f'Download failed: {ex}')
 
+
 def init_spotify_client(
   output_dir_path: str,
 ):
   client_id = os.environ.get('SPOTIPY_CLIENT_ID')
   client_secret = os.environ.get('SPOTIPY_CLIENT_SECRET')
   if not client_id or not client_secret:
-    raise RuntimeError('SPOTIPY_CLIENT_ID and SPOTIPY_CLIENT_SECRET environment variables must be set.')
+    raise RuntimeError(
+      'SPOTIPY_CLIENT_ID and SPOTIPY_CLIENT_SECRET environment variables must be set.'
+    )
 
   return Spotdl(
-    client_id = client_id,
-    client_secret = client_secret,
-    downloader_settings = { "output": output_dir_path }
+    client_id=client_id,
+    client_secret=client_secret,
+    downloader_settings={'output': output_dir_path},
   )
+
 
 if __name__ == '__main__':
   try:

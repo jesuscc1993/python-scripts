@@ -11,9 +11,12 @@ from tqdm import tqdm
 
 from _common import get_jira_client, get_jira_url
 
-OUTPUT_DIR_PATH = os.path.join(os.path.dirname(__file__), '..', '_output', 'jira')
+OUTPUT_DIR_PATH = os.path.join(
+  os.path.dirname(__file__), '..', '_output', 'jira'
+)
 OUTPUT_FILE_PATH = os.path.join(OUTPUT_DIR_PATH, 'ticket_export.xlsx')
 MAX_RESULTS = 255
+
 
 def main():
   if len(sys.argv) > 1:
@@ -21,7 +24,9 @@ def main():
     skip_completed = to_bool(sys.argv[2]) if len(sys.argv) > 2 else False
   else:
     ticket_ids = Prompt.list('Enter parent ticket IDs (comma-separated)')
-    skip_completed = Prompt.bool('Skip completed tasks (Done/Closed)?', default=False)
+    skip_completed = Prompt.bool(
+      'Skip completed tasks (Done/Closed)?', default=False
+    )
 
   if not ticket_ids:
     logger.error('No ticket IDs provided.')
@@ -29,12 +34,13 @@ def main():
 
   os.makedirs(OUTPUT_DIR_PATH, exist_ok=True)
   logger.debug(f'Processing {len(ticket_ids)} parent ticket(s)')
-  export_to_excel(
-    process_tickets(ticket_ids, skip_completed)
-  )
+  export_to_excel(process_tickets(ticket_ids, skip_completed))
   logger.success(f'Saved "{OUTPUT_FILE_PATH}".')
 
-def process_child(child: Issue, parent_id: str, parent_name: str, skip_completed: bool):
+
+def process_child(
+  child: Issue, parent_id: str, parent_name: str, skip_completed: bool
+):
   child_id = child.key
   child_name = child.fields.summary
   child_status = child.fields.status.name
@@ -53,6 +59,7 @@ def process_child(child: Issue, parent_id: str, parent_name: str, skip_completed
     'Child Labels': child_labels,
   }
 
+
 def process_tickets(ticket_ids: list[str], skip_completed: bool):
   data = []
 
@@ -70,10 +77,14 @@ def process_tickets(ticket_ids: list[str], skip_completed: bool):
 
       try:
         jql_query = f'"Epic Link" = {ticket_id}'
-        epic_tasks = get_jira_client().search_issues(jql_query, maxResults=MAX_RESULTS)
+        epic_tasks = get_jira_client().search_issues(
+          jql_query, maxResults=MAX_RESULTS
+        )
         if epic_tasks:
           existing_keys = {issue.key for issue in all_issues}
-          new_epic_tasks = [issue for issue in epic_tasks if issue.key not in existing_keys]
+          new_epic_tasks = [
+            issue for issue in epic_tasks if issue.key not in existing_keys
+          ]
           all_issues.extend(new_epic_tasks)
       except Exception as ex:
         logger.debug(f'No epic tasks found for {ticket_id}: {ex}')
@@ -86,9 +97,20 @@ def process_tickets(ticket_ids: list[str], skip_completed: bool):
       parent_name = parent_issue.fields.summary
 
       with ThreadPoolExecutor() as executor:
-        futures = {executor.submit(process_child, child, ticket_id, parent_name, skip_completed): child.key for child in all_issues}
+        futures = {
+          executor.submit(
+            process_child, child, ticket_id, parent_name, skip_completed
+          ): child.key
+          for child in all_issues
+        }
 
-        for future in tqdm(as_completed(futures), total=len(all_issues), desc=ticket_id, leave=False, unit='child'):
+        for future in tqdm(
+          as_completed(futures),
+          total=len(all_issues),
+          desc=ticket_id,
+          leave=False,
+          unit='child',
+        ):
           try:
             result = future.result()
             if result:
@@ -101,6 +123,7 @@ def process_tickets(ticket_ids: list[str], skip_completed: bool):
 
   return data
 
+
 def export_to_excel(data: list[dict]):
   if not data:
     logger.error('No child items to export.')
@@ -112,7 +135,14 @@ def export_to_excel(data: list[dict]):
     worksheet = workbook.active
     worksheet.title = 'Tickets'
 
-    fieldnames = ['Parent ID', 'Parent Name', 'Child ID', 'Child Name', 'Child Status', 'Child Labels']
+    fieldnames = [
+      'Parent ID',
+      'Parent Name',
+      'Child ID',
+      'Child Name',
+      'Child Status',
+      'Child Labels',
+    ]
     worksheet.append(fieldnames)
 
     for row_idx, row_data in enumerate(data, start=2):
@@ -124,14 +154,22 @@ def export_to_excel(data: list[dict]):
       labels = row_data['Child Labels']
 
       worksheet.cell(row=row_idx, column=1, value=parent_id)
-      worksheet.cell(row=row_idx, column=1).hyperlink = f'{jira_url}/browse/{parent_id}'
-      worksheet.cell(row=row_idx, column=1).font = Font(underline='single', color='0563C1')
+      worksheet.cell(
+        row=row_idx, column=1
+      ).hyperlink = f'{jira_url}/browse/{parent_id}'
+      worksheet.cell(row=row_idx, column=1).font = Font(
+        underline='single', color='0563C1'
+      )
 
       worksheet.cell(row=row_idx, column=2, value=parent_name)
 
       worksheet.cell(row=row_idx, column=3, value=child_id)
-      worksheet.cell(row=row_idx, column=3).hyperlink = f'{jira_url}/browse/{child_id}'
-      worksheet.cell(row=row_idx, column=3).font = Font(underline='single', color='0563C1')
+      worksheet.cell(
+        row=row_idx, column=3
+      ).hyperlink = f'{jira_url}/browse/{child_id}'
+      worksheet.cell(row=row_idx, column=3).font = Font(
+        underline='single', color='0563C1'
+      )
 
       worksheet.cell(row=row_idx, column=4, value=child_name)
       worksheet.cell(row=row_idx, column=5, value=child_status)
@@ -148,6 +186,7 @@ def export_to_excel(data: list[dict]):
 
   except Exception as ex:
     logger.error(f'Failed to write Excel file: {ex}')
+
 
 if __name__ == '__main__':
   try:

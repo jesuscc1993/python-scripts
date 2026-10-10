@@ -3,7 +3,14 @@ import os
 from PIL import Image
 from mtlogger import logger
 
-from _settings import LONG_STRIP_ASPECT_RATIO, MAX_HEIGHT, MAX_WIDTH, OUTPUT_FORMAT, OUTPUT_EXTENSION, OUTPUT_QUALITY
+from _settings import (
+  LONG_STRIP_ASPECT_RATIO,
+  MAX_HEIGHT,
+  MAX_WIDTH,
+  OUTPUT_FORMAT,
+  OUTPUT_EXTENSION,
+  OUTPUT_QUALITY,
+)
 
 JPEG_EXTENSION = '.jpeg'
 JPG_EXTENSION = '.jpg'
@@ -12,21 +19,30 @@ WEBP_EXTENSION = '.webp'
 
 FILE_EXCLUSIONS = ['folder.jpg', 'cover.jpg']
 
+
 def is_image_file(
   filename: str,
 ):
   name = filename.lower()
-  return name.endswith((JPG_EXTENSION, JPEG_EXTENSION, PNG_EXTENSION, WEBP_EXTENSION)) and name not in FILE_EXCLUSIONS
+  return (
+    name.endswith(
+      (JPG_EXTENSION, JPEG_EXTENSION, PNG_EXTENSION, WEBP_EXTENSION)
+    )
+    and name not in FILE_EXCLUSIONS
+  )
+
 
 def is_image_uncompressed(
   filename: str,
 ):
   return filename.lower().endswith(PNG_EXTENSION)
 
+
 def is_image_optimally_compressed(
   filename: str,
 ):
   return filename.lower().endswith(WEBP_EXTENSION)
+
 
 def get_max_dimensions(
   img: Image.Image,
@@ -52,10 +68,12 @@ def get_max_dimensions(
 
   return (width, height)
 
+
 def image_needs_resizing(
   img: Image.Image,
 ):
   return get_max_dimensions(img) is not None
+
 
 def resize_image(
   img: Image.Image,
@@ -65,14 +83,17 @@ def resize_image(
     return img.resize(new_dimensions, Image.LANCZOS)
   return img
 
+
 def save_image_to_path(
   img: Image.Image,
   original_img_path: str,
-  keep = False,
+  keep=False,
 ):
   try:
-    output_img_path = f"{os.path.splitext(original_img_path)[0]}.{OUTPUT_EXTENSION}"
-    img.save(output_img_path, OUTPUT_FORMAT, quality = OUTPUT_QUALITY)
+    output_img_path = (
+      f'{os.path.splitext(original_img_path)[0]}.{OUTPUT_EXTENSION}'
+    )
+    img.save(output_img_path, OUTPUT_FORMAT, quality=OUTPUT_QUALITY)
     if not keep and output_img_path != original_img_path:
       os.remove(original_img_path)
 

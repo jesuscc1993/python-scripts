@@ -5,9 +5,6 @@ COVER_NAMES = [
   'cover.webp',
 ]
 
-DIRECTORY_BLACKLIST = [
-  'subs',
-  'subtitles'
-]
+DIRECTORY_BLACKLIST = ['subs', 'subtitles']
 
 METADATA_FILENAME = 'metadata.json'

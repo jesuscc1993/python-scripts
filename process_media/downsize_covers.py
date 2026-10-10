@@ -13,6 +13,7 @@ from _common import collect_dirs_to_process, tqdm_dim
 MAX_COVER_W = 300
 MAX_COVER_H = 450
 
+
 def main():
   if len(sys.argv) > 1:
     parent_dir = sys.argv[1]
@@ -21,18 +22,21 @@ def main():
     parent_dir = Prompt.dir(
       'Enter the path to the directory containing your media'
     )
-    depth = Prompt.int(
-      'Enter the depth for processing subfolders',
-      default=1
-    )
+    depth = Prompt.int('Enter the depth for processing subfolders', default=1)
 
   dirs_to_process = collect_dirs_to_process(parent_dir, depth)
 
-  with ThreadPoolExecutor() as executor, tqdm(total = len(dirs_to_process), desc = f'Processing "{parent_dir}"') as progress:
+  with (
+    ThreadPoolExecutor() as executor,
+    tqdm(
+      total=len(dirs_to_process), desc=f'Processing "{parent_dir}"'
+    ) as progress,
+  ):
     for _ in executor.map(process_dir, dirs_to_process):
       progress.update(1)
 
   logger.success(f'Finished downsizing covers in "{parent_dir}".')
+
 
 def find_cover(
   dir: str,
@@ -42,6 +46,7 @@ def find_cover(
     if os.path.isfile(path):
       return path
   return None
+
 
 def process_dir(
   dir: str,
@@ -68,13 +73,17 @@ def process_dir(
 
   tqdm.write(logger.format_debug(f'Downsized cover for "{dir_name}".'))
 
+
 def downsize_cover(
   img: Image.Image,
   max_w: int,
   max_h: int,
 ):
   scale = max(max_w / img.width, max_h / img.height)
-  return img.resize((round(img.width * scale), round(img.height * scale)), Image.LANCZOS)
+  return img.resize(
+    (round(img.width * scale), round(img.height * scale)), Image.LANCZOS
+  )
+
 
 if __name__ == '__main__':
   try:

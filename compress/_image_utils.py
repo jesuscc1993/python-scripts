@@ -12,16 +12,23 @@ LOSSLESS = 'lossless'
 FILE_EXCLUSIONS = ['folder.jpg', 'cover.jpg']
 WEBP_DIMENSION_LIMIT = 16383
 
+
 def is_image_file(
   filename: str,
 ):
   name = filename.lower()
-  return name.endswith((JPG_EXTENSION, JPEG_EXTENSION, PNG_EXTENSION, WEBP_EXTENSION)) and name not in FILE_EXCLUSIONS
+  return (
+    name.endswith(
+      (JPG_EXTENSION, JPEG_EXTENSION, PNG_EXTENSION, WEBP_EXTENSION)
+    )
+    and name not in FILE_EXCLUSIONS
+  )
+
 
 def is_image_monochrome(
   img: Image.Image,
-  sample_step = 24,
-  sat_threshold = 24,
+  sample_step=24,
+  sat_threshold=24,
 ):
   hsv = img.convert('HSV')
   arr = numpy.array(hsv)

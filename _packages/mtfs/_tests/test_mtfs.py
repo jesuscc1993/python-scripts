@@ -5,12 +5,19 @@ import tempfile
 import unittest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
-from mtfs import read_file, read_json_file, read_text_file, write_file, write_json_file, write_text_file
+from mtfs import (
+  read_file,
+  read_json_file,
+  read_text_file,
+  write_file,
+  write_json_file,
+  write_text_file,
+)
 
 TEST_DIR = os.path.join(tempfile.gettempdir(), 'mtfs-tests')
 
-class MtfsTests(unittest.TestCase):
 
+class MtfsTests(unittest.TestCase):
   def setUp(self):
     shutil.rmtree(TEST_DIR, ignore_errors=True)
     os.makedirs(TEST_DIR)
@@ -45,6 +52,7 @@ class MtfsTests(unittest.TestCase):
     write_json_file(path, content)
 
     self.assertEqual(read_json_file(path), content)
+
 
 if __name__ == '__main__':
   unittest.main()

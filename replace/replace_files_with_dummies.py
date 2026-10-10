@@ -7,15 +7,17 @@ from mtfs import write_file
 from mtprompt import Prompt
 from tqdm import tqdm
 
+
 def main():
   parent_folder = Prompt.dir(
     'Enter the path to the parent folder containing the files'
   )
-  pattern = re.compile(Prompt.str(
-    'Enter the pattern files need to match (regex)'
-  ))
+  pattern = re.compile(
+    Prompt.str('Enter the pattern files need to match (regex)')
+  )
 
   process_files(parent_folder, pattern)
+
 
 def process_files(
   parent_folder_path: str,
@@ -29,16 +31,23 @@ def process_files(
         file_path = os.path.join(root, file)
         files_to_process.append(file_path)
 
-  with ThreadPoolExecutor() as executor, tqdm(total = len(files_to_process), desc = f'Processing "{parent_folder_path}"') as progress:
+  with (
+    ThreadPoolExecutor() as executor,
+    tqdm(
+      total=len(files_to_process), desc=f'Processing "{parent_folder_path}"'
+    ) as progress,
+  ):
     for _ in executor.map(replace_file, files_to_process):
       progress.update(1)
 
   logger.success(f'Finished replacing files in "{parent_folder_path}".\n')
 
+
 def replace_file(
   file_path: str,
 ):
   write_file(file_path, b'')
+
 
 if __name__ == '__main__':
   try:

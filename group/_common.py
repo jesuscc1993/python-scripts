@@ -11,8 +11,9 @@ FILE_BLACKLIST = [
   r'desktop.ini',
   r'folder.jpg',
   r'.*\.url',
-  r'.*\.lnk'
+  r'.*\.lnk',
 ]
+
 
 def find_files_to_process(
   parent_folder_path: str,
@@ -27,16 +28,28 @@ def find_files_to_process(
 
   return files_to_process
 
+
 def group_files(
   parent_folder_path: str,
   files_to_process: list,
   get_group_name: Callable,
 ):
-  with ThreadPoolExecutor() as executor, tqdm(total = len(files_to_process), desc = f'Processing "{parent_folder_path}"') as progress:
-    for _ in executor.map(lambda item_path: process_file(item_path, parent_folder_path, get_group_name), files_to_process):
+  with (
+    ThreadPoolExecutor() as executor,
+    tqdm(
+      total=len(files_to_process), desc=f'Processing "{parent_folder_path}"'
+    ) as progress,
+  ):
+    for _ in executor.map(
+      lambda item_path: process_file(
+        item_path, parent_folder_path, get_group_name
+      ),
+      files_to_process,
+    ):
       progress.update(1)
 
   logger.success(f'Finished grouping files in "{parent_folder_path}".')
+
 
 def process_file(
   item_path: str,
@@ -48,6 +61,6 @@ def process_file(
     return
 
   target_folder = os.path.join(parent_folder_path, group_name)
-  os.makedirs(target_folder, exist_ok = True)
+  os.makedirs(target_folder, exist_ok=True)
   dest = os.path.join(target_folder, os.path.basename(item_path))
   shutil.move(item_path, dest)

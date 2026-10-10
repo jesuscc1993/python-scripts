@@ -20,6 +20,7 @@ NO_RESULTS_FOUND_ERROR = 'No results found'
 
 ENTRY_URL_REGEX = re.compile(r'^https://myanimelist\.net/manga/(\d+)/')
 
+
 def main():
   if len(sys.argv) > 1:
     parent_dir = sys.argv[1]
@@ -38,12 +39,15 @@ def main():
 
   logger.success(f'Finished generating metadata in "{parent_dir}".')
 
+
 def process_dir(
   dir_path: str,
 ):
   dir_name = os.path.basename(dir_path)
 
-  files_missing = [f for f in ALL_FILES if not os.path.exists(os.path.join(dir_path, f))]
+  files_missing = [
+    f for f in ALL_FILES if not os.path.exists(os.path.join(dir_path, f))
+  ]
   if not files_missing:
     logger.trace(f'  Skipping "{dir_name}". All metadata files already exist.')
     return
@@ -52,17 +56,22 @@ def process_dir(
   generate_no_meta_files(dir_path)
   fetch_manga_info(dir_path, sanitized_name)
 
+
 def format_result_title(result: MangaSearchResult):
   return f'{result.title} {logger.format_trace("(" + result.type + ")")}'
 
+
 def find_exact_match(name: str):
-  response = requests.get(f'{config.MAL_ENDPOINT}manga.php?q={name}', timeout=10)
+  response = requests.get(
+    f'{config.MAL_ENDPOINT}manga.php?q={name}', timeout=10
+  )
 
   match = ENTRY_URL_REGEX.match(response.url)
   if not match:
     return None
 
   return Manga(int(match.group(1)))
+
 
 def write_comic_info(
   dir_path: str,
@@ -81,8 +90,11 @@ def write_comic_info(
   ElementTree.indent(tree, space='  ')
   tree.write(file_path, encoding='utf-8', xml_declaration=True)
 
-  rel_file_path = os.path.join(os.path.basename(dir_path), os.path.basename(file_path))
+  rel_file_path = os.path.join(
+    os.path.basename(dir_path), os.path.basename(file_path)
+  )
   logger.success(f'Generated "{rel_file_path}" file.')
+
 
 def add_xml_field(
   root: ElementTree.Element,
@@ -92,10 +104,12 @@ def add_xml_field(
   if value:
     ElementTree.SubElement(root, tag).text = str(value)
 
+
 def format_score(
   score: float,
 ):
   return score / 2 if score else None
+
 
 def generate_no_meta_files(
   dir_path: str,
@@ -119,6 +133,7 @@ def generate_no_meta_files(
     except Exception as ex:
       logger.error(f'Could not create "{filename}":\n{ex}')
 
+
 def fetch_manga_info(dir_path: str, name: str):
   dir_name = os.path.basename(dir_path)
   comic_info_path = os.path.join(dir_path, COMIC_INFO_FILENAME)
@@ -129,7 +144,9 @@ def fetch_manga_info(dir_path: str, name: str):
 
     try:
       try:
-        results = [r for r in MangaSearch(name).results if r.type not in TYPE_BLACKLIST][:MAX_RESULTS]
+        results = [
+          r for r in MangaSearch(name).results if r.type not in TYPE_BLACKLIST
+        ][:MAX_RESULTS]
         if not results:
           # manually raise NO_RESULTS_FOUND_ERROR after filtering blacklist,
           # to route into the same handling as no results found by the library
@@ -140,13 +157,17 @@ def fetch_manga_info(dir_path: str, name: str):
           # which the library mistakes for a search page with no results
           exact_match = find_exact_match(name)
           if exact_match is None:
-            logger.warn(f'  Skipping "{dir_name}". No results found for query "{name}".')
+            logger.warn(
+              f'  Skipping "{dir_name}". No results found for query "{name}".'
+            )
             return
           results = [exact_match]
         else:
           raise
 
-      exact_match = next((r for r in results if r.title.lower() == name.lower()), None)
+      exact_match = next(
+        (r for r in results if r.title.lower() == name.lower()), None
+      )
       if exact_match:
         result = exact_match
       elif len(results) == 1:
@@ -181,6 +202,7 @@ def fetch_manga_info(dir_path: str, name: str):
   else:
     logger.trace(f'  Skipping "{rel_comic_info_path}". File already exists.')
 
+
 def generate_cover_image(
   dir_path: str,
   manga: Manga,
@@ -197,7 +219,9 @@ def generate_cover_image(
     return
 
   try:
-    response = requests.get(manga.image_url.replace('.jpg', 'l.jpg'), timeout=10)
+    response = requests.get(
+      manga.image_url.replace('.jpg', 'l.jpg'), timeout=10
+    )
     response.raise_for_status()
 
     with open(cover_path, 'wb') as file:
@@ -207,6 +231,7 @@ def generate_cover_image(
 
   except Exception as ex:
     logger.error(f'Could not save "{rel_cover_path}":\n{ex}')
+
 
 if __name__ == '__main__':
   try:

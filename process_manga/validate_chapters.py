@@ -8,26 +8,30 @@ from mtprompt import Prompt, to_bool, to_dir
 
 from _common import get_chapter, select_parent_folder
 
+
 def main():
   if len(sys.argv) > 1:
     params = [to_dir(sys.argv[1])]
-    if len(sys.argv) > 2: params.append(to_bool(sys.argv[2]))
-    if len(sys.argv) > 3: params.append(to_bool(sys.argv[3]))
+    if len(sys.argv) > 2:
+      params.append(to_bool(sys.argv[2]))
+    if len(sys.argv) > 3:
+      params.append(to_bool(sys.argv[3]))
     process_parent_folder(*params)
   else:
     select_parent_folder(
       'Enter the path to the parent folder containing the chapter folders:\n',
       process_parent_folder,
-      { 'log_success': False }
+      {'log_success': False},
     )
+
 
 def process_parent_folder(
   dir_path: str,
-  prompt_for_deletion = True,
-  recursive = True,
+  prompt_for_deletion=True,
+  recursive=True,
 ):
   dir_name = os.path.basename(dir_path)
-  entries = sorted(os.scandir(dir_path), key = get_sort_key)
+  entries = sorted(os.scandir(dir_path), key=get_sort_key)
   found_chapters = set()
 
   missing_chapters: list[float] = []
@@ -49,9 +53,13 @@ def process_parent_folder(
       for entry in os.scandir(dir_path):
         if entry.is_dir():
           subfolder_result = process_parent_folder(entry.path, recursive=False)
-          found_subfolder_chapters = found_subfolder_chapters or subfolder_result
+          found_subfolder_chapters = (
+            found_subfolder_chapters or subfolder_result
+          )
       if not found_subfolder_chapters:
-        logger.trace(f'No chapters found in "{dir_name}", trying subfolders instead.')
+        logger.trace(
+          f'No chapters found in "{dir_name}", trying subfolders instead.'
+        )
 
     return found_subfolder_chapters
 
@@ -70,7 +78,9 @@ def process_parent_folder(
 
   logger.log()
 
-  is_problematic = bool(missing_chapters or incomplete_chapters or empty_chapters)
+  is_problematic = bool(
+    missing_chapters or incomplete_chapters or empty_chapters
+  )
   if not is_problematic:
     logger.success(f'No chapters nor pages detected missing in "{dir_name}".')
     return True
@@ -82,8 +92,7 @@ def process_parent_folder(
 
   if missing_chapters:
     logger.warn(
-      f'* Missing chapters: '
-      f'{" ".join(format_number_ranges(missing_chapters))}'
+      f'* Missing chapters: {" ".join(format_number_ranges(missing_chapters))}'
     )
 
   if incomplete_chapters:
@@ -101,20 +110,20 @@ def process_parent_folder(
 
   if empty_chapters:
     logger.warn(
-      f'* Empty chapters: '
-      f'{" ".join(format_number_ranges(empty_chapters))}'
+      f'* Empty chapters: {" ".join(format_number_ranges(empty_chapters))}'
     )
 
   if (
-    empty_chapters and
-    prompt_for_deletion is not False and
-    Prompt.bool('Delete empty chapters?')
+    empty_chapters
+    and prompt_for_deletion is not False
+    and Prompt.bool('Delete empty chapters?')
   ):
     for entry in empty_chapters:
       os.rmdir(entry.path)
       logger.success(f'Deleted empty chapter folder: "{entry.name}"')
 
   return True
+
 
 def get_missing_chapter_pages(
   dir_path: str,
@@ -135,11 +144,13 @@ def get_missing_chapter_pages(
 
   return find_missing(found_pages)
 
+
 def get_sort_key(
   entry: os.DirEntry,
 ):
   chapter = get_chapter(entry.name)
   return (0, float(chapter)) if chapter is not None else (1, entry.name.lower())
+
 
 def find_missing(
   found: set[float],
@@ -147,11 +158,13 @@ def find_missing(
   expected = range(1, int(max(found)) + 1)
   return [n for n in expected if n not in found]
 
+
 def format_chapter(
   chapter: str,
 ):
   integer, dot, decimal = f'{float(chapter):g}'.partition('.')
   return f'{int(integer):03d}{dot}{decimal}'
+
 
 def format_number_ranges(
   numbers: list[float],
@@ -160,9 +173,12 @@ def format_number_ranges(
   ranges = [[number for _, number in group] for _, group in groups]
 
   return [
-    format_chapter(group[0]) if len(group) == 1 else f'{format_chapter(group[0])}-{format_chapter(group[-1])}'
+    format_chapter(group[0])
+    if len(group) == 1
+    else f'{format_chapter(group[0])}-{format_chapter(group[-1])}'
     for group in ranges
   ]
+
 
 if __name__ == '__main__':
   try:

@@ -31,6 +31,7 @@ STEAM_APPS_COMMON = os.path.join(STEAM_APPS, 'common')
 AMAZON_GAMES = 'Amazon Games'
 AMAZON_LIBRARY = os.path.join(AMAZON_GAMES, 'Library')
 
+
 def main():
   logger.log('Creating game client symlinks...\n')
   link_steam()
@@ -42,79 +43,84 @@ def main():
   reverse_link_electronic_arts()
   logger.info('Finished creating game client symlinks')
 
+
 def link_steam():
   if STEAM_USER_ID3:
     link_dir(
       os.path.join(D_DRIVE, CLIENTS, 'Steam', 'steamapps'),
-      os.path.join(D_DRIVE, STEAM_APPS)
+      os.path.join(D_DRIVE, STEAM_APPS),
     )
     link_dir(
-      os.path.join(D_DRIVE, CLIENTS, 'Steam', 'userdata', STEAM_USER_ID3, 'config', 'grid'),
-      os.path.join(Z_DRIVE, 'Images', 'Covers', 'Steam', '_output')
+      os.path.join(
+        D_DRIVE, CLIENTS, 'Steam', 'userdata', STEAM_USER_ID3, 'config', 'grid'
+      ),
+      os.path.join(Z_DRIVE, 'Images', 'Covers', 'Steam', '_output'),
     )
     for drive in DRIVES:
       link_dir(
-        os.path.join(drive, STEAM_APPS_COMMON),
-        os.path.join(drive, GAMES)
+        os.path.join(drive, STEAM_APPS_COMMON), os.path.join(drive, GAMES)
       )
       link_dir(
         os.path.join(drive, CLIENTS, 'Steam', 'userdata', STEAM_USER_ID3),
-        os.path.join(GAME_CLIENTS_SAVES_PATH, 'Steam')
+        os.path.join(GAME_CLIENTS_SAVES_PATH, 'Steam'),
       )
     link_dir(
       os.path.join(PROGRAM_FILES, 'Steam', 'userdata', STEAM_USER_ID3),
-      os.path.join(GAME_CLIENTS_SAVES_PATH, 'Steam')
+      os.path.join(GAME_CLIENTS_SAVES_PATH, 'Steam'),
     )
     print()
   else:
     logger.warn('STEAM_USER_ID3 not set. Skipping Steam links.')
 
+
 def link_amazon():
   link_dir(
     os.path.join(LOCAL_DATA, AMAZON_GAMES),
-    os.path.join(D_DRIVE, CLIENTS, AMAZON_GAMES)
+    os.path.join(D_DRIVE, CLIENTS, AMAZON_GAMES),
   )
   link_dir(
-    os.path.join(LOCAL_DATA, AMAZON_LIBRARY),
-    os.path.join(D_DRIVE, GAMES)
+    os.path.join(LOCAL_DATA, AMAZON_LIBRARY), os.path.join(D_DRIVE, GAMES)
   )
   for drive in DRIVES:
-    link_dir(
-      os.path.join(drive, AMAZON_LIBRARY),
-      os.path.join(drive, GAMES)
-    )
+    link_dir(os.path.join(drive, AMAZON_LIBRARY), os.path.join(drive, GAMES))
   print()
+
 
 def link_epic():
   if EPIC_USER_ID:
     link_dir(
-      os.path.join(LOCAL_DATA, 'EpicGamesLauncher', 'Saved', 'Saves', EPIC_USER_ID),
-      os.path.join(GAME_CLIENTS_SAVES_PATH, 'Epic')
+      os.path.join(
+        LOCAL_DATA, 'EpicGamesLauncher', 'Saved', 'Saves', EPIC_USER_ID
+      ),
+      os.path.join(GAME_CLIENTS_SAVES_PATH, 'Epic'),
     )
     print()
   else:
     logger.warn('EPIC_USER_ID not set. Skipping Epic links.')
 
+
 def link_ubisoft():
   if UBISOFT_USER_ID:
     link_dir(
       os.path.join(D_DRIVE, CLIENTS, 'Uplay', 'games'),
-      os.path.join(D_DRIVE, GAMES)
+      os.path.join(D_DRIVE, GAMES),
     )
     link_dir(
       os.path.join(E_DRIVE, CLIENTS, 'Uplay', 'savegames', UBISOFT_USER_ID),
-      os.path.join(GAME_CLIENTS_SAVES_PATH, 'Ubisoft')
+      os.path.join(GAME_CLIENTS_SAVES_PATH, 'Ubisoft'),
     )
   else:
     logger.warn('UBISOFT_USER_ID not set. Skipping Ubisoft links.')
   print()
 
+
 def link_electronic_arts():
   link_dir(
     os.path.join(PROGRAM_FILES, 'Electronic Arts', 'EA Desktop', 'EA Desktop'),
-    os.path.join(D_DRIVE, CLIENTS, 'EA Desktop')
+    os.path.join(D_DRIVE, CLIENTS, 'EA Desktop'),
   )
   print()
+
 
 def reverse_link_electronic_arts():
   link_dir(
@@ -122,6 +128,7 @@ def reverse_link_electronic_arts():
     os.path.join(PROGRAM_FILES, 'Electronic Arts', 'EA Desktop', 'EA Desktop'),
   )
   print()
+
 
 if __name__ == '__main__':
   try:

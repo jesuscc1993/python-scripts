@@ -9,6 +9,7 @@ from unittest.mock import patch
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 from convert_to_srt import convert_to_srt, process_file
 
+
 class TestConvertToSrt(unittest.TestCase):
   def setUp(self):
     self.dir_path = os.path.join(
@@ -16,7 +17,7 @@ class TestConvertToSrt(unittest.TestCase):
       'python-scripts-tests',
       'process_video',
       'convert_to_srt',
-      self._testMethodName
+      self._testMethodName,
     )
     shutil.rmtree(self.dir_path, ignore_errors=True)
     os.makedirs(self.dir_path)
@@ -35,17 +36,30 @@ class TestConvertToSrt(unittest.TestCase):
         output_file.write('1\n00:00:00,000 --> 00:00:01,000\nfoo\n')
       return SimpleNamespace(returncode=0, stderr='')
 
-    with patch('convert_to_srt.subprocess.run', side_effect=run_ffmpeg) as run, patch('convert_to_srt.send2trash') as trash:
+    with (
+      patch('convert_to_srt.subprocess.run', side_effect=run_ffmpeg) as run,
+      patch('convert_to_srt.send2trash') as trash,
+    ):
       result = convert_to_srt(input_path, output_path)
 
     self.assertTrue(result)
     run.assert_called_once_with(
-      ['ffmpeg', '-v', 'error', '-n', '-i', input_path, '-c:s', 'srt', output_path],
+      [
+        'ffmpeg',
+        '-v',
+        'error',
+        '-n',
+        '-i',
+        input_path,
+        '-c:s',
+        'srt',
+        output_path,
+      ],
       check=False,
       capture_output=True,
       encoding='utf-8',
       errors='replace',
-      text=True
+      text=True,
     )
     self.assertTrue(os.path.isfile(output_path))
     with open(output_path, encoding='utf-8') as output_file:
@@ -63,17 +77,30 @@ class TestConvertToSrt(unittest.TestCase):
         output_file.write('partial output')
       return SimpleNamespace(returncode=1, stderr='conversion failed')
 
-    with patch('convert_to_srt.subprocess.run', side_effect=run_ffmpeg) as run, patch('convert_to_srt.send2trash') as trash:
+    with (
+      patch('convert_to_srt.subprocess.run', side_effect=run_ffmpeg) as run,
+      patch('convert_to_srt.send2trash') as trash,
+    ):
       result = convert_to_srt(input_path, output_path)
 
     self.assertFalse(result)
     run.assert_called_once_with(
-      ['ffmpeg', '-v', 'error', '-n', '-i', input_path, '-c:s', 'srt', output_path],
+      [
+        'ffmpeg',
+        '-v',
+        'error',
+        '-n',
+        '-i',
+        input_path,
+        '-c:s',
+        'srt',
+        output_path,
+      ],
       check=False,
       capture_output=True,
       encoding='utf-8',
       errors='replace',
-      text=True
+      text=True,
     )
     trash.assert_not_called()
     self.assertTrue(os.path.isfile(input_path))
@@ -86,7 +113,10 @@ class TestConvertToSrt(unittest.TestCase):
       with open(path, 'w', encoding='utf-8'):
         pass
 
-    with patch('convert_to_srt.subprocess.run') as run, patch('convert_to_srt.send2trash') as trash:
+    with (
+      patch('convert_to_srt.subprocess.run') as run,
+      patch('convert_to_srt.send2trash') as trash,
+    ):
       result = convert_to_srt(input_path, output_path)
 
     self.assertFalse(result)
@@ -102,6 +132,7 @@ class TestConvertToSrt(unittest.TestCase):
 
     with open(input_path, encoding='utf-8') as input_file:
       self.assertEqual(input_file.read(), 'foo')
+
 
 if __name__ == '__main__':
   unittest.main()

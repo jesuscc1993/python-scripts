@@ -22,8 +22,9 @@ EXE_EXCLUSION_PATTERNS = [
   r'trainer',
   r'unins',
   r'updat',
-  r'upload'
+  r'upload',
 ]
+
 
 def main():
   if len(sys.argv) > 1:
@@ -33,10 +34,7 @@ def main():
     parent_path = Prompt.dir(
       'Enter the path to the directory containing the exes you want to process'
     )
-    depth = Prompt.int(
-      'Enter the depth for processing subfolders',
-      default=1
-    )
+    depth = Prompt.int('Enter the depth for processing subfolders', default=1)
 
   parent_path = os.path.abspath(parent_path)
   parent_depth = parent_path.rstrip(os.sep).count(os.sep)
@@ -54,7 +52,10 @@ def main():
       process_dir(child_path)
 
   mtsound.notify()
-  logger.success(f'Finished setting icons for "{parent_path}".', prefix_newline=True)
+  logger.success(
+    f'Finished setting icons for "{parent_path}".', prefix_newline=True
+  )
+
 
 def process_dir(
   dir_path: str,
@@ -70,6 +71,7 @@ def process_dir(
   except Exception as ex:
     logger.error(f'Could not process "{dir_path}": {ex}')
 
+
 def find_exe(
   dir_path: str,
 ):
@@ -80,6 +82,7 @@ def find_exe(
       if f.lower().endswith('.exe') and not pattern.search(f):
         return os.path.join(dirpath, f)
   return None
+
 
 if __name__ == '__main__':
   try:

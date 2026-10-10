@@ -17,6 +17,7 @@ FUZZY_MATCH_THRESHOLD = 0.8
 #  Tales (1845)
 #  Tales (1845), Wiley & Putnam
 
+
 def main():
   if len(sys.argv) > 2:
     parent_dir = sys.argv[1]
@@ -25,11 +26,10 @@ def main():
     parent_dir = Prompt.dir(
       'Enter the path to the directory containing the subfolders you want to order'
     )
-    order_file = Prompt.file(
-      'Enter the path to the order text file'
-    )
+    order_file = Prompt.file('Enter the path to the order text file')
 
   process_parent_folder(parent_dir, order_file)
+
 
 def process_parent_folder(
   parent_dir: str,
@@ -53,6 +53,7 @@ def process_parent_folder(
 
   logger.success(f'Finished prefixing order in "{parent_dir}".')
 
+
 def order_subfolder_files(
   dir_path: str,
   entries: list,
@@ -70,21 +71,26 @@ def order_subfolder_files(
       continue
 
     year, matched_title, is_exact = match
-    if not is_exact and not Prompt.bool(f'Match "{title}" to "{matched_title}" ({year})?', default = True):
+    if not is_exact and not Prompt.bool(
+      f'Match "{title}" to "{matched_title}" ({year})?', default=True
+    ):
       logger.warn(f'Skipping "{file_name}". Match not confirmed.')
       continue
 
     matches.append((year, title, file_name))
 
-  matches.sort(key = lambda match: (match[0], match[1]))
+  matches.sort(key=lambda match: (match[0], match[1]))
   num_digits = max(2, len(str(len(matches))))
 
-  for index, (_, _, file_name) in enumerate(matches, start = 1):
+  for index, (_, _, file_name) in enumerate(matches, start=1):
     order_str = str(index).zfill(num_digits)
     new_file_name = insert_order_tag(file_name, order_str)
     if new_file_name != file_name:
-      os.rename(os.path.join(dir_path, file_name), os.path.join(dir_path, new_file_name))
+      os.rename(
+        os.path.join(dir_path, file_name), os.path.join(dir_path, new_file_name)
+      )
       logger.debug(f'Renamed "{file_name}" to "{new_file_name}".')
+
 
 def extract_title(
   file_name: str,
@@ -94,10 +100,12 @@ def extract_title(
   name = re.sub(r'^-\s*', '', name)
   return name.strip()
 
+
 def normalize(
   text: str,
 ):
   return re.sub(r'[^a-z0-9]', '', text.lower())
+
 
 def find_year(
   title: str,
@@ -115,7 +123,9 @@ def find_year(
   for variants, year in entries:
     for variant in variants:
       normalized_variant = normalize(variant)
-      if normalized_variant and (normalized_variant in target or target in normalized_variant):
+      if normalized_variant and (
+        normalized_variant in target or target in normalized_variant
+      ):
         return year, variant, False
 
   best_year, best_variant, best_ratio = None, None, 0
@@ -125,7 +135,12 @@ def find_year(
       if ratio > best_ratio:
         best_ratio, best_year, best_variant = ratio, year, variant
 
-  return (best_year, best_variant, False) if best_ratio >= FUZZY_MATCH_THRESHOLD else None
+  return (
+    (best_year, best_variant, False)
+    if best_ratio >= FUZZY_MATCH_THRESHOLD
+    else None
+  )
+
 
 def insert_order_tag(
   file_name: str,
@@ -141,13 +156,14 @@ def insert_order_tag(
   insert_pos = brackets[-1].end()
   return f'{name[:insert_pos]} [{order_str}]{name[insert_pos:]}{ext}'
 
+
 def parse_order_entries(
   order_file_path: str,
 ):
   entries = []
   pending_title = None
 
-  with open(order_file_path, 'r', encoding = 'utf-8') as file:
+  with open(order_file_path, 'r', encoding='utf-8') as file:
     lines = [line.strip() for line in file if line.strip()]
 
   for line in lines:
@@ -159,7 +175,7 @@ def parse_order_entries(
       pending_title = line
       continue
 
-    title_part = line[:year_match.start()].split('\t')[0].strip()
+    title_part = line[: year_match.start()].split('\t')[0].strip()
     title = title_part if title_part else pending_title
     pending_title = None
 
@@ -168,6 +184,7 @@ def parse_order_entries(
       entries.append((variants, int(year_match.group(1))))
 
   return entries
+
 
 if __name__ == '__main__':
   try:

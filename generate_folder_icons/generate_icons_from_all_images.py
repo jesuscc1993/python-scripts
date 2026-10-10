@@ -18,6 +18,7 @@ IMAGE_EXTS = [
 ]
 ICON_SIZES = [16, 32, 48, 256]
 
+
 def main():
   if len(sys.argv) > 1:
     parent_path = to_dir(sys.argv[1])
@@ -34,6 +35,7 @@ def main():
         ico_path = os.path.join(root, os.path.splitext(image_path)[0] + '.ico')
         image_to_ico(image_path, ico_path, ICON_SIZES)
         logger.log(f'Generated "{ico_path}".')
+
 
 if __name__ == '__main__':
   try:

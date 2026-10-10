@@ -6,13 +6,15 @@ from _common import select_parent_folder, run_scripts_in_sequence
 SCRIPT_NAMES = [
   'crop_webtoon $dir',
   '../compress/compress_folders $dir ZIP Y',
-  'rename_items $dir'
+  'rename_items $dir',
 ]
+
 
 def process_parent_folder(
   parent_folder_path: str,
 ):
   run_scripts_in_sequence(SCRIPT_NAMES, parent_folder_path)
+
 
 if __name__ == '__main__':
   try:

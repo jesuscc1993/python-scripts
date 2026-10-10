@@ -13,13 +13,12 @@ from _settings import SETTINGS
 LANGUAGE = 'eng'
 SUBTITLES_PATH = 'subtitles'
 
+
 def main():
   if len(sys.argv) > 1:
     input_path = to_path(sys.argv[1])
   else:
-    input_path = Prompt.path(
-      'Enter the path to a video file or directory'
-    )
+    input_path = Prompt.path('Enter the path to a video file or directory')
 
   logger.log(f'Extracting subs for "{input_path}"...')
   logger.hr()
@@ -31,6 +30,7 @@ def main():
 
   logger.hr()
   logger.log(f'Finished extracting subs for "{input_path}".')
+
 
 def process_file(
   file_path: str,
@@ -52,21 +52,27 @@ def process_file(
   in_place_output_path = dir_path
   in_folder_output_path = os.path.join(dir_path, SUBTITLES_PATH)
 
-  if any(os.path.exists(os.path.join(path, subtitles_file_name)) for path in [in_place_output_path, in_folder_output_path]):
+  if any(
+    os.path.exists(os.path.join(path, subtitles_file_name))
+    for path in [in_place_output_path, in_folder_output_path]
+  ):
     logger.trace(f'Skipping "{file_name}". Subtitles file already exists.\n')
     return
 
   if SETTINGS['extract_to_folder']:
     output_path = in_folder_output_path
-    os.makedirs(output_path, exist_ok = True)
+    os.makedirs(output_path, exist_ok=True)
   else:
     output_path = in_place_output_path
 
   dest_file_path = os.path.join(output_path, subtitles_file_name)
-  extract_subtitles(file_path, dest_file_path, file_name, stream_idx, subtitle_ext)
+  extract_subtitles(
+    file_path, dest_file_path, file_name, stream_idx, subtitle_ext
+  )
 
   if os.path.isdir(output_path) and not os.listdir(output_path):
     os.rmdir(output_path)
+
 
 def process_directory(
   dir_path: str,
@@ -75,6 +81,7 @@ def process_directory(
     for file_name in file_names:
       process_file(os.path.join(root, file_name))
 
+
 def extract_subtitles(
   src_file_path: str,
   dest_file_path: str,
@@ -82,20 +89,29 @@ def extract_subtitles(
   stream_idx: str,
   subtitle_ext: str,
 ):
-  no_subs_found_message = f'Skipping "{file_name}". No {LANGUAGE} subtitles found.\n'
+  no_subs_found_message = (
+    f'Skipping "{file_name}". No {LANGUAGE} subtitles found.\n'
+  )
 
   logger.log(f'Extracting {LANGUAGE} subtitles for "{file_name}"...')
   cmd = [
     'ffmpeg',
     '-y',
-    '-analyzeduration', '0',
-    '-probesize', '5000000',
-    '-i', src_file_path,
-    '-map', f'0:{stream_idx}',
-    '-c:s', 'copy',
-    dest_file_path
+    '-analyzeduration',
+    '0',
+    '-probesize',
+    '5000000',
+    '-i',
+    src_file_path,
+    '-map',
+    f'0:{stream_idx}',
+    '-c:s',
+    'copy',
+    dest_file_path,
   ]
-  subprocess.run(cmd, check = False, stdout = subprocess.DEVNULL, stderr = subprocess.DEVNULL)
+  subprocess.run(
+    cmd, check=False, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+  )
 
   if os.path.exists(dest_file_path):
     if os.path.getsize(dest_file_path) == 0:
@@ -107,26 +123,36 @@ def extract_subtitles(
   else:
     logger.warn(no_subs_found_message)
 
-def find_subtitle_stream(src_file_path: str, target_language: str) -> tuple[str | None, str | None]:
+
+def find_subtitle_stream(
+  src_file_path: str, target_language: str
+) -> tuple[str | None, str | None]:
   try:
     result = subprocess.run(
       [
         'ffprobe',
-        '-v', 'quiet',
-        '-analyzeduration', '0',
-        '-probesize', '5000000',
-        '-print_format', 'json',
+        '-v',
+        'quiet',
+        '-analyzeduration',
+        '0',
+        '-probesize',
+        '5000000',
+        '-print_format',
+        'json',
         '-show_streams',
-        src_file_path
+        src_file_path,
       ],
-      check = False,
-      capture_output = True,
-      encoding = 'utf-8',
-      errors = 'replace',
-      text = True,
+      check=False,
+      capture_output=True,
+      encoding='utf-8',
+      errors='replace',
+      text=True,
     )
     for stream in json.loads(result.stdout).get('streams', []):
-      if stream.get('codec_type') == 'subtitle' and stream.get('codec_name') in SUBTITLE_EXTS_BY_CODEC:
+      if (
+        stream.get('codec_type') == 'subtitle'
+        and stream.get('codec_name') in SUBTITLE_EXTS_BY_CODEC
+      ):
         tags = stream.get('tags', {})
         language = tags.get('language', '').lower()
         if language.startswith(target_language):
@@ -135,6 +161,7 @@ def find_subtitle_stream(src_file_path: str, target_language: str) -> tuple[str 
   except Exception:
     logger.failure(f'Failed to find subtitle stream for "{src_file_path}".')
   return None, None
+
 
 if __name__ == '__main__':
   try:

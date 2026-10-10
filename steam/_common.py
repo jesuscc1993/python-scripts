@@ -5,7 +5,12 @@ from io import BytesIO
 from mtlogger import logger
 from pathlib import Path
 
-from _constants import COVER_URL_MAP, REQUEST_TIMEOUT, GET_OWNED_GAMES_ENDPOINT_URL
+from _constants import (
+  COVER_URL_MAP,
+  REQUEST_TIMEOUT,
+  GET_OWNED_GAMES_ENDPOINT_URL,
+)
+
 
 def send_request(endpoint_url: str, params: dict):
   response = requests.get(
@@ -15,6 +20,7 @@ def send_request(endpoint_url: str, params: dict):
   )
   response.raise_for_status()
   return response.json().get('response', {})
+
 
 def get_owned_games(
   api_key: str,
@@ -29,17 +35,19 @@ def get_owned_games(
     },
   ).get('games', [])
 
+
 def download_assets_for_app_id(
   steam_app_id: str,
   dest_dir: str,
   filename_id: str | None = None,
 ):
   filename_id = filename_id or steam_app_id
-  Path(dest_dir).mkdir(parents = True, exist_ok = True)
+  Path(dest_dir).mkdir(parents=True, exist_ok=True)
   for data in COVER_URL_MAP.values():
     url = data['url'].format(steam_app_id)
     filename = data['dest'].format(filename_id)
     download_asset_for_app_id(url, Path(dest_dir) / filename, data.get('size'))
+
 
 def download_asset_for_app_id(
   url: str,
@@ -52,6 +60,7 @@ def download_asset_for_app_id(
   response = requests.get(url)
   response.raise_for_status()
   save_asset(response.content, dest, size)
+
 
 def save_asset(
   content: bytes,

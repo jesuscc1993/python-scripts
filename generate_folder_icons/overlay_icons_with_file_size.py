@@ -15,7 +15,13 @@ from mtlogger import logger
 from mtfs import read_text_file
 from mtprompt import Prompt, to_bool, to_dir, to_int
 
-from _constants import DESKTOP_INI_FILENAME, HIDDEN_SYSTEM_FILE_ATTRS, ICO_FILENAME, MAX_ICO_SIZE, PREFERRED_ENCODING
+from _constants import (
+  DESKTOP_INI_FILENAME,
+  HIDDEN_SYSTEM_FILE_ATTRS,
+  ICO_FILENAME,
+  MAX_ICO_SIZE,
+  PREFERRED_ENCODING,
+)
 from _common import get_ini_icon, read_ini, set_folder_icon, write_hidden_file
 
 DEBUG = False
@@ -41,6 +47,7 @@ BG_COLOR = (25, 25, 25, 255)
 VALUE_COLOR = (255, 255, 255, 255)
 UNITS_COLOR = (192, 192, 192, 255)
 
+
 def main():
   if len(sys.argv) > 1:
     parent_path = to_dir(sys.argv[1])
@@ -50,14 +57,8 @@ def main():
     parent_path = Prompt.dir(
       'Enter the path to the directory containing the exes you want to process'
     )
-    depth = Prompt.int(
-      'Enter the depth for processing subfolders',
-      default=1
-    )
-    overwrite_existing = Prompt.bool(
-      'Overwrite existing icons?',
-      default=False
-    )
+    depth = Prompt.int('Enter the depth for processing subfolders', default=1)
+    overwrite_existing = Prompt.bool('Overwrite existing icons?', default=False)
 
   parent_path = os.path.abspath(parent_path)
 
@@ -80,24 +81,31 @@ def main():
         process_dir(child_path, overwrite_existing)
 
   mtsound.notify()
-  logger.success(f'Finished setting icons for "{parent_path}".', prefix_newline=True)
+  logger.success(
+    f'Finished setting icons for "{parent_path}".', prefix_newline=True
+  )
+
 
 def should_skip_dir(
   dir_path: str,
 ):
   should_skip = Attr.is_hidden(dir_path) or has_exclusion_file(dir_path)
   if should_skip:
-    logger.trace(f'  Skipping "{dir_path}". Directory is hidden or contains a {EXCLUSION_FILE} file.')
+    logger.trace(
+      f'  Skipping "{dir_path}". Directory is hidden or contains a {EXCLUSION_FILE} file.'
+    )
   return should_skip
+
 
 def has_exclusion_file(
   path: str,
 ):
   return os.path.exists(os.path.join(path, EXCLUSION_FILE))
 
+
 def process_dir(
   dir_path: str,
-  overwrite_existing = False,
+  overwrite_existing=False,
 ):
   try:
     ini_path = os.path.join(dir_path, DESKTOP_INI_FILENAME)
@@ -120,9 +128,11 @@ def process_dir(
     overwrite = overwrite_existing or new_ico_name not in ico_path
 
     if (
-      not FORCE_RECALCULATE and not overwrite_existing and
-      os.path.exists(new_ico_path) and os.path.exists(dir_size_path) and
-      os.path.getmtime(new_ico_path) > os.path.getmtime(dir_size_path)
+      not FORCE_RECALCULATE
+      and not overwrite_existing
+      and os.path.exists(new_ico_path)
+      and os.path.exists(dir_size_path)
+      and os.path.getmtime(new_ico_path) > os.path.getmtime(dir_size_path)
     ):
       logger.trace(f'  Skipping "{dir_path}". Icon is up to date.')
       return
@@ -153,7 +163,9 @@ def process_dir(
     if ico_img and ico_img.mode == 'RGBA':
       r, g, b, a = ico_img.split()
       if not any(a.getdata()):
-        ico_img = Image.merge('RGBA', (r, g, b, Image.new('L', ico_img.size, 255)))
+        ico_img = Image.merge(
+          'RGBA', (r, g, b, Image.new('L', ico_img.size, 255))
+        )
 
     if not ico_img:
       logger.trace(f'  Skipping "{dir_path}". Could not load folder icon.')
@@ -161,12 +173,16 @@ def process_dir(
 
     formatted_size = calculate_dir_size(dir_path)
     if formatted_size == '<1 GB' and not OVERLAY_SMALLER_THAN_GB:
-      logger.trace(f'  Skipping "{dir_path}". Overlay is disabled for sizes smaller than 1 GB.')
+      logger.trace(
+        f'  Skipping "{dir_path}". Overlay is disabled for sizes smaller than 1 GB.'
+      )
       return
 
     size_parts = formatted_size.split() if formatted_size else []
     if not (size_parts and len(size_parts) == 2):
-      logger.trace(f'  Skipping "{dir_path}". Formatted size is not in format "<value> <unit>".')
+      logger.trace(
+        f'  Skipping "{dir_path}". Formatted size is not in format "<value> <unit>".'
+      )
       return
 
     if not os.path.exists(bak_ico_path):
@@ -192,7 +208,7 @@ def process_dir(
       new_ico_path,
       format='ICO',
       sizes=[img_256.size] + [image.size for image in append_images],
-      append_images=append_images
+      append_images=append_images,
     )
     logger.success(f'Saved "{new_ico_path}".')
 
@@ -211,15 +227,19 @@ def process_dir(
 
   Attr.add(ini_path, HIDDEN_SYSTEM_FILE_ATTRS)
 
+
 def get_file_size_on_disk(
   file_path: str,
 ):
   high = ctypes.c_ulong(0)
-  low = ctypes.windll.kernel32.GetCompressedFileSizeW(file_path, ctypes.byref(high))
+  low = ctypes.windll.kernel32.GetCompressedFileSizeW(
+    file_path, ctypes.byref(high)
+  )
   low_unsigned = low & 0xFFFFFFFF
   if low_unsigned == 0xFFFFFFFF and ctypes.GetLastError() != 0:
     return os.path.getsize(file_path)
   return (high.value << 32) + low_unsigned
+
 
 def calculate_dir_size(
   dir_path: str,
@@ -248,11 +268,13 @@ def calculate_dir_size(
 
   return formatted_size
 
+
 def crop_to_content(
   img: Image.Image,
 ):
   bbox = img.split()[-1].getbbox()
   return img.crop(bbox) if bbox else img
+
 
 def overlay_file_size_256(
   value_text: str,
@@ -285,7 +307,7 @@ def overlay_file_size_256(
     [0, 0, box_w - 1, box_h - 1],
     radius=padding,
     fill=BG_COLOR,
-    corners=(False, False, False, True)
+    corners=(False, False, False, True),
   )
   img.paste(box, (box_x, box_y), box)
 
@@ -294,7 +316,7 @@ def overlay_file_size_256(
     (box_x + padding - bbox_value[0], box_y + padding - bbox_value[1]),
     value_text,
     font=value_font,
-    fill=VALUE_COLOR
+    fill=VALUE_COLOR,
   )
 
   unit_x = box_x + padding + value_w + gap - bbox_unit[0]
@@ -302,6 +324,7 @@ def overlay_file_size_256(
   draw.text((unit_x, unit_y), unit_text, font=unit_font, fill=UNITS_COLOR)
 
   return img
+
 
 def overlay_file_size_48(
   value_text: str,
@@ -354,19 +377,15 @@ def overlay_file_size_48(
     (text_start_x - bbox_value[0], box_y + padding - bbox_value[1]),
     value_text,
     font=value_font,
-    fill=VALUE_COLOR
+    fill=VALUE_COLOR,
   )
 
   unit_x = text_start_x + value_w + gap - bbox_unit[0]
   unit_y = box_y + padding + (value_h - unit_h) // 2 - bbox_unit[1]
-  draw.text(
-    (unit_x, unit_y),
-    unit_text,
-    font=unit_font,
-    fill=UNITS_COLOR
-  )
+  draw.text((unit_x, unit_y), unit_text, font=unit_font, fill=UNITS_COLOR)
 
   return img
+
 
 def format_size(
   size_bytes: int,
@@ -380,6 +399,7 @@ def format_size(
       return f'{math.ceil(int(size * 100) / 100)}  {unit}'
     size /= 1024
 
+
 def get_exe_icon(
   exe_path: str,
   index: int,
@@ -388,10 +408,7 @@ def get_exe_icon(
   hicon_large = ctypes.c_void_p()
 
   hr = ctypes.windll.shell32.SHDefExtractIconW(
-    exe_path, index, 0,
-    ctypes.byref(hicon_large),
-    None,
-    size
+    exe_path, index, 0, ctypes.byref(hicon_large), None, size
   )
 
   if hr != 0 or not hicon_large.value:
@@ -407,7 +424,9 @@ def get_exe_icon(
     hbmp.CreateCompatibleBitmap(hdc, size, size)
     hdc_mem.SelectObject(hbmp)
     hdc_mem.FillSolidRect((0, 0, size, size), 0)
-    win32gui.DrawIconEx(hdc_mem.GetSafeHdc(), 0, 0, hicon, size, size, 0, None, win32con.DI_NORMAL)
+    win32gui.DrawIconEx(
+      hdc_mem.GetSafeHdc(), 0, 0, hicon, size, size, 0, None, win32con.DI_NORMAL
+    )
     bmpstr = hbmp.GetBitmapBits(True)
     img = Image.frombuffer('RGBA', (size, size), bmpstr, 'raw', 'BGRA', 0, 1)
   finally:
@@ -417,6 +436,7 @@ def get_exe_icon(
     win32gui.ReleaseDC(0, screen_dc)
 
   return img
+
 
 if __name__ == '__main__':
   try:

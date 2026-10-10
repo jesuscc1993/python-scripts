@@ -10,7 +10,13 @@ from mtprompt import Prompt, to_bool, to_dir
 from natsort import natsorted
 
 from _common import resize_image
-from _constants import JPEG_FORMAT, JPEG_QUALITY, FOLDER_IMAGE_FILENAME, FOLDER_IMAGE_H, FOLDER_IMAGE_W
+from _constants import (
+  JPEG_FORMAT,
+  JPEG_QUALITY,
+  FOLDER_IMAGE_FILENAME,
+  FOLDER_IMAGE_H,
+  FOLDER_IMAGE_W,
+)
 
 ID_LENGTH = 7
 
@@ -26,8 +32,9 @@ CROP_SIZE = FOLDER_IMAGE_W
 COVER_URL_MAP = {
   'capsule': 'https://cdn.cloudflare.steamstatic.com/steam/apps/{}/capsule_616x353.jpg',
   'header': 'https://steamcdn-a.akamaihd.net/steam/apps/{}/header.jpg',
-  'library': 'https://steamcdn-a.akamaihd.net/steam/apps/{}/library_600x900.jpg'
+  'library': 'https://steamcdn-a.akamaihd.net/steam/apps/{}/library_600x900.jpg',
 }
+
 
 def main():
   if len(sys.argv) > 1:
@@ -39,20 +46,18 @@ def main():
 
   generate_covers(parent_folder, cover_type, overwrite_existing)
 
+
 def prompt_params():
   parent_folder = Prompt.dir(
     'Enter the path to the parent folder containing your Steam saves'
-    )
+  )
   cover_type = Prompt.str(
-    'Enter cover type [capsule | header | library]',
-    default='capsule'
+    'Enter cover type [capsule | header | library]', default='capsule'
   )
-  overwrite_existing = Prompt.bool(
-    'Overwrite existing images?',
-    default=False
-  )
+  overwrite_existing = Prompt.bool('Overwrite existing images?', default=False)
 
   return parent_folder, cover_type, overwrite_existing
+
 
 def generate_covers(
   parent_folder_path: str,
@@ -61,7 +66,9 @@ def generate_covers(
 ):
   cover_url = COVER_URL_MAP.get(cover_type)
   if not cover_url:
-    logger.error(f'Invalid cover type "{cover_type}". Must be one of: {", ".join(COVER_URL_MAP)}.')
+    logger.error(
+      f'Invalid cover type "{cover_type}". Must be one of: {", ".join(COVER_URL_MAP)}.'
+    )
     return
 
   logger.log('Generating cover images...')
@@ -75,6 +82,7 @@ def generate_covers(
   mtsound.notify()
   logger.log('\nFinished generating cover images.')
 
+
 def process_folder(
   folder_path: str,
   folder_name: str,
@@ -85,7 +93,9 @@ def process_folder(
   formatted_name = folder_name.rjust(ID_LENGTH)
 
   if os.path.exists(cover_path) and not overwrite_existing:
-    logger.trace(f'  [{formatted_name}] {FOLDER_IMAGE_FILENAME} already exists.')
+    logger.trace(
+      f'  [{formatted_name}] {FOLDER_IMAGE_FILENAME} already exists.'
+    )
     return
 
   try:
@@ -99,9 +109,10 @@ def process_folder(
   img = Image.open(BytesIO(response.content))
   img = resize_image_to_fill(img, RESIZE_WIDTH, RESIZE_HEIGHT)
   img = crop_image(img, CROP_SIZE)
-  img.save(cover_path, JPEG_FORMAT, quality = JPEG_QUALITY)
+  img.save(cover_path, JPEG_FORMAT, quality=JPEG_QUALITY)
 
   logger.success(f'[{formatted_name}] Generated cover image.')
+
 
 def resize_image_to_fill(
   img: Image.Image,
@@ -113,6 +124,7 @@ def resize_image_to_fill(
   new_height = int(img.height * new_scale)
 
   return resize_image(img, new_width, new_height)
+
 
 def crop_image(
   img: Image.Image,
@@ -135,6 +147,7 @@ def crop_image(
     y1 = y0 + crop_size
 
   return img.crop((x0, y0, x1, y1))
+
 
 if __name__ == '__main__':
   try:

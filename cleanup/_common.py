@@ -8,19 +8,24 @@ from mtlogger import logger
 
 ALL_FILES_PATTERN = '*'
 
+
 def run_as_admin():
   if os.name == 'nt' and not ctypes.windll.shell32.IsUserAnAdmin():
     params = ' '.join([f'"{arg}"' for arg in sys.argv])
-    ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, params, None, 1)
+    ctypes.windll.shell32.ShellExecuteW(
+      None, 'runas', sys.executable, params, None, 1
+    )
     sys.exit(0)
 
-def delete_children_for_dirs(dir_patterns, file_patterns = None):
+
+def delete_children_for_dirs(dir_patterns, file_patterns=None):
   if file_patterns is None:
     file_patterns = [ALL_FILES_PATTERN]
   for dir_pattern in dir_patterns:
     delete_children_for_dir(dir_pattern, file_patterns)
 
-def delete_children_for_dir(dir_pattern, file_patterns = None):
+
+def delete_children_for_dir(dir_pattern, file_patterns=None):
   if file_patterns is None:
     file_patterns = [ALL_FILES_PATTERN]
   logger.log(f'Cleaning "{dir_pattern}"...')

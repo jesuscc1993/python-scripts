@@ -7,6 +7,7 @@ from _common import process_parent_folder
 
 IMAGE_FILENAMES = ['ICON0.PNG']
 
+
 def main():
   if len(sys.argv) > 1:
     parent_path = to_dir(sys.argv[1])
@@ -15,12 +16,10 @@ def main():
     parent_path = Prompt.dir(
       'Enter the path to the directory containing the PlayStation saves you want to process'
     )
-    depth = Prompt.int(
-      'Enter the depth for processing subfolders',
-      default=1
-    )
+    depth = Prompt.int('Enter the depth for processing subfolders', default=1)
 
   process_parent_folder(parent_path, depth, IMAGE_FILENAMES)
+
 
 if __name__ == '__main__':
   try:

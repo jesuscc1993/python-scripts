@@ -7,11 +7,19 @@ from mtprompt import Prompt, to_dir
 
 from _common import FILE_BLACKLIST, find_files_to_process, group_files
 
+
 def main():
-  parent_dir = to_dir(sys.argv[1]) if len(sys.argv) > 1 else Prompt.dir('Enter the path to the directory containing the files you want to group')
+  parent_dir = (
+    to_dir(sys.argv[1])
+    if len(sys.argv) > 1
+    else Prompt.dir(
+      'Enter the path to the directory containing the files you want to group'
+    )
+  )
 
   files_to_process = find_files_to_process(parent_dir, should_process_item)
   group_files(parent_dir, files_to_process, get_group_name)
+
 
 def should_process_item(
   item_path: str,
@@ -25,6 +33,7 @@ def should_process_item(
 
   return True
 
+
 def get_group_name(
   file_path: str,
 ):
@@ -32,6 +41,7 @@ def get_group_name(
   tags = re.findall(r'\[(.*?)\]', file_name)
   tags = [tag.strip() for tag in tags if not re.fullmatch(r'\d+', tag.strip())]
   return ' '.join(f'[{tag}]' for tag in tags)
+
 
 if __name__ == '__main__':
   try:

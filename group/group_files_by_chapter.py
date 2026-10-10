@@ -12,12 +12,20 @@ from mtprompt import Prompt, to_dir
 
 NUMBER_REGEX = r'\.?\s*(\d+(?:\.\d+)?)'
 CHAPTER_REGEX = r'Ch(?:ap(?:ter)?)?|Ep(?:isode)?|Ep(?:ilogue)?|Sp(?:ecial)?'
-CHAPTER_NUMBER_REGEX  = rf'(?:{CHAPTER_REGEX}){NUMBER_REGEX}'
+CHAPTER_NUMBER_REGEX = rf'(?:{CHAPTER_REGEX}){NUMBER_REGEX}'
+
 
 def main():
-  parent_dir = to_dir(sys.argv[1]) if len(sys.argv) > 1 else Prompt.dir('Enter the path to the directory containing the files you want to group')
+  parent_dir = (
+    to_dir(sys.argv[1])
+    if len(sys.argv) > 1
+    else Prompt.dir(
+      'Enter the path to the directory containing the files you want to group'
+    )
+  )
 
   process_parent_folder(parent_dir)
+
 
 def process_parent_folder(
   parent_dir_path: str,
@@ -29,7 +37,11 @@ def process_parent_folder(
     if should_process_item(item_path):
       chapter = get_chapter(item)
       if not chapter:
-        tqdm.write(logger.format_warn(f'Skipping "{item}". Chapter number could not be inferred.'))
+        tqdm.write(
+          logger.format_warn(
+            f'Skipping "{item}". Chapter number could not be inferred.'
+          )
+        )
         continue
 
       output_path = os.path.join(parent_dir_path, f'Ch.{chapter.zfill(2)}')
@@ -38,11 +50,17 @@ def process_parent_folder(
 
       files_to_process.append((item_path, output_path, chapter))
 
-  with ThreadPoolExecutor() as executor, tqdm(total = len(files_to_process), desc = f'Processing "{parent_dir_path}"') as progress:
+  with (
+    ThreadPoolExecutor() as executor,
+    tqdm(
+      total=len(files_to_process), desc=f'Processing "{parent_dir_path}"'
+    ) as progress,
+  ):
     for _ in executor.map(process_file, files_to_process):
       progress.update(1)
 
   logger.success(f'Finished grouping files in "{parent_dir_path}".\n')
+
 
 def should_process_item(
   item_path: str,
@@ -56,6 +74,7 @@ def should_process_item(
 
   return True
 
+
 def process_file(
   params: tuple,
 ):
@@ -66,9 +85,12 @@ def process_file(
 
   counter = 1
   while os.path.exists(dest):
-    dest = os.path.join(target_folder, f'ch{chapter}_p{base}_{counter:02d}{ext}')
+    dest = os.path.join(
+      target_folder, f'ch{chapter}_p{base}_{counter:02d}{ext}'
+    )
     counter += 1
   shutil.move(src, dest)
+
 
 def get_chapter(
   filename: str,
@@ -76,6 +98,7 @@ def get_chapter(
   ch_match = re.search(CHAPTER_NUMBER_REGEX, filename, re.IGNORECASE)
   chapter = ch_match.group(1) if ch_match else None
   return chapter
+
 
 if __name__ == '__main__':
   try:

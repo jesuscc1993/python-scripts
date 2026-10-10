@@ -13,12 +13,19 @@ from mtprompt import Prompt, to_bool, to_dir
 from natsort import natsorted
 
 from _common import resize_image
-from _constants import JPEG_FORMAT, JPEG_QUALITY, FOLDER_IMAGE_FILENAME, FOLDER_IMAGE_W, REQUEST_TIMEOUT
+from _constants import (
+  JPEG_FORMAT,
+  JPEG_QUALITY,
+  FOLDER_IMAGE_FILENAME,
+  FOLDER_IMAGE_W,
+  REQUEST_TIMEOUT,
+)
 
 ID_LENGTH = 16
 SWITCH_MAPPING_URL = 'https://www.eliboa.com/switch/nsw_titles.php?export=json'
 CACHE_FILENAME = 'nsw_titles.json'
 CACHE_TTL = 24 * 60 * 60
+
 
 def main():
   if len(sys.argv) > 1:
@@ -29,16 +36,15 @@ def main():
 
   generate_covers(parent_folder, overwrite_existing)
 
+
 def prompt_params():
   parent_folder = Prompt.dir(
     'Enter the path to the parent folder containing your Switch saves'
   )
-  overwrite_existing = Prompt.bool(
-    'Overwrite existing images?',
-    default=False
-  )
+  overwrite_existing = Prompt.bool('Overwrite existing images?', default=False)
 
   return parent_folder, overwrite_existing
+
 
 def generate_covers(
   parent_folder_path: str,
@@ -52,10 +58,13 @@ def generate_covers(
     folder_path = os.path.join(parent_folder_path, folder_name)
 
     if os.path.isdir(folder_path):
-      process_folder(folder_path, folder_name, mapping.get(folder_name), overwrite_existing)
+      process_folder(
+        folder_path, folder_name, mapping.get(folder_name), overwrite_existing
+      )
 
   mtsound.notify()
   logger.log('\nFinished generating cover images.')
+
 
 def process_folder(
   folder_path: str,
@@ -67,7 +76,9 @@ def process_folder(
   cover_path = os.path.join(folder_path, FOLDER_IMAGE_FILENAME)
 
   if os.path.exists(cover_path) and not overwrite_existing:
-    logger.trace(f'  [{formatted_name}] {FOLDER_IMAGE_FILENAME} already exists.')
+    logger.trace(
+      f'  [{formatted_name}] {FOLDER_IMAGE_FILENAME} already exists.'
+    )
     return
 
   image_url = entry.get('iconUrl') if entry else None
@@ -84,17 +95,22 @@ def process_folder(
 
   img = Image.open(BytesIO(response.content))
   img = resize_image(img, FOLDER_IMAGE_W, FOLDER_IMAGE_W)
-  img.save(cover_path, JPEG_FORMAT, quality = JPEG_QUALITY)
+  img.save(cover_path, JPEG_FORMAT, quality=JPEG_QUALITY)
 
   logger.success(f'[{formatted_name}] Generated cover image.')
+
 
 def read_cached_mapping(
   file_path: str,
 ):
-  if not os.path.exists(file_path) or time.time() - os.path.getmtime(file_path) >= CACHE_TTL:
+  if (
+    not os.path.exists(file_path)
+    or time.time() - os.path.getmtime(file_path) >= CACHE_TTL
+  ):
     return None
 
   return read_json_file(file_path)
+
 
 def load_switch_mapping():
   path = os.path.join(os.path.dirname(__file__), 'cache', CACHE_FILENAME)
@@ -119,6 +135,7 @@ def load_switch_mapping():
       return read_json_file(path)
 
     return {}
+
 
 if __name__ == '__main__':
   try:

@@ -11,8 +11,9 @@ IMAGE_FILENAMES = [
   'cover.png',
   'cover.webp',
   'albumart.jpg',
-  'AlbumArtSmall.jpg'
+  'AlbumArtSmall.jpg',
 ]
+
 
 def main():
   if len(sys.argv) > 1:
@@ -22,12 +23,10 @@ def main():
     parent_path = Prompt.dir(
       'Enter the path to the directory containing the images you want to process'
     )
-    depth = Prompt.int(
-      'Enter the depth for processing subfolders',
-      default=1
-    )
+    depth = Prompt.int('Enter the depth for processing subfolders', default=1)
 
   process_parent_folder(parent_path, depth, IMAGE_FILENAMES)
+
 
 if __name__ == '__main__':
   try:

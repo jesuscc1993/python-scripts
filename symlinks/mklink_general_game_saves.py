@@ -16,6 +16,7 @@ GAME_SAVES_PATH = os.environ.get('GAME_SAVES_PATH')
 OTHER_SAVES = os.path.join(GAME_SAVES_PATH, 'Other')
 PUBLISHER_SAVES = os.path.join(GAME_SAVES_PATH, 'Publishers')
 
+
 def main():
   logger.log('Creating game client symlinks...\n')
   link_user_profile()
@@ -23,54 +24,48 @@ def main():
   link_documents()
   logger.info('Finished creating game client symlinks')
 
+
 def link_user_profile():
-  link_dir(
-    os.path.join(USER_PROFILE, 'Saved Games'),
-    OTHER_SAVES
-  )
-  link_dir(
-    os.path.join(DOCUMENTS, 'SavedGames'),
-    OTHER_SAVES
-  )
+  link_dir(os.path.join(USER_PROFILE, 'Saved Games'), OTHER_SAVES)
+  link_dir(os.path.join(DOCUMENTS, 'SavedGames'), OTHER_SAVES)
   print()
+
 
 def link_local_data():
   link_dir(
     os.path.join(LOCAL_DATA, 'BANDAI NAMCO Entertainment'),
-    os.path.join(PUBLISHER_SAVES, 'BANDAI NAMCO')
+    os.path.join(PUBLISHER_SAVES, 'BANDAI NAMCO'),
   )
   link_dir(
     os.path.join(LOCAL_DATA, 'Daedalic Entertainment GmbH'),
-    os.path.join(PUBLISHER_SAVES, 'Daedalic Entertainment')
+    os.path.join(PUBLISHER_SAVES, 'Daedalic Entertainment'),
   )
   print()
 
+
 def link_documents():
+  link_dir(os.path.join(DOCUMENTS, 'My Games'), OTHER_SAVES)
   link_dir(
-    os.path.join(DOCUMENTS, 'My Games'),
-    OTHER_SAVES
-  )
-  link_dir(
-    os.path.join(DOCUMENTS, 'BioWare'),
-    os.path.join(PUBLISHER_SAVES, 'BioWare')
+    os.path.join(DOCUMENTS, 'BioWare'), os.path.join(PUBLISHER_SAVES, 'BioWare')
   )
   link_dir(
     os.path.join(DOCUMENTS, 'EA Games'),
-    os.path.join(PUBLISHER_SAVES, 'Electronic Arts')
+    os.path.join(PUBLISHER_SAVES, 'Electronic Arts'),
   )
   link_dir(
     os.path.join(DOCUMENTS, 'Electronic Arts'),
-    os.path.join(PUBLISHER_SAVES, 'Electronic Arts')
+    os.path.join(PUBLISHER_SAVES, 'Electronic Arts'),
   )
   link_dir(
     os.path.join(DOCUMENTS, 'Electrontic Arts'),
-    os.path.join(PUBLISHER_SAVES, 'Electronic Arts')
+    os.path.join(PUBLISHER_SAVES, 'Electronic Arts'),
   )
   link_dir(
     os.path.join(DOCUMENTS, 'KoeiTecmo'),
-    os.path.join(PUBLISHER_SAVES, 'KoeiTecmo')
+    os.path.join(PUBLISHER_SAVES, 'KoeiTecmo'),
   )
   print()
+
 
 if __name__ == '__main__':
   try:

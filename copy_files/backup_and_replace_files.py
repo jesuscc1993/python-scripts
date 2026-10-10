@@ -7,28 +7,25 @@ from mtprompt import Prompt
 
 from _common import enforce_unique_path
 
+
 def main():
   if len(sys.argv) > 2:
     src_path = sys.argv[1]
     dest_path = sys.argv[2]
-    matches_only = (sys.argv[3] if len(sys.argv) > 3 else 'n').strip().lower() == 'n'
+    matches_only = (
+      sys.argv[3] if len(sys.argv) > 3 else 'n'
+    ).strip().lower() == 'n'
   else:
-    src_path = Prompt.dir(
-      'Enter the path containing the files to copy'
-    )
-    dest_path = Prompt.str(
-      'Enter the path the files will be copied to'
-    )
-    matches_only = Prompt.bool(
-      'Matches only?',
-      default=True
-    )
+    src_path = Prompt.dir('Enter the path containing the files to copy')
+    dest_path = Prompt.str('Enter the path the files will be copied to')
+    matches_only = Prompt.bool('Matches only?', default=True)
 
   try:
     enforce_unique_path(src_path, dest_path)
     rename_and_copy_files(src_path, dest_path, matches_only)
   except ValueError as ex:
     logger.error(ex)
+
 
 def rename_and_copy_files(
   src_dir_path: str,
@@ -42,10 +39,15 @@ def rename_and_copy_files(
     for filename in files:
       src_file = os.path.join(src_dir_path, filename)
       dest_file = os.path.join(dest_dir_path, filename)
-      if os.path.isfile(src_file) and (os.path.exists(dest_file) or not matches_only):
+      if os.path.isfile(src_file) and (
+        os.path.exists(dest_file) or not matches_only
+      ):
         backup_file(dest_file)
         shutil.copy(src_file, dest_file)
-    logger.success(f'Finished copying files from "{src_dir_path}" to "{dest_dir_path}".')
+    logger.success(
+      f'Finished copying files from "{src_dir_path}" to "{dest_dir_path}".'
+    )
+
 
 def backup_file(
   file_path: str,
@@ -59,7 +61,10 @@ def backup_file(
       os.rename(file_path, bak_path)
       logger.debug(f'Backed up "{file_path}" as "{bak_path}".')
     else:
-      logger.trace(f'Backup file "{bak_path}" already exists. It will be reused.')
+      logger.trace(
+        f'Backup file "{bak_path}" already exists. It will be reused.'
+      )
+
 
 if __name__ == '__main__':
   try:

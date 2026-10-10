@@ -8,6 +8,7 @@ from _common import find_in_issue_ids
 
 CODE_PATTERN = re.compile(r'\b[A-Z]{2}\b')
 
+
 def main():
   if len(sys.argv) > 1:
     issue_ids = to_list(sys.argv[1])
@@ -19,7 +20,10 @@ def main():
     return
 
   combined_countries = find_in_issue_ids(issue_ids, CODE_PATTERN)
-  logger.log(f'\nComplete set of countries:\n  [{", ".join(sorted(combined_countries))}]\nFor issue IDs:\n  [{", ".join(issue_ids)}]')
+  logger.log(
+    f'\nComplete set of countries:\n  [{", ".join(sorted(combined_countries))}]\nFor issue IDs:\n  [{", ".join(issue_ids)}]'
+  )
+
 
 if __name__ == '__main__':
   try:

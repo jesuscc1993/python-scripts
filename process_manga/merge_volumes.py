@@ -7,13 +7,23 @@ from mtlogger import logger
 from mtprompt import Prompt, to_dir
 from tqdm import tqdm
 
-from _common import delete_empty_folders, get_volume_and_chapter, select_parent_folder, zfill_float
+from _common import (
+  delete_empty_folders,
+  get_volume_and_chapter,
+  select_parent_folder,
+  zfill_float,
+)
+
 
 def main():
   if len(sys.argv) > 1:
     process_parent_folder(to_dir(sys.argv[1]))
   else:
-    select_parent_folder('Enter the path to the parent folder containing the volume folders you want to merge:\n', process_parent_folder)
+    select_parent_folder(
+      'Enter the path to the parent folder containing the volume folders you want to merge:\n',
+      process_parent_folder,
+    )
+
 
 def process_parent_folder(
   parent_folder_path: str,
@@ -25,19 +35,32 @@ def process_parent_folder(
     if os.path.isdir(folder_path):
       volume, chapter = get_volume_and_chapter(folder)
       if volume is None or chapter is None:
-        tqdm.write(logger.format_warn(f'Skipping "{folder}". Volume or chapter numbers could not be inferred.'))
+        tqdm.write(
+          logger.format_warn(
+            f'Skipping "{folder}". Volume or chapter numbers could not be inferred.'
+          )
+        )
         continue
 
-      output_path = os.path.join(parent_folder_path, f'Vol.{zfill_float(volume, 2)}')
+      output_path = os.path.join(
+        parent_folder_path, f'Vol.{zfill_float(volume, 2)}'
+      )
       if not os.path.exists(output_path):
         os.makedirs(output_path)
 
       for item in os.listdir(folder_path):
         src = os.path.join(folder_path, item)
         if os.path.isfile(src):
-          files_to_process.append((src, output_path, get_sanitized_chapter(chapter)))
+          files_to_process.append(
+            (src, output_path, get_sanitized_chapter(chapter))
+          )
 
-  with ThreadPoolExecutor() as executor, tqdm(total = len(files_to_process), desc = f'Processing "{parent_folder_path}"') as progress:
+  with (
+    ThreadPoolExecutor() as executor,
+    tqdm(
+      total=len(files_to_process), desc=f'Processing "{parent_folder_path}"'
+    ) as progress,
+  ):
     for _ in executor.map(process_file, files_to_process):
       progress.update(1)
 
@@ -45,13 +68,16 @@ def process_parent_folder(
 
   logger.success(f'Finished merging volumes in "{parent_folder_path}".')
 
+
 def get_sanitized_chapter(
   chapter: str,
 ):
   parts = zfill_float(chapter, 3).split('.')
   name = parts[0]
-  if len(parts) > 1: name += chr(ord('a') + int(parts[1]) - 1)
+  if len(parts) > 1:
+    name += chr(ord('a') + int(parts[1]) - 1)
   return name
+
 
 def process_file(
   params: tuple,
@@ -63,9 +89,12 @@ def process_file(
 
   counter = 1
   while os.path.exists(dest):
-    dest = os.path.join(target_folder, f'ch{chapter}_p{base}_{counter:02d}{ext}')
+    dest = os.path.join(
+      target_folder, f'ch{chapter}_p{base}_{counter:02d}{ext}'
+    )
     counter += 1
   shutil.move(src, dest)
+
 
 if __name__ == '__main__':
   try:

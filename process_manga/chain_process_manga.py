@@ -8,13 +8,15 @@ SCRIPT_NAMES = [
   'crop_borders $dir',
   '../compress/compress_folders $dir ZIP Y',
   'rename_items $dir',
-  '../rename/rename_zip_to_cbz $dir'
+  '../rename/rename_zip_to_cbz $dir',
 ]
+
 
 def process_parent_folder(
   parent_folder_path: str,
 ):
   run_scripts_in_sequence(SCRIPT_NAMES, parent_folder_path)
+
 
 if __name__ == '__main__':
   try:

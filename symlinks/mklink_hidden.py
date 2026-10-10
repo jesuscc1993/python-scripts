@@ -1,5 +1,3 @@
-
-
 import ctypes
 import os
 
@@ -10,9 +8,13 @@ from mtprompt import Prompt
 
 FILE_ATTRIBUTE_HIDDEN = 0x02
 
+
 def main():
-  while src_path := Prompt.path('Enter the path you want to create a hidden symlink for', optional=True):
+  while src_path := Prompt.path(
+    'Enter the path you want to create a hidden symlink for', optional=True
+  ):
     process_dir(src_path)
+
 
 def process_dir(
   src_path: str,
@@ -31,10 +33,12 @@ def process_dir(
 
   logger.hr()
 
+
 def hide_path(
   path: str,
 ):
   ctypes.windll.kernel32.SetFileAttributesW(path, FILE_ATTRIBUTE_HIDDEN)
+
 
 if __name__ == '__main__':
   try:
@@ -43,4 +47,4 @@ if __name__ == '__main__':
   except Exception as ex:
     logger.unhandled_error(ex)
 
-  Prompt.enter_to_exit(timeout = True)
+  Prompt.enter_to_exit(timeout=True)

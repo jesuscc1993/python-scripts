@@ -1,5 +1,3 @@
-
-
 import os
 from os import path
 
@@ -8,8 +6,11 @@ from _common import run_as_admin
 from mtlogger import logger
 from mtprompt import Prompt
 
+
 def main():
-  logger.debug('Script will backup and replace files containing "link token" with symlinks to files containing "target token".\nOnly target token can be an empty string.\nExample: link token = "_4k", target token = "" will create a "movie_4k.bk" link pointing to "movie.bk".\n')
+  logger.debug(
+    'Script will backup and replace files containing "link token" with symlinks to files containing "target token".\nOnly target token can be an empty string.\nExample: link token = "_4k", target token = "" will create a "movie_4k.bk" link pointing to "movie.bk".\n'
+  )
   parent_dir = Prompt.dir('Enter the parent dir')
   link_token = Prompt.str('Enter the link token')
   target_token = Prompt.str('Enter the target token', default='')
@@ -26,10 +27,14 @@ def main():
         if os.path.exists(target_path):
           items_to_process.append(file_name)
         else:
-          logger.warn(f'File\n"{item_path}"\nmatches link token but target file\n"{target_path}"\ndoes not exist. Skipping...\n')
+          logger.warn(
+            f'File\n"{item_path}"\nmatches link token but target file\n"{target_path}"\ndoes not exist. Skipping...\n'
+          )
 
     if not items_to_process:
-      logger.warn(f'No matches found for "{link_token}" in directory "{dir_path}".')
+      logger.warn(
+        f'No matches found for "{link_token}" in directory "{dir_path}".'
+      )
       continue
 
     backup_dir = os.path.join(dir_path, 'backup')
@@ -45,7 +50,10 @@ def main():
 
       link_path = item_path
       os.symlink(target_path, link_path)
-      logger.info(f'Created symlink:\n"{path.relpath(link_path, parent_dir)}" -> "{path.relpath(target_path, parent_dir)}"')
+      logger.info(
+        f'Created symlink:\n"{path.relpath(link_path, parent_dir)}" -> "{path.relpath(target_path, parent_dir)}"'
+      )
+
 
 if __name__ == '__main__':
   try:

@@ -8,12 +8,14 @@ from mtlogger import logger
 
 from _constants import DIR_BLACKLIST, GENERIC_EXCLUSION_FILE
 
+
 def validate_dir_paths(
   dir_paths: list[str],
 ):
   for dir_path in dir_paths:
     if not os.path.isdir(dir_path):
       raise ValueError(f'Path "{dir_path}" is not a directory.')
+
 
 def read_steam_wishlist_game_names(
   wishlist_file: str,
@@ -29,6 +31,7 @@ def read_steam_wishlist_game_names(
     if (app_name := get_app_name_from_steam_wishlist_item(app))
   ]
 
+
 def get_app_name_from_steam_wishlist_item(app: dict):
   store_item = (app or {}).get('store_item')
   if not store_item:
@@ -39,6 +42,7 @@ def get_app_name_from_steam_wishlist_item(app: dict):
     return None
 
   return app_name
+
 
 def scan_dir_names(
   dir_paths: list[str],
@@ -52,6 +56,7 @@ def scan_dir_names(
     for entry in os.scandir(dir_path)
     if entry.is_dir() and not should_skip_dir(entry.path, exclusions)
   ]
+
 
 def should_skip_dir(
   dir_path: str,
@@ -71,47 +76,72 @@ def should_skip_dir(
 
   return False
 
+
 def has_exclusion_file(
   path: str,
   exclusion: str,
 ):
   return os.path.exists(os.path.join(path, exclusion))
 
+
 def seconds_to_hours(
   seconds: int,
 ):
   return round(seconds / 3600) if seconds is not None else None
+
 
 def format_dimmed(
   msg: str,
 ):
   return f'<span class="dim">{msg}</span>'
 
+
 def simplify_game_name(
   name: str,
 ):
   parsed_name = name
   parsed_name = re.sub(r'[™®]', '', parsed_name)
-  parsed_name = re.sub(r'([:-]\s?)?(GOTY|Game of The Year|Director.s Cut)(\sEdition)?', '', parsed_name, flags = re.IGNORECASE)
-  parsed_name = re.sub(r'([:-]\s?)?(Definitive|Deluxe|Gold|Premium|Ultimate)\sEdition', '', parsed_name, flags = re.IGNORECASE)
-  parsed_name = re.sub(r'[:-]\s?(\w+)\sEdition', '', parsed_name, flags = re.IGNORECASE)
+  parsed_name = re.sub(
+    r'([:-]\s?)?(GOTY|Game of The Year|Director.s Cut)(\sEdition)?',
+    '',
+    parsed_name,
+    flags=re.IGNORECASE,
+  )
+  parsed_name = re.sub(
+    r'([:-]\s?)?(Definitive|Deluxe|Gold|Premium|Ultimate)\sEdition',
+    '',
+    parsed_name,
+    flags=re.IGNORECASE,
+  )
+  parsed_name = re.sub(
+    r'[:-]\s?(\w+)\sEdition', '', parsed_name, flags=re.IGNORECASE
+  )
   return parsed_name.strip()
+
 
 def normalize_dir_name(
   name: str,
 ):
   parsed_name = name.lower()
   parsed_name = re.sub(r'[\'’:꞉—-]', '', parsed_name)
-  parsed_name = ''.join(char for char in unicodedata.normalize('NFKD', parsed_name) if not unicodedata.combining(char))
+  parsed_name = ''.join(
+    char
+    for char in unicodedata.normalize('NFKD', parsed_name)
+    if not unicodedata.combining(char)
+  )
   return parsed_name
+
 
 def flatten_game_name(
   name: str,
 ):
   parsed_name = name
-  parsed_name = re.sub(r'\b(HD|Remake|Remaster(?:ed)?)\b', '', parsed_name, flags = re.IGNORECASE)
+  parsed_name = re.sub(
+    r'\b(HD|Remake|Remaster(?:ed)?)\b', '', parsed_name, flags=re.IGNORECASE
+  )
   parsed_name = re.sub(r'(\s+)', '', parsed_name)
   return parsed_name
+
 
 def get_comparable_dir_name(
   name: str,
@@ -121,6 +151,7 @@ def get_comparable_dir_name(
   parsed_name = normalize_dir_name(parsed_name)
   parsed_name = flatten_game_name(parsed_name)
   return parsed_name
+
 
 def matches_loosely(
   name_a: str,

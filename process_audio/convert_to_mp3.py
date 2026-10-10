@@ -1,4 +1,3 @@
-
 import os
 import sys
 import subprocess
@@ -24,8 +23,13 @@ AUDIO_EXTS = [
 MP3_BITRATE = '320k'
 MP3_EXT = '.mp3'
 
+
 def main():
-  parent_path = to_dir(sys.argv[1]) if len(sys.argv) > 1 else Prompt.dir('Enter the folder path to process')
+  parent_path = (
+    to_dir(sys.argv[1])
+    if len(sys.argv) > 1
+    else Prompt.dir('Enter the folder path to process')
+  )
   bitrate = sys.argv[2] if len(sys.argv) > 2 else MP3_BITRATE
 
   files_to_convert = []
@@ -35,12 +39,14 @@ def main():
       if ext in AUDIO_EXTS:
         new_filename = os.path.splitext(og_filename)[0] + MP3_EXT
 
-        files_to_convert.append((
-          os.path.join(root, og_filename),
-          os.path.join(root, new_filename),
-          og_filename,
-          new_filename
-        ))
+        files_to_convert.append(
+          (
+            os.path.join(root, og_filename),
+            os.path.join(root, new_filename),
+            og_filename,
+            new_filename,
+          )
+        )
 
   with ThreadPoolExecutor() as executor:
     futures = [
@@ -50,14 +56,17 @@ def main():
         output_path,
         input_filename,
         output_filename,
-        bitrate
+        bitrate,
       )
       for input_path, output_path, input_filename, output_filename in files_to_convert
     ]
-    for _ in tqdm(as_completed(futures), total = len(futures), desc = "Converting files to MP3"):
+    for _ in tqdm(
+      as_completed(futures), total=len(futures), desc='Converting files to MP3'
+    ):
       pass
 
-  tqdm.write("Finished converting files to MP3.")
+  tqdm.write('Finished converting files to MP3.')
+
 
 def worker(
   input_file_path: str,
@@ -73,6 +82,7 @@ def worker(
   except Exception as ex:
     tqdm.write(f'Failed to convert "{input_file_path}":\n{ex}')
 
+
 def convert_to_mp3(
   input_file_path: str,
   output_file_path: str,
@@ -81,18 +91,23 @@ def convert_to_mp3(
   result = subprocess.run(
     [
       'ffmpeg',
-      '-i', input_file_path,
-      '-b:a', bitrate,
-      '-codec:a', 'libmp3lame',
-      '-map', 'a',
+      '-i',
+      input_file_path,
+      '-b:a',
+      bitrate,
+      '-codec:a',
+      'libmp3lame',
+      '-map',
+      'a',
       '-y',
-      output_file_path
+      output_file_path,
     ],
     check=False,
-    capture_output=True
+    capture_output=True,
   )
   if result.returncode != 0:
     raise RuntimeError(result.stderr.decode('utf-8'))
+
 
 if __name__ == '__main__':
   try:

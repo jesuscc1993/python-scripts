@@ -6,6 +6,7 @@ from mtprompt import Prompt
 
 from _common import rename_items_by_sequential_pattern
 
+
 def main():
   if len(sys.argv) > 1:
     parent_dir = sys.argv[1]
@@ -15,8 +16,7 @@ def main():
     )
 
   name_pattern = Prompt.str(
-    'Enter the name pattern\nUse $ for number interpolation\n',
-    default='$'
+    'Enter the name pattern\nUse $ for number interpolation\n', default='$'
   )
 
   items = [
@@ -25,6 +25,7 @@ def main():
     if os.path.isfile(os.path.join(parent_dir, f)) and not f.startswith('.')
   ]
   rename_items_by_sequential_pattern(parent_dir, items, name_pattern)
+
 
 if __name__ == '__main__':
   try:

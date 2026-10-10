@@ -14,11 +14,12 @@ STATS_BY_ATTR: dict[AttrKey, int] = {
   'r': stat.FILE_ATTRIBUTE_READONLY,
 }
 
+
 def _get_stat_for_attr(attr: AttrKey):
   return STATS_BY_ATTR.get(attr, 0)
 
-class Attr:
 
+class Attr:
   # generic
 
   @staticmethod
@@ -27,7 +28,9 @@ class Attr:
     attrs: list[AttrKey],
   ):
     if os.path.exists(path):
-      subprocess.run(['attrib'] + ['+' + attr for attr in attrs] + [path], check=True)
+      subprocess.run(
+        ['attrib'] + ['+' + attr for attr in attrs] + [path], check=True
+      )
 
   @staticmethod
   def remove(
@@ -35,7 +38,9 @@ class Attr:
     attrs: list[AttrKey],
   ):
     if os.path.exists(path):
-      subprocess.run(['attrib'] + ['-' + attr for attr in attrs] + [path], check=True)
+      subprocess.run(
+        ['attrib'] + ['-' + attr for attr in attrs] + [path], check=True
+      )
 
   @staticmethod
   def set(
@@ -51,12 +56,8 @@ class Attr:
     path: str,
     attr: AttrKey,
   ):
-    return (
-      os.path.exists(path) and
-      bool(
-        os.lstat(path).st_file_attributes &
-        _get_stat_for_attr(attr)
-      )
+    return os.path.exists(path) and bool(
+      os.lstat(path).st_file_attributes & _get_stat_for_attr(attr)
     )
 
   @staticmethod

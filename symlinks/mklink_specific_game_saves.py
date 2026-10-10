@@ -11,6 +11,7 @@ load_dotenv(os.path.join(os.path.dirname(__file__), '.env'))
 
 SPECIFIC_GAME_SAVES_PATH = os.getenv('SPECIFIC_GAME_SAVES_PATH')
 
+
 def main():
   logger.log('Generating links for specific game saves...')
 
@@ -18,7 +19,9 @@ def main():
   mappings_path = os.path.join(script_dir, 'specific_game_save_mappings.json')
 
   if not os.path.exists(mappings_path):
-    logger.error(f'File not found: "{mappings_path}". Check readme for instructions.')
+    logger.error(
+      f'File not found: "{mappings_path}". Check readme for instructions.'
+    )
     return
 
   for group in read_json_file(mappings_path):
@@ -49,6 +52,7 @@ def main():
         link_dir(src_path, dest_path, make_dirs=expand)
 
   logger.success('Finished generating links for specific game saves.')
+
 
 if __name__ == '__main__':
   try:

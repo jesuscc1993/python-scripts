@@ -5,20 +5,19 @@ import os
 from mtlogger import logger
 from mtprompt import Prompt
 
+
 def main():
   parent_folder = Prompt.dir(
     'Enter the path to the directory containing the folders you want to process'
   )
-  recursive = Prompt.bool(
-    'Run recursively in subfolders?',
-    default = False
-  )
-  process_subfolders(parent_folder, recursive, is_root = True)
+  recursive = Prompt.bool('Run recursively in subfolders?', default=False)
+  process_subfolders(parent_folder, recursive, is_root=True)
+
 
 def process_subfolders(
   base_folder_path: str,
   recursive: bool,
-  is_root = False,
+  is_root=False,
 ):
   logger.log(f'Processing "{base_folder_path}"...')
 
@@ -32,6 +31,7 @@ def process_subfolders(
         process_subfolders(subfolder_path, recursive)
 
   logger.success(f'Finished processing "{base_folder_path}".')
+
 
 def process_folder(
   folder_path: str,
@@ -47,7 +47,10 @@ def process_folder(
     ctypes.windll.kernel32.SetFileAttributesW(desktop_ini_path, 0x80)
     config.read(desktop_ini_path)
 
-    if '.ShellClassInfo' in config and 'IconResource' in config['.ShellClassInfo']:
+    if (
+      '.ShellClassInfo' in config
+      and 'IconResource' in config['.ShellClassInfo']
+    ):
       icon_resource = config['.ShellClassInfo']['IconResource']
       icon_resource = icon_resource.removesuffix(',0')
 
@@ -57,15 +60,20 @@ def process_folder(
 
         with open(desktop_ini_path, 'w') as desktop_ini:
           config.write(desktop_ini)
-        logger.success(f'Updated folder "{folder_path}" with IconResource "{relative_icon_path}".')
+        logger.success(
+          f'Updated folder "{folder_path}" with IconResource "{relative_icon_path}".'
+        )
       else:
-        logger.trace(f'Skipping folder "{folder_path}" with IconResource "{icon_resource}".')
+        logger.trace(
+          f'Skipping folder "{folder_path}" with IconResource "{icon_resource}".'
+        )
 
       ctypes.windll.kernel32.SetFileAttributesW(desktop_ini_path, 0x02 | 0x04)
   except PermissionError:
     logger.error(f'Permission denied for "{desktop_ini_path}"')
   except Exception as ex:
     logger.error(f'Could not process "{desktop_ini_path}":\n{ex}')
+
 
 if __name__ == '__main__':
   try:

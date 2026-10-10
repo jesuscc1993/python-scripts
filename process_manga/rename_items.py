@@ -8,13 +8,26 @@ from mtprompt import Prompt, to_dir
 from tqdm import tqdm
 from collections.abc import Callable
 
-from _common import CHAPTER_NUMBER_REGEX, ENDING_REGEX, EPILOGUE_REGEX, IMAGE_EXTENSIONS, INTEGER_REGEX, SEASON_REGEX, SIDE_STORY_REGEX, SPECIAL_REGEX, VOLUME_NUMBER_REGEX, zfill_float
+from _common import (
+  CHAPTER_NUMBER_REGEX,
+  ENDING_REGEX,
+  EPILOGUE_REGEX,
+  IMAGE_EXTENSIONS,
+  INTEGER_REGEX,
+  SEASON_REGEX,
+  SIDE_STORY_REGEX,
+  SPECIAL_REGEX,
+  VOLUME_NUMBER_REGEX,
+  zfill_float,
+)
+
 
 def main():
   if len(sys.argv) > 1:
     process_parent_folder(to_dir(sys.argv[1]))
   else:
     prompt_parent_folder()
+
 
 def prompt_parent_folder():
   parent_folder = Prompt.dir(
@@ -23,17 +36,29 @@ def prompt_parent_folder():
 
   process_parent_folder(parent_folder)
 
+
 def process_parent_folder(
   parent_folder_path: str,
 ):
-  for root, dirs, files in os.walk(parent_folder_path, topdown = False):
-    filtered_files = [f for f in files if os.path.splitext(f)[1].lower() in IMAGE_EXTENSIONS]
+  for root, dirs, files in os.walk(parent_folder_path, topdown=False):
+    filtered_files = [
+      f for f in files if os.path.splitext(f)[1].lower() in IMAGE_EXTENSIONS
+    ]
     all_items = filtered_files + dirs
 
     with ThreadPoolExecutor() as executor:
-      list(tqdm(executor.map(lambda item, root=root: process_item(root, item), all_items), total = len(all_items), desc=f'Processing "{root}"'))
+      list(
+        tqdm(
+          executor.map(
+            lambda item, root=root: process_item(root, item), all_items
+          ),
+          total=len(all_items),
+          desc=f'Processing "{root}"',
+        )
+      )
 
   logger.success(f'Finished renaming items in "{parent_folder_path}".')
+
 
 def process_item(
   parent_folder_path: str,
@@ -44,6 +69,7 @@ def process_item(
   if new_name != item_name:
     new_path = os.path.join(parent_folder_path, new_name)
     os.rename(item_path, new_path)
+
 
 def get_processed_name(
   item_path: str,
@@ -70,14 +96,14 @@ def get_processed_name(
   new_name = replace(
     rf'{VOLUME_NUMBER_REGEX}',
     lambda match: f'Vol.{zfill_float(match.group(1), 2)}',
-    new_name
+    new_name,
   )
 
   # prettify chapter number
   new_name = replace(
     rf'{CHAPTER_NUMBER_REGEX}',
     lambda match: f'Ch.{zfill_float(match.group(1), 3)}',
-    new_name
+    new_name,
   )
 
   # shorten common words
@@ -100,6 +126,7 @@ def get_processed_name(
 
   return new_name + ext
 
+
 def replace(
   pattern: str,
   repl: str | Callable,
@@ -107,6 +134,7 @@ def replace(
   flags=re.IGNORECASE,
 ):
   return re.sub(pattern, repl, string, flags=flags)
+
 
 if __name__ == '__main__':
   try:

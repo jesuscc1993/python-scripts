@@ -4,6 +4,7 @@ import sys
 from mtlogger import logger
 from mtprompt import Prompt
 
+
 def main():
   if len(sys.argv) > 1:
     parent_dir = sys.argv[1]
@@ -13,6 +14,7 @@ def main():
     )
 
   rename_zip_to_cbz(parent_dir)
+
 
 def rename_zip_to_cbz(
   parent_dir_path: str,
@@ -31,6 +33,7 @@ def rename_zip_to_cbz(
       logger.debug(f'Renamed "{old_path}" to "{new_path}".')
 
   logger.success(f'Renamed ZIP files to CBZ in "{parent_dir_path}".')
+
 
 if __name__ == '__main__':
   try:

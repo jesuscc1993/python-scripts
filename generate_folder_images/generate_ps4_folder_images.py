@@ -12,8 +12,10 @@ from _common import process_parent_folder, save_resized_image
 
 TITLE_URL = 'https://serialstation.com/titles/{game_id}'
 
+
 def main():
   process_parent_folder(process_folder)
+
 
 def process_folder(
   folder_path: str,
@@ -21,12 +23,15 @@ def process_folder(
   game_id = os.path.basename(os.path.normpath(folder_path))
   download_game_cover(game_id, folder_path)
 
+
 def download_game_cover(
   game_id: str,
   folder_path: str,
 ):
   try:
-    url = TITLE_URL.format(game_id=re.sub(r'([A-Za-z]+)(\d+)', r'\1/\2', game_id))
+    url = TITLE_URL.format(
+      game_id=re.sub(r'([A-Za-z]+)(\d+)', r'\1/\2', game_id)
+    )
     response = requests.get(url)
     response.raise_for_status()
   except Exception as ex:
@@ -50,6 +55,7 @@ def download_game_cover(
   img = Image.open(BytesIO(image_response.content))
   save_resized_image(img, folder_path)
   logger.success(f'Saved image for game ID {game_id}.')
+
 
 if __name__ == '__main__':
   try:

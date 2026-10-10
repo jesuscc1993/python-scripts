@@ -15,14 +15,18 @@ load_dotenv()
 _jira_client = None
 _jira_client_lock = threading.Lock()
 
+
 def get_jira_url():
   return os.getenv('JIRA_URL')
+
 
 def get_jira_email():
   return os.getenv('JIRA_EMAIL')
 
+
 def get_jira_token():
   return os.getenv('JIRA_TOKEN')
+
 
 def get_jira_vars():
   jira_url = get_jira_url()
@@ -37,6 +41,7 @@ def get_jira_vars():
     sys.exit(1)
 
   return jira_url, jira_email, jira_token
+
 
 def get_jira_client():
   global _jira_client
@@ -58,18 +63,28 @@ def get_jira_client():
       logger.error(f'Failed to connect to {jira_url}: {ex}')
       sys.exit(1)
 
+
 def find_in_issue_ids(issue_ids: list[str], pattern: re.Pattern):
   combined = set()
 
   with ThreadPoolExecutor() as executor:
-    futures = {executor.submit(fetch_and_find_in_issue, issue_id, pattern): issue_id for issue_id in issue_ids}
+    futures = {
+      executor.submit(fetch_and_find_in_issue, issue_id, pattern): issue_id
+      for issue_id in issue_ids
+    }
 
-    for future in tqdm(as_completed(futures), total=len(issue_ids), desc='Processing issues', unit='issue'):
+    for future in tqdm(
+      as_completed(futures),
+      total=len(issue_ids),
+      desc='Processing issues',
+      unit='issue',
+    ):
       matches = future.result()
       if matches:
         combined.update(matches)
 
   return combined
+
 
 def fetch_and_find_in_issue(issue_id: str, pattern: re.Pattern):
   try:
@@ -79,6 +94,7 @@ def fetch_and_find_in_issue(issue_id: str, pattern: re.Pattern):
     return None
 
   return find_in_issue(issue, pattern)
+
 
 def find_in_issue(issue: Issue, pattern: re.Pattern):
   text = f'{issue.fields.summary or ""}\n{issue.fields.description or ""}'

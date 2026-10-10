@@ -26,13 +26,12 @@ OVERLAY_PADDING = 4
 OVERLAY_LINE_GAP = 8
 OVERLAY_BG_ALPHA = 192
 
+
 def main():
   if len(sys.argv) > 1:
     input_path = to_path(sys.argv[1])
   else:
-    input_path = Prompt.path(
-      'Enter the path to a video file or directory'
-    )
+    input_path = Prompt.path('Enter the path to a video file or directory')
 
   logger.log(f'Generating video covers for "{input_path}"...')
   logger.hr()
@@ -50,6 +49,7 @@ def main():
 
   logger.hr()
   logger.log(f'Finished generating video covers for "{input_path}".')
+
 
 def process_directory(
   dir_path: str,
@@ -70,8 +70,9 @@ def process_directory(
     tqdm.write('No video files found.')
     return
 
-  for file_path in tqdm(video_files, unit = 'file'):
+  for file_path in tqdm(video_files, unit='file'):
     process_file(file_path, tmp_dir)
+
 
 def process_file(
   file_path: str,
@@ -101,7 +102,7 @@ def process_file(
     img = crop_to_16_9(img)
     img.thumbnail((256, 256), Image.LANCZOS)
     img = draw_stats_overlay(img, duration_secs, file_size)
-    img.save(frame_path, 'JPEG', quality = 90)
+    img.save(frame_path, 'JPEG', quality=90)
 
     if ext in MP4_EXTS:
       embed_mp4_cover(file_path, frame_path)
@@ -115,6 +116,7 @@ def process_file(
   except Exception as ex:
     tqdm.write(f'  Failed: {ex}')
 
+
 def embed_mp4_cover(
   file_path: str,
   cover_path: str,
@@ -123,6 +125,7 @@ def embed_mp4_cover(
   tags = MP4(file_path)
   tags['covr'] = [MP4Cover(data, MP4Cover.FORMAT_JPEG)]
   tags.save()
+
 
 def embed_asf_cover(
   file_path: str,
@@ -133,6 +136,7 @@ def embed_asf_cover(
   tags['WM/Picture'] = [ASFByteArrayAttribute(data)]
   tags.save()
 
+
 def embed_cover_ffmpeg(
   file_path: str,
   cover_path: str,
@@ -141,31 +145,47 @@ def embed_cover_ffmpeg(
 ):
   if ext == MKV_EXT:
     cmd = [
-      'ffmpeg', '-y',
-      '-loglevel', 'error',
-      '-i', file_path,
-      '-attach', cover_path,
-      '-metadata:s:t:0', 'mimetype=image/jpeg',
-      '-metadata:s:t:0', 'filename=cover.jpg',
-      '-c', 'copy',
-      output_path
+      'ffmpeg',
+      '-y',
+      '-loglevel',
+      'error',
+      '-i',
+      file_path,
+      '-attach',
+      cover_path,
+      '-metadata:s:t:0',
+      'mimetype=image/jpeg',
+      '-metadata:s:t:0',
+      'filename=cover.jpg',
+      '-c',
+      'copy',
+      output_path,
     ]
   else:
     cmd = [
-      'ffmpeg', '-y',
-      '-loglevel', 'error',
-      '-i', file_path,
-      '-i', cover_path,
-      '-map', '0',
-      '-map', '1',
-      '-c', 'copy',
-      '-disposition:v:1', 'attached_pic',
-      output_path
+      'ffmpeg',
+      '-y',
+      '-loglevel',
+      'error',
+      '-i',
+      file_path,
+      '-i',
+      cover_path,
+      '-map',
+      '0',
+      '-map',
+      '1',
+      '-c',
+      'copy',
+      '-disposition:v:1',
+      'attached_pic',
+      output_path,
     ]
 
-  result = subprocess.run(cmd, check = False, capture_output = True)
+  result = subprocess.run(cmd, check=False, capture_output=True)
   if result.returncode != 0:
-    raise RuntimeError(result.stderr.decode(errors = 'replace'))
+    raise RuntimeError(result.stderr.decode(errors='replace'))
+
 
 def get_video_info(
   file_path: str,
@@ -174,22 +194,27 @@ def get_video_info(
     result = subprocess.run(
       [
         'ffprobe',
-        '-v', 'quiet',
-        '-analyzeduration', '0',
-        '-probesize', '5000000',
-        '-print_format', 'json',
+        '-v',
+        'quiet',
+        '-analyzeduration',
+        '0',
+        '-probesize',
+        '5000000',
+        '-print_format',
+        'json',
         '-show_format',
-        file_path
+        file_path,
       ],
-      check = False,
-      capture_output = True,
-      encoding = 'utf-8',
-      errors = 'replace',
-      text = True,
+      check=False,
+      capture_output=True,
+      encoding='utf-8',
+      errors='replace',
+      text=True,
     )
     return json.loads(result.stdout)
   except Exception:
     return None
+
 
 def crop_to_16_9(
   img: Image.Image,
@@ -200,6 +225,7 @@ def crop_to_16_9(
     x = (w - new_w) // 2
     img = img.crop((x, 0, x + new_w, h))
   return img
+
 
 def crop_black_borders(
   img: Image.Image,
@@ -215,6 +241,7 @@ def crop_black_borders(
   x0, x1 = np.where(cols)[0][[0, -1]]
   return img.crop((x0, y0, x1 + 1, y1 + 1))
 
+
 def capture_frame(
   file_path: str,
   seek_secs: float,
@@ -224,21 +251,31 @@ def capture_frame(
     [
       'ffmpeg',
       '-y',
-      '-loglevel', 'error',
-      '-analyzeduration', '0',
-      '-probesize', '5000000',
-      '-ss', str(seek_secs),
-      '-i', file_path,
-      '-vframes', '1',
-      '-q:v', '2',
-      output_path
+      '-loglevel',
+      'error',
+      '-analyzeduration',
+      '0',
+      '-probesize',
+      '5000000',
+      '-ss',
+      str(seek_secs),
+      '-i',
+      file_path,
+      '-vframes',
+      '1',
+      '-q:v',
+      '2',
+      output_path,
     ],
-    check = False,
-    stdout = subprocess.DEVNULL,
-    stderr = subprocess.DEVNULL
+    check=False,
+    stdout=subprocess.DEVNULL,
+    stderr=subprocess.DEVNULL,
   )
   if not os.path.exists(output_path):
-    raise RuntimeError(f'Failed to extract frame from: {os.path.basename(file_path)}')
+    raise RuntimeError(
+      f'Failed to extract frame from: {os.path.basename(file_path)}'
+    )
+
 
 def format_duration(
   secs: float,
@@ -251,12 +288,14 @@ def format_duration(
     return f'{h}:{m:02d}:{s:02d}'
   return f'{m}:{s:02d}'
 
+
 def format_size(
   size_bytes: int,
 ):
-  if size_bytes >= 1024 ** 3:
-    return f'{round(size_bytes / (1024 ** 3), 2)} GB'
-  return f'{round(size_bytes / (1024 ** 2))} MB'
+  if size_bytes >= 1024**3:
+    return f'{round(size_bytes / (1024**3), 2)} GB'
+  return f'{round(size_bytes / (1024**2))} MB'
+
 
 def draw_stats_overlay(
   img: Image.Image,
@@ -267,10 +306,13 @@ def draw_stats_overlay(
   font = Font.load_by_path(FONT_PATH, FONT_SIZE)
   img_w, _ = img.size
 
-  draw_label(draw, font, format_duration(duration_secs), side = 'left', img_w = img_w)
-  draw_label(draw, font, format_size(file_size), side = 'right', img_w = img_w)
+  draw_label(
+    draw, font, format_duration(duration_secs), side='left', img_w=img_w
+  )
+  draw_label(draw, font, format_size(file_size), side='right', img_w=img_w)
 
   return img.convert('RGB')
+
 
 def draw_label(
   draw: ImageDraw.ImageDraw,
@@ -290,10 +332,13 @@ def draw_label(
   box_x = 0 if side == 'left' else img_w - box_w
   box_x2 = box_w if side == 'left' else img_w
 
-  draw.rectangle([box_x, 0, box_x2, box_h], fill = (0, 0, 0, OVERLAY_BG_ALPHA))
+  draw.rectangle([box_x, 0, box_x2, box_h], fill=(0, 0, 0, OVERLAY_BG_ALPHA))
 
   tx = box_x + OVERLAY_PADDING
-  draw.text((tx, OVERLAY_PADDING - top), text, font = font, fill = (255, 255, 255, 255))
+  draw.text(
+    (tx, OVERLAY_PADDING - top), text, font=font, fill=(255, 255, 255, 255)
+  )
+
 
 if __name__ == '__main__':
   try:

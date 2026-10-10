@@ -8,13 +8,18 @@ from mtprompt import Prompt
 
 from _common import ITEM_EXTENSIONS, get_volume_and_chapter
 
+
 def main():
   if len(sys.argv) > 2:
     folder_a = sys.argv[1]
     folder_b = sys.argv[2]
   else:
-    folder_a = Prompt.dir('Enter the path to the first folder you want to compare')
-    folder_b = Prompt.dir('Enter the path to the second folder you want to compare')
+    folder_a = Prompt.dir(
+      'Enter the path to the first folder you want to compare'
+    )
+    folder_b = Prompt.dir(
+      'Enter the path to the second folder you want to compare'
+    )
 
   subfolders_a = get_subfolders(folder_a)
   subfolders_b = get_subfolders(folder_b)
@@ -36,11 +41,17 @@ def main():
 
       if range_a and range_b:
         if range_a == range_b:
-          logger.success(f'"{item_name}" has the same volumes and chapters in both folders.')
+          logger.success(
+            f'"{item_name}" has the same volumes and chapters in both folders.'
+          )
         else:
           mismatches.append(item_name)
-          logger.log(f'  "{item_name}" has different volumes or chapters in the folders.')
-          logger.failure(f'{logger.format_trace(f"\"{folder_a}\"")} {print_range(range_a)} | {print_range(range_b)} {logger.format_trace(f"\"{folder_b}\"")}')
+          logger.log(
+            f'  "{item_name}" has different volumes or chapters in the folders.'
+          )
+          logger.failure(
+            f'{logger.format_trace(f'"{folder_a}"')} {print_range(range_a)} | {print_range(range_b)} {logger.format_trace(f'"{folder_b}"')}'
+          )
       else:
         logger.trace(f'Failed to determine ranges for "{item_name}".')
     elif path_a:
@@ -53,18 +64,26 @@ def main():
   logger.hr()
 
   if missing_in_a:
-    logger.warn(f'Missing in "{folder_a}" ({len(missing_in_a)}): {stringify(missing_in_a)}\n')
+    logger.warn(
+      f'Missing in "{folder_a}" ({len(missing_in_a)}): {stringify(missing_in_a)}\n'
+    )
 
   if missing_in_b:
-    logger.warn(f'Missing in "{folder_b}" ({len(missing_in_b)}): {stringify(missing_in_b)}\n')
+    logger.warn(
+      f'Missing in "{folder_b}" ({len(missing_in_b)}): {stringify(missing_in_b)}\n'
+    )
 
   if mismatches:
-    logger.failure(f'Mismatching ranges ({len(mismatches)}): {stringify(mismatches)}\n')
+    logger.failure(
+      f'Mismatching ranges ({len(mismatches)}): {stringify(mismatches)}\n'
+    )
+
 
 def stringify(
   obj: dict,
 ):
-  return json.dumps(obj, indent = 2)
+  return json.dumps(obj, indent=2)
+
 
 def get_subfolders(
   parent_folder_path: str,
@@ -79,20 +98,24 @@ def get_subfolders(
       results[normalize_name(os.path.basename(rel))] = rel
   return results
 
+
 def normalize_name(
   name: str,
 ):
   return re.sub(r'\s*(\{.*?\}|\(.*?\))\s*', '', name).strip()
 
+
 def get_subfolder_ranges(
   folder_path: str,
 ):
-  items = sorted([
-    item
-    for item in os.listdir(folder_path)
-    if os.path.isdir(os.path.join(folder_path, item))
-    or os.path.splitext(item)[1].lower().endswith(tuple(ITEM_EXTENSIONS))
-  ])
+  items = sorted(
+    [
+      item
+      for item in os.listdir(folder_path)
+      if os.path.isdir(os.path.join(folder_path, item))
+      or os.path.splitext(item)[1].lower().endswith(tuple(ITEM_EXTENSIONS))
+    ]
+  )
 
   if len(items):
     firstItem = items[0]
@@ -106,16 +129,27 @@ def get_subfolder_ranges(
 
     if firstMissing or lastMissing:
       if firstMissing:
-        logger.trace(f'Could not determine volume or chapter for "{firstItem}".')
+        logger.trace(
+          f'Could not determine volume or chapter for "{firstItem}".'
+        )
       if lastMissing:
         logger.trace(f'Could not determine volume or chapter for "{lastItem}".')
       return None
 
-    volumeRange = (firstVolume, lastVolume) if firstVolume is not None and lastVolume is not None else None
-    chapterRange = (firstChapter, lastChapter) if firstChapter is not None and lastChapter is not None else None
+    volumeRange = (
+      (firstVolume, lastVolume)
+      if firstVolume is not None and lastVolume is not None
+      else None
+    )
+    chapterRange = (
+      (firstChapter, lastChapter)
+      if firstChapter is not None and lastChapter is not None
+      else None
+    )
     return volumeRange, chapterRange
   else:
     return None
+
 
 def print_range(
   range: tuple,
@@ -134,6 +168,7 @@ def print_range(
     return msg
   else:
     raise ValueError('Range is invalid')
+
 
 if __name__ == '__main__':
   try:

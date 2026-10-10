@@ -7,30 +7,23 @@ from mtprompt import Prompt
 
 from _common import enforce_unique_path
 
-FILES_TO_COPY = {
-  'cover.jpg',
-  'desktop.ini',
-  'folder.jpg',
-  'icon.ico'
-}
+FILES_TO_COPY = {'cover.jpg', 'desktop.ini', 'folder.jpg', 'icon.ico'}
+
 
 def main():
   if len(sys.argv) > 2:
     src_path = sys.argv[1]
     dest_path = sys.argv[2]
   else:
-    src_path = Prompt.dir(
-      'Enter the path containing the files to copy'
-    )
-    dest_path = Prompt.dir(
-      'Enter the path the files will be copied to'
-    )
+    src_path = Prompt.dir('Enter the path containing the files to copy')
+    dest_path = Prompt.dir('Enter the path the files will be copied to')
 
   try:
     enforce_unique_path(src_path, dest_path)
     copy_folder_assets(src_path, dest_path)
   except ValueError as ex:
     logger.error(ex)
+
 
 def copy_folder_assets(
   src_dir_path: str,
@@ -50,6 +43,7 @@ def copy_folder_assets(
           logger.debug(f'Copied "{src_file}" as "{dest_file}".')
 
   logger.success(f'Finished copying "{src_dir_path}" to "{dest_dir_path}".')
+
 
 if __name__ == '__main__':
   try:

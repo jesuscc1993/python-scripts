@@ -13,7 +13,9 @@ results = []
 
 for test_dir in test_dirs:
   logger.log(f'\nTesting "{test_dir}"...')
-  result = subprocess.run([sys.executable, '-m', 'pytest', '.', '-q'], check=False, cwd=str(test_dir))
+  result = subprocess.run(
+    [sys.executable, '-m', 'pytest', '.', '-q'], check=False, cwd=str(test_dir)
+  )
   results.append((test_dir.name, test_dir.parent.name, result.returncode == 0))
 
 passed_count = sum(1 for _, _, p in results if p)

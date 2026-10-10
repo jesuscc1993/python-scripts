@@ -1,4 +1,3 @@
-
 import math
 import os
 import re
@@ -43,6 +42,7 @@ VALUE_MEDIUM = 65
 VALUE_HIGH = 70
 VALUE_HIGHEST = 80
 
+
 def main():
   if len(sys.argv) > 1:
     parent_dir = sys.argv[1]
@@ -51,24 +51,27 @@ def main():
     parent_dir = Prompt.dir(
       'Enter the path to the directory containing your media'
     )
-    depth = Prompt.int(
-      'Enter the depth for processing subfolders',
-      default=1
-    )
+    depth = Prompt.int('Enter the depth for processing subfolders', default=1)
 
   font = Font.load_by_path(FONT_PATH, FONT_SIZE)
 
   dirs_to_process = collect_dirs_to_process(parent_dir, depth)
 
-  with ThreadPoolExecutor() as executor, tqdm(total = len(dirs_to_process), desc = f'Processing "{parent_dir}"') as progress:
+  with (
+    ThreadPoolExecutor() as executor,
+    tqdm(
+      total=len(dirs_to_process), desc=f'Processing "{parent_dir}"'
+    ) as progress,
+  ):
     for _ in executor.map(lambda dir: process_dir(dir, font), dirs_to_process):
       progress.update(1)
 
   logger.success(f'Finished overlaying scores in "{parent_dir}".')
 
+
 def find_cover(
   dir: str,
-  is_backup = False,
+  is_backup=False,
 ):
   for cover_name in COVER_NAMES:
     path = get_cover_path(dir, cover_name, is_backup)
@@ -76,14 +79,16 @@ def find_cover(
       return path
   return None
 
+
 def get_cover_path(
   dir: str,
   cover_name: str,
-  is_backup = False,
+  is_backup=False,
 ):
   name, ext = os.path.splitext(cover_name)
   path = os.path.join(dir, name + (COVER_BAK_EXT if is_backup else '') + ext)
   return path
+
 
 def process_dir(
   dir: str,
@@ -98,7 +103,9 @@ def process_dir(
     return
 
   if cover_img_bak_path is None:
-    cover_img_bak_path = get_cover_path(dir, os.path.basename(cover_img_path), is_backup=True)
+    cover_img_bak_path = get_cover_path(
+      dir, os.path.basename(cover_img_path), is_backup=True
+    )
 
   score = read_score_from_metadata(dir)
   if score is None:
@@ -112,6 +119,7 @@ def process_dir(
 
   process_cover(dir, cover_img_path, cover_img_bak_path, score, font)
 
+
 def read_score_from_metadata(
   dir: str,
 ):
@@ -121,6 +129,7 @@ def read_score_from_metadata(
   except Exception:
     return None
 
+
 def read_score_from_comic_info(
   dir: str,
 ):
@@ -129,10 +138,13 @@ def read_score_from_comic_info(
     return None
 
   try:
-    rating = ElementTree.parse(comic_info_path).getroot().findtext('CommunityRating')
+    rating = (
+      ElementTree.parse(comic_info_path).getroot().findtext('CommunityRating')
+    )
     return round(float(rating) * 20) if rating else None
   except Exception:
     return None
+
 
 def process_cover(
   dir: str,
@@ -153,9 +165,9 @@ def process_cover(
     if not os.path.exists(cover_img_bak_path):
       shutil.copy(cover_img_path, cover_img_bak_path)
     if (
-      cover_img_path and
-      cover_img_path != processed_cover_img_path and
-      os.path.exists(cover_img_path)
+      cover_img_path
+      and cover_img_path != processed_cover_img_path
+      and os.path.exists(cover_img_path)
     ):
       os.remove(cover_img_path)
 
@@ -165,10 +177,13 @@ def process_cover(
     img.save(processed_cover_img_path, quality=100)
 
   finally:
-    Attr.set_hidden(processed_cover_img_path, SETTINGS.get("hide_cover"))
-    Attr.set_hidden(cover_img_bak_path, SETTINGS.get("hide_cover_bak"))
+    Attr.set_hidden(processed_cover_img_path, SETTINGS.get('hide_cover'))
+    Attr.set_hidden(cover_img_bak_path, SETTINGS.get('hide_cover_bak'))
 
-  tqdm.write(logger.format_debug(f'Applied score overlay to "{os.path.basename(dir)}".'))
+  tqdm.write(
+    logger.format_debug(f'Applied score overlay to "{os.path.basename(dir)}".')
+  )
+
 
 def resize_cover(
   img: Image.Image,
@@ -176,10 +191,13 @@ def resize_cover(
   target_h: int,
 ):
   scale = max(target_w / img.width, target_h / img.height)
-  img = img.resize((round(img.width * scale), round(img.height * scale)), Image.LANCZOS)
+  img = img.resize(
+    (round(img.width * scale), round(img.height * scale)), Image.LANCZOS
+  )
   left = (img.width - target_w) // 2
   top = (img.height - target_h) // 2
   return img.crop((left, top, left + target_w, top + target_h))
+
 
 def overlay_score(
   img: Image.Image,
@@ -203,10 +221,18 @@ def overlay_score(
   x = img.width - canvas_w - OVERLAY_MARGIN - 1
   y = OVERLAY_MARGIN
 
-  draw.rounded_rectangle([x, y, x + canvas_w, y + canvas_h], radius=OVERLAY_RADIUS, fill=bg_color)
-  draw.text((x + OVERLAY_PADDING + text_offset_x, y + OVERLAY_PADDING + text_offset_y), text, font=font, fill=FG_GRAY)
+  draw.rounded_rectangle(
+    [x, y, x + canvas_w, y + canvas_h], radius=OVERLAY_RADIUS, fill=bg_color
+  )
+  draw.text(
+    (x + OVERLAY_PADDING + text_offset_x, y + OVERLAY_PADDING + text_offset_y),
+    text,
+    font=font,
+    fill=FG_GRAY,
+  )
 
   return Image.alpha_composite(img, overlay).convert('RGB')
+
 
 def format_score(
   score: int,
@@ -214,14 +240,20 @@ def format_score(
   return f'{math.ceil(score)}%'
   # return f'{math.ceil(score) / 10:.1f}'
 
+
 def get_score_color(
   score: int,
 ):
-  if score < VALUE_LOW: return BG_LOWEST
-  if score < VALUE_MEDIUM: return BG_LOW
-  elif score < VALUE_HIGH: return BG_MEDIUM
-  elif score < VALUE_HIGHEST: return BG_HIGH
+  if score < VALUE_LOW:
+    return BG_LOWEST
+  if score < VALUE_MEDIUM:
+    return BG_LOW
+  elif score < VALUE_HIGH:
+    return BG_MEDIUM
+  elif score < VALUE_HIGHEST:
+    return BG_HIGH
   return BG_HIGHEST
+
 
 if __name__ == '__main__':
   try:

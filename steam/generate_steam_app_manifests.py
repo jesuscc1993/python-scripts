@@ -9,7 +9,7 @@ from pathlib import Path
 from _common import get_owned_games
 from _constants import STEAM_API_KEY, STEAM_USER_ID3, STEAM_USER_ID64
 
-APP_MANIFEST_TEMPLATE = '''"AppState"
+APP_MANIFEST_TEMPLATE = """"AppState"
 {{
   "appid"               "{app_id}"
   "Universe"            "1"
@@ -34,23 +34,27 @@ APP_MANIFEST_TEMPLATE = '''"AppState"
   {{
     "language"          "english"
   }}
-}}'''
+}}"""
+
 
 def main():
-  folder = Prompt.dir(
-    'Enter the path of your steam games folder'
-  )
+  folder = Prompt.dir('Enter the path of your steam games folder')
 
-  game_folders = [d for d in os.listdir(folder) if os.path.isdir(os.path.join(folder, d))]
+  game_folders = [
+    d for d in os.listdir(folder) if os.path.isdir(os.path.join(folder, d))
+  ]
   if not game_folders:
     logger.log('No game folders found.')
     return
 
-  owned_games = {sanitize_name(g['name']): g['appid'] for g in get_owned_games(STEAM_API_KEY, STEAM_USER_ID64)}
+  owned_games = {
+    sanitize_name(g['name']): g['appid']
+    for g in get_owned_games(STEAM_API_KEY, STEAM_USER_ID64)
+  }
 
   drive = Path(folder).drive
   steam_apps_path = os.path.join(drive, 'SteamLibrary', 'steamapps')
-  os.makedirs(steam_apps_path, exist_ok = True)
+  os.makedirs(steam_apps_path, exist_ok=True)
 
   for game in game_folders:
     sanitized = sanitize_name(game)
@@ -67,19 +71,21 @@ def main():
     name = game
     install_dir = game
     content = APP_MANIFEST_TEMPLATE.format(
-      app_id = app_id,
-      name = name,
-      install_dir = install_dir,
-      steam_user_id = STEAM_USER_ID3
+      app_id=app_id,
+      name=name,
+      install_dir=install_dir,
+      steam_user_id=STEAM_USER_ID3,
     )
 
     write_text_file(filepath, content)
     logger.log(f'Created manifest for "{game}" -> {filepath}')
 
+
 def sanitize_name(
   name: str,
 ):
   return re.sub(r'[^a-zA-Z0-9 _\-]', '', name).strip().lower()
+
 
 if __name__ == '__main__':
   try:

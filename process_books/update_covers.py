@@ -20,6 +20,7 @@ MAX_H = 300
 CVI_PATTERN = re.compile(r'(.*)_cvi(_|\.)', re.IGNORECASE)
 CVT_PATTERN = re.compile(r'(.*)_cvt(_|\.)', re.IGNORECASE)
 
+
 def main():
   if len(sys.argv) > 1:
     parent_dir = sys.argv[1]
@@ -38,6 +39,7 @@ def main():
         logger.hr()
 
   logger.success(f'Finished updating covers in "{parent_dir}".')
+
 
 def process_file(
   file_path: str,
@@ -62,7 +64,9 @@ def process_file(
         if external_cover_path:
           cover_bytes = load_cover_image(external_cover_path, cvi_name)
           updates[cvi_name] = cover_bytes
-          logger.log(f'Replacing cover "{cvi_name}" with "{os.path.basename(external_cover_path)}".')
+          logger.log(
+            f'Replacing cover "{cvi_name}" with "{os.path.basename(external_cover_path)}".'
+          )
         elif cvt_name:
           with archive.open(cvi_name) as cvi_file:
             cover_bytes = cvi_file.read()
@@ -77,10 +81,15 @@ def process_file(
 
     tmp_path = os.path.join(tempfile.gettempdir(), f'{file_name}.tmp')
     try:
-      with zipfile.ZipFile(file_path, 'r') as source, zipfile.ZipFile(tmp_path, 'w', zipfile.ZIP_DEFLATED) as target:
+      with (
+        zipfile.ZipFile(file_path, 'r') as source,
+        zipfile.ZipFile(tmp_path, 'w', zipfile.ZIP_DEFLATED) as target,
+      ):
         for item in source.infolist():
           data = updates.get(item.filename, None)
-          target.writestr(item, data if data is not None else source.read(item.filename))
+          target.writestr(
+            item, data if data is not None else source.read(item.filename)
+          )
 
       shutil.move(tmp_path, file_path)
     except Exception:
@@ -92,6 +101,7 @@ def process_file(
 
   except Exception as ex:
     logger.error(f'An error occurred while processing "{file_name}":\n{ex}')
+
 
 def find_external_cover(
   file_path: str,
@@ -106,21 +116,22 @@ def find_external_cover(
 
   return None
 
+
 def is_cover_thumb(
   name: str,
 ):
-  return (
-    os.path.dirname(name).lower().endswith(IMAGES_DIR.lower()) and
-    bool(CVT_PATTERN.match(os.path.basename(name)))
+  return os.path.dirname(name).lower().endswith(IMAGES_DIR.lower()) and bool(
+    CVT_PATTERN.match(os.path.basename(name))
   )
+
 
 def is_cover(
   name: str,
 ):
-  return (
-    os.path.dirname(name).lower().endswith(IMAGES_DIR.lower()) and
-    bool(CVI_PATTERN.match(os.path.basename(name)))
+  return os.path.dirname(name).lower().endswith(IMAGES_DIR.lower()) and bool(
+    CVI_PATTERN.match(os.path.basename(name))
   )
+
 
 def get_cover_image_name(
   cvt_name: str,
@@ -132,13 +143,18 @@ def get_cover_image_name(
 
   base = match.group(1)
   dir_name = os.path.dirname(cvt_name)
-  covers = [name for name in names if is_cover(name) and os.path.dirname(name) == dir_name]
+  covers = [
+    name
+    for name in names
+    if is_cover(name) and os.path.dirname(name) == dir_name
+  ]
 
   for name in covers:
     if CVI_PATTERN.match(name).group(1) == base:
       return name
 
   return covers[0] if len(covers) == 1 else None
+
 
 def find_cover_by_opf(
   archive: zipfile.ZipFile,
@@ -164,11 +180,14 @@ def find_cover_by_opf(
       if not href:
         continue
 
-      cover_path = os.path.normpath(os.path.join(os.path.dirname(opf_path), href)).replace(os.sep, '/')
+      cover_path = os.path.normpath(
+        os.path.join(os.path.dirname(opf_path), href)
+      ).replace(os.sep, '/')
       if cover_path in names:
         return cover_path
 
   return None
+
 
 def get_cover_pairs(
   archive: zipfile.ZipFile,
@@ -182,7 +201,7 @@ def get_cover_pairs(
   for cvt_name in cvt_names:
     cvi_name = get_cover_image_name(cvt_name, names)
     if cvi_name:
-      pairs.append({ 'cvi_name': cvi_name, 'cvt_name': cvt_name })
+      pairs.append({'cvi_name': cvi_name, 'cvt_name': cvt_name})
       handled_cvis.add(cvi_name)
       handled_cvts.add(cvt_name)
 
@@ -190,15 +209,19 @@ def get_cover_pairs(
   if opf_cover_name and opf_cover_name not in handled_cvis:
     dir_name = os.path.dirname(opf_cover_name)
     candidate_cvts = [
-      name for name in cvt_names
+      name
+      for name in cvt_names
       if os.path.dirname(name) == dir_name and name not in handled_cvts
     ]
-    pairs.append({
-      'cvi_name': opf_cover_name,
-      'cvt_name': candidate_cvts[0] if len(candidate_cvts) == 1 else None,
-    })
+    pairs.append(
+      {
+        'cvi_name': opf_cover_name,
+        'cvt_name': candidate_cvts[0] if len(candidate_cvts) == 1 else None,
+      }
+    )
 
   return pairs
+
 
 def load_cover_image(
   image_path: str,
@@ -212,8 +235,9 @@ def load_cover_image(
     img = img.convert('RGB')
 
   buffer = BytesIO()
-  img.save(buffer, format = image_format)
+  img.save(buffer, format=image_format)
   return buffer.getvalue()
+
 
 def generate_thumb(
   cover_bytes: bytes,
@@ -229,8 +253,9 @@ def generate_thumb(
     img = img.convert('RGB')
 
   buffer = BytesIO()
-  img.save(buffer, format = image_format)
+  img.save(buffer, format=image_format)
   return buffer.getvalue()
+
 
 def get_image_format(
   name: str,
@@ -238,6 +263,7 @@ def get_image_format(
 ):
   ext = os.path.splitext(name)[1].lower()
   return Image.registered_extensions().get(ext, img.format)
+
 
 if __name__ == '__main__':
   try:

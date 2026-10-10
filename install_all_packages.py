@@ -3,10 +3,12 @@ import subprocess
 
 SETUP_FILE = 'setup.py'
 
+
 def main():
   for path, _, files in os.walk('.'):
     if SETUP_FILE in files:
       subprocess.run(['pip', 'install', path], check=False)
+
 
 if __name__ == '__main__':
   try:

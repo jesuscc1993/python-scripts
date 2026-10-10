@@ -23,10 +23,11 @@ ENDING_REGEX = r'\bEnd(?:ing)?\b'
 SIDE_STORY_REGEX = r'\bSide Story\b'
 
 VOLUME_NUMBER_REGEX = rf'{VOLUME_REGEX}{NUMBER_REGEX}'
-CHAPTER_NUMBER_REGEX  = rf'{CHAPTER_REGEX}{NUMBER_REGEX}'
+CHAPTER_NUMBER_REGEX = rf'{CHAPTER_REGEX}{NUMBER_REGEX}'
 
 ITEM_EXTENSIONS = ['cbz', 'zip']
 IMAGE_EXTENSIONS = ['webp', 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'tif']
+
 
 def select_parent_folder(
   prompt: str,
@@ -35,7 +36,9 @@ def select_parent_folder(
 ):
   if options is None:
     options = {}
-  prompt = prompt or 'Enter the path to the parent folder you want to process:\n'
+  prompt = (
+    prompt or 'Enter the path to the parent folder you want to process:\n'
+  )
   log_success = options.get('log_success', False)
   loop = options.get('loop', True)
 
@@ -57,6 +60,7 @@ def select_parent_folder(
   else:
     Prompt.enter_to_exit()
 
+
 def process_folder_images(
   folder_path: str,
   callback: Callable,
@@ -69,20 +73,27 @@ def process_folder_images(
         file_path = os.path.join(root, file)
         files_to_process.append(file_path)
 
-  with ThreadPoolExecutor() as executor, tqdm(total = len(files_to_process), desc = f'Processing "{folder_path}"') as progress:
+  with (
+    ThreadPoolExecutor() as executor,
+    tqdm(
+      total=len(files_to_process), desc=f'Processing "{folder_path}"'
+    ) as progress,
+  ):
     for _ in executor.map(callback, files_to_process):
       progress.update(1)
+
 
 def delete_empty_folders(
   folder_path: str,
 ):
-  for root, dirs, _ in os.walk(folder_path, topdown = False):
+  for root, dirs, _ in os.walk(folder_path, topdown=False):
     for dir_name in dirs:
       dir_path = os.path.join(root, dir_name)
       try:
         os.rmdir(dir_path)
       except OSError:
         pass
+
 
 def get_volume_and_chapter(
   filename: str,
@@ -93,12 +104,14 @@ def get_volume_and_chapter(
   chapter = float(ch_match.group(1)) if ch_match else None
   return (volume, chapter)
 
+
 def get_chapter(
   filename: str,
 ):
   ch_match = re.search(CHAPTER_NUMBER_REGEX, filename, re.IGNORECASE)
   chapter = ch_match.group(1) if ch_match else None
   return chapter
+
 
 def run_scripts_in_sequence(
   script_commands: list,
@@ -109,19 +122,24 @@ def run_scripts_in_sequence(
 
   for script_command in script_commands:
     script, *arg_tokens = script_command.split(' ')
-    args = [parent_folder_path if token == '$dir' else token for token in arg_tokens]
-    abs_path = os.path.abspath(os.path.join(os.path.dirname(__file__), script + '.py'))
+    args = [
+      parent_folder_path if token == '$dir' else token for token in arg_tokens
+    ]
+    abs_path = os.path.abspath(
+      os.path.join(os.path.dirname(__file__), script + '.py')
+    )
 
     logger.trace(f'\nRunning {script}:')
     subprocess.run(['python', abs_path, *args], check=False, env=env)
 
   logger.info(
     f'Finished batch running scripts on "{parent_folder_path}".\n',
-    prefix_newline=True
+    prefix_newline=True,
   )
 
+
 def zfill_float(
-  value: float |str,
+  value: float | str,
   width: int,
 ):
   parts = f'{float(value):g}'.split('.')

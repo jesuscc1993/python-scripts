@@ -5,11 +5,14 @@ from mtprompt import Prompt
 
 from _constants import HLTB_DB_PATH
 
+
 def main():
   db = read_json_file(HLTB_DB_PATH) or {}
 
   while True:
-    folder_name = Prompt.str('Enter the game folder name, or press Enter to exit', optional=True)
+    folder_name = Prompt.str(
+      'Enter the game folder name, or press Enter to exit', optional=True
+    )
     if not folder_name:
       return
 
@@ -23,8 +26,11 @@ def main():
 
     db[folder_name] = result
     write_json_file(HLTB_DB_PATH, db)
-    logger.success(f'Saved HLTB result for "{folder_name}" using "{fallback_name}".')
+    logger.success(
+      f'Saved HLTB result for "{folder_name}" using "{fallback_name}".'
+    )
     logger.hr()
+
 
 if __name__ == '__main__':
   try:

@@ -9,31 +9,41 @@ from _constants import OUTPUT_DIR_PATH
 
 YTDL_OPTIONS = {
   'format': 'bestaudio/best',
-  'postprocessors': [{
-    'key': 'FFmpegExtractAudio',
-    'preferredcodec': 'mp3'
-  }]
+  'postprocessors': [{'key': 'FFmpegExtractAudio', 'preferredcodec': 'mp3'}],
 }
 
+
 def main():
-  youtube_url = sys.argv[1] if len(sys.argv) > 1 else Prompt.str('Enter a YouTube video/playlist URL/ID')
-  output_dir_path = sys.argv[2] if len(sys.argv) > 2 else os.path.join(OUTPUT_DIR_PATH, 'youtube')
+  youtube_url = (
+    sys.argv[1]
+    if len(sys.argv) > 1
+    else Prompt.str('Enter a YouTube video/playlist URL/ID')
+  )
+  output_dir_path = (
+    sys.argv[2]
+    if len(sys.argv) > 2
+    else os.path.join(OUTPUT_DIR_PATH, 'youtube')
+  )
 
   download_from_yt(output_dir_path, youtube_url)
+
 
 def download_from_yt(
   output_dir_path: str,
   youtube_url: str,
 ):
   try:
-    with YoutubeDL({
-      **YTDL_OPTIONS,
-      'outtmpl': os.path.join(output_dir_path, '%(title)s.%(ext)s')
-    }) as ydl:
+    with YoutubeDL(
+      {
+        **YTDL_OPTIONS,
+        'outtmpl': os.path.join(output_dir_path, '%(title)s.%(ext)s'),
+      }
+    ) as ydl:
       ydl.download([youtube_url])
       logger.success('Download complete.')
   except Exception as ex:
     logger.error(f'Download failed: {ex}')
+
 
 if __name__ == '__main__':
   try:

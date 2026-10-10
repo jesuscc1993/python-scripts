@@ -7,6 +7,7 @@ from mtprompt import Prompt
 
 PREPEND_PARENT = True
 
+
 def main():
   if len(sys.argv) > 1:
     parent_dir = sys.argv[1]
@@ -16,6 +17,7 @@ def main():
     )
 
   flatten_subfolders(parent_dir)
+
 
 def flatten_subfolders(parent_dir: str):
   logger.log(f'Flattening subfolders in "{parent_dir}"...')
@@ -44,6 +46,7 @@ def flatten_subfolders(parent_dir: str):
           os.rmdir(sub_root)
 
   logger.success(f'Finished flattening subfolders in "{parent_dir}".')
+
 
 if __name__ == '__main__':
   try:

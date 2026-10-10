@@ -13,13 +13,12 @@ from tqdm import tqdm
 from _common import generate_tmp_dir, get_ext
 from _constants import MP4_EXTS, VIDEO_EXTS, WMV_EXT
 
+
 def main():
   if len(sys.argv) > 1:
     input_path = to_path(sys.argv[1])
   else:
-    input_path = Prompt.path(
-      'Enter the path to a video file or directory'
-    )
+    input_path = Prompt.path('Enter the path to a video file or directory')
 
   logger.log(f'Removing video covers from "{input_path}"...')
   logger.hr()
@@ -37,6 +36,7 @@ def main():
 
   logger.hr()
   logger.log(f'Finished removing video covers from "{input_path}".')
+
 
 def process_directory(
   dir_path: str,
@@ -57,8 +57,9 @@ def process_directory(
     tqdm.write('No video files found.')
     return
 
-  for file_path in tqdm(video_files, unit = 'file'):
+  for file_path in tqdm(video_files, unit='file'):
     process_file(file_path, tmp_dir)
+
 
 def process_file(
   file_path: str,
@@ -75,6 +76,7 @@ def process_file(
 
   return remove_ffmpeg_covers(file_path, tmp_dir)
 
+
 def remove_mp4_cover(
   file_path: str,
 ):
@@ -85,8 +87,11 @@ def remove_mp4_cover(
 
   del media['covr']
   media.save()
-  logger.success(f'Removed embedded cover from "{os.path.basename(file_path)}".')
+  logger.success(
+    f'Removed embedded cover from "{os.path.basename(file_path)}".'
+  )
   return True
+
 
 def remove_asf_cover(
   file_path: str,
@@ -98,8 +103,11 @@ def remove_asf_cover(
 
   del media['WM/Picture']
   media.save()
-  logger.success(f'Removed embedded cover from "{os.path.basename(file_path)}".')
+  logger.success(
+    f'Removed embedded cover from "{os.path.basename(file_path)}".'
+  )
   return True
+
 
 def find_cover_streams(
   file_path: str,
@@ -107,34 +115,45 @@ def find_cover_streams(
   result = subprocess.run(
     [
       'ffprobe',
-      '-v', 'quiet',
-      '-analyzeduration', '0',
-      '-probesize', '5000000',
-      '-print_format', 'json',
+      '-v',
+      'quiet',
+      '-analyzeduration',
+      '0',
+      '-probesize',
+      '5000000',
+      '-print_format',
+      'json',
       '-show_streams',
-      file_path
+      file_path,
     ],
     check=False,
     capture_output=True,
     encoding='utf-8',
     errors='replace',
-    text=True
+    text=True,
   )
   if result.returncode != 0:
-    raise RuntimeError(result.stderr.strip() or f'Could not inspect "{file_path}".')
+    raise RuntimeError(
+      result.stderr.strip() or f'Could not inspect "{file_path}".'
+    )
 
   streams = json.loads(result.stdout).get('streams', [])
   cover_indices = []
   for stream in streams:
     stream_type = stream.get('codec_type')
     filename = stream.get('tags', {}).get('filename', '').casefold()
-    is_attached_picture = stream_type == 'video' and stream.get('disposition', {}).get('attached_pic')
-    is_cover_attachment = stream_type == 'attachment' and filename == 'cover.jpg'
+    is_attached_picture = stream_type == 'video' and stream.get(
+      'disposition', {}
+    ).get('attached_pic')
+    is_cover_attachment = (
+      stream_type == 'attachment' and filename == 'cover.jpg'
+    )
     is_cover_video = stream_type == 'video' and filename == 'cover.jpg'
     if is_attached_picture or is_cover_attachment or is_cover_video:
       cover_indices.append(stream['index'])
 
   return cover_indices
+
 
 def remove_ffmpeg_covers(
   file_path: str,
@@ -152,16 +171,28 @@ def remove_ffmpeg_covers(
   cmd.extend(['-c', 'copy', output_path])
 
   result = subprocess.run(cmd, check=False, capture_output=True)
-  if result.returncode != 0 or not os.path.isfile(output_path) or os.path.getsize(output_path) == 0:
+  if (
+    result.returncode != 0
+    or not os.path.isfile(output_path)
+    or os.path.getsize(output_path) == 0
+  ):
     if os.path.exists(output_path):
       os.remove(output_path)
-    error_message = result.stderr.decode(errors='replace').strip() or 'ffmpeg did not create a non-empty output file.'
-    logger.warn(f'Failed to remove cover from "{os.path.basename(file_path)}": {error_message}')
+    error_message = (
+      result.stderr.decode(errors='replace').strip()
+      or 'ffmpeg did not create a non-empty output file.'
+    )
+    logger.warn(
+      f'Failed to remove cover from "{os.path.basename(file_path)}": {error_message}'
+    )
     return False
 
   os.replace(output_path, file_path)
-  logger.success(f'Removed embedded cover from "{os.path.basename(file_path)}".')
+  logger.success(
+    f'Removed embedded cover from "{os.path.basename(file_path)}".'
+  )
   return True
+
 
 if __name__ == '__main__':
   try:

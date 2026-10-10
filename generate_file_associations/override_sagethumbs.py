@@ -15,8 +15,9 @@ IMAGE_EXTENSIONS = [
   'tga',
   'tif',
   'tiff',
-  'webp'
+  'webp',
 ]
+
 
 def main():
   for ext in IMAGE_EXTENSIONS:
@@ -24,15 +25,19 @@ def main():
     # update generic class too in case sagethumbs is nto set up for this particular extension
     update_key(f'{ext}file')
 
+
 def update_key(
   key_name: str,
 ):
   try:
-    with winreg.OpenKey(winreg.HKEY_CLASSES_ROOT, key_name, 0, winreg.KEY_SET_VALUE) as subkey:
+    with winreg.OpenKey(
+      winreg.HKEY_CLASSES_ROOT, key_name, 0, winreg.KEY_SET_VALUE
+    ) as subkey:
       winreg.SetValueEx(subkey, '', 0, winreg.REG_SZ, 'Image File')
       logger.debug(f'Updated "{key_name}".')
   except FileNotFoundError:
     pass
+
 
 if __name__ == '__main__':
   try:

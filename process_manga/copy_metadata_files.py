@@ -18,6 +18,7 @@ FILES_TO_COPY = [DESKTOP_INI, ICON_ICO, COVER_JPG, COMIC_INFO, NO_XML, NO_MEDIA]
 HIDDEN_FILES = [ICON_ICO, NO_XML, NO_MEDIA]
 HIDDEN_SYSTEM_FILES = [DESKTOP_INI]
 
+
 def main():
   a = Prompt.dir('Enter the path to the source directory')
   b = Prompt.dir('Enter the path to the destination directory')
@@ -54,8 +55,10 @@ def main():
   mtsound.notify()
   Prompt.enter_to_exit()
 
+
 def sanitize_name(name: str):
   return re.sub(r'\s*[\(\{]\d{1,3}[\)\}]\s*$', '', name).strip()
+
 
 def copy_file(src: str, dst_dir: str, file_name: str):
   try:
@@ -64,6 +67,7 @@ def copy_file(src: str, dst_dir: str, file_name: str):
       tqdm.write(f'Copied: {dst_dir} - {file_name}')
   except Exception as e:
     tqdm.write(f'Error copying {file_name} to {dst_dir}: {e}')
+
 
 if __name__ == '__main__':
   try:

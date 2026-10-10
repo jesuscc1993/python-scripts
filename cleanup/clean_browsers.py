@@ -11,12 +11,13 @@ FIREFOX_PATH = r'%LOCALAPPDATA%\Mozilla\Firefox\Profiles\*'
 DIR_PATTERNS = [
   os.path.join(CHROME_PATH, r'*cache*'),
   os.path.join(CHROME_PATH, r'Service Worker\CacheStorage'),
-
   os.path.join(FIREFOX_PATH, r'*cache*'),
 ]
 
+
 def main():
   delete_children_for_dirs(DIR_PATTERNS)
+
 
 if __name__ == '__main__':
   try:

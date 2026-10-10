@@ -4,6 +4,7 @@ from PIL import ImageFont
 from enum import Enum
 from mtlogger import LogLevel, Logger
 
+
 class SegoeFontName(Enum):
   BLACK = 'seguibl.ttf'
   BOLD = 'segoeuib.ttf'
@@ -12,10 +13,11 @@ class SegoeFontName(Enum):
   SEMIBOLD = 'seguisb.ttf'
   SEMILIGHT = 'segoeuisl.ttf'
 
+
 FontName = SegoeFontName
 
-class Font:
 
+class Font:
   logger = Logger(LogLevel.ERROR)
 
   @staticmethod
@@ -24,7 +26,9 @@ class Font:
   ):
     name = name.value if isinstance(name, Enum) else name
 
-    user_fonts = os.path.join(os.environ.get('LOCALAPPDATA', ''), 'Microsoft', 'Windows', 'Fonts', name)
+    user_fonts = os.path.join(
+      os.environ.get('LOCALAPPDATA', ''), 'Microsoft', 'Windows', 'Fonts', name
+    )
     if os.path.exists(user_fonts):
       Font.logger.trace(f'Found font "{name}" in user fonts.')
       return user_fonts
@@ -52,5 +56,7 @@ class Font:
       return ImageFont.truetype(path, size)
 
     except Exception:
-      Font.logger.warn(f'Failed to load font "{path}". Using default font instead.')
+      Font.logger.warn(
+        f'Failed to load font "{path}". Using default font instead.'
+      )
       return ImageFont.load_default(size)

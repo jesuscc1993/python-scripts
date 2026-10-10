@@ -9,8 +9,20 @@ from mtlogger import logger
 from mtfs import write_text_file
 from tqdm import tqdm
 
-from _constants import DEFAULT_ICO_SIZES, DESKTOP_INI_FILENAME, FALLBACK_ENCODING, HIDDEN_FILE_ATTRS, HIDDEN_SYSTEM_FILE_ATTRS, ICO_FILENAME, INI_ICON_KEY, INI_SHELL_SECTION, MAX_ICO_SIZE, PREFERRED_ENCODING
+from _constants import (
+  DEFAULT_ICO_SIZES,
+  DESKTOP_INI_FILENAME,
+  FALLBACK_ENCODING,
+  HIDDEN_FILE_ATTRS,
+  HIDDEN_SYSTEM_FILE_ATTRS,
+  ICO_FILENAME,
+  INI_ICON_KEY,
+  INI_SHELL_SECTION,
+  MAX_ICO_SIZE,
+  PREFERRED_ENCODING,
+)
 from _settings import HIDE_GENERATED_ICONS
+
 
 def process_parent_folder(
   parent_folder_path: str,
@@ -30,12 +42,20 @@ def process_parent_folder(
     for dir_name in dirs:
       folders_to_process.append(os.path.join(root, dir_name))
 
-  with ThreadPoolExecutor() as executor, tqdm(total = len(folders_to_process), desc = f'Processing "{parent_folder_path}"') as progress:
-    for _ in executor.map(lambda f: process_folder(f, image_filenames), folders_to_process):
+  with (
+    ThreadPoolExecutor() as executor,
+    tqdm(
+      total=len(folders_to_process), desc=f'Processing "{parent_folder_path}"'
+    ) as progress,
+  ):
+    for _ in executor.map(
+      lambda f: process_folder(f, image_filenames), folders_to_process
+    ):
       progress.update(1)
 
   mtsound.notify()
   logger.log(f'\nFinished setting icons for "{parent_folder_path}".')
+
 
 def process_folder(
   folder_path: str,
@@ -59,9 +79,16 @@ def process_folder(
     image_to_ico(image_path, ico_path)
     set_folder_icon(folder_path, ICO_FILENAME)
   elif skipped:
-    tqdm.write(logger.format_warn(f'No image found in "{folder_path}" is newer than the icon.'))
+    tqdm.write(
+      logger.format_warn(
+        f'No image found in "{folder_path}" is newer than the icon.'
+      )
+    )
   else:
-    tqdm.write(logger.format_warn(f'No suitable image found in "{folder_path}".'))
+    tqdm.write(
+      logger.format_warn(f'No suitable image found in "{folder_path}".')
+    )
+
 
 def is_file_newer_than(
   file_a: str,
@@ -69,10 +96,11 @@ def is_file_newer_than(
 ):
   return os.path.getmtime(file_a) > os.path.getmtime(file_b)
 
+
 def image_to_ico(
   image_path: str,
   ico_path: str,
-  icon_sizes = DEFAULT_ICO_SIZES,
+  icon_sizes=DEFAULT_ICO_SIZES,
 ):
   try:
     if os.path.exists(ico_path):
@@ -80,20 +108,29 @@ def image_to_ico(
 
     with Image.open(image_path) as img:
       if img.width < MAX_ICO_SIZE:
-        img = img.resize((MAX_ICO_SIZE, int(MAX_ICO_SIZE * img.height / img.width)), resample = Image.LANCZOS)
+        img = img.resize(
+          (MAX_ICO_SIZE, int(MAX_ICO_SIZE * img.height / img.width)),
+          resample=Image.LANCZOS,
+        )
       img.thumbnail((MAX_ICO_SIZE, MAX_ICO_SIZE), Image.LANCZOS)
       background = Image.new('RGBA', (MAX_ICO_SIZE, MAX_ICO_SIZE), (0, 0, 0, 0))
-      offset = (int((MAX_ICO_SIZE - img.size[0]) / 2), int((MAX_ICO_SIZE - img.size[1]) / 2))
+      offset = (
+        int((MAX_ICO_SIZE - img.size[0]) / 2),
+        int((MAX_ICO_SIZE - img.size[1]) / 2),
+      )
       background.paste(img, offset)
-      background.save(ico_path, format = 'ICO', sizes = [(s, s) for s in icon_sizes])
+      background.save(
+        ico_path, format='ICO', sizes=[(s, s) for s in icon_sizes]
+      )
 
   except Exception as ex:
     logger.error(f'Error converting "{image_path}" to ICO:\n{ex}')
 
+
 def set_folder_icon(
   folder_path: str,
   ico_path: str,
-  overwrite_existing = False,
+  overwrite_existing=False,
 ):
   try:
     desktop_ini_path = os.path.join(folder_path, DESKTOP_INI_FILENAME)
@@ -115,14 +152,23 @@ def set_folder_icon(
     Attr.add(folder_path, ['s'])
 
   except PermissionError:
-    tqdm.write(logger.format_warn(f'Permission denied: "{desktop_ini_path}". You may need to run the script as an administrator.'))
+    tqdm.write(
+      logger.format_warn(
+        f'Permission denied: "{desktop_ini_path}". You may need to run the script as an administrator.'
+      )
+    )
 
   except Exception as ex:
-    tqdm.write(logger.format_error(f'Error setting folder icon to "{folder_path}":\n{ex}'))
+    tqdm.write(
+      logger.format_error(
+        f'Error setting folder icon to "{folder_path}":\n{ex}'
+      )
+    )
+
 
 def read_ini(
   ini_path: str,
-  encoding = PREFERRED_ENCODING,
+  encoding=PREFERRED_ENCODING,
 ):
   config = ConfigParser()
   config.optionxform = str
@@ -141,11 +187,12 @@ def read_ini(
 
   return config, encoding
 
+
 def write_file(
   file_path: str,
   content: str,
   attrs: list[str],
-  encoding = PREFERRED_ENCODING,
+  encoding=PREFERRED_ENCODING,
 ):
   if os.path.exists(file_path):
     Attr.remove(file_path, attrs)
@@ -154,6 +201,7 @@ def write_file(
   logger.success(f'Saved "{file_path}".')
 
   Attr.add(file_path, attrs)
+
 
 def write_ini(
   file_path: str,
@@ -169,22 +217,25 @@ def write_ini(
 
   Attr.add(file_path, HIDDEN_SYSTEM_FILE_ATTRS)
 
+
 def write_hidden_file(
   file_path: str,
   content: str,
-  encoding = PREFERRED_ENCODING,
+  encoding=PREFERRED_ENCODING,
 ):
   write_file(file_path, content, HIDDEN_FILE_ATTRS, encoding)
+
 
 def get_ini_icon(
   config: ConfigParser,
 ):
   return config.get(INI_SHELL_SECTION, INI_ICON_KEY, fallback=None)
 
+
 def set_ini_icon(
   config: ConfigParser,
   ico_path: str,
-  ico_index = 0,
+  ico_index=0,
 ):
   if INI_SHELL_SECTION not in config:
     config[INI_SHELL_SECTION] = {}

@@ -11,15 +11,13 @@ from mtprompt import Prompt
 ATTRS_TO_REMOVE = []
 CLASSES_TO_REMOVE = []
 
-REMOVE_BY_SELECTORS = [
-  '[data-amznremoved]',
-  '.mobispace'
-]
+REMOVE_BY_SELECTORS = ['[data-amznremoved]', '.mobispace']
 
 REMOVE_EMPTY_TAGS = False
 
 EXTENSIONS_TO_MATCH = ['.html', '.htm', '.xhtml']
 SELF_CLOSING_TAGS = ['br', 'hr', 'img']
+
 
 def main():
   ebook_path = Prompt.path('Enter the path to the ebook file/folder to clean')
@@ -27,7 +25,7 @@ def main():
   logger.log(f'Cleaning contents in "{ebook_path}"...')
   logger.hr()
 
-  if (os.path.isfile(ebook_path)):
+  if os.path.isfile(ebook_path):
     process_ebook_file(ebook_path)
   else:
     process_ebook_dir(ebook_path)
@@ -35,10 +33,11 @@ def main():
   logger.hr()
   logger.success(f'Finished cleaning contents in "{ebook_path}".')
 
+
 def process_ebook_file(ebook_file_path):
   ebook_file_name = os.path.basename(ebook_file_path)
   ebook_dir_path = os.path.join(tempfile.gettempdir(), ebook_file_name)
-  os.makedirs(ebook_dir_path, exist_ok = True)
+  os.makedirs(ebook_dir_path, exist_ok=True)
 
   try:
     unpack_ebook(ebook_file_path, ebook_dir_path)
@@ -46,10 +45,13 @@ def process_ebook_file(ebook_file_path):
     pack_ebook(ebook_file_path, ebook_dir_path)
 
   except Exception as ex:
-    logger.error(f'An error occurred while processing "{ebook_file_name}":\n{ex}')
+    logger.error(
+      f'An error occurred while processing "{ebook_file_name}":\n{ex}'
+    )
 
   finally:
-    shutil.rmtree(ebook_dir_path, ignore_errors = True)
+    shutil.rmtree(ebook_dir_path, ignore_errors=True)
+
 
 def unpack_ebook(ebook_file_path, ebook_dir_path):
   with zipfile.ZipFile(ebook_file_path, 'r') as archive:
@@ -62,6 +64,7 @@ def unpack_ebook(ebook_file_path, ebook_dir_path):
 
     archive.extractall(ebook_dir_path)
 
+
 def pack_ebook(ebook_file_path, ebook_dir_path):
   file_name = os.path.basename(ebook_file_path)
   tmp_path = os.path.join(tempfile.gettempdir(), f'{file_name}.tmp')
@@ -71,7 +74,9 @@ def pack_ebook(ebook_file_path, ebook_dir_path):
       for root, _, files in os.walk(ebook_dir_path):
         for file in files:
           full_path = os.path.join(root, file)
-          archive_name = os.path.relpath(full_path, ebook_dir_path).replace(os.sep, '/')
+          archive_name = os.path.relpath(full_path, ebook_dir_path).replace(
+            os.sep, '/'
+          )
           target.write(full_path, archive_name)
 
     shutil.move(tmp_path, ebook_file_path)
@@ -80,6 +85,7 @@ def pack_ebook(ebook_file_path, ebook_dir_path):
       os.remove(tmp_path)
     raise
 
+
 def process_ebook_dir(ebook_dir_path):
   for root, _, files in os.walk(ebook_dir_path):
     for file in files:
@@ -87,6 +93,7 @@ def process_ebook_dir(ebook_dir_path):
         process_html_file(os.path.join(root, file))
       elif file.lower().endswith('.epub'):
         process_ebook_file(os.path.join(root, file))
+
 
 def process_html_file(html_path):
   file_name = os.path.basename(html_path)
@@ -106,18 +113,19 @@ def process_html_file(html_path):
   except Exception as ex:
     logger.error(f'An error occurred while processing "{file_name}":\n{ex}')
 
+
 def clean_soup(
   soup: BeautifulSoup,
 ):
   changed = False
 
   for attr in ATTRS_TO_REMOVE:
-    for tag in soup.find_all(attrs = {attr: True}):
+    for tag in soup.find_all(attrs={attr: True}):
       del tag[attr]
       changed = True
 
   for class_name in CLASSES_TO_REMOVE:
-    for tag in soup.find_all(class_ = class_name):
+    for tag in soup.find_all(class_=class_name):
       classes = [name for name in tag.get('class', []) if name != class_name]
       if classes:
         tag['class'] = classes
@@ -132,11 +140,12 @@ def clean_soup(
 
   if REMOVE_EMPTY_TAGS:
     tags_to_delete += [
-      tag for tag in soup.find_all()
+      tag
+      for tag in soup.find_all()
       if (
-        tag.name not in SELF_CLOSING_TAGS and
-        not tag.find(True) and
-        not tag.get_text().strip()
+        tag.name not in SELF_CLOSING_TAGS
+        and not tag.find(True)
+        and not tag.get_text().strip()
       )
     ]
 
@@ -145,6 +154,7 @@ def clean_soup(
     changed = True
 
   return changed
+
 
 if __name__ == '__main__':
   try:

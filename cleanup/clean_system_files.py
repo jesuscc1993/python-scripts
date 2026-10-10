@@ -12,9 +12,11 @@ CRASH_DUMP_DIRS = [
 ]
 CRASH_DUMP_FILE_PATTERNS = ['*.dmp', '*.mdmp']
 
+
 def main():
   cleanup_temp()
   cleanup_crash_dumps()
+
 
 def cleanup_temp():
   logger.log('Deleting temporary files...')
@@ -26,8 +28,10 @@ def cleanup_temp():
 
   delete_children_for_dir(temp_dir)
 
+
 def cleanup_crash_dumps():
   delete_children_for_dirs(CRASH_DUMP_DIRS, CRASH_DUMP_FILE_PATTERNS)
+
 
 if __name__ == '__main__':
   try:

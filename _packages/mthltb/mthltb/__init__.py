@@ -11,6 +11,7 @@ REQUEST_TIMEOUT = 10
 
 USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
 
+
 class HltbResult(TypedDict):
   game_id: int
   game_name: str
@@ -19,8 +20,8 @@ class HltbResult(TypedDict):
   comp_100: int | None
   url: str
 
-class Hltb:
 
+class Hltb:
   @staticmethod
   def search(
     game_name: str,
@@ -29,9 +30,9 @@ class Hltb:
 
     response = requests.post(
       HLTB_SEARCH_URL,
-      json = build_query(normalize_game_name(game_name), hp_key, hp_val),
-      headers = build_headers(token, hp_key, hp_val),
-      timeout = REQUEST_TIMEOUT,
+      json=build_query(normalize_game_name(game_name), hp_key, hp_val),
+      headers=build_headers(token, hp_key, hp_val),
+      timeout=REQUEST_TIMEOUT,
     )
     response.raise_for_status()
 
@@ -40,31 +41,39 @@ class Hltb:
       return None
 
     entry = next(
-      (entry for entry in entries if entry.get('game_name', '').lower() == game_name.lower()),
-      entries[0]
+      (
+        entry
+        for entry in entries
+        if entry.get('game_name', '').lower() == game_name.lower()
+      ),
+      entries[0],
     )
 
     game_id = entry.get('game_id')
     return {
       **entry,
       'game_id': game_id,
-      'url': HLTB_GAME_URL.format(game_id) if game_id else HLTB_SEARCH_QUERY_URL.format(game_name),
+      'url': HLTB_GAME_URL.format(game_id)
+      if game_id
+      else HLTB_SEARCH_QUERY_URL.format(game_name),
     }
+
 
 def get_token():
   response = requests.get(
     f'{HLTB_SEARCH_URL}/init?t=',
-    headers = {
+    headers={
       'Accept': '*/*',
       'Referer': 'https://howlongtobeat.com/?q=',
       'User-Agent': USER_AGENT,
     },
-    timeout = REQUEST_TIMEOUT,
+    timeout=REQUEST_TIMEOUT,
   )
   response.raise_for_status()
 
   data = response.json()
   return data.get('token'), data.get('hpKey'), data.get('hpVal')
+
 
 def build_query(
   normalized_name: str,
@@ -82,13 +91,18 @@ def build_query(
         'platform': '',
         'sortCategory': 'popular',
         'rangeCategory': 'main',
-        'rangeTime': { 'min': None, 'max': None },
-        'gameplay': { 'perspective': '', 'flow': '', 'genre': '', 'difficulty': '' },
-        'rangeYear': { 'min': '', 'max': '' },
+        'rangeTime': {'min': None, 'max': None},
+        'gameplay': {
+          'perspective': '',
+          'flow': '',
+          'genre': '',
+          'difficulty': '',
+        },
+        'rangeYear': {'min': '', 'max': ''},
         'modifier': '',
       },
-      'users': { 'sortCategory': 'postcount' },
-      'lists': { 'sortCategory': 'follows' },
+      'users': {'sortCategory': 'postcount'},
+      'lists': {'sortCategory': 'follows'},
       'filter': '',
       'sort': 0,
       'randomizer': 0,
@@ -96,6 +110,7 @@ def build_query(
     'useCache': False,
     hp_key: hp_val,
   }
+
 
 def build_headers(
   token: str,
@@ -112,11 +127,17 @@ def build_headers(
     'x-hp-val': hp_val,
   }
 
+
 def normalize_game_name(
   name: str,
 ):
   normalized = unicodedata.normalize('NFD', name)
   normalized = re.sub(r'[\u0300-\u036f]', '', normalized)
   normalized = normalized.replace('’', "'")
-  normalized = re.sub(r"[^-a-z _0-9`~!@#$%^&*()_=+|\\\]}[{;:',<.>/?]", '', normalized, flags = re.IGNORECASE)
+  normalized = re.sub(
+    r"[^-a-z _0-9`~!@#$%^&*()_=+|\\\]}[{;:',<.>/?]",
+    '',
+    normalized,
+    flags=re.IGNORECASE,
+  )
   return normalized

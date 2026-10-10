@@ -6,16 +6,20 @@ import time
 from mtlogger import logger
 from mtprompt import Prompt
 
-from _common import rename_with_timestamp, BACKUP_EXT, BACKUP_PATH, WATCH_INTERVAL
+from _common import (
+  rename_with_timestamp,
+  BACKUP_EXT,
+  BACKUP_PATH,
+  WATCH_INTERVAL,
+)
+
 
 def main():
   if len(sys.argv) > 1:
     og_file_path = sys.argv[1]
     watch = sys.argv[2] == 'watch' if len(sys.argv) > 2 else False
   else:
-    og_file_path = Prompt.file(
-      'Enter the path to the file to backup'
-    )
+    og_file_path = Prompt.file('Enter the path to the file to backup')
     watch = False
 
   if watch:
@@ -25,6 +29,7 @@ def main():
       time.sleep(WATCH_INTERVAL)
   else:
     backup_file(og_file_path)
+
 
 def backup_file(
   og_file_path: str,
@@ -36,7 +41,7 @@ def backup_file(
   bak_dir_path = os.path.join(og_dir_path, BACKUP_PATH)
   bak_file_name = f'{og_file_stem}{BACKUP_EXT}{src_file_ext}'
   bak_file_path = os.path.join(bak_dir_path, bak_file_name)
-  os.makedirs(bak_dir_path, exist_ok = True)
+  os.makedirs(bak_dir_path, exist_ok=True)
 
   if not os.path.exists(og_file_path):
     logger.error(f'File "{og_file_name}" does not exist')
@@ -44,13 +49,16 @@ def backup_file(
 
   if os.path.exists(bak_file_path):
     if os.path.getmtime(og_file_path) == os.path.getmtime(bak_file_path):
-      logger.trace(f'Skipping "{og_file_name}". Both "{og_file_name}" and "{bak_file_name}" have the same timestamp.')
+      logger.trace(
+        f'Skipping "{og_file_name}". Both "{og_file_name}" and "{bak_file_name}" have the same timestamp.'
+      )
       return
 
     rename_with_timestamp(bak_dir_path, bak_file_path)
 
   shutil.copy2(og_file_path, bak_file_path)
   logger.success(f'Backed up "{og_file_name}" as "{bak_file_name}"')
+
 
 if __name__ == '__main__':
   try:

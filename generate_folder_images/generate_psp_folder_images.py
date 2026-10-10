@@ -12,13 +12,17 @@ from _common import process_parent_folder, save_resized_image
 
 SEARCH_URL = 'https://cdromance.org/?s={game_id}'
 
+
 def main():
   process_parent_folder(process_folder)
+
 
 def process_folder(
   folder_path: str,
 ):
-  match = re.match(r'([A-Za-z]+\d+)', os.path.basename(os.path.normpath(folder_path)))
+  match = re.match(
+    r'([A-Za-z]+\d+)', os.path.basename(os.path.normpath(folder_path))
+  )
 
   if match:
     game_id = match.group(1)
@@ -29,12 +33,13 @@ def process_folder(
 
   download_game_cover(game_id, folder_path)
 
+
 def download_game_cover(
   game_id: str,
   folder_path: str,
 ):
   try:
-    search_url = SEARCH_URL.format(game_id = game_id)
+    search_url = SEARCH_URL.format(game_id=game_id)
     response = requests.get(search_url)
     response.raise_for_status()
   except Exception as ex:
@@ -71,6 +76,7 @@ def download_game_cover(
 
   img = Image.open(BytesIO(image_response.content))
   save_resized_image(img, folder_path)
+
 
 if __name__ == '__main__':
   try:

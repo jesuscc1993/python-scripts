@@ -9,6 +9,7 @@ from collections.abc import Callable
 
 from _constants import FOLDER_IMAGE_FILENAME, FOLDER_IMAGE_SIZE
 
+
 def process_parent_folder(
   process_folder: Callable,
 ):
@@ -17,7 +18,7 @@ def process_parent_folder(
   else:
     parent_folder = Prompt.dir(
       'Enter the path to the parent folder containing the folders you want to generate icons for.\nLeave empty to provide and process a single folder instead',
-      optional=True
+      optional=True,
     )
 
     if not parent_folder:
@@ -34,12 +35,15 @@ def process_parent_folder(
     for dir_name in dirs:
       item_path = os.path.join(root, dir_name)
       if os.path.exists(os.path.join(item_path, FOLDER_IMAGE_FILENAME)):
-        logger.trace(f'  [{dir_name}] "{FOLDER_IMAGE_FILENAME}" already exists.')
+        logger.trace(
+          f'  [{dir_name}] "{FOLDER_IMAGE_FILENAME}" already exists.'
+        )
         continue
       process_folder(item_path)
 
   mtsound.notify()
   logger.log('Finished generating cover images.')
+
 
 def resize_image(
   img: Image.Image,
@@ -47,6 +51,7 @@ def resize_image(
   h: int,
 ):
   return img.resize((w, h), Image.LANCZOS)
+
 
 def save_resized_image(
   img: Image.Image,

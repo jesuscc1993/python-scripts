@@ -7,6 +7,7 @@ import threading
 
 from mtlogger import logger
 
+
 def to_bool(val: str):
   val = val.strip().lower()
 
@@ -17,6 +18,7 @@ def to_bool(val: str):
 
   raise ValueError(f'Value "{val}" is not a valid boolean (y/n).')
 
+
 def to_int(val: str):
   val = val.strip()
 
@@ -24,6 +26,7 @@ def to_int(val: str):
     return int(val)
   except ValueError:
     raise ValueError(f'Input "{val}" is not an integer.')
+
 
 def to_float(val: str):
   val = val.strip()
@@ -33,6 +36,7 @@ def to_float(val: str):
   except ValueError:
     raise ValueError(f'Input "{val}" is not a valid number.')
 
+
 def to_path(val: str):
   val = os.path.abspath(val.strip(' "'))
 
@@ -40,6 +44,7 @@ def to_path(val: str):
     raise ValueError(f'Path "{val}" does not exist.')
 
   return val
+
 
 def to_dir(val: str):
   val = os.path.abspath(val.strip(' "'))
@@ -49,6 +54,7 @@ def to_dir(val: str):
 
   return val
 
+
 def to_file(val: str):
   val = os.path.abspath(val.strip(' "'))
 
@@ -57,9 +63,12 @@ def to_file(val: str):
 
   return val
 
+
 def to_list(val: str):
   try:
-    values = next(csv.reader(io.StringIO(val), skipinitialspace=True, strict=True))
+    values = next(
+      csv.reader(io.StringIO(val), skipinitialspace=True, strict=True)
+    )
   except csv.Error:
     raise ValueError(f'Input "{val}" is not a valid comma-separated list.')
 
@@ -72,15 +81,10 @@ def to_list(val: str):
 
   return parsed_values
 
-class Prompt:
 
+class Prompt:
   @staticmethod
-  def str(
-    prompt = '',
-    *,
-    optional = False,
-    default: str | None = None
-  ):
+  def str(prompt='', *, optional=False, default: str | None = None):
     prompt = prompt.strip(' "\'')
 
     while True:
@@ -94,12 +98,7 @@ class Prompt:
       return val if val != '' else default
 
   @staticmethod
-  def list(
-    prompt = '',
-    *,
-    optional = False,
-    default: list | None = None
-  ):
+  def list(prompt='', *, optional=False, default: list | None = None):
     prompt = prompt.strip(' "\'')
 
     while True:
@@ -120,13 +119,7 @@ class Prompt:
       return val if val else default
 
   @staticmethod
-  def option(
-    options: list,
-    prompt = '',
-    *,
-    optional = False,
-    default = None
-  ):
+  def option(options: list, prompt='', *, optional=False, default=None):
     if not isinstance(options, list):
       raise TypeError('A list of options must be passed.')
 
@@ -155,12 +148,7 @@ class Prompt:
       return options[int(val) - 1]
 
   @staticmethod
-  def int(
-    prompt = '',
-    *,
-    optional = False,
-    default: int | None = None
-  ):
+  def int(prompt='', *, optional=False, default: int | None = None):
     prompt = prompt.strip(' "\'')
 
     while True:
@@ -181,12 +169,7 @@ class Prompt:
       return val if val != '' else default
 
   @staticmethod
-  def float(
-    prompt = '',
-    *,
-    optional = False,
-    default: float | None = None
-  ):
+  def float(prompt='', *, optional=False, default: float | None = None):
     prompt = prompt.strip(' "\'')
 
     while True:
@@ -207,18 +190,13 @@ class Prompt:
       return val if val != '' else default
 
   @staticmethod
-  def bool(
-    prompt: str,
-    *,
-    optional = False,
-    default: bool | None = None
-  ):
+  def bool(prompt: str, *, optional=False, default: bool | None = None):
     prompt = prompt.strip(' "\'')
 
     default_display = 'y/n'
-    if (default == True):
+    if default == True:
       default_display = 'Y/n'
-    elif (default == False):
+    elif default == False:
       default_display = 'y/N'
 
     while True:
@@ -241,10 +219,10 @@ class Prompt:
 
   @staticmethod
   def path(
-    prompt = 'Enter the path you want to process',
+    prompt='Enter the path you want to process',
     *,
-    optional = False,
-    default: str = None
+    optional=False,
+    default: str = None,
   ):
     prompt = prompt.strip(' "\'')
 
@@ -267,10 +245,10 @@ class Prompt:
 
   @staticmethod
   def dir(
-    prompt = 'Enter the path to the directory you want to process',
+    prompt='Enter the path to the directory you want to process',
     *,
-    optional = False,
-    default: str = None
+    optional=False,
+    default: str = None,
   ):
     prompt = prompt.strip(' "\'')
 
@@ -293,10 +271,10 @@ class Prompt:
 
   @staticmethod
   def file(
-    prompt = 'Enter the path to the file you want to process',
+    prompt='Enter the path to the file you want to process',
     *,
-    optional = False,
-    default: str = None
+    optional=False,
+    default: str = None,
   ):
     prompt = prompt.strip(' "\'')
 
@@ -318,7 +296,7 @@ class Prompt:
       return val if val != '' else default
 
   @staticmethod
-  def enter_to_exit(timeout = False, sound = True):
+  def enter_to_exit(timeout=False, sound=True):
     if sound:
       mtsound.notify()
 
@@ -338,19 +316,22 @@ class Prompt:
       input('')
       entered.set()
 
-    thread = threading.Thread(target = wait_for_input, daemon = True)
+    thread = threading.Thread(target=wait_for_input, daemon=True)
     thread.start()
 
     sys.stdout.write('\n')
     for remaining in range(timeout, 0, -1):
-      sys.stdout.write(f'\rPress Enter to exit. Terminal will automatically close in {remaining}s...')
+      sys.stdout.write(
+        f'\rPress Enter to exit. Terminal will automatically close in {remaining}s...'
+      )
       sys.stdout.flush()
-      if entered.wait(timeout = 1):
+      if entered.wait(timeout=1):
         return
 
     os._exit(0)
 
-def format_prompt(prompt: str, default: str | None = None, use_colon = True):
+
+def format_prompt(prompt: str, default: str | None = None, use_colon=True):
   formatted_prompt = prompt.strip(' ')
   formatted_default = f'(default: {default})' if default else ''
-  return f'{formatted_prompt}{' ' if formatted_default and not formatted_prompt.endswith('\n') else ''}{formatted_default}{"\n: " if use_colon and (formatted_prompt or formatted_default) else ""}'
+  return f'{formatted_prompt}{" " if formatted_default and not formatted_prompt.endswith("\n") else ""}{formatted_default}{"\n: " if use_colon and (formatted_prompt or formatted_default) else ""}'

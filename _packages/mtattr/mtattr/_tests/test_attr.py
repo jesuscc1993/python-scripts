@@ -5,9 +5,10 @@ import pytest
 
 from .. import Attr
 
+
 @pytest.fixture
 def temp_file():
-  '''Create a temporary file for testing.'''
+  """Create a temporary file for testing."""
   with tempfile.NamedTemporaryFile(delete=False) as f:
     temp_path = f.name
   yield temp_path
@@ -16,8 +17,8 @@ def temp_file():
       Attr.remove(temp_path, ['h', 's', 'r'])
       os.remove(temp_path)
 
-class TestAttrAdd:
 
+class TestAttrAdd:
   def test_add_hidden_attribute(self, temp_file):
     Attr.add(temp_file, ['h'])
     assert Attr.has(temp_file, 'h')
@@ -38,8 +39,8 @@ class TestAttrAdd:
   def test_add_nonexistent_path(self):
     Attr.add('/nonexistent/path/file.txt', ['h'])
 
-class TestAttrRemove:
 
+class TestAttrRemove:
   def test_remove_hidden_attribute(self, temp_file):
     Attr.add(temp_file, ['h'])
     assert Attr.has(temp_file, 'h')
@@ -68,8 +69,8 @@ class TestAttrRemove:
   def test_remove_nonexistent_path(self):
     Attr.remove('/nonexistent/path/file.txt', ['h'])
 
-class TestAttrHas:
 
+class TestAttrHas:
   def test_has_hidden_attribute(self, temp_file):
     Attr.add(temp_file, ['h'])
     assert Attr.has(temp_file, 'h')
@@ -88,8 +89,8 @@ class TestAttrHas:
   def test_has_nonexistent_path(self):
     assert not Attr.has('/nonexistent/path/file.txt', 'h')
 
-class TestAttrToggle:
 
+class TestAttrToggle:
   def test_toggle_add_hidden(self, temp_file):
     assert not Attr.has(temp_file, 'h')
     Attr.toggle(temp_file, 'h')
@@ -111,8 +112,8 @@ class TestAttrToggle:
   def test_toggle_nonexistent_path(self):
     Attr.toggle('/nonexistent/path/file.txt', 'h')
 
-class TestAttrSet:
 
+class TestAttrSet:
   def test_set_multiple_attributes(self, temp_file):
     Attr.set(temp_file, ['h', 's'], True)
     assert Attr.has(temp_file, 'h')
@@ -124,8 +125,8 @@ class TestAttrSet:
   def test_set_nonexistent_path(self):
     Attr.set('/nonexistent/path/file.txt', ['h'], True)
 
-class TestAttrSetFlags:
 
+class TestAttrSetFlags:
   def test_set_hidden(self, temp_file):
     Attr.set_hidden(temp_file, True)
     assert Attr.is_hidden(temp_file)
@@ -144,8 +145,8 @@ class TestAttrSetFlags:
     Attr.set_readonly(temp_file, False)
     assert not Attr.is_readonly(temp_file)
 
-class TestAttrIsHidden:
 
+class TestAttrIsHidden:
   def test_is_hidden_true(self, temp_file):
     Attr.add(temp_file, ['h'])
     assert Attr.is_hidden(temp_file)
@@ -156,8 +157,8 @@ class TestAttrIsHidden:
   def test_is_hidden_nonexistent_path(self):
     assert not Attr.is_hidden('/nonexistent/path/file.txt')
 
-class TestAttrHideShow:
 
+class TestAttrHideShow:
   def test_hide_file(self, temp_file):
     Attr.hide(temp_file)
     assert Attr.has(temp_file, 'h')

@@ -11,7 +11,13 @@ from mtprompt import Prompt, to_bool, to_dir
 from natsort import natsorted
 
 from _common import resize_image
-from _constants import JPEG_FORMAT, JPEG_QUALITY, FOLDER_IMAGE_FILENAME, FOLDER_IMAGE_W, REQUEST_TIMEOUT
+from _constants import (
+  JPEG_FORMAT,
+  JPEG_QUALITY,
+  FOLDER_IMAGE_FILENAME,
+  FOLDER_IMAGE_W,
+  REQUEST_TIMEOUT,
+)
 
 CLIENT_ID = os.getenv('TWITCH_CLIENT_ID')
 CLIENT_SECRET = os.getenv('TWITCH_CLIENT_SECRET')
@@ -20,6 +26,7 @@ TWITCH_AUTH_URL = 'https://id.twitch.tv/oauth2/token'
 IGDB_API_URL = 'https://api.igdb.com/v4/games'
 
 ACCESS_TOKEN = None
+
 
 def main():
   if len(sys.argv) > 1:
@@ -30,23 +37,24 @@ def main():
 
   generate_covers(parent_folder, overwrite_existing)
 
+
 def prompt_params():
   parent_folder = Prompt.dir(
     'Enter the path to the parent folder containing your games'
-    )
-  overwrite_existing = Prompt.bool(
-    'Overwrite existing images?',
-    default=False
   )
+  overwrite_existing = Prompt.bool('Overwrite existing images?', default=False)
 
   return parent_folder, overwrite_existing
+
 
 def generate_covers(
   parent_folder_path: str,
   overwrite_existing: bool,
 ):
   if not os.path.isdir(parent_folder_path):
-    logger.error(f'The specified path "{parent_folder_path}" is not a directory.')
+    logger.error(
+      f'The specified path "{parent_folder_path}" is not a directory.'
+    )
     return
 
   logger.log('Generating cover images...')
@@ -59,6 +67,7 @@ def generate_covers(
 
   mtsound.notify()
   logger.log('\nFinished generating cover images.')
+
 
 def get_access_token():
   global ACCESS_TOKEN
@@ -75,9 +84,9 @@ def get_access_token():
       params={
         'client_id': CLIENT_ID,
         'client_secret': CLIENT_SECRET,
-        'grant_type': 'client_credentials'
+        'grant_type': 'client_credentials',
       },
-      timeout=REQUEST_TIMEOUT
+      timeout=REQUEST_TIMEOUT,
     )
     response.raise_for_status()
     ACCESS_TOKEN = response.json().get('access_token')
@@ -87,10 +96,12 @@ def get_access_token():
 
   return None
 
+
 def split_camel_case(
   name: str,
 ):
   return re.sub(r'([a-z])([A-Z])', r'\1 \2', name)
+
 
 def get_cover_image(
   query: str,
@@ -105,21 +116,26 @@ def get_cover_image(
       headers={
         'Client-ID': CLIENT_ID,
         'Authorization': f'Bearer {access_token}',
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
       data=body,
-      timeout=REQUEST_TIMEOUT
+      timeout=REQUEST_TIMEOUT,
     )
     response.raise_for_status()
 
     games = response.json()
     cover_url = games[0].get('cover', {}).get('url') if games else None
-    return f'https:{cover_url.replace("t_thumb", "t_cover_big")}' if cover_url else None
+    return (
+      f'https:{cover_url.replace("t_thumb", "t_cover_big")}'
+      if cover_url
+      else None
+    )
 
   except Exception as ex:
     logger.error(f'Could not fetch data for game {query}:\n{ex}')
 
   return None
+
 
 def download_image(
   image_url: str,
@@ -133,6 +149,7 @@ def download_image(
 
   return None
 
+
 def save_image(
   img: Image.Image,
   save_path: str,
@@ -141,9 +158,10 @@ def save_image(
     if img.mode != 'RGB':
       img = img.convert('RGB')
     img = resize_image(img, FOLDER_IMAGE_W, FOLDER_IMAGE_W)
-    img.save(save_path, JPEG_FORMAT, quality = JPEG_QUALITY)
+    img.save(save_path, JPEG_FORMAT, quality=JPEG_QUALITY)
   except Exception as ex:
     logger.error(f'Could not save "{save_path}":\n{ex}')
+
 
 def process_folder(
   folder_path: str,
@@ -171,6 +189,7 @@ def process_folder(
     logger.success(f'[{folder_name}] Generated cover image.')
   except Exception as ex:
     logger.failure(f'[{folder_name}] Could not process folder:\n{ex}')
+
 
 if __name__ == '__main__':
   try:
