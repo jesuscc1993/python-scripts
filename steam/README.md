@@ -43,3 +43,7 @@ Exports your Steam wishlist to a JSON file.
 ### [generate_steam_app_manifests.py](generate_steam_app_manifests.py)
 
 Generates an `appmanifest_{app_id}.acf` file for each game folder, matched against your owned games.
+
+### [generate_steam_app_shortcuts.py](generate_steam_app_shortcuts.py)
+
+Scans your installed Steam libraries and generates a shortcut for each game.
