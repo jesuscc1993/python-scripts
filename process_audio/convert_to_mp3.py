@@ -88,8 +88,8 @@ def convert_to_mp3(
       '-y',
       output_file_path
     ],
-    stdout = subprocess.PIPE,
-    stderr = subprocess.PIPE
+    check=False,
+    capture_output=True
   )
   if result.returncode != 0:
     raise RuntimeError(result.stderr.decode('utf-8'))

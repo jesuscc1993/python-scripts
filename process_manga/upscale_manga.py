@@ -32,6 +32,7 @@ def process_image(
         '-s', '2',
         '-n', 'realesr-animevideov3-x2'
       ],
+      check=False,
       stdout=subprocess.DEVNULL,
       stderr=subprocess.DEVNULL
     )

@@ -17,7 +17,7 @@ def compress_child_folders(
   parent_folder_path: str,
   output_type: str,
   remove_original = False,
-  exclusion_patterns: list = None,
+  exclusion_patterns: list | None = None,
   min_depth = 1,
   max_depth = 1,
 ):
@@ -69,7 +69,7 @@ def compress_folder(
   folder_path: str,
   output_type: str = ZIP_TYPES[0],
   remove_original = False,
-  exclusion_patterns: list = None,
+  exclusion_patterns: list | None = None,
   show_progress = True,
 ):
   folder_name = os.path.basename(folder_path)

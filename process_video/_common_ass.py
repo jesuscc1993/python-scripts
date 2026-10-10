@@ -26,7 +26,7 @@ def post_process_ass_subtitles(
       preferred_foreground_color = SETTINGS['preferred_foreground_color']
       content = re.sub(
         rf'&H({HEX_DIGIT_PATTERN}{{0,2}}){lookup_foreground_color[4:6]}{lookup_foreground_color[2:4]}{lookup_foreground_color[0:2]}',
-        lambda match: f'&H{match.group(1) if len(preferred_foreground_color) == 6 else ""}{rgba_to_bgra(preferred_foreground_color)}',
+        lambda match, preferred_foreground_color=preferred_foreground_color: f'&H{match.group(1) if len(preferred_foreground_color) == 6 else ""}{rgba_to_bgra(preferred_foreground_color)}',
         content,
         flags = re.IGNORECASE
       )

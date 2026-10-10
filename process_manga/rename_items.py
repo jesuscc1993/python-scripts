@@ -6,7 +6,7 @@ from concurrent.futures import ThreadPoolExecutor
 from mtlogger import logger
 from mtprompt import Prompt, to_dir
 from tqdm import tqdm
-from typing import Callable
+from collections.abc import Callable
 
 from _common import CHAPTER_NUMBER_REGEX, ENDING_REGEX, EPILOGUE_REGEX, IMAGE_EXTENSIONS, INTEGER_REGEX, SEASON_REGEX, SIDE_STORY_REGEX, SPECIAL_REGEX, VOLUME_NUMBER_REGEX, zfill_float
 
@@ -31,7 +31,7 @@ def process_parent_folder(
     all_items = filtered_files + dirs
 
     with ThreadPoolExecutor() as executor:
-      list(tqdm(executor.map(lambda item: process_item(root, item), all_items), total = len(all_items), desc=f'Processing "{root}"'))
+      list(tqdm(executor.map(lambda item, root=root: process_item(root, item), all_items), total = len(all_items), desc=f'Processing "{root}"'))
 
   logger.success(f'Finished renaming items in "{parent_folder_path}".')
 
@@ -93,11 +93,10 @@ def get_processed_name(
   # remove remaining unnecessary whitespaces
   new_name = replace(r'\s+', ' ', new_name).strip()
 
-  if not is_dir:
-    # rename ZIP volumes as CBZ
-    # do not rename chapters as they have too much of a performance impact
-    if (ext == '.zip' and 'Vol.' in new_name):
-      ext = '.cbz'
+  # rename ZIP volumes as CBZ
+  # do not rename chapters as they have too much of a performance impact
+  if not is_dir and ext == '.zip' and 'Vol.' in new_name:
+    ext = '.cbz'
 
   return new_name + ext
 

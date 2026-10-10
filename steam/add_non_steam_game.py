@@ -141,7 +141,7 @@ def serialize_object(
     elif isinstance(value, int):
       result += bytes([TYPE_INT]) + key_bytes + (value & 0xFFFFFFFF).to_bytes(4, 'little')
     else:
-      raise ValueError(f'Unsupported type: {type(value)}')
+      raise TypeError(f'Unsupported type: {type(value)}')
   result += bytes([TYPE_END])
   return bytes(result)
 

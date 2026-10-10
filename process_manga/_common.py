@@ -7,7 +7,7 @@ from concurrent.futures import ThreadPoolExecutor
 from mtlogger import logger
 from mtprompt import Prompt
 from tqdm import tqdm
-from typing import Callable
+from collections.abc import Callable
 
 from _image_utils import is_image_file
 
@@ -31,8 +31,10 @@ IMAGE_EXTENSIONS = ['webp', 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'tif']
 def select_parent_folder(
   prompt: str,
   callback: Callable,
-  options: dict = {},
+  options: dict | None = None,
 ):
+  if options is None:
+    options = {}
   prompt = prompt or 'Enter the path to the parent folder you want to process:\n'
   log_success = options.get('log_success', False)
   loop = options.get('loop', True)
@@ -111,7 +113,7 @@ def run_scripts_in_sequence(
     abs_path = os.path.abspath(os.path.join(os.path.dirname(__file__), script + '.py'))
 
     logger.trace(f'\nRunning {script}:')
-    subprocess.run(['python', abs_path, *args], env=env)
+    subprocess.run(['python', abs_path, *args], check=False, env=env)
 
   logger.info(
     f'Finished batch running scripts on "{parent_folder_path}".\n',

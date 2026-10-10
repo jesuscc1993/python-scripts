@@ -53,7 +53,7 @@ def read_metadata(
     with open(metadata_path, encoding='utf-8') as metadata_file:
       metadata = json.load(metadata_file)
     if not isinstance(metadata, dict):
-      raise ValueError(f'Invalid metadata in "{metadata_path}": expected a JSON object.')
+      raise TypeError(f'Invalid metadata in "{metadata_path}": expected a JSON object.')
     return metadata
   finally:
     Attr.hide(metadata_path)

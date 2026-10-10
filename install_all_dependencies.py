@@ -8,7 +8,7 @@ def main():
     if REQUIREMENTS_FILE in files:
       req_path = os.path.join(path, REQUIREMENTS_FILE)
       print(f'\nInstalling {req_path}...')
-      subprocess.run(['pip', 'install', '-r', req_path])
+      subprocess.run(['pip', 'install', '-r', req_path], check=False)
 
 if __name__ == '__main__':
   try:

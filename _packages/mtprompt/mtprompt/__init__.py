@@ -79,7 +79,7 @@ class Prompt:
     prompt = '',
     *,
     optional = False,
-    default: str = None
+    default: str | None = None
   ):
     prompt = prompt.strip(' "\'')
 
@@ -98,7 +98,7 @@ class Prompt:
     prompt = '',
     *,
     optional = False,
-    default: list = None
+    default: list | None = None
   ):
     prompt = prompt.strip(' "\'')
 
@@ -136,7 +136,7 @@ class Prompt:
       full_prompt = format_prompt(prompt, default, use_colon=False)
       for i, option in enumerate(options):
         full_prompt += f'\n {i + 1} - {option}'
-      full_prompt += f'\n:'
+      full_prompt += '\n:'
 
       val = input(full_prompt).strip()
 
@@ -159,7 +159,7 @@ class Prompt:
     prompt = '',
     *,
     optional = False,
-    default: int = None
+    default: int | None = None
   ):
     prompt = prompt.strip(' "\'')
 
@@ -185,7 +185,7 @@ class Prompt:
     prompt = '',
     *,
     optional = False,
-    default: float = None
+    default: float | None = None
   ):
     prompt = prompt.strip(' "\'')
 
@@ -211,7 +211,7 @@ class Prompt:
     prompt: str,
     *,
     optional = False,
-    default: bool = None
+    default: bool | None = None
   ):
     prompt = prompt.strip(' "\'')
 
@@ -350,7 +350,7 @@ class Prompt:
 
     os._exit(0)
 
-def format_prompt(prompt: str, default: str = None, use_colon = True):
+def format_prompt(prompt: str, default: str | None = None, use_colon = True):
   formatted_prompt = prompt.strip(' ')
   formatted_default = f'(default: {default})' if default else ''
   return f'{formatted_prompt}{' ' if formatted_default and not formatted_prompt.endswith('\n') else ''}{formatted_default}{"\n: " if use_colon and (formatted_prompt or formatted_default) else ""}'

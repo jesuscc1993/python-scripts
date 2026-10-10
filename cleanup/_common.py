@@ -14,11 +14,15 @@ def run_as_admin():
     ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, params, None, 1)
     sys.exit(0)
 
-def delete_children_for_dirs(dir_patterns, file_patterns = [ALL_FILES_PATTERN]):
+def delete_children_for_dirs(dir_patterns, file_patterns = None):
+  if file_patterns is None:
+    file_patterns = [ALL_FILES_PATTERN]
   for dir_pattern in dir_patterns:
     delete_children_for_dir(dir_pattern, file_patterns)
 
-def delete_children_for_dir(dir_pattern, file_patterns = [ALL_FILES_PATTERN]):
+def delete_children_for_dir(dir_pattern, file_patterns = None):
+  if file_patterns is None:
+    file_patterns = [ALL_FILES_PATTERN]
   logger.log(f'Cleaning "{dir_pattern}"...')
 
   dir_path = os.path.expandvars(dir_pattern)

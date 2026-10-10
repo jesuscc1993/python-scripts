@@ -163,7 +163,7 @@ def embed_cover_ffmpeg(
       output_path
     ]
 
-  result = subprocess.run(cmd, capture_output = True)
+  result = subprocess.run(cmd, check = False, capture_output = True)
   if result.returncode != 0:
     raise RuntimeError(result.stderr.decode(errors = 'replace'))
 
@@ -181,6 +181,7 @@ def get_video_info(
         '-show_format',
         file_path
       ],
+      check = False,
       capture_output = True,
       encoding = 'utf-8',
       errors = 'replace',
@@ -232,6 +233,7 @@ def capture_frame(
       '-q:v', '2',
       output_path
     ],
+    check = False,
     stdout = subprocess.DEVNULL,
     stderr = subprocess.DEVNULL
   )

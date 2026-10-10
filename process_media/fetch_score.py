@@ -3,7 +3,6 @@ import re
 import requests
 import sys
 
-from typing import Union
 
 from mal import Anime, AnimeSearch, AnimeSearchResult, Manga, MangaSearch, MangaSearchResult, config
 from mtlogger import logger
@@ -39,7 +38,7 @@ def main():
     )
     media_type = Prompt.option(
       MEDIA_TYPES,
-      f'Select the media type',
+      'Select the media type',
       default=ANIME_MEDIA_TYPE
     )
 
@@ -128,7 +127,7 @@ def fetch_score(dir_name: str, name: str, media_type: str):
     for i, result in enumerate(results):
       prefix = f'({i + 1})' if i == 0 else f' {i + 1} '
       logger.log(f'{prefix} {format_result_title(result)} — {result.score_int}')
-    logger.trace(f' X  Skip')
+    logger.trace(' X  Skip')
 
     choice = input('> ').strip()
     if not choice:
@@ -156,7 +155,7 @@ def suffix_dir_score(dir_path: str, score: int):
   os.rename(dir_path, new_dir_path)
   logger.success(f'Renamed "{dir_name}" -> "{new_dir_name}".')
 
-def format_result_title(result: Union[AnimeSearchResult, MangaSearchResult]):
+def format_result_title(result: AnimeSearchResult | MangaSearchResult):
   return f'{result.title} {logger.format_trace("(" + result.type + ")")}'
 
 if __name__ == '__main__':

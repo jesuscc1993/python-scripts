@@ -36,6 +36,6 @@ SETTINGS = {
   'preferred_font': 'Quicksand SemiBold',
   'preferred_foreground_color': 'FFFF55FF',
   'preferred_outline_color': '000000FF',
-  'preferred_outline_thickness': '5.0',
-  'preferred_shadow_offset': '2.5',
+  'preferred_outline_thickness': '4.0',
+  'preferred_shadow_offset': '2.0',
 }

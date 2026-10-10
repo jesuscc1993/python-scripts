@@ -119,10 +119,13 @@ def process_dir(
     dir_size_path = os.path.join(dir_path, DIR_SIZE_FILENAME)
     overwrite = overwrite_existing or new_ico_name not in ico_path
 
-    if not FORCE_RECALCULATE and not overwrite_existing and os.path.exists(new_ico_path) and os.path.exists(dir_size_path):
-      if os.path.getmtime(new_ico_path) > os.path.getmtime(dir_size_path):
-        logger.trace(f'  Skipping "{dir_path}". Icon is up to date.')
-        return
+    if (
+      not FORCE_RECALCULATE and not overwrite_existing and
+      os.path.exists(new_ico_path) and os.path.exists(dir_size_path) and
+      os.path.getmtime(new_ico_path) > os.path.getmtime(dir_size_path)
+    ):
+      logger.trace(f'  Skipping "{dir_path}". Icon is up to date.')
+      return
 
     ico_path_lower = ico_path.lower()
 

@@ -42,8 +42,10 @@ def get_app_name_from_steam_wishlist_item(app: dict):
 
 def scan_dir_names(
   dir_paths: list[str],
-  exclusions: list[str] = [GENERIC_EXCLUSION_FILE],
+  exclusions: list[str] | None = None,
 ):
+  if exclusions is None:
+    exclusions = [GENERIC_EXCLUSION_FILE]
   return [
     entry.name
     for dir_path in dir_paths

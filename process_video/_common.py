@@ -43,5 +43,5 @@ def generate_tmp_dir(
 ):
   tmp_dir = os.path.join(dir_path, '.tmp')
   os.makedirs(tmp_dir, exist_ok=True)
-  subprocess.run(['attrib', '+H', tmp_dir], capture_output=True)
+  subprocess.run(['attrib', '+H', tmp_dir], check=False, capture_output=True)
   return tmp_dir

@@ -4,7 +4,7 @@ import shutil
 from concurrent.futures import ThreadPoolExecutor
 from mtlogger import logger
 from tqdm import tqdm
-from typing import Callable
+from collections.abc import Callable
 
 FILE_BLACKLIST = [
   r'cover.jpg',

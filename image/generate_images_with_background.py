@@ -75,8 +75,8 @@ def generate_images_with_background(
   foreground_folder: str,
   output_folder: str,
   background_path: str,
-  tints: list = None,
-  requested_size: int = None,
+  tints: list | None = None,
+  requested_size: int | None = None,
   foreground_scale: float = 1.0,
   background_scale: float = 1.0,
 ):
@@ -95,7 +95,7 @@ def generate_images_with_background(
 
   tmp_dir = os.path.join(output_folder, '.tmp')
   os.makedirs(tmp_dir, exist_ok=True)
-  subprocess.run(['attrib', '+H', tmp_dir], capture_output=True)
+  subprocess.run(['attrib', '+H', tmp_dir], check=False, capture_output=True)
 
   try:
     for background_img_path in background_paths:
@@ -155,6 +155,7 @@ def rasterize_svg(
 
   result = subprocess.run(
     ['magick', '-background', 'none', svg_path, '-resize', f'{w}x{h}', output_path],
+    check=False,
     capture_output=True
   )
   if result.returncode != 0:
@@ -181,7 +182,7 @@ def compose_image_with_background(
   foreground_img: Image.Image,
   background_img: Image.Image,
   canvas_size: tuple,
-  tint: str = None,
+  tint: str | None = None,
 ):
   canvas_w, canvas_h = canvas_size
 

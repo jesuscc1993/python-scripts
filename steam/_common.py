@@ -32,11 +32,11 @@ def get_owned_games(
 def download_assets_for_app_id(
   steam_app_id: str,
   dest_dir: str,
-  filename_id: str = None,
+  filename_id: str | None = None,
 ):
   filename_id = filename_id or steam_app_id
   Path(dest_dir).mkdir(parents = True, exist_ok = True)
-  for _, data in COVER_URL_MAP.items():
+  for data in COVER_URL_MAP.values():
     url = data['url'].format(steam_app_id)
     filename = data['dest'].format(filename_id)
     download_asset_for_app_id(url, Path(dest_dir) / filename, data.get('size'))
@@ -44,7 +44,7 @@ def download_assets_for_app_id(
 def download_asset_for_app_id(
   url: str,
   dest: Path,
-  size: list = None,
+  size: list | None = None,
 ):
   if Path(dest).exists():
     logger.trace(f'Skipping {Path(dest).name}: already exists.')
@@ -56,7 +56,7 @@ def download_asset_for_app_id(
 def save_asset(
   content: bytes,
   filepath: Path,
-  size: list = None,
+  size: list | None = None,
 ):
   try:
     img = Image.open(BytesIO(content))

@@ -62,6 +62,7 @@ def convert_to_srt(
 			'-c:s', 'srt',
 			output_file_path
 		],
+    check = False,
     capture_output = True,
     encoding = 'utf-8',
     errors = 'replace',

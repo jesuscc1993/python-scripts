@@ -1,3 +1,4 @@
+import contextlib
 import os
 import tempfile
 import pytest
@@ -11,11 +12,9 @@ def temp_file():
     temp_path = f.name
   yield temp_path
   if os.path.exists(temp_path):
-    try:
+    with contextlib.suppress(Exception):
       Attr.remove(temp_path, ['h', 's', 'r'])
       os.remove(temp_path)
-    except:
-      pass
 
 class TestAttrAdd:
 

@@ -114,6 +114,7 @@ def find_cover_streams(
       '-show_streams',
       file_path
     ],
+    check=False,
     capture_output=True,
     encoding='utf-8',
     errors='replace',
@@ -150,7 +151,7 @@ def remove_ffmpeg_covers(
     cmd.extend(['-map', f'-0:{stream_index}'])
   cmd.extend(['-c', 'copy', output_path])
 
-  result = subprocess.run(cmd, capture_output=True)
+  result = subprocess.run(cmd, check=False, capture_output=True)
   if result.returncode != 0 or not os.path.isfile(output_path) or os.path.getsize(output_path) == 0:
     if os.path.exists(output_path):
       os.remove(output_path)

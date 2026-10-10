@@ -26,7 +26,7 @@ def add_registry_entry(
 def delete_registry_entry(
   root: int,
   path: str,
-  name: str = None,
+  name: str | None = None,
 ):
   try:
     if not name:
@@ -58,7 +58,7 @@ def get_registry_value(
 def get_registry_key(
   root: int,
   path: str,
-  name: str = None,
+  name: str | None = None,
 ):
   root_name = HKEY_NAMES.get(root, str(root))
   return f'{root_name}\\{path}' + (f'\\{name}' if name else '')

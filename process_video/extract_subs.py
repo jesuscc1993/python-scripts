@@ -95,7 +95,7 @@ def extract_subtitles(
     '-c:s', 'copy',
     dest_file_path
   ]
-  subprocess.run(cmd, stdout = subprocess.DEVNULL, stderr = subprocess.DEVNULL)
+  subprocess.run(cmd, check = False, stdout = subprocess.DEVNULL, stderr = subprocess.DEVNULL)
 
   if os.path.exists(dest_file_path):
     if os.path.getsize(dest_file_path) == 0:
@@ -119,6 +119,7 @@ def find_subtitle_stream(src_file_path: str, target_language: str) -> tuple[str 
         '-show_streams',
         src_file_path
       ],
+      check = False,
       capture_output = True,
       encoding = 'utf-8',
       errors = 'replace',

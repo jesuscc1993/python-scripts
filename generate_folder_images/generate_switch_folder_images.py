@@ -1,3 +1,4 @@
+import contextlib
 import mtsound
 import os
 import requests
@@ -98,12 +99,10 @@ def read_cached_mapping(
 def load_switch_mapping():
   path = os.path.join(os.path.dirname(__file__), 'cache', CACHE_FILENAME)
 
-  try:
+  with contextlib.suppress(Exception):
     cached_mapping = read_cached_mapping(path)
     if cached_mapping is not None:
       return cached_mapping
-  except Exception:
-    pass
 
   try:
     resp = requests.get(SWITCH_MAPPING_URL, timeout=REQUEST_TIMEOUT)
@@ -116,10 +115,8 @@ def load_switch_mapping():
   except Exception as ex:
     logger.error(f'Failed to load switch mapping:\n{ex}')
 
-    try:
+    with contextlib.suppress(Exception):
       return read_json_file(path)
-    except Exception:
-      pass
 
     return {}
 

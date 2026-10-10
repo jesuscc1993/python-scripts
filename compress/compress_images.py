@@ -53,10 +53,9 @@ def compress_image(
     os.rename(img_path, backup_path)
 
     with Image.open(backup_path) as img:
-      if output_ext == WEBP_EXTENSION:
-        if img.width > WEBP_DIMENSION_LIMIT or img.height > WEBP_DIMENSION_LIMIT:
-          logger.warn(f'Skipping "{img_path}" as the image\'s dimensions ({img.width}px x {img.height}px) exceed WebP\'s limit of {WEBP_DIMENSION_LIMIT}px.')
-          return
+      if output_ext == WEBP_EXTENSION and (img.width > WEBP_DIMENSION_LIMIT or img.height > WEBP_DIMENSION_LIMIT):
+        logger.warn(f'Skipping "{img_path}" as the image\'s dimensions ({img.width}px x {img.height}px) exceed WebP\'s limit of {WEBP_DIMENSION_LIMIT}px.')
+        return
 
       img.save(
         output_path,

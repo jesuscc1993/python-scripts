@@ -1,0 +1,9 @@
+[tool.ruff]
+indent-width = 2
+line-length = 80
+
+[tool.ruff.format]
+quote-style = 'single'
+
+[tool.ruff.lint]
+ignore = ['I001', 'BLE001']

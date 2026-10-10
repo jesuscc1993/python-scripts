@@ -1,3 +1,4 @@
+import contextlib
 import subprocess
 import sys
 
@@ -12,10 +13,8 @@ def notify():
     else:
       _notify_linux()
   except Exception:
-    try:
+    with contextlib.suppress(Exception):
       _beep()
-    except Exception:
-      pass
 
 def _notify_windows():
   import ctypes
@@ -25,7 +24,7 @@ def _notify_windows():
 def _notify_macos():
   command = 'afplay' if which('afplay') else None
   if command:
-    subprocess.run([command, '/System/Library/Sounds/Glass.aiff'])
+    subprocess.run([command, '/System/Library/Sounds/Glass.aiff'], check=False)
 
 def _notify_linux():
   command = (
@@ -34,9 +33,9 @@ def _notify_linux():
     None
   )
   if command:
-    subprocess.run([command, '/usr/share/sounds/freedesktop/stereo/complete.oga'])
+    subprocess.run([command, '/usr/share/sounds/freedesktop/stereo/complete.oga'], check=False)
 
 def _beep():
   command = 'beep' if which('beep') else None
   if command:
-    subprocess.run([command])
+    subprocess.run([command], check=False)

@@ -5,7 +5,7 @@ import sys
 from PIL import Image
 from mtlogger import logger
 from mtprompt import Prompt
-from typing import Callable
+from collections.abc import Callable
 
 from _constants import FOLDER_IMAGE_FILENAME, FOLDER_IMAGE_SIZE
 
@@ -39,7 +39,7 @@ def process_parent_folder(
       process_folder(item_path)
 
   mtsound.notify()
-  logger.log(f'Finished generating cover images.')
+  logger.log('Finished generating cover images.')
 
 def resize_image(
   img: Image.Image,

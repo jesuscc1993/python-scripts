@@ -12,7 +12,7 @@ load_dotenv(os.path.join(os.path.dirname(__file__), '.env'))
 SPECIFIC_GAME_SAVES_PATH = os.getenv('SPECIFIC_GAME_SAVES_PATH')
 
 def main():
-  logger.log(f'Generating links for specific game saves...')
+  logger.log('Generating links for specific game saves...')
 
   script_dir = os.path.dirname(os.path.abspath(__file__))
   mappings_path = os.path.join(script_dir, 'specific_game_save_mappings.json')

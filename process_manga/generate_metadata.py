@@ -156,7 +156,7 @@ def fetch_manga_info(dir_path: str, name: str):
         for i, result in enumerate(results):
           prefix = f'({i + 1})' if i == 0 else f' {i + 1} '
           logger.log(f'{prefix} {format_result_title(result)}')
-        logger.trace(f' X  Skip')
+        logger.trace(' X  Skip')
 
         choice = input('> ').strip()
         if not choice:

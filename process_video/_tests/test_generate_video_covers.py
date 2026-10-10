@@ -2,7 +2,6 @@ import json
 import os
 import shutil
 import sys
-import subprocess
 import tempfile
 import unittest
 from types import SimpleNamespace

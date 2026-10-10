@@ -7,7 +7,7 @@ from mtfs import read_text_file, write_text_file
 from unittest.mock import patch
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
-from _common_html import post_process_html_subtitles, replace_html_foreground_color, force_html_font, strip_conversion_leftovers, strip_html_tags, strip_attribute, strip_unsupported_tags
+from _common_html import post_process_html_subtitles, replace_html_foreground_color, force_html_font, strip_html_tags, strip_attribute, strip_unsupported_tags
 from _constants import ENCODING
 from _settings import SETTINGS
 

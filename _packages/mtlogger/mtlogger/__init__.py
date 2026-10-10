@@ -3,7 +3,7 @@ import sys
 
 from colorama import init, Fore
 from enum import Enum
-from typing import Optional, TypedDict, Unpack
+from typing import TypedDict, Unpack
 
 init(autoreset=True, wrap=True, convert=(sys.platform == 'win32'))
 
@@ -49,13 +49,12 @@ class Logger:
   def is_enabled(self, level: LogLevel):
     return LOG_LEVEL_SEVERITY[level] >= LOG_LEVEL_SEVERITY[self.level]
 
-  def print(self, level: LogLevel, msg = '', options: Optional[LogOptions] = None):
+  def print(self, level: LogLevel, msg = '', options: LogOptions | None = None):
     if not self.is_enabled(level):
       return
 
     prefix_newline = options.get('prefix_newline', False) if options else False
     print(f'{'\n' if prefix_newline else ''}{msg}')
-  #
 
   # formatting functions
   def format_trace(self, msg = ''):
@@ -81,7 +80,6 @@ class Logger:
 
   def format_failure(self, msg = ''):
     return f'{self.colorize(Fore.RED, "✗")} {msg}'
-  #
 
   # print functions
   def trace(self, msg = '', **kwargs: Unpack[LogOptions]):
@@ -107,7 +105,6 @@ class Logger:
 
   def failure(self, msg = '', **kwargs: Unpack[LogOptions]):
     self.print(LogLevel.ERROR, self.format_failure(msg), LogOptions(**kwargs))
-  #
 
   # other functions
   def unhandled_error(self, msg = '', **kwargs: Unpack[LogOptions]):
@@ -115,6 +112,5 @@ class Logger:
 
   def hr(self, char = '─'):
     self.print(LogLevel.LOG, self.colorize(Fore.LIGHTBLACK_EX, char * os.get_terminal_size().columns))
-  #
 
 logger = Logger()

@@ -6,7 +6,7 @@ UTF8 = 'utf-8'
 def read_file(
   path: str,
   mode = 'rb',
-  encoding: str = None,
+  encoding: str | None = None,
 ):
   if not os.path.exists(path):
     return None
@@ -18,7 +18,7 @@ def write_file(
   path: str,
   content: bytes,
   mode = 'wb',
-  encoding: str = None,
+  encoding: str | None = None,
 ):
   os.makedirs(os.path.dirname(path) or '.', exist_ok=True)
 

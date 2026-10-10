@@ -2,7 +2,7 @@ import re
 import requests
 import unicodedata
 
-from typing import Optional, TypedDict
+from typing import TypedDict
 
 HLTB_SEARCH_URL = 'https://howlongtobeat.com/api/search/site'
 HLTB_GAME_URL = 'https://howlongtobeat.com/game/{}'
@@ -14,9 +14,9 @@ USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTM
 class HltbResult(TypedDict):
   game_id: int
   game_name: str
-  comp_main: Optional[int]
-  comp_plus: Optional[int]
-  comp_100: Optional[int]
+  comp_main: int | None
+  comp_plus: int | None
+  comp_100: int | None
   url: str
 
 class Hltb:
@@ -24,7 +24,7 @@ class Hltb:
   @staticmethod
   def search(
     game_name: str,
-  ) -> Optional[HltbResult]:
+  ) -> HltbResult | None:
     token, hp_key, hp_val = get_token()
 
     response = requests.post(

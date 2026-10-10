@@ -125,7 +125,7 @@ def write_output(
     '<title>CompactGUI Report</title>',
     f'<style>{STYLE}</style>',
     '',
-    f'# CompactGUI Report',
+    '# CompactGUI Report',
     '',
   ]
 
@@ -133,7 +133,7 @@ def write_output(
     lines += [
       f'### Games Found {format_dimmed(f"(source: [{os.path.basename(DATABASE_PATH)}]({os.path.expandvars(DATABASE_PATH).replace(chr(92), "/")}))")}',
       '',
-      f'| Game | Matched {format_dimmed(f"(accuracy%)")} | Type | Before | After | Savings |',
+      f'| Game | Matched {format_dimmed("(accuracy%)")} | Type | Before | After | Savings |',
       '|---|---|:-:|--:|--:|:-:|',
     ]
     for dir_name, entry, score, best_result in matched:
@@ -171,12 +171,11 @@ def format_matched_column(
   steam_id = entry.get('SteamID')
   game_name = entry.get('GameName')
   folder_name = entry.get('FolderName')
-  if score < 100:
-    if (
-      matches_loosely(dir_name, game_name) or
-      matches_loosely(dir_name, folder_name)
-    ):
-      score = 100
+  if score < 100 and (
+    matches_loosely(dir_name, game_name) or
+    matches_loosely(dir_name, folder_name)
+  ):
+    score = 100
 
   formatted_game_name = simplify_game_name(game_name)
   game_name_content = f'[{formatted_game_name}](https://store.steampowered.com/app/{steam_id})' if steam_id else formatted_game_name

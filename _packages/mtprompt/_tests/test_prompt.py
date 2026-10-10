@@ -146,7 +146,9 @@ class PromptListTests(unittest.TestCase):
 
 class PromptOptionTests(unittest.TestCase):
 
-  def call(self, inputs, options = ['foo', 'bar', 'baz'], **kwargs):
+  def call(self, inputs, options = None, **kwargs):
+    if options is None:
+      options = ['foo', 'bar', 'baz']
     input_iter = iter(inputs)
     with patch('builtins.input', side_effect = lambda _ = '': next(input_iter)), redirect_stdout(io.StringIO()):
       return Prompt.option(options, 'p', **kwargs)

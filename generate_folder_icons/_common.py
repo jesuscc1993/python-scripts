@@ -131,7 +131,7 @@ def read_ini(
     if os.path.exists(ini_path):
       config.read(ini_path, encoding=encoding)
 
-  except Exception as ex:
+  except Exception:
     try:
       encoding = FALLBACK_ENCODING
       config.read(ini_path, encoding=encoding)
