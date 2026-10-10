@@ -5,5 +5,7 @@
 *.env
 *.lnk
 *.url
+.pytest_cache
+.ruff_cache
 _data/
 _output/
