@@ -49,3 +49,8 @@ Collection of my own python scripts.
   - Depending on the script, additional arguments may be used.<br>Check the individual scripts for more info.
 
 (replace SCRIPT_NAME with your script of choice)
+
+## Git Hooks
+
+- Run `git config core.hooksPath hooks` once per clone to enable the tracked hooks in [hooks](hooks).
+- The `pre-push` hook runs `run_all_tests.py` and blocks the push if any test fails.
