@@ -27,6 +27,7 @@ from _common import get_ini_icon, read_ini, set_folder_icon, write_hidden_file
 DEBUG = False
 FORCE_RECALCULATE = False
 OVERLAY_SMALLER_THAN_GB = False
+USE_DECIMALS = True
 
 FONT_PATH = Font.find_by_name(SegoeFontName.BOLD)
 ICO_BAK_FILENAME = 'icon.bak.ico'
@@ -121,44 +122,50 @@ def process_dir(
       ico_path = ico_config
       ico_index = '0'
 
-    new_ico_name = ICO_FILENAME
-    new_ico_path = os.path.join(dir_path, new_ico_name)
+    dest_ico_name = ICO_FILENAME
+    dest_ico_path = os.path.join(dir_path, dest_ico_name)
     bak_ico_path = os.path.join(dir_path, ICO_BAK_FILENAME)
     dir_size_path = os.path.join(dir_path, DIR_SIZE_FILENAME)
-    overwrite = overwrite_existing or new_ico_name not in ico_path
+    overwrite = overwrite_existing or dest_ico_name not in ico_path
 
     if (
       not FORCE_RECALCULATE
-      and not overwrite_existing
-      and os.path.exists(new_ico_path)
+      and not overwrite
+      and os.path.exists(dest_ico_path)
       and os.path.exists(dir_size_path)
-      and os.path.getmtime(new_ico_path) > os.path.getmtime(dir_size_path)
+      and os.path.getmtime(dest_ico_path) > os.path.getmtime(dir_size_path)
     ):
       logger.trace(f'  Skipping "{dir_path}". Icon is up to date.')
       return
 
-    ico_path_lower = ico_path.lower()
+    source_ico_path = ico_path
+    source_ico_path_lower = source_ico_path.lower()
 
-    if ICO_FILENAME in ico_path_lower and os.path.exists(bak_ico_path):
-      ico_path = ico_path.replace(ICO_FILENAME, ICO_BAK_FILENAME)
-      ico_path_lower = ico_path.lower()
-    elif '.ico' in ico_path_lower and ICO_FILENAME not in ico_path_lower:
+    if ICO_FILENAME in source_ico_path_lower and os.path.exists(bak_ico_path):
+      source_ico_path = source_ico_path.replace(ICO_FILENAME, ICO_BAK_FILENAME)
+      source_ico_path_lower = source_ico_path.lower()
+    elif (
+      '.ico' in source_ico_path_lower
+      and ICO_FILENAME not in source_ico_path_lower
+    ):
       if os.path.exists(bak_ico_path):
         Attr.show(bak_ico_path)
-      shutil.copy2(os.path.join(dir_path, ico_path), bak_ico_path)
+      shutil.copy2(os.path.join(dir_path, source_ico_path), bak_ico_path)
       Attr.hide(bak_ico_path)
 
     ico_img = None
 
-    if '.dll' in ico_path_lower:
+    if '.dll' in source_ico_path_lower:
       logger.trace(f'  Skipping "{dir_path}". Folder icon is using a DLL file.')
       return
 
-    if '.exe' in ico_path_lower:
-      ico_img = get_exe_icon(os.path.join(dir_path, ico_path), int(ico_index))
+    if '.exe' in source_ico_path_lower:
+      ico_img = get_exe_icon(
+        os.path.join(dir_path, source_ico_path), int(ico_index)
+      )
 
-    if '.ico' in ico_path_lower:
-      ico_img = Image.open(os.path.join(dir_path, ico_path))
+    if '.ico' in source_ico_path_lower:
+      ico_img = Image.open(os.path.join(dir_path, source_ico_path))
 
     if ico_img and ico_img.mode == 'RGBA':
       r, g, b, a = ico_img.split()
@@ -171,13 +178,19 @@ def process_dir(
       logger.trace(f'  Skipping "{dir_path}". Could not load folder icon.')
       return
 
-    formatted_size = calculate_dir_size(dir_path)
-    if formatted_size == '<1 GB' and not OVERLAY_SMALLER_THAN_GB:
+    total_size = get_dir_size(dir_path)
+    if (
+      format_size(total_size, use_decimals=False) == '<1 GB'
+      and not OVERLAY_SMALLER_THAN_GB
+    ):
+      if os.path.exists(bak_ico_path):
+        shutil.copy2(bak_ico_path, dest_ico_path)
       logger.trace(
         f'  Skipping "{dir_path}". Overlay is disabled for sizes smaller than 1 GB.'
       )
       return
 
+    formatted_size = format_size(total_size, use_decimals=USE_DECIMALS)
     size_parts = formatted_size.split() if formatted_size else []
     if not (size_parts and len(size_parts) == 2):
       logger.trace(
@@ -189,8 +202,8 @@ def process_dir(
       ico_img.save(bak_ico_path, format='ICO', sizes=[(256, 256)])
       Attr.hide(bak_ico_path)
 
-    if os.path.exists(new_ico_path):
-      Attr.show(new_ico_path)
+    if os.path.exists(dest_ico_path):
+      Attr.show(dest_ico_path)
 
     ico_img = ico_img.convert('RGBA')
     img_256 = overlay_file_size_256(size_parts[0], size_parts[1], ico_img)
@@ -205,12 +218,12 @@ def process_dir(
 
     append_images = [img_48, img_16]
     img_256.save(
-      new_ico_path,
+      dest_ico_path,
       format='ICO',
       sizes=[img_256.size] + [image.size for image in append_images],
       append_images=append_images,
     )
-    logger.success(f'Saved "{new_ico_path}".')
+    logger.success(f'Saved "{dest_ico_path}".')
 
     if DEBUG:
       debug_dir = os.path.join(dir_path, 'icon')
@@ -220,7 +233,7 @@ def process_dir(
       img_48.save(os.path.join(debug_dir, '48.png'), format='PNG')
 
     if ico_path != os.path.basename(bak_ico_path):
-      set_folder_icon(dir_path, new_ico_name, overwrite_existing=overwrite)
+      set_folder_icon(dir_path, dest_ico_name, overwrite_existing=overwrite)
 
   except Exception as ex:
     logger.error(f'Could not process "{dir_path}": {ex}')
@@ -241,7 +254,7 @@ def get_file_size_on_disk(
   return (high.value << 32) + low_unsigned
 
 
-def calculate_dir_size(
+def get_dir_size(
   dir_path: str,
 ):
   cache_path = os.path.join(dir_path, DIR_SIZE_FILENAME)
@@ -250,9 +263,6 @@ def calculate_dir_size(
   if not FORCE_RECALCULATE and os.path.exists(cache_path):
     lines = read_text_file(cache_path, PREFERRED_ENCODING).strip().splitlines()
     total_size = int(lines[0].replace(',', '')) if lines else None
-    formatted_size = lines[1] if len(lines) > 1 else None
-    if formatted_size and formatted_size != 'None':
-      return formatted_size
 
   if total_size is None:
     total_size = sum(
@@ -261,12 +271,9 @@ def calculate_dir_size(
       for f in files
       if os.path.exists(path := os.path.join(root, f))
     )
-  formatted_size = format_size(total_size)
+    write_hidden_file(cache_path, str(total_size))
 
-  cache_contents = f'{total_size}\n{formatted_size or ""}'
-  write_hidden_file(cache_path, cache_contents)
-
-  return formatted_size
+  return total_size
 
 
 def crop_to_content(
@@ -387,16 +394,18 @@ def overlay_file_size_48(
   return img
 
 
-def format_size(
-  size_bytes: int,
-):
+def format_size(size_bytes: int, use_decimals: bool):
   units = ['GB', 'TB', 'PB']
   size = size_bytes / (1024 * 1024 * 1024)
-  if size < 1:
+
+  if size < 1 and not use_decimals:
     return f'<1 {units[0]}'
+
   for unit in units:
     if size < 1024 or unit == units[-1]:
-      return f'{math.ceil(int(size * 100) / 100)}  {unit}'
+      if use_decimals and unit == units[0] and size < 10:
+        return f'{math.ceil(size * 10) / 10} {unit}'
+      return f'{math.ceil(int(size * 100) / 100)} {unit}'
     size /= 1024
 
 
