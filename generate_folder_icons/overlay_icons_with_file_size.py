@@ -12,7 +12,6 @@ from PIL import Image, ImageDraw
 from mtattr import Attr
 from mtfont import Font, SegoeFontName
 from mtlogger import logger
-from mtfs import read_text_file
 from mtprompt import Prompt, to_bool, to_dir, to_int
 
 from _constants import (
@@ -20,9 +19,16 @@ from _constants import (
   HIDDEN_SYSTEM_FILE_ATTRS,
   ICO_FILENAME,
   MAX_ICO_SIZE,
-  PREFERRED_ENCODING,
+  METADATA_FILENAME,
+  METADATA_SIZE_KEY,
 )
-from _common import get_ini_icon, read_ini, set_folder_icon, write_hidden_file
+from _common import (
+  get_ini_icon,
+  read_ini,
+  read_metadata,
+  set_folder_icon,
+  write_metadata,
+)
 
 DEBUG = False
 FORCE_RECALCULATE = False
@@ -31,7 +37,6 @@ USE_DECIMALS = True
 
 FONT_PATH = Font.find_by_name(SegoeFontName.BOLD)
 ICO_BAK_FILENAME = 'icon.bak.ico'
-DIR_SIZE_FILENAME = 'dir_file_size.txt'
 EXCLUSION_FILE = '.noscan'
 
 SIZE_256 = 256
@@ -125,15 +130,15 @@ def process_dir(
     dest_ico_name = ICO_FILENAME
     dest_ico_path = os.path.join(dir_path, dest_ico_name)
     bak_ico_path = os.path.join(dir_path, ICO_BAK_FILENAME)
-    dir_size_path = os.path.join(dir_path, DIR_SIZE_FILENAME)
+    metadata_path = os.path.join(dir_path, METADATA_FILENAME)
     overwrite = overwrite_existing or dest_ico_name not in ico_path
 
     if (
       not FORCE_RECALCULATE
       and not overwrite
       and os.path.exists(dest_ico_path)
-      and os.path.exists(dir_size_path)
-      and os.path.getmtime(dest_ico_path) > os.path.getmtime(dir_size_path)
+      and os.path.exists(metadata_path)
+      and os.path.getmtime(dest_ico_path) > os.path.getmtime(metadata_path)
     ):
       logger.trace(f'  Skipping "{dir_path}". Icon is up to date.')
       return
@@ -257,12 +262,12 @@ def get_file_size_on_disk(
 def get_dir_size(
   dir_path: str,
 ):
-  cache_path = os.path.join(dir_path, DIR_SIZE_FILENAME)
   total_size = None
 
-  if not FORCE_RECALCULATE and os.path.exists(cache_path):
-    lines = read_text_file(cache_path, PREFERRED_ENCODING).strip().splitlines()
-    total_size = int(lines[0].replace(',', '')) if lines else None
+  if not FORCE_RECALCULATE:
+    metadata = read_metadata(dir_path)
+    if metadata and METADATA_SIZE_KEY in metadata:
+      total_size = metadata[METADATA_SIZE_KEY]
 
   if total_size is None:
     total_size = sum(
@@ -271,7 +276,10 @@ def get_dir_size(
       for f in files
       if os.path.exists(path := os.path.join(root, f))
     )
-    write_hidden_file(cache_path, str(total_size))
+
+    metadata = read_metadata(dir_path, default={})
+    metadata[METADATA_SIZE_KEY] = total_size
+    write_metadata(dir_path, metadata)
 
   return total_size
 

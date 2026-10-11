@@ -7,6 +7,9 @@ DESKTOP_INI_FILENAME = 'desktop.ini'
 INI_ICON_KEY = 'IconResource'
 INI_SHELL_SECTION = '.ShellClassInfo'
 
+METADATA_FILENAME = 'metadata.json'
+METADATA_SIZE_KEY = 'size'
+
 MAX_ICO_SIZE = 256
 DEFAULT_ICO_SIZES = [16, 48, 256]
 ICO_FILENAME = 'icon.ico'
