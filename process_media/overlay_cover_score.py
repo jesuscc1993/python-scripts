@@ -8,12 +8,13 @@ from PIL import Image, ImageDraw, ImageFont
 from concurrent.futures import ThreadPoolExecutor
 from mtattr import Attr
 from mtfont import Font
+from mtfs import read_metadata
 from mtlogger import logger
 from mtprompt import Prompt, to_int
 from tqdm import tqdm
 from xml.etree import ElementTree
 
-from _common import collect_dirs_to_process, read_metadata, tqdm_dim
+from _common import collect_dirs_to_process, tqdm_dim
 from _constants import COVER_NAMES
 from _settings import SETTINGS
 
@@ -124,7 +125,7 @@ def read_score_from_metadata(
   dir: str,
 ):
   try:
-    metadata = read_metadata(dir, {})
+    metadata = read_metadata(dir) or {}
     return int(metadata['score']) if metadata.get('score') is not None else None
   except Exception:
     return None

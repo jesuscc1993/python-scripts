@@ -5,12 +5,15 @@ import tempfile
 import unittest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+from mtattr import Attr
 from mtfs import (
   read_file,
   read_json_file,
+  read_metadata,
   read_text_file,
   write_file,
   write_json_file,
+  write_metadata,
   write_text_file,
 )
 
@@ -52,6 +55,34 @@ class MtfsTests(unittest.TestCase):
     write_json_file(path, content)
 
     self.assertEqual(read_json_file(path), content)
+
+  def test_read_metadata_missing_returns_none(self):
+    self.assertIsNone(read_metadata(os.path.join(TEST_DIR, 'foo')))
+
+  def test_metadata_round_trip(self):
+    dir_path = os.path.join(TEST_DIR, 'foo')
+    os.makedirs(dir_path)
+    content = {'size': 123, 'bar': 'baz'}
+
+    write_metadata(dir_path, content)
+
+    self.assertEqual(read_metadata(dir_path), content)
+
+  def test_write_metadata_hides_file(self):
+    dir_path = os.path.join(TEST_DIR, 'foo')
+    os.makedirs(dir_path)
+
+    write_metadata(dir_path, {'size': 123})
+
+    self.assertTrue(Attr.is_hidden(os.path.join(dir_path, 'metadata.json')))
+
+  def test_read_metadata_invalid_json_raises_type_error(self):
+    dir_path = os.path.join(TEST_DIR, 'foo')
+    os.makedirs(dir_path)
+    write_json_file(os.path.join(dir_path, 'metadata.json'), ['bar', 'baz'])
+
+    with self.assertRaises(TypeError):
+      read_metadata(dir_path)
 
 
 if __name__ == '__main__':

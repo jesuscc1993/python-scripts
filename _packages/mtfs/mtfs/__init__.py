@@ -1,7 +1,10 @@
 import json
 import os
 
+from mtattr import Attr
+
 UTF8 = 'utf-8'
+METADATA_FILENAME = 'metadata.json'
 
 
 def read_file(
@@ -58,3 +61,34 @@ def write_json_file(
 ):
   formattedContent = json.dumps(content, indent=2)
   write_text_file(path, formattedContent, encoding=encoding)
+
+
+def read_metadata(
+  dir_path: str,
+):
+  metadata_path = os.path.join(dir_path, METADATA_FILENAME)
+  if not os.path.isfile(metadata_path):
+    return None
+
+  try:
+    Attr.show(metadata_path)
+    metadata = read_json_file(metadata_path)
+    if not isinstance(metadata, dict):
+      raise TypeError(
+        f'Invalid metadata in "{metadata_path}": expected a JSON object.'
+      )
+    return metadata
+  finally:
+    Attr.hide(metadata_path)
+
+
+def write_metadata(
+  dir_path: str,
+  metadata: dict,
+):
+  metadata_path = os.path.join(dir_path, METADATA_FILENAME)
+  try:
+    Attr.show(metadata_path)
+    write_json_file(metadata_path, metadata)
+  finally:
+    Attr.hide(metadata_path)

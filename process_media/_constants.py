@@ -6,5 +6,3 @@ COVER_NAMES = [
 ]
 
 DIRECTORY_BLACKLIST = ['subs', 'subtitles']
-
-METADATA_FILENAME = 'metadata.json'

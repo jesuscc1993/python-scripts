@@ -14,9 +14,10 @@ from mal import (
   config,
 )
 from mtlogger import logger
+from mtfs import read_metadata, write_metadata
 from mtprompt import Prompt, to_int
 
-from _common import collect_dirs_to_process, read_metadata, write_metadata
+from _common import collect_dirs_to_process
 
 ANIME_MEDIA_TYPE = 'anime'
 MANGA_MEDIA_TYPE = 'manga'
@@ -168,7 +169,7 @@ def fetch_score(dir_name: str, name: str, media_type: str):
 
 
 def save_metadata(dir_path: str, score: int):
-  metadata = read_metadata(dir_path, {})
+  metadata = read_metadata(dir_path) or {}
   metadata['score'] = score
   write_metadata(dir_path, metadata)
 

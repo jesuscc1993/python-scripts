@@ -1,4 +1,3 @@
-import json
 import mtsound
 import os
 
@@ -20,7 +19,6 @@ from _constants import (
   INI_ICON_KEY,
   INI_SHELL_SECTION,
   MAX_ICO_SIZE,
-  METADATA_FILENAME,
   PREFERRED_ENCODING,
 )
 from _settings import HIDE_GENERATED_ICONS
@@ -226,40 +224,6 @@ def write_hidden_file(
   encoding=PREFERRED_ENCODING,
 ):
   write_file(file_path, content, HIDDEN_FILE_ATTRS, encoding)
-
-
-def read_metadata(
-  dir_path: str,
-  default: dict | None = None,
-):
-  metadata_path = os.path.join(dir_path, METADATA_FILENAME)
-  if not os.path.isfile(metadata_path):
-    return default
-
-  try:
-    Attr.show(metadata_path)
-    with open(metadata_path, encoding=PREFERRED_ENCODING) as metadata_file:
-      metadata = json.load(metadata_file)
-    if not isinstance(metadata, dict):
-      raise TypeError(
-        f'Invalid metadata in "{metadata_path}": expected a JSON object.'
-      )
-    return metadata
-  finally:
-    Attr.hide(metadata_path)
-
-
-def write_metadata(
-  dir_path: str,
-  metadata: dict,
-):
-  metadata_path = os.path.join(dir_path, METADATA_FILENAME)
-  try:
-    Attr.show(metadata_path)
-    with open(metadata_path, 'w', encoding=PREFERRED_ENCODING) as metadata_file:
-      json.dump(metadata, metadata_file, indent=2)
-  finally:
-    Attr.hide(metadata_path)
 
 
 def get_ini_icon(

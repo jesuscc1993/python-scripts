@@ -12,6 +12,7 @@ from PIL import Image, ImageDraw
 from mtattr import Attr
 from mtfont import Font, SegoeFontName
 from mtlogger import logger
+from mtfs import read_metadata, write_metadata
 from mtprompt import Prompt, to_bool, to_dir, to_int
 
 from _constants import (
@@ -22,13 +23,7 @@ from _constants import (
   METADATA_FILENAME,
   METADATA_SIZE_KEY,
 )
-from _common import (
-  get_ini_icon,
-  read_ini,
-  read_metadata,
-  set_folder_icon,
-  write_metadata,
-)
+from _common import get_ini_icon, read_ini, set_folder_icon
 
 DEBUG = False
 FORCE_RECALCULATE = False
@@ -277,7 +272,7 @@ def get_dir_size(
       if os.path.exists(path := os.path.join(root, f))
     )
 
-    metadata = read_metadata(dir_path, default={})
+    metadata = read_metadata(dir_path) or {}
     metadata[METADATA_SIZE_KEY] = total_size
     write_metadata(dir_path, metadata)
 
