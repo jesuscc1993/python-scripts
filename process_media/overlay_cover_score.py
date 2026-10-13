@@ -8,7 +8,7 @@ from PIL import Image, ImageDraw, ImageFont
 from concurrent.futures import ThreadPoolExecutor
 from mtattr import Attr
 from mtfont import Font
-from mtfs import read_metadata
+from mtfs import read_metadata, write_metadata
 from mtlogger import logger
 from mtprompt import Prompt, to_int
 from tqdm import tqdm
@@ -108,17 +108,28 @@ def process_dir(
       dir, os.path.basename(cover_img_path), is_backup=True
     )
 
-  score = read_score_from_metadata(dir)
+  score_match = re.search(r'\{(\d{1,3})\}', os.path.basename(dir))
+  score = int(score_match.group(1)) if score_match else None
+  score_source = 'name'
+
   if score is None:
-    score_match = re.search(r'\{(\d{1,3})?\}', os.path.basename(dir))
-    score = int(score_match.group(1)) if score_match else None
+    score = read_score_from_metadata(dir)
+    score_source = 'metadata'
+
   if score is None:
     score = read_score_from_comic_info(dir)
+    score_source = 'comic_info'
+
   if score is None:
+    score_source = None
     tqdm_dim(f'Skipping "{dir_name}". Score could not be inferred.')
     return
 
   process_cover(dir, cover_img_path, cover_img_bak_path, score, font)
+
+  if score_source == 'name':
+    save_score_to_metadata(dir, score)
+    strip_score_from_dir_name(dir)
 
 
 def read_score_from_metadata(
@@ -129,6 +140,25 @@ def read_score_from_metadata(
     return int(metadata['score']) if metadata.get('score') is not None else None
   except Exception:
     return None
+
+
+def save_score_to_metadata(
+  dir: str,
+  score: int,
+):
+  metadata = read_metadata(dir) or {}
+  metadata['score'] = score
+  write_metadata(dir, metadata)
+
+
+def strip_score_from_dir_name(
+  dir: str,
+):
+  dir_name = os.path.basename(dir)
+  new_dir_name = re.sub(r'\s*\{\d{1,3}\}', '', dir_name).strip()
+  new_dir_path = os.path.join(os.path.dirname(dir), new_dir_name)
+  os.rename(dir, new_dir_path)
+  return new_dir_path
 
 
 def read_score_from_comic_info(
