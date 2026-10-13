@@ -1,9 +1,12 @@
 #!/bin/sh
 
-# if no .py files are staged, exit
-git diff --cached --name-only --diff-filter=ACM | grep -q '\.py$' || exit 0
+# collect staged .py files, NUL-separated to handle spaces in filenames
+files=$(git diff --cached --name-only --diff-filter=ACM -z -- '*.py')
 
-# if .py files are staged, run lint and formatter
-ruff check --fix .
-ruff format .
-git add -u
+# if no .py files are staged, exit
+[ -z "$files" ] && exit 0
+
+# run lint and formatter on staged .py files only, then re-stage them
+printf '%s' "$files" | xargs -0 ruff check --fix
+printf '%s' "$files" | xargs -0 ruff format
+printf '%s' "$files" | xargs -0 git add --
