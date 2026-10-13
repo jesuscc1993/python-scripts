@@ -169,7 +169,7 @@ def process_dir(
 
     if ico_img and ico_img.mode == 'RGBA':
       r, g, b, a = ico_img.split()
-      if not any(a.getdata()):
+      if not any(a.get_flattened_data()):
         ico_img = Image.merge(
           'RGBA', (r, g, b, Image.new('L', ico_img.size, 255))
         )

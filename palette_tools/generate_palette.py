@@ -34,7 +34,7 @@ def extract_colors(
   image_path: str,
 ):
   img = Image.open(image_path).convert('RGBA')
-  pixels = [p for p in img.getdata() if p[3] > 0]
+  pixels = [p for p in img.get_flattened_data() if p[3] > 0]
   count = Counter(pixels)
 
   def sort_key(
