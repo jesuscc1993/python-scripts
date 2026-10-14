@@ -28,6 +28,8 @@ GAMES = os.path.join('Games', 'PC')
 STEAM_APPS = os.path.join('SteamLibrary', 'steamapps')
 STEAM_APPS_COMMON = os.path.join(STEAM_APPS, 'common')
 
+EPIC_GAMES = 'Epic Games'
+
 AMAZON_GAMES = 'Amazon Games'
 AMAZON_LIBRARY = os.path.join(AMAZON_GAMES, 'Library')
 
@@ -87,6 +89,10 @@ def link_amazon():
 
 
 def link_epic():
+  link_dir(
+    os.path.join(LOCAL_DATA, EPIC_GAMES),
+    os.path.join(D_DRIVE, CLIENTS, EPIC_GAMES),
+  )
   if EPIC_USER_ID:
     link_dir(
       os.path.join(
