@@ -28,7 +28,7 @@ def main():
   missing_in_b = []
   mismatches = []
 
-  for item_name in sorted(set(subfolders_a.keys()) | set(subfolders_b.keys())):
+  for item_name in sort_by_path(subfolders_a, subfolders_b):
     nameA = subfolders_a.get(item_name)
     nameB = subfolders_b.get(item_name)
 
@@ -55,11 +55,15 @@ def main():
       else:
         logger.trace(f'Failed to determine ranges for "{item_name}".')
     elif path_a:
-      missing_in_b.append(item_name)
-      logger.warn(f'  "{folder_a}" only: "{item_name}".')
+      missing_in_b.append(subfolders_a[item_name])
+      logger.warn(
+        f'  "{item_name}" exists in "{os.path.dirname(path_a)}" only.'
+      )
     elif path_b:
-      missing_in_a.append(item_name)
-      logger.warn(f'  "{folder_b}" only: "{item_name}".')
+      missing_in_a.append(subfolders_b[item_name])
+      logger.warn(
+        f'  "{item_name}" exists in "{os.path.dirname(path_b)}" only.'
+      )
 
   logger.hr()
 
@@ -79,10 +83,24 @@ def main():
     )
 
 
+def sort_by_path(
+  subfolders_a: dict,
+  subfolders_b: dict,
+):
+  item_names = set(subfolders_a.keys()) | set(subfolders_b.keys())
+  return sorted(
+    item_names,
+    key=lambda name: min(
+      subfolders_a.get(name, subfolders_b.get(name)),
+      subfolders_b.get(name, subfolders_a.get(name)),
+    ),
+  )
+
+
 def stringify(
   obj: dict,
 ):
-  return json.dumps(obj, indent=2)
+  return json.dumps(obj, indent=2).replace('\\\\', '\\')
 
 
 def get_subfolders(
