@@ -17,7 +17,7 @@ def main():
   if len(sys.argv) > 1:
     folder_path = sys.argv[1]
   else:
-    folder_path = Prompt.dir(
+    folder_path = Prompt.path(
       'Enter the path to the parent folder containing the chapter folders you want to clear of credits'
     )
 
@@ -35,6 +35,9 @@ def main():
       'Enter the position of the image to match (1 = first, -1 = last)',
       default=1,
     )
+
+  if os.path.isfile(folder_path):
+    folder_path = os.path.dirname(folder_path)
 
   process_root(folder_path, img_path, img_spot)
 
