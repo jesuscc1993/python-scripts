@@ -123,6 +123,9 @@ def image_to_ico(
         ico_path, format='ICO', sizes=[(s, s) for s in icon_sizes]
       )
 
+      if HIDE_GENERATED_ICONS:
+        Attr.hide(ico_path)
+
   except Exception as ex:
     logger.error(f'Error converting "{image_path}" to ICO:\n{ex}')
 
@@ -146,8 +149,6 @@ def set_folder_icon(
 
     set_ini_icon(config, ico_path)
     write_ini(desktop_ini_path, config, encoding)
-    if HIDE_GENERATED_ICONS and os.path.splitext(ico_path)[1].lower() == '.ico':
-      Attr.hide(os.path.join(folder_path, ico_path))
     Attr.hide(desktop_ini_path)
     Attr.add(folder_path, ['s'])
 
