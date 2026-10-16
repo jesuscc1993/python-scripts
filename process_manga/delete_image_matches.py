@@ -118,11 +118,15 @@ def get_image_by_spot(
       if os.path.splitext(f)[1].lstrip('.').lower() in IMAGE_EXTENSIONS
     ]
   )
+
   if not images:
     return None
-  if spot == -1:
-    return os.path.join(folder_path, images[-1])
-  return os.path.join(folder_path, images[spot - 1])
+
+  index = spot - 1 if spot > 0 else spot
+  if index < -len(images) or index >= len(images):
+    return None
+
+  return os.path.join(folder_path, images[index])
 
 
 if __name__ == '__main__':
