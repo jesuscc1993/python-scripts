@@ -21,6 +21,11 @@ from _common import (
   zfill_float,
 )
 
+LOOKUP_EXTENSIONS = [
+  '.cbz',
+  '.zip',
+]
+
 
 def main():
   if len(sys.argv) > 1:
@@ -42,7 +47,7 @@ def process_parent_folder(
 ):
   for root, dirs, files in os.walk(parent_folder_path, topdown=False):
     filtered_files = [
-      f for f in files if os.path.splitext(f)[1].lower() in IMAGE_EXTENSIONS
+      f for f in files if os.path.splitext(f)[1].lower() in LOOKUP_EXTENSIONS
     ]
     all_items = filtered_files + dirs
 
