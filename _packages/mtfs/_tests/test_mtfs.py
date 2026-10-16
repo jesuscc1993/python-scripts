@@ -48,6 +48,38 @@ class MtfsTests(unittest.TestCase):
 
     self.assertEqual(read_text_file(path), 'foo')
 
+  def test_text_file_cp1252_fallback(self):
+    path = os.path.join(TEST_DIR, 'data.txt')
+    content = 'café'
+
+    with open(path, 'wb') as file:
+      file.write(content.encode('cp1252'))
+
+    self.assertEqual(read_text_file(path), content)
+
+    with open(path, 'rb') as file:
+      self.assertEqual(file.read(), content.encode('utf-8'))
+
+  def test_text_file_custom_encoding(self):
+    path = os.path.join(TEST_DIR, 'data.txt')
+    content = 'café'
+
+    write_text_file(path, content, encoding='latin-1')
+
+    self.assertEqual(read_text_file(path, encoding='latin-1'), content)
+
+  def test_text_file_cp1252_fallback_custom_encoding(self):
+    path = os.path.join(TEST_DIR, 'data.txt')
+    content = 'café'
+
+    with open(path, 'wb') as file:
+      file.write(content.encode('cp1252'))
+
+    self.assertEqual(read_text_file(path, encoding='latin-1'), content)
+
+    with open(path, 'rb') as file:
+      self.assertEqual(file.read(), content.encode('latin-1'))
+
   def test_json_file_round_trip(self):
     path = os.path.join(TEST_DIR, 'nested', 'data.json')
     content = {'foo': ['bar', 1]}

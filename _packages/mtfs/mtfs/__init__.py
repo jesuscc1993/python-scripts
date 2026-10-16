@@ -2,8 +2,15 @@ import json
 import os
 
 from mtattr import Attr
+from pathlib import Path
 
 UTF8 = 'utf-8'
+CP1252 = 'cp1252'
+NEWLINE = ''
+
+DEFAULT_ENCODING = UTF8
+FALLBACK_ENCODING = CP1252
+
 METADATA_FILENAME = 'metadata.json'
 
 
@@ -11,11 +18,12 @@ def read_file(
   path: str,
   mode='rb',
   encoding: str | None = None,
+  newline: str | None = None,
 ):
   if not os.path.exists(path):
     return None
 
-  with open(path, mode, encoding=encoding) as file:
+  with open(path, mode, encoding=encoding, newline=newline) as file:
     return file.read()
 
 
@@ -24,31 +32,42 @@ def write_file(
   content: bytes,
   mode='wb',
   encoding: str | None = None,
+  newline: str | None = None,
 ):
   os.makedirs(os.path.dirname(path) or '.', exist_ok=True)
 
-  with open(path, mode, encoding=encoding) as file:
+  with open(path, mode, encoding=encoding, newline=newline) as file:
     file.write(content)
 
 
 def read_text_file(
   path: str,
-  encoding=UTF8,
+  encoding=DEFAULT_ENCODING,
 ):
-  return read_file(path, mode='r', encoding=encoding)
+  if not os.path.exists(path):
+    return None
+
+  data = Path(path).read_bytes()
+
+  try:
+    return data.decode(encoding)
+  except UnicodeDecodeError:
+    contents = data.decode(CP1252)
+    Path(path).write_text(contents, encoding)
+    return contents
 
 
 def write_text_file(
   path: str,
   content: str,
-  encoding=UTF8,
+  encoding=DEFAULT_ENCODING,
 ):
-  write_file(path, content, mode='w', encoding=encoding)
+  write_file(path, content, mode='w', encoding=encoding, newline=NEWLINE)
 
 
 def read_json_file(
   path: str,
-  encoding=UTF8,
+  encoding=DEFAULT_ENCODING,
 ):
   content = read_text_file(path, encoding=encoding)
   return json.loads(content) if content is not None else None
@@ -57,7 +76,7 @@ def read_json_file(
 def write_json_file(
   path: str,
   content: object,
-  encoding=UTF8,
+  encoding=DEFAULT_ENCODING,
 ):
   formattedContent = json.dumps(content, indent=2)
   write_text_file(path, formattedContent, encoding=encoding)

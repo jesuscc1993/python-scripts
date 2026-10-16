@@ -1,12 +1,14 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 # collect staged .py files, NUL-separated to handle spaces in filenames
-files=$(git diff --cached --name-only --diff-filter=ACM -z -- '*.py')
+mapfile -d '' -t files < <(
+  git diff --cached --name-only --diff-filter=ACM -z -- '*.py'
+)
 
 # if no .py files are staged, exit
-[ -z "$files" ] && exit 0
+[ ${#files[@]} -eq 0 ] && exit 0
 
 # run lint and formatter on staged .py files only, then re-stage them
-printf '%s' "$files" | xargs -0 ruff check --fix
-printf '%s' "$files" | xargs -0 ruff format
-printf '%s' "$files" | xargs -0 git add --
+ruff check --fix "${files[@]}" || exit $?
+ruff format "${files[@]}" || exit $?
+git add -- "${files[@]}"
