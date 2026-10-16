@@ -110,13 +110,19 @@ def process_parent_folder(
 
   if empty_chapters:
     logger.warn(
-      f'* Empty chapters: {" ".join(format_number_ranges(empty_chapters))}'
+      f'* Empty chapters: {
+        " ".join(
+          format_number_ranges(
+            [float(get_chapter(entry.name)) for entry in empty_chapters]
+          )
+        )
+      }'
     )
 
   if (
     empty_chapters
     and prompt_for_deletion is not False
-    and Prompt.bool('Delete empty chapters?')
+    and Prompt.bool('\nDelete empty chapters?', default=True)
   ):
     for entry in empty_chapters:
       os.rmdir(entry.path)
@@ -140,7 +146,7 @@ def get_missing_chapter_pages(
 
   if not found_pages:
     logger.warn(f'- [Ch.{format_chapter(chapter)}] All pages missing.')
-    return True
+    return None
 
   return find_missing(found_pages)
 
