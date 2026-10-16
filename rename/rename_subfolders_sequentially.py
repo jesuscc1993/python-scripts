@@ -20,9 +20,12 @@ def main():
   )
 
   items = [
-    f
-    for f in os.listdir(parent_dir)
-    if os.path.isdir(os.path.join(parent_dir, f)) and not f.startswith('.')
+    dir_name
+    for dir_name in os.listdir(parent_dir)
+    if (
+      os.path.isdir(os.path.join(parent_dir, dir_name))
+      and not dir_name.startswith('.')
+    )
   ]
   rename_items_by_sequential_pattern(parent_dir, items, name_pattern)
 
