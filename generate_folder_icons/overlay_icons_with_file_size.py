@@ -24,6 +24,7 @@ from _constants import (
   METADATA_SIZE_KEY,
 )
 from _common import get_ini_icon, read_ini, set_folder_icon
+from _settings import HIDE_GENERATED_ICONS
 
 DEBUG = False
 FORCE_RECALCULATE = False
@@ -224,6 +225,9 @@ def process_dir(
       append_images=append_images,
     )
     logger.success(f'Saved "{dest_ico_path}".')
+
+    if HIDE_GENERATED_ICONS:
+      Attr.hide(dest_ico_path)
 
     if DEBUG:
       debug_dir = os.path.join(dir_path, 'icon')
