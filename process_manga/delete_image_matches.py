@@ -4,7 +4,7 @@ import sys
 
 from PIL import Image
 from mtlogger import logger
-from mtprompt import Prompt
+from mtprompt import Prompt, to_int, to_path
 from send2trash import send2trash
 from tqdm import tqdm
 
@@ -15,25 +15,25 @@ HASH_THRESHOLD = 10
 
 def main():
   if len(sys.argv) > 1:
-    folder_path = sys.argv[1]
+    folder_path = to_path(sys.argv[1])
   else:
     folder_path = Prompt.path(
       'Enter the path to the parent folder containing the chapter folders you want to clear of credits'
     )
 
   if len(sys.argv) > 2:
-    img_path = sys.argv[2]
+    img_path = to_path(sys.argv[2])
   else:
     img_path = Prompt.path(
       'Enter the path to the image file or folder containing the image files to match'
     )
 
   if len(sys.argv) > 3:
-    img_spot = sys.argv[3]
+    img_spot = to_int(sys.argv[3])
   else:
     img_spot = Prompt.int(
-      'Enter the position of the image to match (1 = first, -1 = last)',
-      default=1,
+      'Enter the position of the image to match (1 = first, 0 = any, -1 = last)',
+      default=0,
     )
 
   if os.path.isfile(folder_path):
@@ -86,31 +86,51 @@ def process_chapter(
 ):
   ref_hashes = list(ref_hashes)
   deleted = 0
+
   while ref_hashes:
-    target_img = get_image_by_spot(chapter_folder, img_spot)
-    if not target_img:
+    target_images = get_images_by_spot(chapter_folder, img_spot)
+    if not target_images:
       break
 
-    img_hash = imagehash.phash(Image.open(target_img))
-    match = next(
-      (
-        ref_hash
-        for ref_hash in ref_hashes
-        if ref_hash - img_hash <= HASH_THRESHOLD
-      ),
-      None,
-    )
-    if not match:
+    match_found = False
+
+    for target_img in target_images:
+      try:
+        with Image.open(target_img) as image:
+          img_hash = imagehash.phash(image)
+
+      except (OSError, ValueError) as ex:
+        tqdm.write(
+          logger.format_warn(f'Skipping unreadable image "{target_img}": {ex}')
+        )
+        continue
+
+      match = next(
+        (
+          ref_hash
+          for ref_hash in ref_hashes
+          if ref_hash - img_hash <= HASH_THRESHOLD
+        ),
+        None,
+      )
+
+      if match is None:
+        continue
+
+      send2trash(target_img)
+      tqdm.write(logger.format_info(f'Deleted "{target_img}"'))
+      ref_hashes.remove(match)
+      deleted += 1
+      match_found = True
       break
 
-    send2trash(target_img)
-    tqdm.write(logger.format_info(f'Deleted "{target_img}"'))
-    ref_hashes.remove(match)
-    deleted += 1
+    if not match_found:
+      break
+
   return deleted
 
 
-def get_image_by_spot(
+def get_images_by_spot(
   folder_path: str,
   spot: int,
 ):
@@ -123,13 +143,16 @@ def get_image_by_spot(
   )
 
   if not images:
-    return None
+    return []
+
+  if spot == 0:
+    return [os.path.join(folder_path, image) for image in images]
 
   index = spot - 1 if spot > 0 else spot
   if index < -len(images) or index >= len(images):
-    return None
+    return []
 
-  return os.path.join(folder_path, images[index])
+  return [os.path.join(folder_path, images[index])]
 
 
 if __name__ == '__main__':

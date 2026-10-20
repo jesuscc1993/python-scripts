@@ -333,5 +333,5 @@ class Prompt:
 
 def format_prompt(prompt: str, default: str | None = None, use_colon=True):
   formatted_prompt = prompt.strip(' ')
-  formatted_default = f'(default: {default})' if default else ''
+  formatted_default = f'(default: {default})' if default is not None else ''
   return f'{formatted_prompt}{" " if formatted_default and not formatted_prompt.endswith("\n") else ""}{formatted_default}{"\n: " if use_colon and (formatted_prompt or formatted_default) else ""}'
