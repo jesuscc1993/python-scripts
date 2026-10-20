@@ -18,3 +18,7 @@ Same as above, but only affects subfolders, leaving files untouched.
 ### [rename_zip_to_cbz.py](rename_zip_to_cbz.py)
 
 Recursively renames `.zip` files to `.cbz`.
+
+### [wrap_in_spaces.py](wrap_in_spaces.py)
+
+Wraps a file/directory in `U+00A0` spaces, putting them at the top when sorting.
