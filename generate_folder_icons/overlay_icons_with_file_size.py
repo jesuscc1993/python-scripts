@@ -228,6 +228,7 @@ def process_dir(
 
     if HIDE_GENERATED_ICONS:
       Attr.hide(dest_ico_path)
+      Attr.hide(bak_ico_path)
 
     if DEBUG:
       debug_dir = os.path.join(dir_path, 'icon')
