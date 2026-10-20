@@ -2,7 +2,7 @@
   "icons_path": "Z:\\Images\\Icons\\Packs\\File Types W11\\ico",
   "mappings": [
     {
-      "fallback_icon": "_textless\\_plain_text",
+      "fallback_icon": "_textless\\_text",
       "shell": [
         {
           "command": "\"Z:\\Software\\Development\\Notepad++\\notepad++.exe\" \"%1\"",
@@ -17,6 +17,7 @@
         "conf",
         "css",
         "csv",
+        "cue",
         "env",
         "git",
         "inc",
@@ -55,7 +56,7 @@
       ]
     },
     {
-      "fallback_icon": "_textless\\_plain_text",
+      "fallback_icon": "_textless\\_text",
       "shell": [
         {
           "command": "\"Z:\\Software\\Development\\Notepad++\\notepad++.exe\" \"%1\"",
@@ -84,7 +85,7 @@
       "types": ["pak", "pkg", "ucas", "utoc"]
     },
     {
-      "fallback_icon": "_textless\\_plain_text",
+      "fallback_icon": "_textless\\_text",
       "shell": [
         {
           "command": "\"Z:\\Software\\Development\\Notepad++\\notepad++.exe\" \"%1\"",
