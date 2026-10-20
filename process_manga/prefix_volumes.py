@@ -46,13 +46,13 @@ def prompt_chapter_ranges(
         or os.path.splitext(item)[1].lower().endswith(tuple(ITEM_EXTENSIONS))
       ]
     )
-    lastChapter = int(get_chapter(items[-1]))
+    lastChapter = int(float(get_chapter(items[-1])))
     chapter_bounds = [i for i in range(step, lastChapter + step, step)]
     chapter_bounds[-1] = lastChapter
     ranges = []
     prev = 0.0
     for b in chapter_bounds:
-      ranges.append((prev + 1, b + 0.99))
+      ranges.append((prev + 0.01, b + 0.99))
       prev = b
     return ranges
 
@@ -84,6 +84,7 @@ def process_parent_folder(
   ]
 
   for folder in tqdm(folders, desc=f'Processing "{parent_folder_path}"'):
+    old_folder_path = os.path.join(parent_folder_path, folder)
     chapter = get_chapter(folder)
     if not chapter:
       tqdm.write(
@@ -100,13 +101,11 @@ def process_parent_folder(
     for vol_index, (start, end) in enumerate(chapter_ranges, 1):
       if start <= ch_num <= end:
         prefix = f'Vol.{str(vol_index).zfill(2)}'
-        if folder.startswith(prefix):
-          break
-        old_folder_path = os.path.join(parent_folder_path, folder)
         new_folder_path = os.path.join(
-          parent_folder_path, prefix + ' ' + folder
+          parent_folder_path, prefix + ' ' + re.sub(r'^Vol\.\d+\s+', '', folder)
         )
-        os.rename(old_folder_path, new_folder_path)
+        if old_folder_path != new_folder_path:
+          os.rename(old_folder_path, new_folder_path)
         break
 
   mtsound.notify()

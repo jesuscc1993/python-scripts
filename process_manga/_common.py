@@ -19,7 +19,7 @@ SEASON_REGEX = r'\bSeason\b'
 CHAPTER_REGEX = r'\b(?:Ch(?:ap(?:ter)?)?|Ep(?:isode)?)\b'
 EPILOGUE_REGEX = r'\bEp(?:ilogue)?\b'
 SPECIAL_REGEX = r'\bSp(?:ecial)?\b'
-ENDING_REGEX = r'\bEnd(?:ing)?\b'
+ENDING_REGEX = r'\bEnd(?:ing)?$'
 SIDE_STORY_REGEX = r'\bSide Story\b'
 
 VOLUME_NUMBER_REGEX = rf'{VOLUME_REGEX}{NUMBER_REGEX}'
