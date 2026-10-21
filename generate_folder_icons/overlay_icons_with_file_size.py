@@ -268,6 +268,10 @@ def get_dir_size(
     metadata = read_metadata(dir_path)
     if metadata and METADATA_SIZE_KEY in metadata:
       total_size = metadata[METADATA_SIZE_KEY]
+      if isinstance(total_size, str):
+        total_size = int(total_size.replace(',', ''))
+        metadata[METADATA_SIZE_KEY] = total_size
+        write_metadata(dir_path, metadata)
 
   if total_size is None:
     total_size = sum(
