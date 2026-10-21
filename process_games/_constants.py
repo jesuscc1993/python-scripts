@@ -14,6 +14,6 @@ HLTB_DB_NAME = 'hltb_database.json'
 HLTB_EXCLUSION_FILE = '.nohltbscan'
 HLTB_OUTPUT_DIRNAME = 'hltb'
 
-DATA_DIR_PATH = os.path.join(os.path.dirname(__file__), '..', '_data')
 OUTPUT_DIR_PATH = os.path.join(os.path.dirname(__file__), '..', '_output')
+DATA_DIR_PATH = os.path.join(OUTPUT_DIR_PATH, '_data')
 HLTB_DB_PATH = os.path.join(DATA_DIR_PATH, HLTB_DB_NAME)
