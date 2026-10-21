@@ -166,14 +166,14 @@ def write_output(
     lines += [
       f'### Games Found {format_dimmed(f"(cache: [{os.path.basename(HLTB_DB_PATH)}]({os.path.abspath(HLTB_DB_PATH).replace(chr(92), "/")}))")}',
       '',
-      '| Game | Matched | Main Story | Main + Extra | Completionist |',
-      '|---|---|--:|--:|--:|',
+      '| Game | Matched | Score | Main Story | Main + Extra | Completionist |',
+      '|---|---|:-:|--:|--:|--:|',
     ]
     for game_name, result in matched:
       game_cell = format_game_column(game_name)
       matched_cell = format_matched_column(game_name, result)
       lines.append(
-        f'| {game_cell} | {matched_cell} | {format_hours_column(result["comp_main"])} | {format_hours_column(result["comp_plus"])} | {format_hours_column(result["comp_100"])} |'
+        f'| {game_cell} | {matched_cell} | {format_score_col(result["review_score"])} | {format_hours_column(result["comp_main"])} | {format_hours_column(result["comp_plus"])} | {format_hours_column(result["comp_100"])} |'
       )
 
   if len(untracked):
@@ -220,6 +220,12 @@ def format_matched_column(
   return (
     game_name_content if loosely_match else format_dimmed(game_name_content)
   )
+
+
+def format_score_col(
+  score: int,
+):
+  return f'{score}%' if score else EMPTY_CELL
 
 
 def format_hours_column(
