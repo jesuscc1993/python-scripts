@@ -7,6 +7,10 @@ Collection of scripts for freeing up disk space.<br>
 
 ## Scripts
 
+### [clean_all.py](clean_all.py)
+
+Runs all the scripts below.
+
 ### [clean_browsers.py](clean_browsers.py)
 
 Deletes Chrome and Firefox cache folders.
