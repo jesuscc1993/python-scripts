@@ -4,7 +4,8 @@ import re
 
 from mtlogger import logger
 from mtfs import read_json_file, write_text_file
-from mtprompt import Prompt, to_list
+from mtprompt import Prompt
+from mtvalidation import to_list
 from rapidfuzz import process
 from tqdm import tqdm
 

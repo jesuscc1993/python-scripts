@@ -2,7 +2,8 @@ import os
 import sys
 
 from mtlogger import logger
-from mtprompt import Prompt, to_dir
+from mtprompt import Prompt
+from mtvalidation import to_dir
 from win32com.client import Dispatch
 
 from _constants import BINARY_BLACKLIST, ROM_EXTS, BINARY_BY_PLATFORM

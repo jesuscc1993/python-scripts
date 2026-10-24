@@ -2,7 +2,8 @@ import os
 import sys
 
 from mtlogger import logger
-from mtprompt import Prompt, to_path
+from mtprompt import Prompt
+from mtvalidation import to_path
 
 from _common import (
   add_missing_spaces_to_subs_file,

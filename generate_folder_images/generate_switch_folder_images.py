@@ -9,7 +9,8 @@ from PIL import Image
 from io import BytesIO
 from mtlogger import logger
 from mtfs import read_json_file, write_json_file
-from mtprompt import Prompt, to_bool, to_dir
+from mtprompt import Prompt
+from mtvalidation import to_bool, to_dir
 from natsort import natsorted
 
 from _common import resize_image

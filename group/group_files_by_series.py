@@ -4,7 +4,8 @@ import sys
 
 from concurrent.futures import ThreadPoolExecutor
 from mtlogger import logger
-from mtprompt import Prompt, to_bool, to_dir
+from mtprompt import Prompt
+from mtvalidation import to_bool, to_dir
 from tqdm import tqdm
 
 from _common import FILE_BLACKLIST, find_files_to_process, group_files

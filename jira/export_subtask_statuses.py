@@ -4,7 +4,8 @@ import sys
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from jira.resources import Issue
 from mtlogger import logger
-from mtprompt import Prompt, to_list, to_bool
+from mtprompt import Prompt
+from mtvalidation import to_list, to_bool
 from openpyxl import Workbook
 from openpyxl.styles import Font
 from tqdm import tqdm

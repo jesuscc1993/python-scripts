@@ -15,7 +15,8 @@ from mal import (
 )
 from mtlogger import logger
 from mtfs import read_metadata, write_metadata
-from mtprompt import Prompt, to_int
+from mtprompt import Prompt
+from mtvalidation import to_int
 
 from _common import collect_dirs_to_process
 

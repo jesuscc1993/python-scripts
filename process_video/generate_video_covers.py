@@ -9,7 +9,8 @@ from PIL import Image, ImageDraw, ImageFont
 from mtfont import Font, SegoeFontName
 from mtfs import read_file
 from mtlogger import logger
-from mtprompt import Prompt, to_path
+from mtprompt import Prompt
+from mtvalidation import to_path
 from mutagen.asf import ASF, ASFByteArrayAttribute
 from mutagen.mp4 import MP4, MP4Cover
 from tqdm import tqdm

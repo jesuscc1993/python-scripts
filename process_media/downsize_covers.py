@@ -4,7 +4,8 @@ import sys
 from PIL import Image
 from concurrent.futures import ThreadPoolExecutor
 from mtlogger import logger
-from mtprompt import Prompt, to_int
+from mtprompt import Prompt
+from mtvalidation import to_int
 from tqdm import tqdm
 
 from _constants import COVER_NAMES

@@ -118,8 +118,8 @@ def run_scripts_in_sequence(
   parent_folder_path: str,
 ):
   env = os.environ.copy()
-  env['PROMPT__MUTE'] = '1'
-  env['PROMPT__NO_ENTER_TO_EXIT'] = '1'
+  env[Prompt.PROMPT__MUTE] = '1'
+  env[Prompt.PROMPT__NO_ENTER_TO_EXIT] = '1'
 
   for script_command in script_commands:
     script, *arg_tokens = script_command.split(' ')

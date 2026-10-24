@@ -6,7 +6,8 @@ from send2trash import send2trash
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from mtlogger import logger
-from mtprompt import Prompt, to_dir
+from mtprompt import Prompt
+from mtvalidation import to_dir
 from tqdm import tqdm
 
 AUDIO_EXTS = [

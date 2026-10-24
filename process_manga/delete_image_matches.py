@@ -4,7 +4,8 @@ import sys
 
 from PIL import Image
 from mtlogger import logger
-from mtprompt import Prompt, to_int, to_path
+from mtprompt import Prompt
+from mtvalidation import to_int, to_path
 from send2trash import send2trash
 from tqdm import tqdm
 

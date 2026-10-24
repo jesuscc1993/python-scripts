@@ -13,7 +13,8 @@ from mtattr import Attr
 from mtfont import Font, SegoeFontName
 from mtlogger import logger
 from mtfs import read_metadata, write_metadata
-from mtprompt import Prompt, to_bool, to_dir, to_int
+from mtprompt import Prompt
+from mtvalidation import to_bool, to_dir, to_int
 
 from _constants import (
   DESKTOP_INI_FILENAME,

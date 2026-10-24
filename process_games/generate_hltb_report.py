@@ -4,7 +4,8 @@ import os
 from mtfs import read_json_file, write_json_file, write_text_file
 from mthltb import Hltb, HltbResult
 from mtlogger import logger
-from mtprompt import Prompt, to_list
+from mtprompt import Prompt
+from mtvalidation import to_list
 from tqdm import tqdm
 
 from _common import (

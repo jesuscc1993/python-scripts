@@ -10,7 +10,8 @@ from mtattr import Attr
 from mtfont import Font
 from mtfs import read_metadata, write_metadata
 from mtlogger import logger
-from mtprompt import Prompt, to_int
+from mtprompt import Prompt
+from mtvalidation import to_int
 from tqdm import tqdm
 from xml.etree import ElementTree
 

@@ -1,7 +1,8 @@
 import argparse
 
 from mtlogger import logger
-from mtprompt import Prompt, to_dir, to_list, to_path
+from mtprompt import Prompt
+from mtvalidation import to_dir, to_list, to_path
 
 from generate_images_with_background import generate_images_with_background
 

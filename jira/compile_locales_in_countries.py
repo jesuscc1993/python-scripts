@@ -2,7 +2,8 @@ import re
 import sys
 
 from mtlogger import logger
-from mtprompt import Prompt, to_list
+from mtprompt import Prompt
+from mtvalidation import to_list
 
 from _common import find_in_issue_ids
 

@@ -1,89 +1,25 @@
-import csv
-import io
 import mtsound
 import os
 import sys
 import threading
 
-from mtlogger import logger
 from mtenv import Env
-
-
-def to_bool(val: str):
-  val = val.strip().lower()
-
-  if val in ('1', 'y', 'yes', 't', 'true'):
-    return True
-  if val in ('0', 'n', 'no', 'f', 'false'):
-    return False
-
-  raise ValueError(f'Value "{val}" is not a valid boolean (y/n).')
-
-
-def to_int(val: str):
-  val = val.strip()
-
-  try:
-    return int(val)
-  except ValueError:
-    raise ValueError(f'Input "{val}" is not an integer.')
-
-
-def to_float(val: str):
-  val = val.strip()
-
-  try:
-    return float(val)
-  except ValueError:
-    raise ValueError(f'Input "{val}" is not a valid number.')
-
-
-def to_path(val: str):
-  val = os.path.abspath(val.strip(' "'))
-
-  if not os.path.exists(val):
-    raise ValueError(f'Path "{val}" does not exist.')
-
-  return val
-
-
-def to_dir(val: str):
-  val = os.path.abspath(val.strip(' "'))
-
-  if not os.path.isdir(val):
-    raise ValueError(f'Path "{val}" is not a directory.')
-
-  return val
-
-
-def to_file(val: str):
-  val = os.path.abspath(val.strip(' "'))
-
-  if not os.path.isfile(val):
-    raise ValueError(f'Path "{val}" is not a file.')
-
-  return val
-
-
-def to_list(val: str):
-  try:
-    values = next(
-      csv.reader(io.StringIO(val), skipinitialspace=True, strict=True)
-    )
-  except csv.Error:
-    raise ValueError(f'Input "{val}" is not a valid comma-separated list.')
-
-  parsed_values = []
-  for item in values:
-    item = item.strip()
-    if len(item) >= 2 and item[0] == item[-1] and item[0] in ('"', "'"):
-      item = item[1:-1]
-    parsed_values.append(item)
-
-  return parsed_values
+from mtlogger import logger
+from mtvalidation import (
+  to_bool,
+  to_dir,
+  to_file,
+  to_float,
+  to_int,
+  to_list,
+  to_path,
+)
 
 
 class Prompt:
+  PROMPT__MUTE = 'PROMPT__MUTE'
+  PROMPT__NO_ENTER_TO_EXIT = 'PROMPT__NO_ENTER_TO_EXIT'
+
   @staticmethod
   def str(prompt='', *, optional=False, default: str | None = None):
     prompt = prompt.strip(' "\'')
@@ -298,7 +234,7 @@ class Prompt:
 
   @staticmethod
   def enter_to_exit(timeout=False, sound=True):
-    if sound and Env.bool(Prompt.PROMPT__MUTE):
+    if sound and not Env.bool(Prompt.PROMPT__MUTE):
       mtsound.notify()
 
     if Env.bool(Prompt.PROMPT__NO_ENTER_TO_EXIT):

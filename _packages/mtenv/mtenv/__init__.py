@@ -1,6 +1,6 @@
 import os
 
-from mtprompt import to_bool
+from mtvalidation import to_bool
 
 
 class Env:

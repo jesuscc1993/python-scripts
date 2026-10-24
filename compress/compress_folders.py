@@ -1,7 +1,8 @@
 import sys
 
 from mtlogger import logger
-from mtprompt import Prompt, to_bool, to_dir, to_int, to_list
+from mtprompt import Prompt
+from mtvalidation import to_bool, to_dir, to_int, to_list
 
 from _common import compress_child_folders
 from _constants import FAILED, INCOMPLETE, SUCCEEDED, ZIP_TYPES

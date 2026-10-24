@@ -3,7 +3,8 @@ import subprocess
 import sys
 
 from mtlogger import logger
-from mtprompt import Prompt, to_dir
+from mtprompt import Prompt
+from mtvalidation import to_dir
 
 from _common import process_folder_images, select_parent_folder
 

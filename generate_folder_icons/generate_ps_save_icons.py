@@ -1,7 +1,8 @@
 import sys
 
 from mtlogger import logger
-from mtprompt import Prompt, to_dir, to_int
+from mtprompt import Prompt
+from mtvalidation import to_dir, to_int
 
 from _common import process_parent_folder
 

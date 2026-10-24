@@ -3,7 +3,8 @@ import sys
 
 from send2trash import send2trash
 from mtlogger import logger
-from mtprompt import Prompt, to_path
+from mtprompt import Prompt
+from mtvalidation import to_path
 
 from _constants import SUBTITLE_EXTS, VIDEO_EXTS
 

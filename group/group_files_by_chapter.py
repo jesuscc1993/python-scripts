@@ -8,7 +8,8 @@ from mtlogger import logger
 from tqdm import tqdm
 
 from _common import FILE_BLACKLIST
-from mtprompt import Prompt, to_dir
+from mtprompt import Prompt
+from mtvalidation import to_dir
 
 NUMBER_REGEX = r'\.?\s*(\d+(?:\.\d+)?)'
 CHAPTER_REGEX = r'Ch(?:ap(?:ter)?)?|Ep(?:isode)?|Ep(?:ilogue)?|Sp(?:ecial)?'

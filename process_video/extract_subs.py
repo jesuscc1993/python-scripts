@@ -4,7 +4,8 @@ import subprocess
 import sys
 
 from mtlogger import logger
-from mtprompt import Prompt, to_path
+from mtprompt import Prompt
+from mtvalidation import to_path
 
 from _common import post_process_subs_file
 from _constants import SUBTITLE_EXTS_BY_CODEC, VIDEO_EXTS

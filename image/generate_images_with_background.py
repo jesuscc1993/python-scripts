@@ -6,7 +6,8 @@ import subprocess
 
 from PIL import Image
 from mtlogger import logger
-from mtprompt import Prompt, to_dir, to_list, to_path
+from mtprompt import Prompt
+from mtvalidation import to_dir, to_list, to_path
 
 from _common import (
   apply_tint,

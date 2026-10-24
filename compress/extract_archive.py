@@ -1,7 +1,8 @@
 import sys
 
 from mtlogger import logger
-from mtprompt import Prompt, to_bool, to_file
+from mtprompt import Prompt
+from mtvalidation import to_bool, to_file
 
 from _common import extract_archive
 from _constants import FAILED, INCOMPLETE, SUCCEEDED

@@ -5,7 +5,8 @@ import subprocess
 import sys
 
 from mtlogger import logger
-from mtprompt import Prompt, to_path
+from mtprompt import Prompt
+from mtvalidation import to_path
 from mutagen.asf import ASF
 from mutagen.mp4 import MP4
 from tqdm import tqdm
