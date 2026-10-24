@@ -297,10 +297,10 @@ class Prompt:
 
   @staticmethod
   def enter_to_exit(timeout=False, sound=True):
-    if sound:
+    if sound and not os.getenv('PROMPT__MUTE'):
       mtsound.notify()
 
-    if os.getenv('NO_ENTER_TO_EXIT'):
+    if os.getenv('PROMPT__NO_ENTER_TO_EXIT'):
       return
 
     if timeout is True:
