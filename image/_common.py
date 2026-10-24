@@ -1,6 +1,6 @@
 import os
 
-from PIL import Image, ImageColor
+from PIL import Image, ImageChops, ImageColor
 
 from _constants import IMAGE_EXTENSIONS
 
@@ -50,10 +50,11 @@ def apply_tint(
   img: Image.Image,
   tint: str,
 ):
-  r, g, b, _ = ImageColor.getcolor(tint, 'RGBA')
-  tint_layer = Image.new('RGBA', img.size, (r, g, b, 255))
-  tint_layer.putalpha(img.getchannel('A'))
-  return tint_layer
+  img = img.convert('RGBA')
+  tint_rgb = Image.new('RGB', img.size, tint)
+  tinted_rgb = ImageChops.multiply(img.convert('RGB'), tint_rgb)
+  tinted_rgb.putalpha(img.getchannel('A'))
+  return tinted_rgb
 
 
 def tint_to_hex(

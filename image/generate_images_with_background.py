@@ -7,7 +7,7 @@ import subprocess
 from PIL import Image
 from mtlogger import logger
 from mtprompt import Prompt
-from mtvalidation import to_dir, to_list, to_path
+from mtvalidation import to_dir, to_int, to_list, to_path
 
 from _common import (
   apply_tint,
@@ -25,9 +25,10 @@ def main():
   has_args = any(value is not None for value in vars(args).values())
 
   if has_args:
-    foreground_folder = to_dir(args.foreground)
-    output_folder = to_dir(args.output)
-    background_path = to_path(args.background)
+    foreground_folder = to_dir(args.foreground) if args.foreground else None
+    output_folder = to_dir(args.output) if args.output else None
+    background_path = to_path(args.background) if args.background else None
+    drop_shadow = to_int(args.drop_shadow) if args.drop_shadow else None
     tints = to_list(args.tint) if args.tint else None
     requested_size = int(args.size) if args.size else None
     foreground_scale = (
@@ -44,6 +45,7 @@ def main():
     background_path = Prompt.path(
       'Enter the path to the background image or a folder of background images'
     )
+    drop_shadow = Prompt.int('Foreground drop shadow amount', default=0)
     tints = Prompt.list(
       'Enter a comma-separated list of tint colors, to apply to the background(s)',
       optional=True,
@@ -58,6 +60,7 @@ def main():
     foreground_folder,
     output_folder,
     background_path,
+    drop_shadow,
     tints,
     requested_size,
     foreground_scale,
@@ -67,13 +70,14 @@ def main():
 
 def parse_args():
   parser = argparse.ArgumentParser()
-  parser.add_argument('-f', '--foreground')
+  parser.add_argument('-fg', '--foreground')
   parser.add_argument('-o', '--output')
-  parser.add_argument('-b', '--background')
+  parser.add_argument('-bg', '--background')
+  parser.add_argument('-ds', '--drop-shadow')
   parser.add_argument('-t', '--tint')
   parser.add_argument('-s', '--size', type=int)
-  parser.add_argument('-fs', '--foreground-scale', type=float)
-  parser.add_argument('-bs', '--background-scale', type=float)
+  parser.add_argument('-fgs', '--foreground-scale', type=float)
+  parser.add_argument('-bgs', '--background-scale', type=float)
   return parser.parse_args()
 
 
@@ -81,19 +85,24 @@ def generate_images_with_background(
   foreground_folder: str,
   output_folder: str,
   background_path: str,
+  drop_shadow: bool = False,
   tints: list | None = None,
   requested_size: int | None = None,
   foreground_scale: float = 1.0,
   background_scale: float = 1.0,
 ):
   background_paths = get_background_paths(background_path)
-  foreground_names = [
-    name for name in os.listdir(foreground_folder) if is_image_file(name)
-  ]
 
   if not background_paths:
     logger.error(f'No background images found at "{background_path}".')
     return
+
+  foreground_names = [
+    os.path.relpath(os.path.join(root, name), foreground_folder)
+    for root, _, names in os.walk(foreground_folder)
+    for name in names
+    if is_image_file(name)
+  ]
 
   if not foreground_names:
     logger.error(f'No images found in "{foreground_folder}".')
@@ -135,6 +144,21 @@ def generate_images_with_background(
           foreground_path, tmp_dir, foreground_size
         ).convert('RGBA')
 
+        if drop_shadow:
+          width, height = foreground_img.size
+          expanded = Image.new(
+            'RGBA',
+            (width + drop_shadow * 2, height + drop_shadow * 2),
+            (0, 0, 0, 0),
+          )
+          expanded.alpha_composite(foreground_img, (drop_shadow, drop_shadow))
+
+          shadow = Image.new('RGBA', expanded.size, (0, 0, 0, 0))
+          shadow.putalpha(expanded.getchannel('A'))
+          offset_shadow = Image.new('RGBA', expanded.size, (0, 0, 0, 0))
+          offset_shadow.paste(shadow, (0, drop_shadow))
+          foreground_img = Image.alpha_composite(offset_shadow, expanded)
+
         for tint in tints or [None]:
           result = compose_image_with_background(
             foreground_img, background_img, canvas_size, tint
@@ -146,10 +170,10 @@ def generate_images_with_background(
           )
           os.makedirs(tint_output_folder, exist_ok=True)
 
-          image_base_name, _ = os.path.splitext(image_name)
           output_path = os.path.join(
-            tint_output_folder, f'{image_base_name}.webp'
+            tint_output_folder, os.path.splitext(image_name)[0] + '.webp'
           )
+          os.makedirs(os.path.dirname(output_path), exist_ok=True)
           result.save(
             output_path, format='WEBP', lossless=True, alpha_quality=100
           )
