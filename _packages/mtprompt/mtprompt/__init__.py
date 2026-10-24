@@ -6,14 +6,15 @@ import sys
 import threading
 
 from mtlogger import logger
+from mtenv import Env
 
 
 def to_bool(val: str):
   val = val.strip().lower()
 
-  if val in ('y', 'yes', 'true'):
+  if val in ('1', 'y', 'yes', 't', 'true'):
     return True
-  if val in ('n', 'no', 'false'):
+  if val in ('0', 'n', 'no', 'f', 'false'):
     return False
 
   raise ValueError(f'Value "{val}" is not a valid boolean (y/n).')
@@ -297,10 +298,10 @@ class Prompt:
 
   @staticmethod
   def enter_to_exit(timeout=False, sound=True):
-    if sound and not os.getenv('PROMPT__MUTE'):
+    if sound and Env.bool(Prompt.PROMPT__MUTE):
       mtsound.notify()
 
-    if os.getenv('PROMPT__NO_ENTER_TO_EXIT'):
+    if Env.bool(Prompt.PROMPT__NO_ENTER_TO_EXIT):
       return
 
     if timeout is True:
