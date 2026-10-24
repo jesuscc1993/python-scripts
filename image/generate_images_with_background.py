@@ -165,17 +165,17 @@ def generate_images_with_background(
           )
           tint_output_folder = (
             os.path.join(background_output_folder, tint_to_hex(tint))
-            if tint
+            if len(tints or []) > 1
             else background_output_folder
           )
           os.makedirs(tint_output_folder, exist_ok=True)
 
           output_path = os.path.join(
-            tint_output_folder, os.path.splitext(image_name)[0] + '.webp'
+            tint_output_folder, os.path.splitext(image_name)[0] + '.png'
           )
           os.makedirs(os.path.dirname(output_path), exist_ok=True)
           result.save(
-            output_path, format='WEBP', lossless=True, alpha_quality=100
+            output_path, format='PNG', lossless=True, alpha_quality=100
           )
           logger.success(f'Saved "{output_path}".')
   finally:
