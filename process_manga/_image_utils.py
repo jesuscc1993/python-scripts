@@ -10,6 +10,7 @@ from _settings import (
   OUTPUT_FORMAT,
   OUTPUT_EXTENSION,
   OUTPUT_QUALITY,
+  WEBP_METHOD,
 )
 
 JPEG_EXTENSION = '.jpeg'
@@ -93,7 +94,10 @@ def save_image_to_path(
     output_img_path = (
       f'{os.path.splitext(original_img_path)[0]}.{OUTPUT_EXTENSION}'
     )
-    img.save(output_img_path, OUTPUT_FORMAT, quality=OUTPUT_QUALITY)
+    save_options = {'quality': OUTPUT_QUALITY}
+    if OUTPUT_FORMAT.upper() == 'WEBP':
+      save_options['method'] = WEBP_METHOD
+    img.save(output_img_path, OUTPUT_FORMAT, **save_options)
     if not keep and output_img_path != original_img_path:
       os.remove(original_img_path)
 
