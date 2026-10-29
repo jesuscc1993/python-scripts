@@ -6,9 +6,15 @@ from mtprompt import Prompt
 from _common import delete_children_for_dir, delete_children_for_dirs
 
 CRASH_DUMP_DIRS = [
-  os.path.expandvars(r'%SystemRoot%\Minidump'),
-  os.path.expandvars(r'%SystemRoot%'),
+  os.path.expandvars(r'%AppData%\Code\Crashpad\attachments'),
+  os.path.expandvars(r'%AppData%\Code\Crashpad\reports'),
   os.path.expandvars(r'%LocalAppData%\CrashDumps'),
+  os.path.expandvars(r'%ProgramData%\Microsoft\Windows\WER'),
+  os.path.expandvars(r'%ProgramData%\Microsoft\Windows\WER\ReportArchive'),
+  os.path.expandvars(r'%ProgramData%\Microsoft\Windows\WER\ReportQueue'),
+  os.path.expandvars(r'%SystemRoot%'),
+  os.path.expandvars(r'%SystemRoot%\LiveKernelReports'),
+  os.path.expandvars(r'%SystemRoot%\Minidump'),
 ]
 CRASH_DUMP_FILE_PATTERNS = ['*.dmp', '*.mdmp']
 

@@ -61,7 +61,12 @@ def delete_children_for_dir(dir_pattern, file_patterns=None):
         logger.debug(f'Deleted "{item_path}"')
 
       except Exception as ex:
-        logger.error(f'Could not delete "{item_path}": {ex}')
+        message = f'Could not delete "{item_path}":\n  {ex}'
+        if getattr(ex, 'winerror', None) == 32:
+          message = message.replace('by another process: ', '\n    ')
+          logger.warn(message)
+        else:
+          logger.error(message)
         failed = True
         continue
 
