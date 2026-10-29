@@ -57,7 +57,15 @@ def find_stale_subtitle_files(
 
     video_stems = video_stems_by_dir.get(video_dir, set())
     subtitle_stem = os.path.splitext(os.path.basename(file_path))[0].casefold()
-    if subtitle_stem not in video_stems:
+    has_matching_video = any(
+      subtitle_stem == video_stem
+      or (
+        subtitle_stem.startswith(video_stem)
+        and not subtitle_stem[len(video_stem)].isalnum()
+      )
+      for video_stem in video_stems
+    )
+    if not has_matching_video:
       stale_files.append(file_path)
 
   return stale_files

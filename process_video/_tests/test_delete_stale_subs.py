@@ -39,6 +39,26 @@ class TestFindStaleSubtitleFiles(unittest.TestCase):
 
     self.assertEqual(stale_files, [])
 
+  def test_keeps_subtitles_with_video_name_prefix_and_separator(self):
+    root = os.path.join('foo', 'bar')
+    walk_results = [
+      (
+        root,
+        [],
+        [
+          'foo.mkv',
+          'foo - Captions.ass',
+          'foo_2.ass',
+          'foobar.ass',
+        ],
+      )
+    ]
+
+    with patch('delete_stale_subs.os.walk', return_value=walk_results):
+      stale_files = find_stale_subtitle_files(root)
+
+    self.assertEqual(stale_files, [os.path.join(root, 'foobar.ass')])
+
 
 if __name__ == '__main__':
   unittest.main()
