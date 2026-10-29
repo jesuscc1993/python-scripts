@@ -86,6 +86,8 @@ def process_chapter(
   img_spot: int,
 ):
   ref_hashes = list(ref_hashes)
+  image_hashes = {}
+  unreadable_images = set()
   deleted = 0
 
   while ref_hashes:
@@ -96,15 +98,24 @@ def process_chapter(
     match_found = False
 
     for target_img in target_images:
-      try:
-        with Image.open(target_img) as image:
-          img_hash = imagehash.phash(image)
-
-      except (OSError, ValueError) as ex:
-        tqdm.write(
-          logger.format_warn(f'Skipping unreadable image "{target_img}": {ex}')
-        )
+      if target_img in unreadable_images:
         continue
+
+      if target_img not in image_hashes:
+        try:
+          with Image.open(target_img) as image:
+            image_hashes[target_img] = imagehash.phash(image)
+
+        except (OSError, ValueError) as ex:
+          unreadable_images.add(target_img)
+          tqdm.write(
+            logger.format_warn(
+              f'Skipping unreadable image "{target_img}": {ex}'
+            )
+          )
+          continue
+
+      img_hash = image_hashes[target_img]
 
       match = next(
         (
@@ -121,6 +132,7 @@ def process_chapter(
       send2trash(target_img)
       tqdm.write(logger.format_info(f'Deleted "{target_img}"'))
       ref_hashes.remove(match)
+      image_hashes.pop(target_img, None)
       deleted += 1
       match_found = True
       break
