@@ -1,3 +1,4 @@
+import numpy
 import os
 import sys
 
@@ -51,10 +52,10 @@ def process_image(
 
 
 def is_blank_strip(
-  image_strip: Image.Image,
+  image_strip: numpy.ndarray,
 ):
-  gray_strip = image_strip.convert('L')
-  min_pixel, max_pixel = gray_strip.getextrema()
+  min_pixel = image_strip.min()
+  max_pixel = image_strip.max()
   return min_pixel >= WHITE_THRESHOLD or max_pixel <= BLACK_THRESHOLD
 
 
@@ -71,14 +72,21 @@ def crop_blanks(
   img: Image.Image,
 ):
   width, height = img.size
+  gray_pixels = numpy.asarray(img.convert('L'))
   blank_start = None
+  content_start = 0
+  has_blank_strip = False
   result_parts = []
 
   for y in range(0, height, HEIGHT_THRESHOLD):
-    strip = img.crop((0, y, width, min(y + HEIGHT_THRESHOLD, height)))
+    strip_end = min(y + HEIGHT_THRESHOLD, height)
+    strip = gray_pixels[y:strip_end, :]
 
     if is_blank_strip(strip):
+      has_blank_strip = True
       if blank_start is None:
+        if content_start < y:
+          result_parts.append(img.crop((0, content_start, width, y)))
         blank_start = y
     else:
       if blank_start is not None:
@@ -87,11 +95,20 @@ def crop_blanks(
         blank_strip = img.crop((0, blank_start, width, blank_end))
         result_parts.append(process_strip(blank_strip, blank_height))
         blank_start = None
-      result_parts.append(strip)
+        content_start = y
 
   if blank_start is not None:
     blank_strip = img.crop((0, blank_start, width, height))
     result_parts.append(process_strip(blank_strip, height - blank_start))
+  elif has_blank_strip:
+    content_strip = img.crop((0, content_start, width, height))
+    result_parts.append(content_strip)
+  else:
+    if img.mode != 'RGB':
+      img = img.convert('RGB')
+    if img.info:
+      img.info.clear()
+    return img
 
   final_height = sum(part.height for part in result_parts)
   stitched_image = Image.new('RGB', (width, final_height))
