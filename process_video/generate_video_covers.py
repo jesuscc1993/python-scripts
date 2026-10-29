@@ -101,6 +101,10 @@ def process_file(
   out_path = os.path.join(tmp_dir, stem + ext)
 
   try:
+    if has_existing_cover(file_path, ext, probe):
+      tqdm.write(f'  Skipping existing cover: {name}')
+      return
+
     capture_frame(file_path, seek_secs, frame_path)
     img = Image.open(frame_path).convert('RGB')
     img = crop_black_borders(img)
@@ -140,6 +144,34 @@ def embed_asf_cover(
   tags = ASF(file_path)
   tags['WM/Picture'] = [ASFByteArrayAttribute(data)]
   tags.save()
+
+
+def has_existing_cover(
+  file_path: str,
+  ext: str,
+  probe: dict,
+) -> bool:
+  if ext in MP4_EXTS:
+    media = MP4(file_path)
+    return media.tags is not None and 'covr' in media.tags
+
+  if ext == WMV_EXT:
+    return 'WM/Picture' in ASF(file_path)
+
+  for stream in probe.get('streams', []):
+    stream_type = stream.get('codec_type')
+    filename = stream.get('tags', {}).get('filename', '').casefold()
+    is_attached_picture = stream_type == 'video' and stream.get(
+      'disposition', {}
+    ).get('attached_pic')
+    is_cover_attachment = (
+      stream_type == 'attachment' and filename == 'cover.jpg'
+    )
+    is_cover_video = stream_type == 'video' and filename == 'cover.jpg'
+    if is_attached_picture or is_cover_attachment or is_cover_video:
+      return True
+
+  return False
 
 
 def embed_cover_ffmpeg(

@@ -199,6 +199,41 @@ class TestGenerateVideoCovers(unittest.TestCase):
 
     process_file.assert_called_once_with(self.video_path, tmp_dir)
 
+  def test_skips_existing_mkv_cover_before_capturing_frame(self):
+    probe = {
+      'format': {'duration': '4.0'},
+      'streams': [
+        {
+          'codec_type': 'attachment',
+          'tags': {'filename': 'cover.jpg'},
+        }
+      ],
+    }
+
+    with (
+      patch.object(generate_video_covers, 'get_video_info', return_value=probe),
+      patch.object(generate_video_covers, 'capture_frame') as capture_frame,
+      patch.object(generate_video_covers.tqdm, 'write'),
+    ):
+      generate_video_covers.process_file(self.video_path, self.dir_path)
+
+    capture_frame.assert_not_called()
+
+  def test_detects_mp4_and_asf_cover_tags(self):
+    mp4_media = SimpleNamespace(tags={'covr': []})
+    asf_media = {'WM/Picture': []}
+
+    with (
+      patch.object(generate_video_covers, 'MP4', return_value=mp4_media),
+      patch.object(generate_video_covers, 'ASF', return_value=asf_media),
+    ):
+      self.assertTrue(
+        generate_video_covers.has_existing_cover('foo.mp4', '.mp4', {})
+      )
+      self.assertTrue(
+        generate_video_covers.has_existing_cover('foo.wmv', '.wmv', {})
+      )
+
   def test_embeds_cover_in_mp4_tag(self):
     tags = MagicMock()
     cover_data = b'cover image'
