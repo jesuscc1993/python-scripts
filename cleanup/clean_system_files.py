@@ -16,7 +16,7 @@ CRASH_DUMP_DIRS = [
   os.path.expandvars(r'%SystemRoot%\LiveKernelReports'),
   os.path.expandvars(r'%SystemRoot%\Minidump'),
 ]
-CRASH_DUMP_FILE_PATTERNS = ['*.dmp', '*.mdmp']
+CRASH_DUMP_FILE_PATTERNS = ['*.dmp', '*.dxdmp', '*.hdmp', '*.mdmp']
 
 
 def main():
