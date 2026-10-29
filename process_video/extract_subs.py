@@ -1,5 +1,6 @@
 import json
 import os
+import re
 import subprocess
 import sys
 
@@ -41,24 +42,14 @@ def process_file(
   if ext.lower() not in VIDEO_EXTS:
     return
 
-  stream_idx, codec_name = find_subtitle_stream(file_path, LANGUAGE.lower())
-  if stream_idx is None:
+  subtitle_streams = find_subtitle_streams(file_path, LANGUAGE.lower())
+  if not subtitle_streams:
     logger.warn(f'Skipping "{file_name}". No {LANGUAGE} subtitles found.\n')
     return
-
-  subtitle_ext = SUBTITLE_EXTS_BY_CODEC[codec_name]
-  subtitles_file_name = name + subtitle_ext
 
   dir_path = os.path.dirname(file_path)
   in_place_output_path = dir_path
   in_folder_output_path = os.path.join(dir_path, SUBTITLES_PATH)
-
-  if any(
-    os.path.exists(os.path.join(path, subtitles_file_name))
-    for path in [in_place_output_path, in_folder_output_path]
-  ):
-    logger.trace(f'Skipping "{file_name}". Subtitles file already exists.\n')
-    return
 
   if SETTINGS['extract_to_folder']:
     output_path = in_folder_output_path
@@ -66,19 +57,54 @@ def process_file(
   else:
     output_path = in_place_output_path
 
-  dest_file_path = os.path.join(output_path, subtitles_file_name)
-  extract_subtitles(
-    file_path, dest_file_path, file_name, stream_idx, subtitle_ext
-  )
+  track_titles = [
+    sanitize_track_title(title or '') if len(subtitle_streams) > 1 else ''
+    for _, _, title in subtitle_streams
+  ]
+  title_counts = {
+    title: track_titles.count(title) for title in set(track_titles) if title
+  }
+
+  for track_number, ((stream_idx, codec_name, _), track_title) in enumerate(
+    zip(subtitle_streams, track_titles), start=1
+  ):
+    subtitle_ext = SUBTITLE_EXTS_BY_CODEC[codec_name]
+    if track_title:
+      duplicate_suffix = (
+        f'_{track_number}' if title_counts[track_title] > 1 else ''
+      )
+      track_suffix = f' - {track_title}{duplicate_suffix}'
+    else:
+      track_suffix = '' if track_number == 1 else f'_{track_number}'
+    subtitles_file_name = f'{name}{track_suffix}{subtitle_ext}'
+    if any(
+      os.path.exists(os.path.join(path, subtitles_file_name))
+      for path in [in_place_output_path, in_folder_output_path]
+    ):
+      logger.trace(
+        f'Skipping "{subtitles_file_name}". Subtitles file already exists.\n'
+      )
+      continue
+
+    dest_file_path = os.path.join(output_path, subtitles_file_name)
+    extract_subtitles(
+      file_path, dest_file_path, file_name, stream_idx, subtitle_ext
+    )
 
   if os.path.isdir(output_path) and not os.listdir(output_path):
     os.rmdir(output_path)
 
 
+def sanitize_track_title(title: str) -> str:
+  title = re.sub(r'[<>:"/\\|?*\x00-\x1f]+', ' ', title)
+  return re.sub(r'\s+', ' ', title).strip(' .')
+
+
 def process_directory(
   dir_path: str,
 ):
-  for root, _, file_names in os.walk(dir_path):
+  for root, dirs, file_names in os.walk(dir_path):
+    dirs[:] = [dir_name for dir_name in dirs if dir_name.casefold() != '.tmp']
     for file_name in file_names:
       process_file(os.path.join(root, file_name))
 
@@ -125,9 +151,9 @@ def extract_subtitles(
     logger.warn(no_subs_found_message)
 
 
-def find_subtitle_stream(
+def find_subtitle_streams(
   src_file_path: str, target_language: str
-) -> tuple[str | None, str | None]:
+) -> list[tuple[int, str, str | None]]:
   try:
     result = subprocess.run(
       [
@@ -149,6 +175,7 @@ def find_subtitle_stream(
       errors='replace',
       text=True,
     )
+    matching_streams = []
     for stream in json.loads(result.stdout).get('streams', []):
       if (
         stream.get('codec_type') == 'subtitle'
@@ -157,11 +184,14 @@ def find_subtitle_stream(
         tags = stream.get('tags', {})
         language = tags.get('language', '').lower()
         if language.startswith(target_language):
-          return stream['index'], stream.get('codec_name')
+          matching_streams.append(
+            (stream['index'], stream['codec_name'], tags.get('title'))
+          )
+    return matching_streams
 
   except Exception:
     logger.failure(f'Failed to find subtitle stream for "{src_file_path}".')
-  return None, None
+  return []
 
 
 if __name__ == '__main__':
