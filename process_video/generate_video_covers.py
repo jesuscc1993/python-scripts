@@ -90,6 +90,10 @@ def process_file(
 
   duration_secs = float(probe['format'].get('duration', 0))
   file_size = int(probe['format'].get('size', os.path.getsize(file_path)))
+  attachment_count = sum(
+    stream.get('codec_type') == 'attachment'
+    for stream in probe.get('streams', [])
+  )
 
   seek_secs = min(SCREENSHOT_SECS, duration_secs * 0.25)
 
@@ -110,7 +114,7 @@ def process_file(
     elif ext == WMV_EXT:
       embed_asf_cover(file_path, frame_path)
     else:
-      embed_cover_ffmpeg(file_path, frame_path, out_path, ext)
+      embed_cover_ffmpeg(file_path, frame_path, out_path, ext, attachment_count)
       os.replace(out_path, file_path)
 
     tqdm.write(f'  Embedded cover into: {name}')
@@ -143,6 +147,7 @@ def embed_cover_ffmpeg(
   cover_path: str,
   output_path: str,
   ext: str,
+  attachment_count: int,
 ):
   if ext == MKV_EXT:
     cmd = [
@@ -152,11 +157,13 @@ def embed_cover_ffmpeg(
       'error',
       '-i',
       file_path,
+      '-map',
+      '0',
       '-attach',
       cover_path,
-      '-metadata:s:t:0',
+      f'-metadata:s:t:{attachment_count}',
       'mimetype=image/jpeg',
-      '-metadata:s:t:0',
+      f'-metadata:s:t:{attachment_count}',
       'filename=cover.jpg',
       '-c',
       'copy',
@@ -204,6 +211,7 @@ def get_video_info(
         '-print_format',
         'json',
         '-show_format',
+        '-show_streams',
         file_path,
       ],
       check=False,

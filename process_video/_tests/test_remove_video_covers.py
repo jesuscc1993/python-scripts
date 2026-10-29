@@ -36,14 +36,17 @@ class TestRemoveVideoCovers(unittest.TestCase):
       {'index': 1, 'codec_type': 'audio'},
       {
         'index': 2,
-        'codec_type': 'video',
-        'disposition': {'attached_pic': 1},
-        'tags': {'filename': 'cover.jpg', 'mimetype': 'image/jpeg'},
+        'codec_type': 'subtitle',
       },
       {
         'index': 3,
         'codec_type': 'attachment',
         'tags': {'filename': 'font.ttf'},
+      },
+      {
+        'index': 4,
+        'codec_type': 'attachment',
+        'tags': {'filename': 'cover.jpg', 'mimetype': 'image/jpeg'},
       },
     ]
 
@@ -92,7 +95,7 @@ class TestRemoveVideoCovers(unittest.TestCase):
           '-map',
           '0',
           '-map',
-          '-0:2',
+          '-0:4',
           '-c',
           'copy',
           os.path.join(self.tmp_dir, 'foo.mkv'),

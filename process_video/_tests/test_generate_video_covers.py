@@ -47,7 +47,13 @@ class TestGenerateVideoCovers(unittest.TestCase):
             'format': {
               'duration': '4.0',
               'size': str(os.path.getsize(command[-1])),
-            }
+            },
+            'streams': [
+              {'codec_type': 'video'},
+              {'codec_type': 'subtitle'},
+              {'codec_type': 'attachment'},
+              {'codec_type': 'attachment'},
+            ],
           }
         ),
         stderr='',
@@ -88,6 +94,7 @@ class TestGenerateVideoCovers(unittest.TestCase):
           '-print_format',
           'json',
           '-show_format',
+          '-show_streams',
           video_path,
         ],
         [
@@ -116,11 +123,13 @@ class TestGenerateVideoCovers(unittest.TestCase):
           'error',
           '-i',
           video_path,
+          '-map',
+          '0',
           '-attach',
           frame_path,
-          '-metadata:s:t:0',
+          '-metadata:s:t:2',
           'mimetype=image/jpeg',
-          '-metadata:s:t:0',
+          '-metadata:s:t:2',
           'filename=cover.jpg',
           '-c',
           'copy',
