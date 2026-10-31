@@ -8,6 +8,7 @@ from mtvalidation import to_path
 from send2trash import send2trash
 
 from _common import post_process_subs_file
+from _common_srt import has_srt_incompatible_data
 from _constants import SUBTITLE_EXTS, SRT_EXT
 
 
@@ -46,6 +47,13 @@ def process_file(
   if ext not in SUBTITLE_EXTS or ext == SRT_EXT:
     return
 
+  if has_srt_incompatible_data(file_path, ext) and not Prompt.bool(
+    f'Converting "{file_path}" to SRT will lose positioning or background data. Continue?',
+    default=False,
+  ):
+    logger.warn(f'Skipping "{file_path}" to prevent data loss.\n')
+    return
+
   output_file_path = os.path.splitext(file_path)[0] + SRT_EXT
   convert_to_srt(file_path, output_file_path)
 
@@ -56,7 +64,7 @@ def convert_to_srt(
 ) -> bool:
   if os.path.exists(output_file_path):
     logger.warn(
-      f'Skipping "{input_file_path}". Output already exists: "{output_file_path}".'
+      f'Skipping "{input_file_path}". Output already exists: "{output_file_path}".\n'
     )
     return False
 

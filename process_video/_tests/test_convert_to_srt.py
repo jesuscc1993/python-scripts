@@ -133,6 +133,86 @@ class TestConvertToSrt(unittest.TestCase):
     with open(input_path, encoding='utf-8') as input_file:
       self.assertEqual(input_file.read(), 'foo')
 
+  def test_skips_ass_when_positioning_is_not_confirmed(self):
+    input_path = os.path.join(self.dir_path, 'foo.ass')
+    with open(input_path, 'w', encoding='utf-8') as input_file:
+      input_file.write(
+        '[Events]\n'
+        'Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text\n'
+        r'Dialogue: 0,0:00:01.00,0:00:02.00,Default,,0,0,0,,{\pos(100,200)}Hello'
+      )
+
+    with (
+      patch('convert_to_srt.Prompt.bool', return_value=False) as prompt,
+      patch('convert_to_srt.convert_to_srt') as convert,
+    ):
+      process_file(input_path)
+
+    prompt.assert_called_once_with(
+      f'Converting "{input_path}" to SRT will lose positioning or background data. Continue?',
+      default=False,
+    )
+    convert.assert_not_called()
+
+  def test_does_not_prompt_for_font_only_ass(self):
+    input_path = os.path.join(self.dir_path, 'foo.ass')
+    output_path = os.path.join(self.dir_path, 'foo.srt')
+    with open(input_path, 'w', encoding='utf-8') as input_file:
+      input_file.write(
+        '[V4+ Styles]\n'
+        'Format: Name, Fontname, Fontsize, PrimaryColour, BackColour, BorderStyle, Alignment\n'
+        'Style: Default,Arial,20,&H00FFFFFF,&HFF000000,1,2\n'
+        '[Events]\n'
+        'Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text\n'
+        'Dialogue: 0,0:00:01.00,0:00:02.00,Default,,0,0,0,,Hello\n'
+      )
+
+    with (
+      patch('convert_to_srt.Prompt.bool') as prompt,
+      patch('convert_to_srt.convert_to_srt') as convert,
+    ):
+      process_file(input_path)
+
+    prompt.assert_not_called()
+    convert.assert_called_once_with(input_path, output_path)
+
+  def test_prompts_for_vtt_positioning(self):
+    input_path = os.path.join(self.dir_path, 'foo.vtt')
+    with open(input_path, 'w', encoding='utf-8') as input_file:
+      input_file.write(
+        'WEBVTT\n\n00:00:00.000 --> 00:00:01.000 position:10%\nHello\n'
+      )
+
+    with (
+      patch('convert_to_srt.Prompt.bool', return_value=False) as prompt,
+      patch('convert_to_srt.convert_to_srt') as convert,
+    ):
+      process_file(input_path)
+
+    prompt.assert_called_once()
+    convert.assert_not_called()
+
+  def test_prompts_for_ass_box_background(self):
+    input_path = os.path.join(self.dir_path, 'foo.ass')
+    with open(input_path, 'w', encoding='utf-8') as input_file:
+      input_file.write(
+        '[V4+ Styles]\n'
+        'Format: Name, Fontname, Fontsize, BackColour, BorderStyle, Alignment\n'
+        'Style: Box,Arial,20,&H00000000,3,2\n'
+        '[Events]\n'
+        'Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text\n'
+        'Dialogue: 0,0:00:01.00,0:00:02.00,Box,,0,0,0,,Hello\n'
+      )
+
+    with (
+      patch('convert_to_srt.Prompt.bool', return_value=False) as prompt,
+      patch('convert_to_srt.convert_to_srt') as convert,
+    ):
+      process_file(input_path)
+
+    prompt.assert_called_once()
+    convert.assert_not_called()
+
 
 if __name__ == '__main__':
   unittest.main()
