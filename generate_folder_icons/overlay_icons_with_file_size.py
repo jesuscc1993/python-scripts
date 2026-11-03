@@ -30,7 +30,6 @@ from _settings import HIDE_GENERATED_ICONS
 
 BLUE_COMPRESSED_NAMES = True
 DEBUG = False
-FORCE_RECALCULATE = False
 OVERLAY_SMALLER_THAN_GB = False
 USE_DECIMALS = True
 
@@ -61,17 +60,23 @@ def main():
     parent_path = to_dir(sys.argv[1])
     depth = to_int(sys.argv[2]) if len(sys.argv) > 2 else 1
     overwrite_existing = to_bool(sys.argv[3]) if len(sys.argv) > 3 else False
+    force_recalculate = to_bool(sys.argv[4]) if len(sys.argv) > 4 else False
   else:
     parent_path = Prompt.dir(
       'Enter the path to the directory containing the exes you want to process'
     )
     depth = Prompt.int('Enter the depth for processing subfolders', default=1)
     overwrite_existing = Prompt.bool('Overwrite existing icons?', default=False)
+    force_recalculate = (
+      Prompt.bool('Force size re-calculation?', default=False)
+      if overwrite_existing
+      else False
+    )
 
   parent_path = os.path.abspath(parent_path)
 
   if depth == 0:
-    process_dir(parent_path, overwrite_existing)
+    process_dir(parent_path, overwrite_existing, force_recalculate)
   else:
     parent_depth = parent_path.rstrip(os.sep).count(os.sep)
 
@@ -86,7 +91,7 @@ def main():
       for dir_name in dirs:
         child_path = os.path.join(root, dir_name)
         logger.log()
-        process_dir(child_path, overwrite_existing)
+        process_dir(child_path, overwrite_existing, force_recalculate)
 
   mtsound.notify()
   logger.success(
@@ -114,6 +119,7 @@ def has_exclusion_file(
 def process_dir(
   dir_path: str,
   overwrite_existing=False,
+  force_recalculate=False,
 ):
   try:
     ini_path = os.path.join(dir_path, DESKTOP_INI_FILENAME)
@@ -136,7 +142,7 @@ def process_dir(
     overwrite = overwrite_existing or dest_ico_name not in ico_path
 
     if (
-      not FORCE_RECALCULATE
+      not force_recalculate
       and not overwrite
       and os.path.exists(dest_ico_path)
       and os.path.exists(metadata_path)
@@ -185,7 +191,7 @@ def process_dir(
       logger.trace(f'  Skipping "{dir_path}". Could not load folder icon.')
       return
 
-    size_on_disk, _, is_compressed = get_dir_size(dir_path)
+    size_on_disk, _, is_compressed = get_dir_size(dir_path, force_recalculate)
     if (
       format_size(size_on_disk, use_decimals=False) == '<1 GB'
       and not OVERLAY_SMALLER_THAN_GB
@@ -286,13 +292,11 @@ def size_str_to_int(
   return int(size.replace(',', ''))
 
 
-def get_dir_size(
-  dir_path: str,
-):
+def get_dir_size(dir_path: str, force_recalculate=False):
   size = None
   size_on_disk = None
 
-  if not FORCE_RECALCULATE:
+  if not force_recalculate:
     metadata = read_metadata(dir_path)
     if metadata:
       size = metadata.get(METADATA_SIZE_KEY)
