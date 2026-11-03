@@ -9,6 +9,7 @@ INI_SHELL_SECTION = '.ShellClassInfo'
 
 METADATA_FILENAME = 'metadata.json'
 METADATA_SIZE_KEY = 'size'
+METADATA_SIZE_ON_DISK_KEY = 'size_on_disk'
 
 MAX_ICO_SIZE = 256
 DEFAULT_ICO_SIZES = [16, 48, 256]

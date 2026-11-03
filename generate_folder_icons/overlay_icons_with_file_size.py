@@ -23,10 +23,12 @@ from _constants import (
   MAX_ICO_SIZE,
   METADATA_FILENAME,
   METADATA_SIZE_KEY,
+  METADATA_SIZE_ON_DISK_KEY,
 )
 from _common import get_ini_icon, read_ini, set_folder_icon
 from _settings import HIDE_GENERATED_ICONS
 
+BLUE_COMPRESSED_NAMES = True
 DEBUG = False
 FORCE_RECALCULATE = False
 OVERLAY_SMALLER_THAN_GB = False
@@ -35,6 +37,8 @@ USE_DECIMALS = True
 FONT_PATH = Font.find_by_name(SegoeFontName.BOLD)
 ICO_BAK_FILENAME = 'icon.bak.ico'
 EXCLUSION_FILE = '.noscan'
+
+MINIMUM_COMPRESSION_FACTOR = 0.99
 
 SIZE_256 = 256
 VALUE_FONT_SIZE_256 = 40
@@ -48,6 +52,7 @@ SIZE_16 = 16
 
 BG_COLOR = (25, 25, 25, 255)
 VALUE_COLOR = (255, 255, 255, 255)
+COMPRESSED_VALUE_COLOR = (56, 192, 255, 255)
 UNITS_COLOR = (192, 192, 192, 255)
 
 
@@ -180,9 +185,9 @@ def process_dir(
       logger.trace(f'  Skipping "{dir_path}". Could not load folder icon.')
       return
 
-    total_size = get_dir_size(dir_path)
+    size_on_disk, _, is_compressed = get_dir_size(dir_path)
     if (
-      format_size(total_size, use_decimals=False) == '<1 GB'
+      format_size(size_on_disk, use_decimals=False) == '<1 GB'
       and not OVERLAY_SMALLER_THAN_GB
     ):
       if os.path.exists(bak_ico_path):
@@ -192,7 +197,7 @@ def process_dir(
       )
       return
 
-    formatted_size = format_size(total_size, use_decimals=USE_DECIMALS)
+    formatted_size = format_size(size_on_disk, use_decimals=USE_DECIMALS)
     size_parts = formatted_size.split() if formatted_size else []
     if not (size_parts and len(size_parts) == 2):
       logger.trace(
@@ -207,9 +212,18 @@ def process_dir(
     if os.path.exists(dest_ico_path):
       Attr.show(dest_ico_path)
 
+    fg_color = (
+      COMPRESSED_VALUE_COLOR
+      if BLUE_COMPRESSED_NAMES and is_compressed
+      else VALUE_COLOR
+    )
     ico_img = ico_img.convert('RGBA')
-    img_256 = overlay_file_size_256(size_parts[0], size_parts[1], ico_img)
-    img_48 = overlay_file_size_48(size_parts[0], size_parts[1], ico_img)
+    img_256 = overlay_file_size_256(
+      fg_color, size_parts[0], size_parts[1], ico_img
+    )
+    img_48 = overlay_file_size_48(
+      fg_color, size_parts[0], size_parts[1], ico_img
+    )
 
     with Image.open(bak_ico_path) as bak:
       if (SIZE_16, SIZE_16) in bak.info.get('sizes', set()):
@@ -247,6 +261,12 @@ def process_dir(
   Attr.add(ini_path, HIDDEN_SYSTEM_FILE_ATTRS)
 
 
+def get_file_size(
+  file_path: str,
+):
+  return os.path.getsize(file_path)
+
+
 def get_file_size_on_disk(
   file_path: str,
 ):
@@ -260,22 +280,37 @@ def get_file_size_on_disk(
   return (high.value << 32) + low_unsigned
 
 
+def size_str_to_int(
+  size: str,
+):
+  return int(size.replace(',', ''))
+
+
 def get_dir_size(
   dir_path: str,
 ):
-  total_size = None
+  size = None
+  size_on_disk = None
 
   if not FORCE_RECALCULATE:
     metadata = read_metadata(dir_path)
-    if metadata and METADATA_SIZE_KEY in metadata:
-      total_size = metadata[METADATA_SIZE_KEY]
-      if isinstance(total_size, str):
-        total_size = int(total_size.replace(',', ''))
-        metadata[METADATA_SIZE_KEY] = total_size
-        write_metadata(dir_path, metadata)
+    if metadata:
+      size = metadata.get(METADATA_SIZE_KEY)
+      size_on_disk = metadata.get(METADATA_SIZE_ON_DISK_KEY)
 
-  if total_size is None:
-    total_size = sum(
+      if isinstance(size, str):
+        size = size_str_to_int(size)
+      if isinstance(size_on_disk, str):
+        size_on_disk = size_str_to_int(size_on_disk)
+
+  if size is None or size_on_disk is None:
+    size = sum(
+      get_file_size(path)
+      for root, _, files in os.walk(dir_path)
+      for f in files
+      if os.path.exists(path := os.path.join(root, f))
+    )
+    size_on_disk = sum(
       get_file_size_on_disk(path)
       for root, _, files in os.walk(dir_path)
       for f in files
@@ -283,10 +318,12 @@ def get_dir_size(
     )
 
     metadata = read_metadata(dir_path) or {}
-    metadata[METADATA_SIZE_KEY] = total_size
+    metadata[METADATA_SIZE_KEY] = size
+    metadata[METADATA_SIZE_ON_DISK_KEY] = size_on_disk
     write_metadata(dir_path, metadata)
 
-  return total_size
+  is_compressed = size_on_disk <= size * MINIMUM_COMPRESSION_FACTOR
+  return size_on_disk, size, is_compressed
 
 
 def crop_to_content(
@@ -297,6 +334,7 @@ def crop_to_content(
 
 
 def overlay_file_size_256(
+  fg_color: tuple,
   value_text: str,
   unit_text: str,
   ico_img: Image.Image,
@@ -336,17 +374,23 @@ def overlay_file_size_256(
     (box_x + padding - bbox_value[0], box_y + padding - bbox_value[1]),
     value_text,
     font=value_font,
-    fill=VALUE_COLOR,
+    fill=fg_color,
   )
 
   unit_x = box_x + padding + value_w + gap - bbox_unit[0]
   unit_y = box_y + padding + (value_h - unit_h) // 2 - bbox_unit[1]
-  draw.text((unit_x, unit_y), unit_text, font=unit_font, fill=UNITS_COLOR)
+  draw.text(
+    (unit_x, unit_y),
+    unit_text,
+    font=unit_font,
+    fill=tuple(round(channel * 0.75) for channel in fg_color[:3]) + (255,),
+  )
 
   return img
 
 
 def overlay_file_size_48(
+  fg_color: tuple,
   value_text: str,
   unit_text: str,
   ico_img: Image.Image,
@@ -397,12 +441,17 @@ def overlay_file_size_48(
     (text_start_x - bbox_value[0], box_y + padding - bbox_value[1]),
     value_text,
     font=value_font,
-    fill=VALUE_COLOR,
+    fill=fg_color,
   )
 
   unit_x = text_start_x + value_w + gap - bbox_unit[0]
   unit_y = box_y + padding + (value_h - unit_h) // 2 - bbox_unit[1]
-  draw.text((unit_x, unit_y), unit_text, font=unit_font, fill=UNITS_COLOR)
+  draw.text(
+    (unit_x, unit_y),
+    unit_text,
+    font=unit_font,
+    fill=tuple(round(channel * 0.75) for channel in fg_color[:3]) + (255,),
+  )
 
   return img
 
