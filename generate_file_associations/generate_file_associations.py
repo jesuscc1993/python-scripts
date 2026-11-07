@@ -40,67 +40,68 @@ def main():
 
     for type_mapping in mapping.get('types'):
       if isinstance(type_mapping, str):
-        ext = type_mapping
+        exts = [type_mapping]
         class_name = type_mapping
       else:
-        ext = type_mapping.get('ext')
+        exts = type_mapping.get('exts') or [type_mapping.get('ext')]
         class_name = type_mapping.get('class')
 
-      ext_icon_path = get_icon_path(icons_path, ext.upper()) or get_icon_path(
-        icons_path, class_name
-      )
-      fallback_icon_path = get_icon_path(icons_path, fallback_icon)
-      file_type = (
-        get_registry_value(winreg.HKEY_CLASSES_ROOT, f'.{ext}', '')
-        or f'{class_name.lower()}file'
-      )
-
-      delete_registry_entry(
-        winreg.HKEY_CURRENT_USER, f'{FILE_EXTS}\\.{ext}\\UserChoice'
-      )
-      add_registry_entry(winreg.HKEY_CLASSES_ROOT, f'.{ext}', '', file_type)
-
-      if type_name:
-        add_registry_entry(
-          winreg.HKEY_CLASSES_ROOT, file_type, 'FriendlyTypeName', type_name
+      for ext in exts:
+        ext_icon_path = get_icon_path(icons_path, ext.upper()) or get_icon_path(
+          icons_path, class_name
+        )
+        fallback_icon_path = get_icon_path(icons_path, fallback_icon)
+        file_type = (
+          get_registry_value(winreg.HKEY_CLASSES_ROOT, f'.{ext}', '')
+          or f'{class_name.lower()}file'
         )
 
-      type_icon = ext_icon_path or fallback_icon_path
-      if type_icon and os.path.exists(type_icon):
-        add_registry_entry(
-          winreg.HKEY_CLASSES_ROOT,
-          f'{file_type}\\DefaultIcon',
-          '',
-          f'"{type_icon}"',
+        delete_registry_entry(
+          winreg.HKEY_CURRENT_USER, f'{FILE_EXTS}\\.{ext}\\UserChoice'
         )
+        add_registry_entry(winreg.HKEY_CLASSES_ROOT, f'.{ext}', '', file_type)
 
-      if shell:
-        for item in shell:
-          command = item.get('command')
-          icon = item.get('icon')
-          key = item.get('key')
-          label = item.get('label')
-
-          shell_key = f'{file_type}\\shell\\{key}'
-
+        if type_name:
           add_registry_entry(
-            winreg.HKEY_CLASSES_ROOT, shell_key, '', label or ''
+            winreg.HKEY_CLASSES_ROOT, file_type, 'FriendlyTypeName', type_name
           )
 
-          if icon:
+        type_icon = ext_icon_path or fallback_icon_path
+        if type_icon and os.path.exists(type_icon):
+          add_registry_entry(
+            winreg.HKEY_CLASSES_ROOT,
+            f'{file_type}\\DefaultIcon',
+            '',
+            f'"{type_icon}"',
+          )
+
+        if shell:
+          for item in shell:
+            command = item.get('command')
+            icon = item.get('icon')
+            key = item.get('key')
+            label = item.get('label')
+
+            shell_key = f'{file_type}\\shell\\{key}'
+
             add_registry_entry(
-              winreg.HKEY_CLASSES_ROOT, shell_key, 'Icon', icon
+              winreg.HKEY_CLASSES_ROOT, shell_key, '', label or ''
             )
-          else:
-            delete_registry_entry(winreg.HKEY_CLASSES_ROOT, shell_key, 'Icon')
 
-          add_registry_entry(
-            winreg.HKEY_CLASSES_ROOT, f'{shell_key}\\command', '', command
-          )
+            if icon:
+              add_registry_entry(
+                winreg.HKEY_CLASSES_ROOT, shell_key, 'Icon', icon
+              )
+            else:
+              delete_registry_entry(winreg.HKEY_CLASSES_ROOT, shell_key, 'Icon')
 
-      logger.log(
-        f'Saved registry key "HKEY_CLASSES_ROOT\\{file_type}" for extension "HKEY_CLASSES_ROOT\\.{ext}".\n'
-      )
+            add_registry_entry(
+              winreg.HKEY_CLASSES_ROOT, f'{shell_key}\\command', '', command
+            )
+
+        logger.log(
+          f'Saved registry key "HKEY_CLASSES_ROOT\\{file_type}" for extension "HKEY_CLASSES_ROOT\\.{ext}".\n'
+        )
 
   logger.success('Saved registry entries.')
 

@@ -18,7 +18,7 @@ TEXTURE_PACKS_PATH = os.environ.get('TEXTURE_PACKS_PATH')
 
 CITRA_USER = os.path.join(EMULATORS_PATH, '3DS', '_user_')
 DOLPHIN_USER = os.path.join(EMULATORS_PATH, 'Wii - GCN', '_user_')
-SWITCH_USER = os.path.join(EMULATORS_PATH, 'Switch', '_user_')
+SWITCH_USER = os.path.join(EMULATORS_PATH, 'NSW', '_user_')
 
 
 def main():
@@ -35,13 +35,13 @@ def main():
 def link_yuzu():
   link_dir(os.path.join(APP_DATA, 'Yuzu'), SWITCH_USER)
   link_dir(
-    os.path.join(EMULATORS_PATH, 'Switch', 'yuzu-early-access', 'user'),
+    os.path.join(EMULATORS_PATH, 'NSW', 'yuzu-early-access', 'user'),
     SWITCH_USER,
   )
-  link_dir(os.path.join(EMULATORS_PATH, 'Switch', 'Eden', 'user'), SWITCH_USER)
+  link_dir(os.path.join(EMULATORS_PATH, 'NSW', 'Eden', 'user'), SWITCH_USER)
   link_dir(
     os.path.join(SWITCH_USER, 'nand', 'user', 'Contents', 'registered'),
-    os.path.join(ROMS_PATH, 'Switch', 'nca'),
+    os.path.join(ROMS_PATH, 'NSW', 'nca'),
   )
   print()
 
@@ -59,7 +59,7 @@ def link_citra():
 def link_ryujinx():
   link_dir(
     os.path.join(APP_DATA, 'Ryujinx'),
-    os.path.join(EMULATORS_PATH, 'Switch', 'Ryujinx'),
+    os.path.join(EMULATORS_PATH, 'NSW', 'Ryujinx'),
   )
   print()
 
@@ -133,18 +133,18 @@ def link_saves():
   link_dir(
     os.path.join(
       EMULATORS_PATH,
-      'Switch',
+      'NSW',
       '_user_',
       'nand',
       'user',
       'save',
       '0000000000000000',
     ),
-    os.path.join(EMULATORS_SAVE_PATH, 'Switch', 'Yuzu'),
+    os.path.join(EMULATORS_SAVE_PATH, 'NSW', 'Yuzu'),
   )
   link_dir(
-    os.path.join(EMULATORS_PATH, 'Switch', 'Ryujinx', 'bis', 'user', 'save'),
-    os.path.join(EMULATORS_SAVE_PATH, 'Switch', 'Ryujinx'),
+    os.path.join(EMULATORS_PATH, 'NSW', 'Ryujinx', 'bis', 'user', 'save'),
+    os.path.join(EMULATORS_SAVE_PATH, 'NSW', 'Ryujinx'),
   )
   link_dir(
     os.path.join(EMULATORS_PATH, 'Wii - GCN', '_user_', 'GC', 'EUR', 'Card A'),

@@ -2,13 +2,6 @@
   "icons_path": "Z:\\Images\\Icons\\Packs\\File Types W11\\ico",
   "mappings": [
     {
-      "fallback_icon": "_textless\\_text",
-      "shell": [
-        {
-          "command": "\"Z:\\Software\\Development\\Notepad++\\notepad++.exe\" \"%1\"",
-          "key": "open"
-        }
-      ],
       "type_name": "Text File",
       "types": [
         "ass",
@@ -22,15 +15,11 @@
         "git",
         "inc",
         "inf",
+        "info",
         "ini",
         "js",
-        { "class": "js", "ext": "jsx" },
         "json",
-        { "class": "json", "ext": "gitconfig" },
-        { "class": "json", "ext": "gitignore" },
-        { "class": "json", "ext": "jsonc" },
-        { "class": "json", "ext": "map" },
-        "info",
+        "jsx",
         "keys",
         "less",
         "lock",
@@ -41,159 +30,141 @@
         "nfo",
         "patch",
         "sass",
-        { "class": "sass", "ext": "scss" },
+        "scss",
         "settings",
         "srt",
         "ssa",
         "ts",
-        { "class": "ts", "ext": "tsx" },
+        "tsx",
         "txt",
         "vdf",
         "vtt",
         "xml",
         "yaml",
-        "yml"
+        "yml",
+        {
+          "class": "json",
+          "exts": ["gitconfig", "gitignore", "jsonc", "map"]
+        }
       ]
     },
     {
-      "fallback_icon": "_textless\\_text",
-      "shell": [
-        {
-          "command": "\"Z:\\Software\\Development\\Notepad++\\notepad++.exe\" \"%1\"",
-          "icon": "Z:\\Software\\Development\\Notepad++\\notepad++.exe",
-          "key": "edit",
-          "label": "Edit with Notepad++"
-        }
-      ],
-      "type_name": "Text File",
-      "types": ["html"]
-    },
-    {
-      "shell": [
-        {
-          "command": "\"Z:\\Software\\Compression\\WinRAR\\WinRAR.exe\" \"%1\"",
-          "icon": "Z:\\Software\\Compression\\WinRAR\\WinRAR.exe",
-          "key": "open_in_winrar",
-          "label": "Open in WinRAR"
-        }
-      ],
-      "type_name": "Archive File",
-      "types": ["apk", "iso", "jar"]
-    },
-    {
-      "type_name": "Package File",
-      "types": ["pak", "pkg", "ucas", "utoc"]
-    },
-    {
-      "fallback_icon": "_textless\\_text",
-      "shell": [
-        {
-          "command": "\"Z:\\Software\\Development\\Notepad++\\notepad++.exe\" \"%1\"",
-          "icon": "Z:\\Software\\Development\\Notepad++\\notepad++.exe",
-          "key": "edit",
-          "label": "Edit with Notepad++"
-        }
-      ],
-      "type_name": "Script File",
-      "types": ["ahk", "bat", "ps1", "py", "rb", "reg", "sh"]
-    },
-    {
-      "shell": [
-        {
-          "command": "\"Z:\\Software\\Development\\Notepad++\\notepad++.exe\" \"%1\"",
-          "key": "open"
-        }
-      ],
-      "type_name": "Audio File",
-      "types": ["aac", "flac", "mp3", "ogg", "wav"]
-    },
-    {
-      "icons_path": "Z:\\Images\\Icons\\Packs\\ROM Types",
       "type_name": "ROM File",
       "types": [
-        "3ds",
+        "gb",
         "gba",
-        "n64",
-        { "class": "n64", "ext": "z64" },
-        "nca",
-        "nds",
-        "nsp",
-        "sfc",
-        "smc",
-        "wbfs",
-        { "class": "nsp", "ext": "xci" }
+        "gbc",
+        {
+          "class": "nes",
+          "exts": ["nes", "unf", "unif"]
+        },
+        {
+          "class": "3ds",
+          "exts": ["3ds", "cia", "cci"]
+        },
+        {
+          "class": "n64",
+          "exts": ["n64", "v64", "z64"]
+        },
+        {
+          "class": "nds",
+          "exts": ["nds", "dsi"]
+        },
+        {
+          "class": "ngc",
+          "exts": ["gcm", "gcz", "tgc"]
+        },
+        {
+          "class": "nsw",
+          "exts": ["nca", "nsp", "nsz", "xci", "xcz"]
+        },
+        {
+          "class": "nsw2",
+          "exts": ["nup"]
+        },
+        {
+          "class": "snes",
+          "exts": ["fig", "sfc", "smc", "swc"]
+        },
+        {
+          "class": "wii",
+          "exts": ["ciso", "iso", "nfs", "rvz", "wbfs", "wia"]
+        },
+        {
+          "class": "wiiu",
+          "exts": ["wua", "wud", "wux"]
+        }
       ]
     },
     {
       "type_name": "Save File",
       "types": [
         "sav",
-        { "class": "save", "ext": "dsv" },
-        { "class": "save", "ext": "gci" },
-        { "class": "save", "ext": "mcd" },
-        { "class": "save", "ext": "srm" }
+        {
+          "class": "save",
+          "exts": ["dsv", "gci", "mcd", "srm"]
+        }
       ]
     },
     {
-      "fallback_icon": "BAK",
       "type_name": "Backup File",
       "types": [
         "bak",
-        { "class": "bak", "ext": "bak1" },
-        { "class": "bak", "ext": "bak2" },
-        { "class": "bak", "ext": "bak3" },
-        { "class": "bak", "ext": "bak4" },
-        { "class": "bak", "ext": "bak5" },
-        { "class": "bak", "ext": "bak01" },
-        { "class": "bak", "ext": "bak02" },
-        { "class": "bak", "ext": "bak03" },
-        { "class": "bak", "ext": "bak04" },
-        { "class": "bak", "ext": "bak05" },
-        { "class": "bak", "ext": "bak_1" },
-        { "class": "bak", "ext": "bak_2" },
-        { "class": "bak", "ext": "bak_3" },
-        { "class": "bak", "ext": "bak_4" },
-        { "class": "bak", "ext": "bak_5" },
-        { "class": "bak", "ext": "bak_01" },
-        { "class": "bak", "ext": "bak_02" },
-        { "class": "bak", "ext": "bak_03" },
-        { "class": "bak", "ext": "bak_04" },
-        { "class": "bak", "ext": "bak_05" },
-        { "class": "bak", "ext": "backup" },
-        { "class": "bak", "ext": "backup1" },
-        { "class": "bak", "ext": "backup2" },
-        { "class": "bak", "ext": "backup3" },
-        { "class": "bak", "ext": "backup4" },
-        { "class": "bak", "ext": "backup5" },
-        { "class": "bak", "ext": "backup01" },
-        { "class": "bak", "ext": "backup02" },
-        { "class": "bak", "ext": "backup03" },
-        { "class": "bak", "ext": "backup04" },
-        { "class": "bak", "ext": "backup05" },
-        { "class": "bak", "ext": "backup_1" },
-        { "class": "bak", "ext": "backup_2" },
-        { "class": "bak", "ext": "backup_3" },
-        { "class": "bak", "ext": "backup_4" },
-        { "class": "bak", "ext": "backup_5" },
-        { "class": "bak", "ext": "backup_01" },
-        { "class": "bak", "ext": "backup_02" },
-        { "class": "bak", "ext": "backup_03" },
-        { "class": "bak", "ext": "backup_04" },
-        { "class": "bak", "ext": "backup_05" }
+        {
+          "class": "bak",
+          "exts": [
+            "bak1",
+            "bak2",
+            "bak3",
+            "bak4",
+            "bak5",
+            "bak01",
+            "bak02",
+            "bak03",
+            "bak04",
+            "bak05",
+            "bak_1",
+            "bak_2",
+            "bak_3",
+            "bak_4",
+            "bak_5",
+            "bak_01",
+            "bak_02",
+            "bak_03",
+            "bak_04",
+            "bak_05",
+            "backup",
+            "backup1",
+            "backup2",
+            "backup3",
+            "backup4",
+            "backup5",
+            "backup01",
+            "backup02",
+            "backup03",
+            "backup04",
+            "backup05",
+            "backup_1",
+            "backup_2",
+            "backup_3",
+            "backup_4",
+            "backup_5",
+            "backup_01",
+            "backup_02",
+            "backup_03",
+            "backup_04",
+            "backup_05"
+          ]
+        }
       ]
-    },
-    {
-      "type_name": "Font File",
-      "types": ["otf", "ttf", "woff", "woff2"]
     },
     {
       "type_name": "Video File",
       "types": [
-        { "class": "video", "ext": "bik" },
-        { "class": "video", "ext": "bk2" },
-        { "class": "video", "ext": "usm" },
-        { "class": "video", "ext": "webm" },
-        { "class": "video", "ext": "wmv" }
+        {
+          "class": "video",
+          "exts": ["bik", "bk2", "usm", "webm", "wmv"]
+        }
       ]
     }
   ]
