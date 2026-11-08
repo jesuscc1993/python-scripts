@@ -5,14 +5,15 @@ import sys
 
 from mtlogger import logger
 from mtprompt import Prompt
+from mtvalidation import to_dir
 
 from _common import ITEM_EXTENSIONS, get_volume_and_chapter
 
 
 def main():
   if len(sys.argv) > 2:
-    folder_a = sys.argv[1]
-    folder_b = sys.argv[2]
+    folder_a = to_dir(sys.argv[1])
+    folder_b = to_dir(sys.argv[2])
   else:
     folder_a = Prompt.dir(
       'Enter the path to the first folder you want to compare'
