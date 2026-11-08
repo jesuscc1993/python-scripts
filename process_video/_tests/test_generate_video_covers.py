@@ -195,9 +195,9 @@ class TestGenerateVideoCovers(unittest.TestCase):
       video_file.write(b'temporary video')
 
     with patch.object(generate_video_covers, 'process_file') as process_file:
-      generate_video_covers.process_directory(self.dir_path, tmp_dir)
+      generate_video_covers.process_directory(self.dir_path, tmp_dir, False)
 
-    process_file.assert_called_once_with(self.video_path, tmp_dir)
+    process_file.assert_called_once_with(self.video_path, tmp_dir, False)
 
   def test_skips_existing_mkv_cover_before_capturing_frame(self):
     probe = {
@@ -215,7 +215,7 @@ class TestGenerateVideoCovers(unittest.TestCase):
       patch.object(generate_video_covers, 'capture_frame') as capture_frame,
       patch.object(generate_video_covers.tqdm, 'write'),
     ):
-      generate_video_covers.process_file(self.video_path, self.dir_path)
+      generate_video_covers.process_file(self.video_path, self.dir_path, False)
 
     capture_frame.assert_not_called()
 

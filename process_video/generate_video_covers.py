@@ -10,7 +10,7 @@ from mtfont import Font, SegoeFontName
 from mtfs import read_file
 from mtlogger import logger
 from mtprompt import Prompt
-from mtvalidation import to_path
+from mtvalidation import to_bool, to_path
 from mutagen.asf import ASF, ASFByteArrayAttribute
 from mutagen.mp4 import MP4, MP4Cover
 from tqdm import tqdm
@@ -31,8 +31,12 @@ OVERLAY_BG_ALPHA = 192
 def main():
   if len(sys.argv) > 1:
     input_path = to_path(sys.argv[1])
+    override_existing = to_bool(sys.argv[2]) if len(sys.argv) > 2 else False
   else:
     input_path = Prompt.path('Enter the path to a video file or directory')
+    override_existing = Prompt.bool(
+      'Override existing covers if present?', default=False
+    )
 
   logger.log(f'Generating video covers for "{input_path}"...')
   logger.hr()
@@ -40,10 +44,10 @@ def main():
   try:
     if os.path.isfile(input_path):
       tmp_dir = generate_tmp_dir(os.path.dirname(input_path))
-      process_file(input_path, tmp_dir)
+      process_file(input_path, tmp_dir, override_existing)
     else:
       tmp_dir = generate_tmp_dir(input_path)
-      process_directory(input_path, tmp_dir)
+      process_directory(input_path, tmp_dir, override_existing)
 
   finally:
     shutil.rmtree(tmp_dir, ignore_errors=True)
@@ -55,6 +59,7 @@ def main():
 def process_directory(
   dir_path: str,
   tmp_dir: str,
+  override_existing: str,
 ):
   video_files = []
 
@@ -72,12 +77,13 @@ def process_directory(
     return
 
   for file_path in tqdm(video_files, unit='file'):
-    process_file(file_path, tmp_dir)
+    process_file(file_path, tmp_dir, override_existing)
 
 
 def process_file(
   file_path: str,
   tmp_dir: str,
+  override_existing: str,
 ):
   name = os.path.basename(file_path)
   stem = os.path.splitext(name)[0]
@@ -101,7 +107,7 @@ def process_file(
   out_path = os.path.join(tmp_dir, stem + ext)
 
   try:
-    if has_existing_cover(file_path, ext, probe):
+    if not override_existing and has_existing_cover(file_path, ext, probe):
       tqdm.write(f'  Skipping existing cover: {name}')
       return
 
