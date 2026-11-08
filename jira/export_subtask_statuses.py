@@ -24,7 +24,7 @@ def main():
     ticket_ids = to_list(sys.argv[1])
     skip_completed = to_bool(sys.argv[2]) if len(sys.argv) > 2 else False
   else:
-    ticket_ids = Prompt.list('Enter parent ticket IDs (comma-separated)')
+    ticket_ids = Prompt.list('Enter parent ticket IDs')
     skip_completed = Prompt.bool(
       'Skip completed tasks (Done/Closed)?', default=False
     )

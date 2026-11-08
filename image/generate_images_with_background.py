@@ -47,7 +47,7 @@ def main():
     )
     drop_shadow = Prompt.int('Foreground drop shadow amount', default=0)
     tints = Prompt.list(
-      'Enter a comma-separated list of tint colors, to apply to the background(s)',
+      'Enter a list of tint colors, to apply to the background(s)',
       optional=True,
     )
     requested_size = Prompt.int(

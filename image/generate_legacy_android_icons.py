@@ -29,7 +29,7 @@ def main():
       'Enter the path to the background image or a folder of background images'
     )
     tints = Prompt.list(
-      'Enter a comma-separated list of tint colors, to apply to the background(s)',
+      'Enter a list of tint colors, to apply to the background(s)',
       optional=True,
     )
 

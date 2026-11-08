@@ -85,6 +85,20 @@ class ToPathTests(unittest.TestCase):
 
 
 class ToListTests(unittest.TestCase):
+  def test_splits_by_pipecomma(self):
+    self.assertEqual(
+      to_list('foo|bar|foo;bar,baz'), ['foo', 'bar', 'foo;bar,baz']
+    )
+
+  def test_splits_by_semicolon(self):
+    self.assertEqual(to_list('foo;bar;foo,bar'), ['foo', 'bar', 'foo,bar'])
+
+  def test_splits_by_comma(self):
+    self.assertEqual(to_list('foo,bar'), ['foo', 'bar'])
+
+  def test_strips_item_whitespace(self):
+    self.assertEqual(to_list(' foo, bar '), ['foo', 'bar'])
+
   def test_splits_unquoted_items(self):
     self.assertEqual(to_list('foo,bar'), ['foo', 'bar'])
 
@@ -93,13 +107,6 @@ class ToListTests(unittest.TestCase):
 
   def test_parses_single_quoted_item(self):
     self.assertEqual(to_list("'foo',bar"), ['foo', 'bar'])
-
-  def test_preserves_commas_inside_quotes(self):
-    self.assertEqual(to_list('foo,"bar,baz"'), ['foo', 'bar,baz'])
-
-  def test_invalid_raises(self):
-    with self.assertRaises(ValueError):
-      to_list('"foo,bar')
 
 
 if __name__ == '__main__':

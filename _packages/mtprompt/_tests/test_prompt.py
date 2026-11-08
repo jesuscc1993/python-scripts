@@ -42,20 +42,25 @@ class PromptListTests(unittest.TestCase):
     ):
       return Prompt.list('p', **kwargs)
 
+  def test_splits_by_pipecomma(self):
+    self.assertEqual(
+      self.call(['foo|bar|foo;bar,baz']), ['foo', 'bar', 'foo;bar,baz']
+    )
+
+  def test_splits_by_semicolon(self):
+    self.assertEqual(self.call(['foo;bar;foo,bar']), ['foo', 'bar', 'foo,bar'])
+
+  def test_splits_by_comma(self):
+    self.assertEqual(self.call(['foo,bar']), ['foo', 'bar'])
+
   def test_splits_unquoted_items(self):
     self.assertEqual(self.call(['foo,bar']), ['foo', 'bar'])
 
   def test_removes_quotes_from_items(self):
     self.assertEqual(self.call(['"foo",bar']), ['foo', 'bar'])
 
-  def test_preserves_commas_inside_quotes(self):
-    self.assertEqual(self.call(['foo,"bar,baz"']), ['foo', 'bar,baz'])
-
   def test_strips_item_whitespace(self):
     self.assertEqual(self.call([' foo, bar ']), ['foo', 'bar'])
-
-  def test_retries_on_malformed_input(self):
-    self.assertEqual(self.call(['"foo,bar', 'foo,bar']), ['foo', 'bar'])
 
   def test_optional_empty(self):
     self.assertIsNone(self.call([''], optional=True))

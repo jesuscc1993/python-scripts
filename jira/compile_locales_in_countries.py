@@ -14,7 +14,7 @@ def main():
   if len(sys.argv) > 1:
     issue_ids = to_list(sys.argv[1])
   else:
-    issue_ids = Prompt.list('Enter issue IDs (comma-separated)')
+    issue_ids = Prompt.list('Enter issue IDs')
 
   if not issue_ids:
     logger.error('No issue IDs provided.')

@@ -1,5 +1,3 @@
-import csv
-import io
 import os
 
 
@@ -60,18 +58,13 @@ def to_file(val: str):
 
 
 def to_list(val: str):
-  try:
-    values = next(
-      csv.reader(io.StringIO(val), skipinitialspace=True, strict=True)
-    )
-  except csv.Error:
-    raise ValueError(f'Input "{val}" is not a valid comma-separated list.')
+  separator = '|' if '|' in val else ';' if ';' in val else ','
+  return [_strip_quotes(item.strip()) for item in val.split(separator)]
 
-  parsed_values = []
-  for item in values:
-    item = item.strip()
-    if len(item) >= 2 and item[0] == item[-1] and item[0] in ('"', "'"):
-      item = item[1:-1]
-    parsed_values.append(item)
 
-  return parsed_values
+def _strip_quotes(value: str):
+  return (
+    value[1:-1]
+    if len(value) >= 2 and value[0] == value[-1] and value[0] in ('"', "'")
+    else value
+  )

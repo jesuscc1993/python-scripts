@@ -22,10 +22,8 @@ class Prompt:
 
   @staticmethod
   def str(prompt='', *, optional=False, default: str | None = None):
-    prompt = prompt.strip(' "\'')
-
     while True:
-      val = input(format_prompt(prompt, default))
+      val = input(format_prompt(prompt, default)).strip()
 
       if not val and default is None and not optional:
         logger.error('A string is required.\n')
@@ -36,10 +34,10 @@ class Prompt:
 
   @staticmethod
   def list(prompt='', *, optional=False, default: list | None = None):
-    prompt = prompt.strip(' "\'')
-
     while True:
-      val = input(format_prompt(prompt, default))
+      prompt = f'{prompt} (separate by | or ; or ,)' if prompt else ''
+
+      val = input(format_prompt(prompt, default)).strip()
 
       if not val and default is None and not optional:
         logger.error('A list is required.\n')
@@ -59,8 +57,6 @@ class Prompt:
   def option(options: list, prompt='', *, optional=False, default=None):
     if not isinstance(options, list):
       raise TypeError('A list of options must be passed.')
-
-    prompt = prompt.strip(' "\'')
 
     while True:
       full_prompt = format_prompt(prompt, default, use_colon=False)
@@ -86,10 +82,8 @@ class Prompt:
 
   @staticmethod
   def int(prompt='', *, optional=False, default: int | None = None):
-    prompt = prompt.strip(' "\'')
-
     while True:
-      val = input(format_prompt(prompt, default))
+      val = input(format_prompt(prompt, default)).strip()
 
       if not val and default is None and not optional:
         logger.error('An integer is required.\n')
@@ -107,10 +101,8 @@ class Prompt:
 
   @staticmethod
   def float(prompt='', *, optional=False, default: float | None = None):
-    prompt = prompt.strip(' "\'')
-
     while True:
-      val = input(format_prompt(prompt, default))
+      val = input(format_prompt(prompt, default)).strip()
 
       if not val and default is None and not optional:
         logger.error('A number is required.\n')
@@ -128,8 +120,6 @@ class Prompt:
 
   @staticmethod
   def bool(prompt: str, *, optional=False, default: bool | None = None):
-    prompt = prompt.strip(' "\'')
-
     default_display = 'y/n'
     if default == True:
       default_display = 'Y/n'
@@ -137,7 +127,7 @@ class Prompt:
       default_display = 'y/N'
 
     while True:
-      val = input(f'{prompt} ({default_display})\n: ').strip()
+      val = input(f'{prompt} [{default_display}]\n: ').strip()
 
       if not val:
         boolean = default
@@ -161,8 +151,6 @@ class Prompt:
     optional=False,
     default: str = None,
   ):
-    prompt = prompt.strip(' "\'')
-
     while True:
       val = input(format_prompt(prompt, default)).strip(' "')
 
@@ -187,8 +175,6 @@ class Prompt:
     optional=False,
     default: str = None,
   ):
-    prompt = prompt.strip(' "\'')
-
     while True:
       val = input(format_prompt(prompt, default)).strip(' "')
 
@@ -213,8 +199,6 @@ class Prompt:
     optional=False,
     default: str = None,
   ):
-    prompt = prompt.strip(' "\'')
-
     while True:
       val = input(format_prompt(prompt, default)).strip(' "')
 
@@ -270,5 +254,9 @@ class Prompt:
 
 def format_prompt(prompt: str, default: str | None = None, use_colon=True):
   formatted_prompt = prompt.strip(' ')
-  formatted_default = f'(default: {default})' if default is not None else ''
-  return f'{formatted_prompt}{" " if formatted_default and not formatted_prompt.endswith("\n") else ""}{formatted_default}{"\n: " if use_colon and (formatted_prompt or formatted_default) else ""}'
+  formatted_default = f'[default: {default}]' if default is not None else ''
+  return f'{formatted_prompt}{
+    (" " if formatted_default and not formatted_prompt.endswith("\n") else "")
+  }{formatted_default}{
+    ("\n: " if use_colon and (formatted_prompt or formatted_default) else "")
+  }'

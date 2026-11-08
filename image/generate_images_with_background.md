@@ -17,7 +17,7 @@ Supports `.svg` backgrounds, which get rasterized before compositing.
   - `-f`, `--foreground`: path to the folder containing the foreground images.
   - `-o`, `--output`: path to the output folder.
   - `-b`, `--background`: path to a background image or a folder of background images.
-  - `-t`, `--tint`: comma-separated list of tint colors to apply to the background(s).
+  - `-t`, `--tint`: list of tint colors to apply to the background(s).
   - `-s`, `--size`: size to resize images to.
   - `-fs`, `--foreground-scale`: foreground scale.
   - `-bs`, `--background-scale`: background scale.
