@@ -35,7 +35,7 @@ def main():
     input_path = Prompt.path('Enter the path to a video file or directory')
     backup_files = Prompt.bool('Backup original files?', default=False)
 
-  logger.log(f'Compressing videos in "{input_path}"...')
+  logger.log(f'Encoding videos in "{input_path}"...')
   logger.hr()
 
   tmp_dir = None
@@ -53,7 +53,7 @@ def main():
       shutil.rmtree(tmp_dir, ignore_errors=True)
 
   logger.hr()
-  logger.log(f'Finished compressing videos in "{input_path}".')
+  logger.log(f'Finished encoding videos in "{input_path}".')
 
 
 def process_directory(input_path: str, tmp_dir: str, backup_files: bool):
