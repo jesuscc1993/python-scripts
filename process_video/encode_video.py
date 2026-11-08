@@ -6,6 +6,7 @@ import sys
 from mtlogger import logger
 from mtprompt import Prompt, to_bool
 from mtvalidation import to_path
+from send2trash import send2trash
 
 from _common import generate_tmp_dir
 
@@ -114,16 +115,16 @@ def process_file(input_path: str, tmp_dir: str, backup_files: bool):
   if not os.path.isfile(output_path) or os.path.getsize(output_path) == 0:
     raise RuntimeError(f'Invalid output file: "{output_path}"')
 
-  if backup_files and (
-    not os.path.exists(backup_path)
-    or not Prompt.bool(
+  if backup_files:
+    if os.path.exists(backup_path) and Prompt.bool(
       f'A backup already exists for file "{file_name}": Keep older backup?',
       default=True,
-    )
-  ):
-    os.replace(input_path, backup_path)
+    ):
+      os.remove(input_path)
+    else:
+      os.replace(input_path, backup_path)
   else:
-    os.remove(input_path)
+    send2trash(input_path)
 
   shutil.move(output_path, input_path)
   logger.log()
