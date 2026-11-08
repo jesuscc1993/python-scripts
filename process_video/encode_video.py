@@ -30,7 +30,7 @@ SETTINGS = {
 def main():
   if len(sys.argv) > 1:
     input_path = to_path(sys.argv[1])
-    backup_files = to_bool(sys.argv[2]) if len(sys.argv) > 2 else True
+    backup_files = to_bool(sys.argv[2]) if len(sys.argv) > 2 else False
   else:
     input_path = Prompt.path('Enter the path to a video file or directory')
     backup_files = Prompt.bool('Backup original files?', default=False)
