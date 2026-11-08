@@ -7,6 +7,7 @@ from mtlogger import logger
 from mtprompt import Prompt, to_bool
 from mtvalidation import to_path
 from send2trash import send2trash
+from tqdm import tqdm
 
 from _common import generate_tmp_dir
 
@@ -59,13 +60,17 @@ def main():
 
 def process_directory(input_path: str, tmp_dir: str, backup_files: bool):
   files = [
-    os.path.join(input_path, filename)
-    for filename in os.listdir(input_path)
-    if should_process_item(os.path.join(input_path, filename))
+    os.path.join(root, filename)
+    for root, _, filenames in os.walk(input_path)
+    for filename in filenames
+    if should_process_item(os.path.join(root, filename))
   ]
 
-  for file_path in files:
-    process_file(file_path, tmp_dir, backup_files)
+  with tqdm(total=len(files), desc='Processing files', unit='file') as progress:
+    for file_path in files:
+      progress.set_postfix_str(os.path.basename(file_path))
+      process_file(file_path, tmp_dir, backup_files)
+      progress.update(1)
 
 
 def process_file(input_path: str, tmp_dir: str, backup_files: bool):
@@ -105,11 +110,9 @@ def process_file(input_path: str, tmp_dir: str, backup_files: bool):
     SETTINGS['max_interleave_delta'],
     '-loglevel',
     'error',
-    '-stats',
     output_path,
   ]
 
-  logger.log(f'Processing "{input_path}"...')
   subprocess.run(command, check=True)
 
   if not os.path.isfile(output_path) or os.path.getsize(output_path) == 0:
@@ -127,7 +130,6 @@ def process_file(input_path: str, tmp_dir: str, backup_files: bool):
     send2trash(input_path)
 
   shutil.move(output_path, input_path)
-  logger.log()
 
 
 def should_process_item(item_path: str):
