@@ -77,12 +77,32 @@ def find_exe(
   dir_path: str,
 ):
   pattern = re.compile('|'.join(EXE_EXCLUSION_PATTERNS), re.IGNORECASE)
+  exes = []
 
-  for dirpath, _, filenames in os.walk(dir_path):
-    for f in filenames:
-      if f.lower().endswith('.exe') and not pattern.search(f):
-        return os.path.join(dirpath, f)
-  return None
+  for root, _, file_names in os.walk(dir_path):
+    for file_name in file_names:
+      if file_name.lower().endswith('.exe') and not pattern.search(file_name):
+        exes.append(os.path.join(root, file_name))
+
+  exes.sort(
+    key=lambda exe_a: (
+      -sum(compare_exes(exe_b, exe_a) for exe_b in exes if exe_b != exe_a),
+      len(os.path.basename(exe_a)),
+    )
+  )
+
+  return exes[0] if exes else None
+
+
+def compare_exes(
+  exe_a: str,
+  exe_b: str,
+):
+  return (
+    os.path.splitext(os.path.basename(exe_a))[0]
+    .lower()
+    .startswith(os.path.splitext(os.path.basename(exe_b))[0].lower())
+  )
 
 
 if __name__ == '__main__':

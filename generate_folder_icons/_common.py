@@ -151,6 +151,7 @@ def set_folder_icon(
     write_ini(desktop_ini_path, config, encoding)
     Attr.hide(desktop_ini_path)
     Attr.add(folder_path, ['s'])
+    logger.trace(f'Set icon "{ico_path}" for "{folder_path}".')
 
   except PermissionError:
     tqdm.write(
