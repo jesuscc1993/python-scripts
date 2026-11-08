@@ -87,8 +87,10 @@ def compress_folder(
   tmp_zip_path = os.path.join(parent_dir, f'.{zip_filename}.tmp')
   final_zip_path = os.path.join(parent_dir, zip_filename)
   already_exists = os.path.exists(final_zip_path)
+  result_type = FAILED
 
   try:
+    overwrite = True
     if already_exists:
       with prompt_lock:
         overwrite = Prompt.bool(
@@ -100,51 +102,53 @@ def compress_folder(
         logger.warn(
           f'Skipping "{folder_path}". A compressed file with the same name already exists.'
         )
-        return INCOMPLETE
 
-    files_to_compress = []
-    for root, dir_names, file_names in os.walk(folder_path):
-      if exclusion_patterns:
-        for dir_name in dir_names[:]:
-          if any(
-            fnmatch(dir_name, pattern.rstrip('/'))
-            for pattern in exclusion_patterns
+    if overwrite:
+      files_to_compress = []
+      for root, dir_names, file_names in os.walk(folder_path):
+        if exclusion_patterns:
+          for dir_name in dir_names[:]:
+            if any(
+              fnmatch(dir_name, pattern.rstrip('/'))
+              for pattern in exclusion_patterns
+            ):
+              dir_names.remove(dir_name)
+
+        for file_name in file_names:
+          if exclusion_patterns and any(
+            fnmatch(file_name, pattern) for pattern in exclusion_patterns
           ):
-            dir_names.remove(dir_name)
+            continue
+          files_to_compress.append(os.path.join(root, file_name))
 
-      for file_name in file_names:
-        if exclusion_patterns and any(
-          fnmatch(file_name, pattern) for pattern in exclusion_patterns
-        ):
-          continue
-        files_to_compress.append(os.path.join(root, file_name))
+      if files_to_compress:
+        with zipfile.ZipFile(
+          tmp_zip_path, 'w', zipfile.ZIP_DEFLATED
+        ) as compressed_file:
+          for file_path in (
+            tqdm(files_to_compress, unit='file')
+            if show_progress
+            else files_to_compress
+          ):
+            compressed_file.write(
+              file_path, os.path.relpath(file_path, folder_path)
+            )
 
-    if files_to_compress:
-      with zipfile.ZipFile(
-        tmp_zip_path, 'w', zipfile.ZIP_DEFLATED
-      ) as compressed_file:
-        for file_path in (
-          tqdm(files_to_compress, unit='file')
-          if show_progress
-          else files_to_compress
-        ):
-          compressed_file.write(
-            file_path, os.path.relpath(file_path, folder_path)
-          )
+        os.replace(tmp_zip_path, final_zip_path)
 
-      os.replace(tmp_zip_path, final_zip_path)
+        if remove_original:
+          shutil.rmtree(folder_path)
 
-      if remove_original:
-        shutil.rmtree(folder_path)
-
-      return SUCCEEDED
-
-    logger.warn(f'No files found in "{folder_path}".')
-    return INCOMPLETE
+        result_type = SUCCEEDED
+      else:
+        logger.warn(f'No files found in "{folder_path}".')
+        result_type = INCOMPLETE
+    else:
+      result_type = INCOMPLETE
 
   except Exception as ex:
     logger.error(f'An error occurred while processing "{folder_name}":\n{ex}')
-    return FAILED
+    result_type = FAILED
 
   finally:
     try:
@@ -155,7 +159,9 @@ def compress_folder(
       logger.error(
         f'Unable to remove temporary archive "{tmp_zip_path}":\n{cleanup_ex}'
       )
-      return FAILED
+      result_type = FAILED
+
+  return result_type
 
 
 def extract_child_archives(
