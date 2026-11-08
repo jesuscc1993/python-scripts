@@ -27,7 +27,7 @@ def main():
 
   missing_in_a = []
   missing_in_b = []
-  mismatches = []
+  mismatches = {}
 
   for item_name in sort_by_path(subfolders_a, subfolders_b):
     nameA = subfolders_a.get(item_name)
@@ -46,13 +46,12 @@ def main():
             f'"{item_name}" has the same volumes and chapters in both folders.'
           )
         else:
-          mismatches.append(item_name)
+          mismatch_text = f'{logger.format_trace(f'"{folder_a}"')} {print_range(range_a)} | {print_range(range_b)} {logger.format_trace(f'"{folder_b}"')}'
+          mismatches[item_name] = mismatch_text
           logger.log(
             f'  "{item_name}" has different volumes or chapters in the folders.'
           )
-          logger.failure(
-            f'{logger.format_trace(f'"{folder_a}"')} {print_range(range_a)} | {print_range(range_b)} {logger.format_trace(f'"{folder_b}"')}'
-          )
+          logger.failure(mismatch_text)
       else:
         logger.trace(f'Failed to determine ranges for "{item_name}".')
     elif path_a:
@@ -80,7 +79,14 @@ def main():
 
   if mismatches:
     logger.failure(
-      f'Mismatching ranges ({len(mismatches)}): {stringify(mismatches)}\n'
+      f'Mismatching ranges ({len(mismatches)}): {{\n{
+        (
+          "\n".join(
+            f'  "{item_name}": {mismatch_text}'
+            for item_name, mismatch_text in mismatches.items()
+          )
+        )
+      }\n}}'
     )
 
 
@@ -101,7 +107,7 @@ def sort_by_path(
 def stringify(
   obj: dict,
 ):
-  return json.dumps(obj, indent=2).replace('\\\\', '\\')
+  return json.dumps(obj, indent=2).replace('\\\\', '\\').replace('\\"', '"')
 
 
 def get_subfolders(
