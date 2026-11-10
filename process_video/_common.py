@@ -1,5 +1,6 @@
 import os
 import re
+import shutil
 import subprocess
 
 from mtfs import read_text_file, write_text_file
@@ -49,6 +50,7 @@ def generate_tmp_dir(
   dir_path: str,
 ):
   tmp_dir = os.path.join(dir_path, '.tmp')
+  shutil.rmtree(tmp_dir, ignore_errors=True)
   os.makedirs(tmp_dir, exist_ok=True)
   subprocess.run(['attrib', '+H', tmp_dir], check=False, capture_output=True)
   return tmp_dir
