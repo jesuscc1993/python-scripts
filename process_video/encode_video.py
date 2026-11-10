@@ -1,3 +1,4 @@
+import json
 import os
 import shutil
 import subprocess
@@ -16,8 +17,6 @@ SETTINGS = {
   'audio_codec': 'copy',
   'bitrate': '0',
   'data_codec': 'copy',
-  'ffmpeg': 'ffmpeg',
-  'map': '0',
   'max_interleave_delta': '0',
   'preset': 'p6',
   'quality': '28',
@@ -81,11 +80,10 @@ def process_file(input_path: str, tmp_dir: str, backup_files: bool):
   output_path = os.path.join(tmp_dir, os.path.basename(input_path))
 
   command = [
-    SETTINGS['ffmpeg'],
+    'ffmpeg',
     '-i',
     input_path,
-    '-map',
-    SETTINGS['map'],
+    *get_map_args(input_path),
     '-c:v',
     SETTINGS['video_codec'],
     '-preset',
@@ -130,6 +128,39 @@ def process_file(input_path: str, tmp_dir: str, backup_files: bool):
     send2trash(input_path)
 
   shutil.move(output_path, input_path)
+
+
+def get_map_args(input_path: str):
+  result = subprocess.run(
+    [
+      'ffprobe',
+      '-v',
+      'error',
+      '-select_streams',
+      'v',
+      '-show_entries',
+      'stream=index:stream_disposition=attached_pic',
+      '-of',
+      'json',
+      input_path,
+    ],
+    capture_output=True,
+    text=True,
+    check=True,
+  )
+
+  streams = json.loads(result.stdout).get('streams', [])
+
+  return [
+    '-map',
+    '0',
+    *[
+      arg
+      for stream in streams
+      if stream.get('disposition', {}).get('attached_pic', 0)
+      for arg in ('-map', f'-0:{stream["index"]}')
+    ],
+  ]
 
 
 def should_process_item(item_path: str):
