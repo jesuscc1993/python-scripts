@@ -10,7 +10,8 @@ from mtvalidation import to_path
 from send2trash import send2trash
 from tqdm import tqdm
 
-from _common import generate_tmp_dir
+from _common import generate_tmp_dir, get_ext
+from _constants import VIDEO_EXTS
 
 SETTINGS = {
   'attachment_codec': 'copy',
@@ -164,12 +165,12 @@ def get_map_args(input_path: str):
 
 
 def should_process_item(item_path: str):
-  filename = os.path.basename(item_path).lower()
+  file_name = os.path.basename(item_path).lower()
 
   return (
     os.path.isfile(item_path)
-    and filename.endswith(SETTINGS['video_ext'])
-    and '.bak.' not in filename
+    and get_ext(file_name) in VIDEO_EXTS
+    and '.bak.' not in file_name
   )
 
 
