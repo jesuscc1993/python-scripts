@@ -173,6 +173,15 @@ def generate_images_with_background(
           output_path = os.path.join(
             tint_output_folder, os.path.splitext(image_name)[0] + '.png'
           )
+
+          if os.path.exists(output_path):
+            output_mtime = os.path.getmtime(output_path)
+            if output_mtime > os.path.getmtime(
+              foreground_path
+            ) and output_mtime > os.path.getmtime(background_img_path):
+              logger.trace(f'Skipping "{output_path}". Image is up to date.')
+              continue
+
           os.makedirs(os.path.dirname(output_path), exist_ok=True)
           result.save(
             output_path, format='PNG', lossless=True, alpha_quality=100
