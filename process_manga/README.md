@@ -84,20 +84,14 @@ Each runs a sequence of individual scripts:
 
 ### [chain_process_manga.py](chain_process_manga.py)
 
-Runs `merge_volumes` > `crop_borders` > `compress_folders` (ZIP) > `rename_items` > `../rename/rename_zip_to_cbz`.
+Runs `extract_archives` > `crop_borders` > `compress_folders` > `rename_items` > `../rename/rename_zip_to_cbz`.
 
 ### [chain_process_volumes.py](chain_process_volumes.py)
 
-Runs `extract_archives` > `prefix_volumes` > `merge_volumes` > `compress_folders` (ZIP) > `rename_items` > `../rename/rename_zip_to_cbz`.
+Runs `extract_archives` > `prefix_volumes` > `merge_volumes` > `chain_process_manga`.
 
 ### [chain_process_webtoon.py](chain_process_webtoon.py)
 
-Runs `crop_webtoon` > `compress_folders` (ZIP) > `rename_items`.
+Runs `extract_archives` > `crop_webtoon` > `compress_folders` > `rename_items`.
 
 ### [chain_reprocess_manga.py](chain_reprocess_manga.py)
-
-Runs `extract_archives` > `resize_manga` > `compress_folders` (ZIP) > `rename_items` > `../rename/rename_zip_to_cbz`.
-
-### [chain_reprocess_webtoon.py](chain_reprocess_webtoon.py)
-
-Runs `extract_archives` > `crop_webtoon` > `compress_folders` (ZIP) > `rename_items`.

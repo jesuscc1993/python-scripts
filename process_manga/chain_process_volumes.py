@@ -6,10 +6,7 @@ from _common import select_parent_folder, run_scripts_in_sequence
 SCRIPT_NAMES = [
   '../compress/extract_archives $dir',
   'prefix_volumes $dir',
-  'merge_volumes $dir',
-  '../compress/compress_folders $dir ZIP Y',
-  'rename_items $dir',
-  '../rename/rename_zip_to_cbz $dir',
+  'chain_process_manga.py $dir',
 ]
 
 

@@ -4,7 +4,7 @@ from mtprompt import Prompt
 from _common import select_parent_folder, run_scripts_in_sequence
 
 SCRIPT_NAMES = [
-  'merge_volumes $dir',
+  '../compress/extract_archives $dir',
   'crop_borders $dir',
   '../compress/compress_folders $dir ZIP Y',
   'rename_items $dir',
