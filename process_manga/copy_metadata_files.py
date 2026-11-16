@@ -5,7 +5,7 @@ import shutil
 
 from mtattr import Attr
 from mtprompt import Prompt
-from mtvalidation import logger
+from mtlogger import logger
 from tqdm import tqdm
 
 DESKTOP_INI = 'desktop.ini'
