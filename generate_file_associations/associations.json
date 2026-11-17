@@ -166,6 +166,28 @@
           "exts": ["bik", "bk2", "usm", "webm", "wmv"]
         }
       ]
+    },
+    {
+      "type_name": "Image File",
+      "types": [
+        {
+          "class": "image",
+          "exts": [
+            "bmp",
+            "dds",
+            "gif",
+            "ico",
+            "jpeg",
+            "jpg",
+            "png",
+            "svg",
+            "tga",
+            "tif",
+            "tiff",
+            "webp"
+          ]
+        }
+      ]
     }
   ]
 }
