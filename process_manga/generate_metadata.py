@@ -15,7 +15,9 @@ TYPE_BLACKLIST = ['Light Novel', 'Novel']
 COMIC_INFO_FILENAME = 'ComicInfo.xml'
 COVER_FILENAME = 'cover.jpg'
 NO_META_FILES = ['.noxml', '.nomedia']
-ALL_FILES = [COMIC_INFO_FILENAME, COVER_FILENAME] + NO_META_FILES
+HIDDEN_FILES = NO_META_FILES + [COMIC_INFO_FILENAME]
+ALL_FILES = HIDDEN_FILES + [COVER_FILENAME]
+
 NO_RESULTS_FOUND_ERROR = 'No results found'
 
 ENTRY_URL_REGEX = re.compile(r'^https://myanimelist\.net/manga/(\d+)/')
@@ -45,9 +47,15 @@ def process_dir(
 ):
   dir_name = os.path.basename(dir_path)
 
-  files_missing = [
-    f for f in ALL_FILES if not os.path.exists(os.path.join(dir_path, f))
-  ]
+  files_missing = []
+  for filename in ALL_FILES:
+    file_path = os.path.join(dir_path, filename)
+
+    if not os.path.exists(file_path):
+      files_missing.append(filename)
+    elif filename in HIDDEN_FILES and not Attr.is_hidden(file_path):
+      Attr.hide(file_path)
+
   if not files_missing:
     logger.trace(f'  Skipping "{dir_name}". All metadata files already exist.')
     return
@@ -74,9 +82,8 @@ def find_exact_match(name: str):
 
 
 def write_comic_info(
-  dir_path: str,
-  file_path: str,
   manga: Manga,
+  file_path: str,
 ):
   root = ElementTree.Element('ComicInfo')
 
@@ -90,10 +97,10 @@ def write_comic_info(
   ElementTree.indent(tree, space='  ')
   tree.write(file_path, encoding='utf-8', xml_declaration=True)
 
-  rel_file_path = os.path.join(
-    os.path.basename(dir_path), os.path.basename(file_path)
-  )
-  logger.success(f'Generated "{rel_file_path}" file.')
+  if os.path.basename(file_path) in HIDDEN_FILES:
+    Attr.hide(file_path)
+
+  logger.success(f'Generated "{format_path(file_path)}" file.')
 
 
 def add_xml_field(
@@ -117,18 +124,17 @@ def generate_no_meta_files(
   for filename in NO_META_FILES:
     try:
       file_path = os.path.join(dir_path, filename)
-      rel_file_path = os.path.join(os.path.basename(dir_path), filename)
+      formatted_file_path = format_path(file_path)
 
       if os.path.exists(file_path):
-        if Attr.is_hidden(file_path):
-          logger.trace(f'  Skipping "{rel_file_path}". File already exists.')
-        else:
-          Attr.hide(file_path)
-          logger.success(f'Hid existing "{rel_file_path}" file.')
+        logger.trace(
+          f'  Skipping "{formatted_file_path}". File already exists.'
+        )
       else:
         open(file_path, 'w').close()
-        Attr.hide(file_path)
-        logger.success(f'Created hidden "{rel_file_path}" file.')
+        if filename in HIDDEN_FILES:
+          Attr.hide(file_path)
+        logger.success(f'Created "{formatted_file_path}" file.')
 
     except Exception as ex:
       logger.error(f'Could not create "{filename}":\n{ex}')
@@ -137,7 +143,7 @@ def generate_no_meta_files(
 def fetch_manga_info(dir_path: str, name: str):
   dir_name = os.path.basename(dir_path)
   comic_info_path = os.path.join(dir_path, COMIC_INFO_FILENAME)
-  rel_comic_info_path = os.path.join(dir_name, COMIC_INFO_FILENAME)
+  formatted_comic_info_path = format_path(comic_info_path)
 
   if not os.path.exists(comic_info_path):
     logger.log()
@@ -181,9 +187,9 @@ def fetch_manga_info(dir_path: str, name: str):
 
         choice = input('> ').strip()
         if not choice:
-          choice = 1
+          choice = '1'
         elif choice.upper() == 'X':
-          logger.trace(f'  Skipped "{rel_comic_info_path}".')
+          logger.trace(f'  Skipped "{formatted_comic_info_path}".')
           return
         elif not choice.isdigit():
           fetch_manga_info(dir_path, choice)
@@ -192,30 +198,32 @@ def fetch_manga_info(dir_path: str, name: str):
         result = results[(int(choice) - 1) if choice else 0]
 
       manga = Manga(result.mal_id)
+      cover_path = os.path.join(dir_path, COVER_FILENAME)
 
-      write_comic_info(dir_path, comic_info_path, manga)
-      generate_cover_image(dir_path, manga)
+      write_comic_info(manga, comic_info_path)
+      generate_cover_image(manga, cover_path)
 
     except Exception as ex:
       logger.error(f'Error processing "{dir_name}": {ex}')
 
   else:
-    logger.trace(f'  Skipping "{rel_comic_info_path}". File already exists.')
+    logger.trace(
+      f'  Skipping "{formatted_comic_info_path}". File already exists.'
+    )
 
 
 def generate_cover_image(
-  dir_path: str,
   manga: Manga,
+  cover_path: str,
 ):
-  cover_path = os.path.join(dir_path, COVER_FILENAME)
-  rel_cover_path = os.path.join(os.path.basename(dir_path), COVER_FILENAME)
+  formatted_cover_path = format_path(cover_path)
 
   if os.path.exists(cover_path):
-    logger.trace(f'  Skipping "{rel_cover_path}". File already exists.')
+    logger.trace(f'  Skipping "{formatted_cover_path}". File already exists.')
     return
 
   if not manga.image_url:
-    logger.warn(f'  Skipping "{rel_cover_path}". No cover image found.')
+    logger.warn(f'  Skipping "{formatted_cover_path}". No cover image found.')
     return
 
   try:
@@ -227,10 +235,16 @@ def generate_cover_image(
     with open(cover_path, 'wb') as file:
       file.write(response.content)
 
-    logger.success(f'Generated "{rel_cover_path}" file.')
+    logger.success(f'Generated "{formatted_cover_path}" file.')
 
   except Exception as ex:
-    logger.error(f'Could not save "{rel_cover_path}":\n{ex}')
+    logger.error(f'Could not save "{formatted_cover_path}":\n{ex}')
+
+
+def format_path(file_path: str):
+  return os.path.join(
+    os.path.basename(os.path.dirname(file_path)), os.path.basename(file_path)
+  )
 
 
 if __name__ == '__main__':
