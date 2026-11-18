@@ -61,8 +61,9 @@ def process_dir(
     return
 
   sanitized_name = re.sub(r'\s*\{\d{1,3}\}\s*$', '', dir_name).strip()
-  generate_no_meta_files(dir_path)
   fetch_manga_info(dir_path, sanitized_name)
+  logger.log()
+  generate_no_meta_files(dir_path)
 
 
 def format_result_title(result: MangaSearchResult):
@@ -88,7 +89,11 @@ def write_comic_info(
   root = ElementTree.Element('ComicInfo')
 
   add_xml_field(root, 'Title', manga.title)
-  add_xml_field(root, 'Summary', manga.synopsis)
+  add_xml_field(
+    root,
+    'Summary',
+    re.sub(r'\s*\[Written by MAL Rewrite\]\s*$', '', manga.synopsis or ''),
+  )
   add_xml_field(root, 'Writer', ', '.join(manga.authors))
   add_xml_field(root, 'CommunityRating', format_score(manga.score))
   add_xml_field(root, 'Genre', ', '.join(manga.genres))
@@ -146,8 +151,6 @@ def fetch_manga_info(dir_path: str, name: str):
   formatted_comic_info_path = format_path(comic_info_path)
 
   if not os.path.exists(comic_info_path):
-    logger.log()
-
     try:
       try:
         results = [
