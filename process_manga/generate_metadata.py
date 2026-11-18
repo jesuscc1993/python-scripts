@@ -92,7 +92,11 @@ def write_comic_info(
   add_xml_field(
     root,
     'Summary',
-    re.sub(r'\s*\[Written by MAL Rewrite\]\s*$', '', manga.synopsis or ''),
+    (
+      re.sub(r'\s*\[Written by MAL Rewrite\]\s*$', '', manga.synopsis)
+      if manga.synopsis
+      else None
+    ),
   )
   add_xml_field(root, 'Writer', ', '.join(manga.authors))
   add_xml_field(root, 'CommunityRating', format_score(manga.score))
