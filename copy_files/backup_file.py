@@ -51,7 +51,7 @@ def backup_file(
   stamped_file_path = None
 
   if not os.path.exists(og_file_path):
-    logger.error(f'File "{og_file_name}" does not exist')
+    logger.error(f'File "{og_file_name}" does not exist.')
     return False
 
   try:
@@ -94,7 +94,7 @@ def backup_file(
     logger.error(f'Failed to back up "{og_file_path}":\n{ex}')
     return False
 
-  logger.success(f'Backed up "{og_file_name}" as "{bak_file_name}"')
+  logger.success(f'Backed up "{og_file_name}" as "{bak_file_name}".')
   return True
 
 
