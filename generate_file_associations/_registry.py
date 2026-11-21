@@ -36,7 +36,7 @@ def delete_registry_entry(
 ):
   try:
     if not name:
-      winreg.DeleteKey(root, path)
+      delete_key_recursively(root, path)
       logger.success(f'Deleted registry key: "{get_registry_key(root, path)}"')
     else:
       with winreg.OpenKey(root, path, 0, winreg.KEY_SET_VALUE) as key:
@@ -52,6 +52,18 @@ def delete_registry_entry(
     logger.error(
       f'Could not delete registry entry "{get_registry_key(root, path)}":\n{ex}'
     )
+
+
+def delete_key_recursively(root: int, path: str) -> None:
+  with winreg.OpenKey(root, path, 0, winreg.KEY_READ) as key:
+    while True:
+      try:
+        sub_key_name = winreg.EnumKey(key, 0)
+      except OSError:
+        break
+      delete_key_recursively(root, f'{path}\\{sub_key_name}')
+
+  winreg.DeleteKey(root, path)
 
 
 def get_registry_value(

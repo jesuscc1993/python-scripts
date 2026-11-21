@@ -15,6 +15,7 @@ from _registry import (
 
 ASSOCIATIONS_JSON = './associations.json'
 FILE_EXTS = 'Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts'
+USER_CHOICE_KEYS = ['UserChoice', 'UserChoiceLatest']
 
 
 def run_as_admin():
@@ -56,9 +57,11 @@ def main():
           or f'{class_name.lower()}file'
         )
 
-        delete_registry_entry(
-          winreg.HKEY_CURRENT_USER, f'{FILE_EXTS}\\.{ext}\\UserChoice'
-        )
+        for key in USER_CHOICE_KEYS:
+          delete_registry_entry(
+            winreg.HKEY_CURRENT_USER, f'{FILE_EXTS}\\.{ext}\\{key}'
+          )
+
         add_registry_entry(winreg.HKEY_CLASSES_ROOT, f'.{ext}', '', file_type)
 
         if type_name:
