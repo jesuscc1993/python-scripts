@@ -3,6 +3,7 @@ import shutil
 import sys
 import time
 
+from mtattr import Attr
 from mtlogger import logger
 from mtprompt import Prompt
 
@@ -24,8 +25,12 @@ def main():
 
   if watch:
     while True:
-      backup_file(og_file_path)
-      logger.debug(f'Sleeping for {WATCH_INTERVAL} seconds...')
+      backup_up = backup_file(og_file_path)
+      logger.debug(
+        f'Sleeping for {WATCH_INTERVAL} seconds...'
+        if backup_up
+        else f'Retrying in {WATCH_INTERVAL} seconds...'
+      )
       time.sleep(WATCH_INTERVAL)
   else:
     backup_file(og_file_path)
@@ -41,23 +46,55 @@ def backup_file(
   bak_dir_path = os.path.join(og_dir_path, BACKUP_PATH)
   bak_file_name = f'{og_file_stem}{BACKUP_EXT}{src_file_ext}'
   bak_file_path = os.path.join(bak_dir_path, bak_file_name)
-  os.makedirs(bak_dir_path, exist_ok=True)
+  tmp_file_path = f'{bak_file_path}.tmp'
+
+  stamped_file_path = None
 
   if not os.path.exists(og_file_path):
     logger.error(f'File "{og_file_name}" does not exist')
-    return
+    return False
 
-  if os.path.exists(bak_file_path):
-    if os.path.getmtime(og_file_path) == os.path.getmtime(bak_file_path):
+  try:
+    if os.path.exists(bak_file_path) and os.path.getmtime(
+      og_file_path
+    ) == os.path.getmtime(bak_file_path):
       logger.trace(
         f'Skipping "{og_file_name}". Both "{og_file_name}" and "{bak_file_name}" have the same timestamp.'
       )
-      return
+      return True
 
-    rename_with_timestamp(bak_dir_path, bak_file_path)
+    src_mtime = os.path.getmtime(og_file_path)
+    os.makedirs(bak_dir_path, exist_ok=True)
 
-  shutil.copy2(og_file_path, bak_file_path)
+    shutil.copy2(og_file_path, tmp_file_path)
+    Attr.hide(tmp_file_path)
+
+    if src_mtime != os.path.getmtime(og_file_path):
+      raise RuntimeError('File changed during backup')
+
+    if os.path.exists(bak_file_path):
+      stamped_file_path = rename_with_timestamp(bak_dir_path, bak_file_path)
+
+    os.replace(tmp_file_path, bak_file_path)
+
+  except Exception as ex:
+    try:
+      if stamped_file_path:
+        os.replace(stamped_file_path, bak_file_path)
+
+      if os.path.exists(tmp_file_path):
+        os.remove(tmp_file_path)
+
+    except Exception as rollback_ex:
+      logger.error(
+        f'Failed to clean up or restore backup "{bak_file_name}":\n{rollback_ex}'
+      )
+
+    logger.error(f'Failed to back up "{og_file_path}":\n{ex}')
+    return False
+
   logger.success(f'Backed up "{og_file_name}" as "{bak_file_name}"')
+  return True
 
 
 if __name__ == '__main__':

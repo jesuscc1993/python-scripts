@@ -26,6 +26,7 @@ def rename_with_timestamp(
     stamped_file_path = os.path.join(dir_path, stamped_file_name)
     shutil.move(src_file_path, stamped_file_path)
     logger.success(f'Backed up existing "{file_name}" as "{stamped_file_name}"')
+    return stamped_file_path
 
 
 def enforce_unique_path(
