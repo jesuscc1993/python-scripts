@@ -76,6 +76,7 @@ def backup_file(
       stamped_file_path = rename_with_timestamp(bak_dir_path, bak_file_path)
 
     os.replace(tmp_file_path, bak_file_path)
+    Attr.show(bak_file_path)
 
   except Exception as ex:
     try:
