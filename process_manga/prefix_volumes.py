@@ -32,10 +32,14 @@ def prompt_chapter_ranges(
   folder_path: str,
 ):
   ranges_input = Prompt.str(
-    f'Enter the volume ranges. Supported formats:\n{logger.colorize(Fore.CYAN, " n1, n2, n3, ..., n99")}\n{logger.colorize(Fore.LIGHTBLACK_EX, "  Last chapter for each volume, separated by commas (e.g. 12,24,36)")}\n{logger.colorize(Fore.CYAN, " [n]")}\n{logger.colorize(Fore.LIGHTBLACK_EX, "  fixed chapter count per volume (e.g. [12])")}\n'
-  )
+    f'Enter the volume ranges. Supported formats:\n'
+    f'{logger.colorize(Fore.CYAN, " n1, n2, n3, ..., n99")}\n'
+    f'{logger.colorize(Fore.LIGHTBLACK_EX, "  Last chapter for each volume, separated by spaces or commas (e.g. 12,24,36)")}\n'
+    f'{logger.colorize(Fore.CYAN, " [n]")}\n'
+    f'{logger.colorize(Fore.LIGHTBLACK_EX, "  Fixed chapter count per volume (e.g. [12])")}\n'
+  ).strip()
 
-  match = re.fullmatch(r'\[(\d+)\]', ranges_input.strip())
+  match = re.fullmatch(r'\[(\d+)\]', ranges_input)
   if match:
     step = int(match.group(1))
     items = sorted(
@@ -57,7 +61,9 @@ def prompt_chapter_ranges(
     return ranges
 
   try:
-    chapter_bounds = sorted([float(x.strip()) for x in ranges_input.split(',')])
+    chapter_bounds = sorted(
+      [float(x.strip()) for x in re.split(r'[,\s]+', ranges_input)]
+    )
   except Exception as ex:
     logger.error(f'Invalid input:\n{ex}')
     return None
