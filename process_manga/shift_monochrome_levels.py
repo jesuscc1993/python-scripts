@@ -2,13 +2,14 @@ import numpy
 import sys
 
 from PIL import Image
-from mtlogger import logger
+from mtlogger import LogLevel, logger
 from mtprompt import Prompt
 from mtvalidation import to_dir
-from tqdm import tqdm
 
 from _common import process_folder_images, select_parent_folder
 from _image_utils import save_image_to_path
+
+LOGGING_ENABLED = False
 
 LEVEL_TOLERANCE = 5
 MIN_PERCENTILE = 5
@@ -24,6 +25,8 @@ BLACK_THRESHOLD, WHITE_THRESHOLD = PROFILES['MINIMUM']
 
 
 def main():
+  logger.set_level(LogLevel.WARN)
+
   if len(sys.argv) > 1:
     process_parent_folder(to_dir(sys.argv[1]))
   else:
@@ -44,8 +47,11 @@ def process_image(
 ):
   img = Image.open(file_path)
   if not is_grayscale(img):
-    tqdm.write(
-      logger.format_trace(f'  Skipping "${file_path}". Image is not grayscale.')
+    logger.write(
+      LogLevel.TRACE,
+      logger.format_trace(
+        f'  Skipping "${file_path}". Image is not grayscale.'
+      ),
     )
     return
 
@@ -56,10 +62,11 @@ def process_image(
     arr_min <= BLACK_THRESHOLD + LEVEL_TOLERANCE
     and arr_max >= WHITE_THRESHOLD - LEVEL_TOLERANCE
   ):
-    tqdm.write(
+    logger.write(
+      LogLevel.TRACE,
       logger.format_trace(
         f'  Skipping "${file_path}". Image already contains pure black and white values.'
-      )
+      ),
     )
     return
 

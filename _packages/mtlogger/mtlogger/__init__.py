@@ -5,6 +5,8 @@ from colorama import init, Fore
 from enum import Enum
 from typing import TypedDict, Unpack
 
+from tqdm import tqdm
+
 init(autoreset=True, wrap=True, convert=(sys.platform == 'win32'))
 
 
@@ -42,9 +44,12 @@ class LogOptions(TypedDict, total=False):
 
 class Logger:
   def __init__(self, level: LogLevel = LogLevel.TRACE):
-    self.level = level
+    self.set_level(level)
 
   # core functions
+  def set_level(self, level: LogLevel):
+    self.level = level
+
   def colorize(_, color: str, msg=''):
     return f'{color}{msg.replace(Fore.RESET, color)}{Fore.RESET}'
 
@@ -60,6 +65,13 @@ class Logger:
 
     prefix_newline = options.get('prefix_newline', False) if options else False
     print(f'{"\n" if prefix_newline else ""}{msg}')
+
+  def write(self, level: LogLevel, msg='', options: LogOptions | None = None):
+    if not self.is_enabled(level):
+      return
+
+    prefix_newline = options.get('prefix_newline', False) if options else False
+    tqdm.write(f'{"\n" if prefix_newline else ""}{msg}')
 
   # formatting functions
   def format_trace(self, msg=''):
@@ -120,8 +132,7 @@ class Logger:
     )
 
   def hr(self, char='─'):
-    self.print(
-      LogLevel.LOG,
+    print(
       self.colorize(Fore.LIGHTBLACK_EX, char * os.get_terminal_size().columns),
     )
 

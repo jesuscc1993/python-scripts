@@ -1,8 +1,7 @@
 import os
 
 from PIL import Image
-from mtlogger import logger
-from tqdm import tqdm
+from mtlogger import LogLevel, logger
 
 from _settings import (
   LONG_STRIP_ASPECT_RATIO,
@@ -100,7 +99,9 @@ def save_image_to_path(
     if not keep and output_img_path != original_img_path:
       os.remove(original_img_path)
     if log:
-      tqdm.write(logger.format_success(f'Saved "${output_img_path}".'))
+      logger.write(
+        LogLevel.TRACE, logger.format_success(f'Saved "${output_img_path}".')
+      )
 
   except Exception as ex:
     logger.error(f'Error processing "{original_img_path}":\n{ex}')
