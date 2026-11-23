@@ -60,7 +60,7 @@ def process_dir(
     logger.trace(f'  Skipping "{dir_name}". All metadata files already exist.')
     return
 
-  sanitized_name = re.sub(r'\s*\{\d{1,3}\}\s*$', '', dir_name).strip()
+  sanitized_name = re.sub(r'\s*\{.*?\}\s*', '', dir_name).strip()
   fetch_manga_info(dir_path, sanitized_name)
   logger.log()
   generate_no_meta_files(dir_path)
