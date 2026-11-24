@@ -35,16 +35,13 @@ FONT_PATH = Font.find_by_name('HarmonyOS_Sans_Regular.ttf')
 FONT_SIZE = 30
 
 FG_GRAY = '#333333'
-BG_LOWEST = '#FF9191'
-BG_LOW = '#FFCC80'
-BG_MEDIUM = '#FFF480'
-BG_HIGH = '#D6E58A'
-BG_HIGHEST = '#A4E0A4'
-
-VALUE_LOW = 60
-VALUE_MEDIUM = 65
-VALUE_HIGH = 70
-VALUE_HIGHEST = 80
+SCORE_COLORS = {
+  80: '#A4E0A4',
+  70: '#D6E58A',
+  65: '#FFF480',
+  60: '#FFCC80',
+  0: '#FF9191',
+}
 
 
 def main():
@@ -298,15 +295,9 @@ def format_score(
 def get_score_color(
   score: int,
 ):
-  if score < VALUE_LOW:
-    return BG_LOWEST
-  if score < VALUE_MEDIUM:
-    return BG_LOW
-  elif score < VALUE_HIGH:
-    return BG_MEDIUM
-  elif score < VALUE_HIGHEST:
-    return BG_HIGH
-  return BG_HIGHEST
+  return next(
+    color for threshold, color in SCORE_COLORS.items() if score >= threshold
+  )
 
 
 if __name__ == '__main__':
