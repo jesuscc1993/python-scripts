@@ -24,13 +24,15 @@ DEFAULT_COVER_NAME = 'cover.jpg'
 COVER_BAK_EXT = '.bak'
 COVER_W = 212
 COVER_H = 318
+SUPER_SAMPLING = 2
 
-OVERLAY_PADDING = 8
+OVERLAY_PADDING_X = 7
+OVERLAY_PADDING_Y = 9
 OVERLAY_MARGIN = 8
 OVERLAY_RADIUS = 8
 
-FONT_PATH = Font.find_by_name('Roboto-Regular.ttf')
-FONT_SIZE = 31
+FONT_PATH = Font.find_by_name('HarmonyOS_Sans_Regular.ttf')
+FONT_SIZE = 30
 
 FG_GRAY = '#333333'
 BG_LOWEST = '#FF9191'
@@ -236,34 +238,54 @@ def overlay_score(
   score: int,
   font: ImageFont.FreeTypeFont,
 ):
+  scale = SUPER_SAMPLING
   text = format_score(score)
   bg_color = get_score_color(score)
 
-  overlay = Image.new('RGBA', img.size, (0, 0, 0, 0))
+  overlay = Image.new(
+    'RGBA',
+    (img.width * scale, img.height * scale),
+    (0, 0, 0, 0),
+  )
   draw = ImageDraw.Draw(overlay)
 
   text_reservation = draw.textbbox((0, 0), text, font=font)
   text_w = text_reservation[2] - text_reservation[0]
   text_h = text_reservation[3] - text_reservation[1]
-  text_offset_x = -text_reservation[0]
-  text_offset_y = -text_reservation[1]
 
-  canvas_w = text_w + OVERLAY_PADDING * 2
-  canvas_h = text_h + OVERLAY_PADDING * 2
+  canvas_w = text_w + OVERLAY_PADDING_X * 2
+  canvas_h = text_h + OVERLAY_PADDING_Y * 2
   x = img.width - canvas_w - OVERLAY_MARGIN - 1
   y = OVERLAY_MARGIN
 
   draw.rounded_rectangle(
-    [x, y, x + canvas_w, y + canvas_h], radius=OVERLAY_RADIUS, fill=bg_color
+    [
+      x * scale,
+      y * scale,
+      (x + canvas_w) * scale,
+      (y + canvas_h) * scale,
+    ],
+    radius=OVERLAY_RADIUS * scale,
+    fill=bg_color,
   )
+
+  overlay = overlay.resize(img.size, Image.Resampling.BILINEAR)
+
+  draw = ImageDraw.Draw(overlay)
+  text_offset_x = -text_reservation[0]
+  text_offset_y = -text_reservation[1]
+
   draw.text(
-    (x + OVERLAY_PADDING + text_offset_x, y + OVERLAY_PADDING + text_offset_y),
+    (
+      x + OVERLAY_PADDING_X + text_offset_x,
+      y + OVERLAY_PADDING_Y + text_offset_y,
+    ),
     text,
     font=font,
     fill=FG_GRAY,
   )
 
-  return Image.alpha_composite(img, overlay).convert('RGB')
+  return Image.alpha_composite(img.convert('RGBA'), overlay).convert('RGB')
 
 
 def format_score(
