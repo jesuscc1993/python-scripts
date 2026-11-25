@@ -1,7 +1,6 @@
 import mtsound
 import os
 import re
-import subprocess
 import sys
 
 from mtlogger import Fore, logger
@@ -115,14 +114,7 @@ def process_parent_folder(
         break
 
   mtsound.notify()
-  logger.success(f'Finished prefixing volumes in "{parent_folder_path}".\n')
-
-  merge_input = Prompt.bool('Merge volumes?', default=True)
-  if merge_input:
-    merge_script = os.path.join(os.path.dirname(__file__), 'merge_volumes.py')
-    subprocess.run(
-      [sys.executable, merge_script, parent_folder_path], check=True
-    )
+  logger.success(f'Finished prefixing volumes in "{parent_folder_path}".')
 
 
 if __name__ == '__main__':
@@ -130,4 +122,5 @@ if __name__ == '__main__':
     main()
   except Exception as ex:
     logger.unhandled_error(ex)
-    Prompt.enter_to_exit()
+
+  Prompt.enter_to_exit()
