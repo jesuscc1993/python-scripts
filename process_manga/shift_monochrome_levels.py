@@ -89,7 +89,7 @@ def process_image(
 
 def is_grayscale(
   img: Image.Image,
-  tolerance=5,
+  tolerance=8,
 ):
   if img.mode == 'L':
     return True
