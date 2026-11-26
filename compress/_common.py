@@ -4,6 +4,7 @@ import zipfile
 
 from concurrent.futures import ThreadPoolExecutor
 from fnmatch import fnmatch
+from mtattr import Attr
 from mtlogger import logger
 from mtprompt import Prompt
 from threading import Lock
@@ -125,6 +126,8 @@ def compress_folder(
         with zipfile.ZipFile(
           tmp_zip_path, 'w', zipfile.ZIP_DEFLATED
         ) as compressed_file:
+          Attr.hide(tmp_zip_path)
+
           for file_path in (
             tqdm(files_to_compress, unit='file')
             if show_progress
@@ -135,6 +138,7 @@ def compress_folder(
             )
 
         os.replace(tmp_zip_path, final_zip_path)
+        Attr.show(final_zip_path)
 
         if remove_original:
           shutil.rmtree(folder_path)
