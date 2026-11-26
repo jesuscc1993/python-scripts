@@ -19,7 +19,7 @@ def main():
     folder_path = to_path(sys.argv[1])
   else:
     folder_path = Prompt.path(
-      'Enter the path to the parent folder containing the chapter folders you want to clear of credits'
+      'Enter the path to the parent folder containing the chapter folders you want to delete image matches from'
     )
 
   if len(sys.argv) > 2:
