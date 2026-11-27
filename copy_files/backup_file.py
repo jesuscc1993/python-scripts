@@ -13,6 +13,7 @@ from _common import (
   BACKUP_PATH,
   WATCH_INTERVAL,
 )
+from _constants import SUCCESS_TIMEOUT
 
 
 def main():
@@ -23,17 +24,22 @@ def main():
     og_file_path = Prompt.file('Enter the path to the file to backup')
     watch = False
 
-  if watch:
-    while True:
-      backup_up = backup_file(og_file_path)
-      logger.debug(
-        f'Sleeping for {WATCH_INTERVAL} seconds...'
-        if backup_up
-        else f'Retrying in {WATCH_INTERVAL} seconds...'
-      )
-      time.sleep(WATCH_INTERVAL)
-  else:
-    backup_file(og_file_path)
+  try:
+    if watch:
+      while True:
+        backup_up = backup_file(og_file_path)
+        logger.debug(
+          f'Sleeping for {WATCH_INTERVAL} seconds...'
+          if backup_up
+          else f'Retrying in {WATCH_INTERVAL} seconds...'
+        )
+        time.sleep(WATCH_INTERVAL)
+    else:
+      return backup_file(og_file_path)
+
+  except ValueError as ex:
+    logger.error(ex)
+    return False
 
 
 def backup_file(
@@ -100,8 +106,9 @@ def backup_file(
 
 if __name__ == '__main__':
   try:
-    main()
+    success = main()
   except Exception as ex:
     logger.unhandled_error(ex)
+    success = False
 
-  Prompt.enter_to_exit(timeout=True)
+  Prompt.enter_to_exit(timeout=SUCCESS_TIMEOUT, success=success)

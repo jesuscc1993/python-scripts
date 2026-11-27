@@ -6,6 +6,7 @@ from mtlogger import logger
 from mtprompt import Prompt
 
 from _common import rename_with_timestamp, BACKUP_EXT, BACKUP_PATH
+from _constants import SUCCESS_TIMEOUT
 
 
 def main():
@@ -14,7 +15,13 @@ def main():
   else:
     bak_file_path = Prompt.file('Enter the path to the file to restore')
 
-  restore_file(bak_file_path)
+  try:
+    restore_file(bak_file_path)
+    return True
+
+  except ValueError as ex:
+    logger.error(ex)
+    return False
 
 
 def restore_file(
@@ -47,8 +54,9 @@ def restore_file(
 
 if __name__ == '__main__':
   try:
-    main()
+    success = main()
   except Exception as ex:
     logger.unhandled_error(ex)
+    success = False
 
-  Prompt.enter_to_exit(timeout=True)
+  Prompt.enter_to_exit(timeout=SUCCESS_TIMEOUT, success=success)

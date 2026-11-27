@@ -1,5 +1,4 @@
 import mtsound
-import os
 import sys
 import threading
 
@@ -14,6 +13,8 @@ from mtvalidation import (
   to_list,
   to_path,
 )
+
+DEFAULT_TIMEOUT = 3
 
 
 class Prompt:
@@ -217,19 +218,19 @@ class Prompt:
       return val if val != '' else default
 
   @staticmethod
-  def enter_to_exit(timeout=False, sound=True):
+  def enter_to_exit(timeout=False, sound=True, success=True):
     if sound and not Env.bool(Prompt.PROMPT__MUTE):
       mtsound.notify()
 
     if Env.bool(Prompt.PROMPT__NO_ENTER_TO_EXIT):
       return
 
-    if timeout is True:
-      timeout = 3
-
-    if timeout is False or timeout is None:
+    if success is False or timeout is False or timeout is None:
       input('\nPress Enter to exit...')
       return
+
+    if timeout is True:
+      timeout = DEFAULT_TIMEOUT
 
     entered = threading.Event()
 
@@ -249,7 +250,7 @@ class Prompt:
       if entered.wait(timeout=1):
         return
 
-    os._exit(0)
+    sys.exit(0)
 
 
 def format_prompt(prompt: str, default: str | None = None, use_colon=True):

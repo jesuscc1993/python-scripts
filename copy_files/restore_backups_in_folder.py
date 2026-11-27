@@ -5,6 +5,8 @@ import sys
 from mtlogger import logger
 from mtprompt import Prompt
 
+from _constants import SUCCESS_TIMEOUT
+
 
 def main():
   if len(sys.argv) > 1:
@@ -14,7 +16,13 @@ def main():
       'Enter the directory containing .bak files to restore'
     )
 
-  restore_backups(src_path)
+  try:
+    restore_backups(src_path)
+    return True
+
+  except ValueError as ex:
+    logger.error(ex)
+    return False
 
 
 def restore_backups(
@@ -33,8 +41,9 @@ def restore_backups(
 
 if __name__ == '__main__':
   try:
-    main()
+    success = main()
   except Exception as ex:
     logger.unhandled_error(ex)
+    success = False
 
-  Prompt.enter_to_exit()
+  Prompt.enter_to_exit(timeout=SUCCESS_TIMEOUT, success=success)

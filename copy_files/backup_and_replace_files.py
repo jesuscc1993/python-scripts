@@ -6,6 +6,7 @@ from mtlogger import logger
 from mtprompt import Prompt
 
 from _common import enforce_unique_path
+from _constants import SUCCESS_TIMEOUT
 
 
 def main():
@@ -23,8 +24,11 @@ def main():
   try:
     enforce_unique_path(src_path, dest_path)
     rename_and_copy_files(src_path, dest_path, matches_only)
+    return True
+
   except ValueError as ex:
     logger.error(ex)
+    return False
 
 
 def rename_and_copy_files(
@@ -68,8 +72,9 @@ def backup_file(
 
 if __name__ == '__main__':
   try:
-    main()
+    success = main()
   except Exception as ex:
     logger.unhandled_error(ex)
+    success = False
 
-  Prompt.enter_to_exit()
+  Prompt.enter_to_exit(timeout=SUCCESS_TIMEOUT, success=success)
