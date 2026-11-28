@@ -229,9 +229,6 @@ class Prompt:
       input('\nPress Enter to exit...')
       return
 
-    if timeout is True:
-      timeout = DEFAULT_TIMEOUT
-
     entered = threading.Event()
 
     def wait_for_input():
@@ -242,13 +239,18 @@ class Prompt:
     thread.start()
 
     sys.stdout.write('\n')
-    for remaining in range(timeout, 0, -1):
+    seconds = DEFAULT_TIMEOUT if timeout is True else timeout
+
+    while seconds > 0:
       sys.stdout.write(
-        f'\rPress Enter to exit. Terminal will automatically close in {remaining}s...'
+        f'\rPress Enter to exit. Terminal will automatically close in {seconds:g}s...'
       )
       sys.stdout.flush()
-      if entered.wait(timeout=1):
+
+      if entered.wait(timeout=min(1, seconds)):
         return
+
+      seconds -= 1
 
     sys.exit(0)
 
