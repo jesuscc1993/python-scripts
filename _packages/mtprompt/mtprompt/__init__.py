@@ -242,8 +242,9 @@ class Prompt:
     seconds = DEFAULT_TIMEOUT if timeout is True else timeout
 
     while seconds > 0:
+      time_text = f'{1000 * seconds:g}ms' if seconds < 1 else f'{seconds:g}s'
       sys.stdout.write(
-        f'\rPress Enter to exit. Terminal will automatically close in {seconds:g}s...'
+        f'\rPress Enter to exit. Terminal will automatically close in {time_text}...'
       )
       sys.stdout.flush()
 
